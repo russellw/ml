@@ -4,7 +4,7 @@ import statistics
 
 import pandas as pd
 
-#Decision trees
+# Decision trees
 def op_lt(a, m):
     x = evaluate(a[1], m)
     y = evaluate(a[2], m)
@@ -68,6 +68,7 @@ def argmin(f, xs):
             ymin = y
             xmin = x
     return xmin, ymin
+
 
 # data
 df = pd.read_csv(args.filename)
