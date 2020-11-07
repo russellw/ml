@@ -14,14 +14,12 @@ y = torch.randn(N, D_out)
 # produce its output. Each Linear Module computes output from input using a
 # linear function, and holds internal Tensors for its weight and bias.
 model = torch.nn.Sequential(
-    torch.nn.Linear(D_in, H),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, D_out),
+    torch.nn.Linear(D_in, H), torch.nn.ReLU(), torch.nn.Linear(H, D_out)
 )
 
 # The nn package also contains definitions of popular loss functions; in this
 # case we will use Mean Squared Error (MSE) as our loss function.
-loss_fn = torch.nn.MSELoss(reduction='sum')
+loss_fn = torch.nn.MSELoss(reduction="sum")
 
 learning_rate = 1e-4
 for t in range(500):

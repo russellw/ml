@@ -11,11 +11,9 @@ y = torch.randn(N, D_out)
 
 # Use the nn package to define our model and loss function.
 model = torch.nn.Sequential(
-    torch.nn.Linear(D_in, H),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, D_out),
+    torch.nn.Linear(D_in, H), torch.nn.ReLU(), torch.nn.Linear(H, D_out)
 )
-loss_fn = torch.nn.MSELoss(reduction='sum')
+loss_fn = torch.nn.MSELoss(reduction="sum")
 
 # Use the optim package to define an Optimizer that will update the weights of
 # the model for us. Here we will use Adam; the optim package contains many other
