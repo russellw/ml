@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#Example code from https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
 import torch
 
 dtype = torch.float
