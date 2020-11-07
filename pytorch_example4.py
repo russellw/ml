@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#Example code from https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
+# Example code from https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
 import torch
 
 # N is batch size; D_in is input dimension;
