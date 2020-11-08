@@ -11,7 +11,6 @@ import numpy as np
 import pandas as pd
 import pydot
 
-import etc
 
 # args
 parser = argparse.ArgumentParser()
