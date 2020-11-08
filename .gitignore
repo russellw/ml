@@ -3,6 +3,7 @@
 *.lst
 *.png
 data/
+papers/
 satlib/
 tsplib/
 
