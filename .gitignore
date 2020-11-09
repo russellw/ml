@@ -2,6 +2,7 @@
 *.dot
 *.lst
 *.png
+*.pth
 data/
 papers/
 satlib/
