@@ -16,17 +16,7 @@ def randboard():
     return b
 
 
-def get(b, i, j):
-    size = len(b)
-    if i < 0 or i >= size:
-        return 0
-    if j < 0 or j >= size:
-        return 0
-    return b[i][j]
-
-
 def step(b):
-    size = len(b)
     b1 = []
     for i in range(size):
         row = []
@@ -36,7 +26,7 @@ def step(b):
                 for j1 in range(j - 1, j + 2):
                     if i1 == i and j1 == j:
                         continue
-                    n += get(b, i1, j1)
+                    n += b[i1 % size][j1 % size]
             if b[i][j]:
                 c = n == 2 or n == 3
             else:
