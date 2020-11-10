@@ -115,6 +115,7 @@ def is_glider(b):
                 return 1
 
 
+# search
 for i in range(1000000):
     b = randpattern(5)
     b = steps(b, 10)
