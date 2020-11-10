@@ -26,17 +26,22 @@ def randpattern(sz):
     return b
 
 
+def neighborhood8(i, j):
+    for i1 in range(i - 1, i + 2):
+        for j1 in range(j - 1, j + 2):
+            if i1 == i and j1 == j:
+                continue
+            yield (i1, j1)
+
+
 def step(b):
     b1 = []
     for i in range(size):
         row = []
         for j in range(size):
             n = 0
-            for i1 in range(i - 1, i + 2):
-                for j1 in range(j - 1, j + 2):
-                    if i1 == i and j1 == j:
-                        continue
-                    n += b[i1 % size][j1 % size]
+            for i1, j1 in neighborhood8(i, j):
+                n += b[i1 % size][j1 % size]
             if b[i][j]:
                 c = n == 2 or n == 3
             else:
@@ -103,12 +108,9 @@ def is_glider(b):
     b1 = step(b)
     if popcount(b1) != n:
         return 0
-    for i1 in range(-1, 2):
-        for j1 in range(-1, 2):
-            if i1 == 0 and j1 == 0:
-                continue
-            if shift(b, i1, j1) == b1:
-                return 1
+    for i1, j1 in neighborhood8(0, 0):
+        if shift(b, i1, j1) == b1:
+            return 1
 
 
 for i in range(1000):
