@@ -1,7 +1,7 @@
 import random
 
 # Conway's Game of Life
-size = 20
+size = 8
 
 
 def blankboard():
@@ -105,7 +105,7 @@ def is_glider(b):
     n = popcount(b)
     if n == 0:
         return 0
-    b1 = step(b)
+    b1 = steps(b, 4)
     if popcount(b1) != n:
         return 0
     for i1, j1 in neighborhood8(0, 0):
@@ -113,10 +113,10 @@ def is_glider(b):
             return 1
 
 
-for i in range(1000):
-    b = randpattern(6)
+for i in range(1000000):
+    b = randpattern(5)
     b = steps(b, 10)
-    if is_blinker(b):
+    if is_glider(b):
         printboard(b)
         print(i)
         break
