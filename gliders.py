@@ -105,12 +105,14 @@ def is_glider(b):
     n = popcount(b)
     if n == 0:
         return 0
-    b1 = steps(b, 4)
-    if popcount(b1) != n:
-        return 0
-    for i1, j1 in neighborhood8(0, 0):
-        if shift(b, i1, j1) == b1:
-            return 1
+    b1 = b
+    for i in range(4):
+        b1 = step(b1)
+        if popcount(b1) != n:
+            continue
+        for i1, j1 in neighborhood8(0, 0):
+            if shift(b, i1, j1) == b1:
+                return 1
 
 
 for i in range(1000000):
