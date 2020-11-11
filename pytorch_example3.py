@@ -28,7 +28,7 @@ class MyReLU(torch.autograd.Function):
         with respect to the output, and we need to compute the gradient of the loss
         with respect to the input.
         """
-        input, = ctx.saved_tensors
+        (input,) = ctx.saved_tensors
         grad_input = grad_output.clone()
         grad_input[input < 0] = 0
         return grad_input
