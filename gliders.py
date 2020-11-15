@@ -24,32 +24,34 @@ def blank_col(rows, j):
 
 
 def trim(rows):
+    r = rows
+
     # count blank south
-    i2 = len(rows)
-    while i2 and blank_row(rows, i2 - 1):
-        i2 -= 1
+    i1 = len(r)
+    while i1 and blank_row(r, i1 - 1):
+        i1 -= 1
 
     # count blank north
-    i1 = 0
-    while i1 < i2 and blank_row(rows, i1):
-        i1 += 1
+    i0 = 0
+    while i0 < i1 and blank_row(r, i0):
+        i0 += 1
 
     # count blank east
-    j2 = len(rows[0])
-    while j2 and blank_col(rows, j2 - 1):
-        j2 -= 1
+    j1 = len(r[0])
+    while j1 and blank_col(r, j1 - 1):
+        j1 -= 1
 
     # count blank west
-    j1 = 0
-    while j1 < j2 and blank_col(rows, j1):
-        j1 += 1
+    j0 = 0
+    while j0 < j1 and blank_col(r, j0):
+        j0 += 1
 
     # trim
-    rows = rows[i1:i2]
-    rows = [row[j1:j2] for row in rows]
-    if not rows:
-        rows = [[]]
-    return rows, i1, j1
+    r = r[i0:i1]
+    r = [row[j0:j1] for row in r]
+    if not r:
+        r = [[]]
+    return r, i0, j0
 
 
 class Grid:
@@ -63,9 +65,9 @@ class Grid:
             width = max([len(row) for row in rows])
             for row in rows:
                 row.extend([False] * (width - len(row)))
-        rows, i1, j1 = trim(rows)
+        rows, i0, j0 = trim(rows)
         self.rows = rows
-        self.origin = origin[0] + i1, origin[1] + j1
+        self.origin = origin[0] + i0, origin[1] + j0
 
     def __bool__(self):
         return self.popcount() > 0
@@ -93,6 +95,21 @@ class Grid:
                 r.append(" ")
             r.append("\n")
         return "".join(r)
+
+    def __xor__(self, other):
+        i0 = min(self.origin[0], other.origin[0])
+        i1 = max(self.origin[0] + len(self.rows), other.origin[0] + len(other.rows))
+        j0 = min(self.origin[1], other.origin[1])
+        j1 = max(
+            self.origin[1] + len(self.rows[0]), other.origin[1] + len(other.rows[0])
+        )
+        r = []
+        for i in range(i0, i1):
+            row = []
+            for j in range(j0, j1):
+                row.append(self[i, j] ^ other[i, j])
+            r.append(row)
+        return Grid(r, (i0, j0))
 
     def home(self):
         return Grid(self.rows)
@@ -175,6 +192,14 @@ def is_glider(g):
     for i in range(4):
         h = h.step()
         if g != h and g == h.home():
+            return 1
+
+
+def is_gun(g):
+    h = g
+    for i in range(30):
+        h = step(h)
+        if is_glider(g ^ h):
             return 1
 
 
