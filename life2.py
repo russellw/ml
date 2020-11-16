@@ -5,6 +5,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torchvision
 
+random.seed(0)
+
 # Conway's Game of Life
 size = 28
 
@@ -51,8 +53,7 @@ def make_datum():
     b = randboard()
     r = random.randrange(2)
     if r:
-        for i in range(3):
-            b = step(b)
+        b = step(b)
     return torch.Tensor([b]), r
 
 
