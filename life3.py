@@ -16,54 +16,60 @@ def neighborhood8(i, j):
             yield (i1, j1)
 
 
-def blank_row(rows, i):
-    for c in rows[i]:
-        if c:
-            return 0
-    return 1
-
-
-def blank_col(rows, j):
+def exists_col(rows, j):
     for i in range(len(rows)):
-        if rows[i][j]:
-            return 0
-    return 1
+        if j < len(rows[i]) and rows[i][j]:
+            return 1
 
 
-def trim(rows):
-    r = rows
+def wid(rows):
+    if not rows:
+        return 0
+    return max([len(row) for row in rows])
+
+
+def trim_row(row):
+    i = len(row)
+    while i and not row[i - 1]:
+        i -= 1
+    return row[:i]
+
+
+def trim_rows(rows):
+    # trim cols
+    r = [trim_row(row) for row in rows]
 
     # count blank south
     i1 = len(r)
-    while i1 and blank_row(r, i1 - 1):
+    while i1 and r[i1 - 1]:
         i1 -= 1
 
     # count blank north
     i0 = 0
-    while i0 < i1 and blank_row(r, i0):
+    while i0 < i1 and r[i0]:
         i0 += 1
 
-    # count blank east
-    j1 = len(r[0])
-    while j1 and blank_col(r, j1 - 1):
-        j1 -= 1
+    # width
+    j1 = wid(r)
 
     # count blank west
     j0 = 0
-    while j0 < j1 and blank_col(r, j0):
+    while j0 < j1 and not exists_col(r, j0):
         j0 += 1
 
-    # trim
+    # trim rows
     r = r[i0:i1]
-    r = [row[j0:j1] for row in r]
-    if not r:
-        r = [[]]
+
+    # trim cols
+    r = [row[j0:] for row in r]
+
+    # return with notice of new origin
     return r, i0, j0
 
 
 def square(rows, size):
     rows = rows[:size]
-    rows.extend([] * (size - len(rows)))
+    rows.extend([[]] * (size - len(rows)))
     for i in range(len(rows)):
         row = rows[i]
         row = row[:size]
@@ -80,10 +86,10 @@ class Grid:
             rows = []
             for s in data.split("\n"):
                 rows.append([c != "." for c in s])
-            width = max([len(row) for row in rows])
+            j1 = wid(rows)
             for row in rows:
-                row.extend([False] * (width - len(row)))
-        rows, i0, j0 = trim(rows)
+                row.extend([False] * (j1 - len(row)))
+        rows, i0, j0 = trim_rows(rows)
         self.rows = rows
         self.origin = origin[0] + i0, origin[1] + j0
 
@@ -118,9 +124,7 @@ class Grid:
         i0 = min(self.origin[0], other.origin[0])
         i1 = max(self.origin[0] + len(self.rows), other.origin[0] + len(other.rows))
         j0 = min(self.origin[1], other.origin[1])
-        j1 = max(
-            self.origin[1] + len(self.rows[0]), other.origin[1] + len(other.rows[0])
-        )
+        j1 = max(self.origin[1] + wid(self.rows), other.origin[1] + wid(other.rows))
         r = []
         for i in range(i0, i1):
             row = []
@@ -139,12 +143,12 @@ class Grid:
         return n
 
     def step(self):
-        height = len(self.rows)
-        width = len(self.rows[0])
+        i1 = len(self.rows)
+        j1 = wid(self.rows)
         rows = []
-        for i in range(-1, height + 1):
+        for i in range(-1, i1 + 1):
             row = []
-            for j in range(-1, width + 1):
+            for j in range(-1, j1 + 1):
                 n = 0
                 for i1, j1 in neighborhood8(i, j):
                     n += self[i1, j1]
