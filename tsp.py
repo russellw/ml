@@ -1,5 +1,6 @@
 import os
 import math
+import matplotlib.pyplot as plt
 
 problems = []
 for root, dirs, files in os.walk("tsplib/"):
@@ -46,5 +47,11 @@ def length(p):
     return t
 
 
-for filename in problems:
-    print(length(parse(filename)))
+for filename in problems[:3]:
+    p = parse(filename)
+    xs = [c[0] for c in p]
+    ys = [c[1] for c in p]
+    plt.plot(xs, ys, "bo")
+    plt.show(block=False)
+    plt.pause(3)
+    plt.close()
