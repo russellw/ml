@@ -32,8 +32,8 @@ def parse(filename):
     p = lines[i + 1 : j]
     assert p
     p = [s.split() for s in p]
-    p = [(parse_num(c[0]), parse_num(c[1])) for c in p]
-    assert len(p) == len(set(p))
+    p = [(parse_num(c[1]), parse_num(c[2])) for c in p]
+    p = list(set(p))
     return p
 
 
@@ -93,12 +93,13 @@ def greedy_select(c, p):
 
 
 for filename in problems[:3]:
+    print(filename)
     p = parse(filename)
     plt.plot(xs(p), ys(p), "bo")
     plt.show(block=False)
     plt.pause(3)
 
-    r = solve(lambda c, p: greedy_select(c, p), p)
+    r = solve(greedy_select, p)
     plt.plot(xs(r), ys(r), "r-")
     plt.show(block=False)
     plt.pause(3)
