@@ -59,6 +59,17 @@ def argmax(f, s):
     return i
 
 
+def argmin(f, s):
+    i = 0
+    val = f(s[0])
+    for j in range(1, len(s)):
+        val1 = f(s[j])
+        if val1 < val:
+            i = j
+            val = val1
+    return i
+
+
 def solve(select, p):
     r = [p[0]]
     p = p[1:]
@@ -77,13 +88,17 @@ def ys(p):
     return [c[1] for c in p]
 
 
+def greedy_select(c, p):
+    return argmin(lambda d: dist(c, d), p)
+
+
 for filename in problems[:3]:
     p = parse(filename)
     plt.plot(xs(p), ys(p), "bo")
     plt.show(block=False)
     plt.pause(3)
 
-    r = solve(lambda c, p: random.randrange(len(p)), p)
+    r = solve(lambda c, p: greedy_select(c, p), p)
     plt.plot(xs(r), ys(r), "r-")
     plt.show(block=False)
     plt.pause(3)
