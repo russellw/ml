@@ -1,4 +1,5 @@
 import os
+import random
 import math
 import matplotlib.pyplot as plt
 
@@ -44,14 +45,47 @@ def length(p):
     t = 0.0
     for i in range(len(p) - 1):
         t += dist(p[i], p[i + 1])
-    return t
+    return t + dist(p[-1], p[0])
+
+
+def argmax(f, s):
+    i = 0
+    val = f(s[0])
+    for j in range(1, len(s)):
+        val1 = f(s[j])
+        if val1 > val:
+            i = j
+            val = val1
+    return i
+
+
+def solve(select, p):
+    r = [p[0]]
+    p = p[1:]
+    while p:
+        i = select(r[-1], p)
+        r.append(p[i])
+        del p[i]
+    return r
+
+
+def xs(p):
+    return [c[0] for c in p]
+
+
+def ys(p):
+    return [c[1] for c in p]
 
 
 for filename in problems[:3]:
     p = parse(filename)
-    xs = [c[0] for c in p]
-    ys = [c[1] for c in p]
-    plt.plot(xs, ys, "bo")
+    plt.plot(xs(p), ys(p), "bo")
     plt.show(block=False)
     plt.pause(3)
+
+    r = solve(lambda c, p: random.randrange(len(p)), p)
+    plt.plot(xs(r), ys(r), "r-")
+    plt.show(block=False)
+    plt.pause(3)
+
     plt.close()
