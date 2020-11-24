@@ -4,7 +4,6 @@
 *.png
 *.pth
 data/
-papers/
 satlib/
 tsplib/
 TPTP/
