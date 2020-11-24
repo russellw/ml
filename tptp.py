@@ -1,5 +1,6 @@
 import argparse
 import fractions
+import inspect
 import itertools
 import os
 import re
@@ -21,7 +22,7 @@ def debug(x):
     print(f"{info.filename}:{info.function}:{info.lineno}: {repr(x)}", file=sys.stderr)
 
 
-########################################logic
+######################################## logic
 
 
 class DistinctObject:
@@ -744,7 +745,7 @@ class Problem:
         return self.name
 
 
-########################################CNF
+######################################## CNF
 
 
 def check_skolemi(a):
@@ -950,7 +951,7 @@ def cnf(problem):
         cnf1(f)
 
 
-########################################TPTP
+######################################## TPTP
 
 
 defined_fns = {
@@ -1033,17 +1034,17 @@ def weird_type(s):
 # parser
 
 
-def read1(filename, select=True):
+class Inappropriate(Exception):
+    pass
+
+
+def read_tptp1(filename, select=True):
     global expected
     text = open(filename).read()
     if text and text[-1] != "\n":
         text += "\n"
 
     # tokenizer
-
-    punct2 = {"/*", "!=", "=>", "<=", "~&", "~|"}
-    punct3 = {"<=>", "<~>"}
-    quotes = {"'", '"'}
 
     line = 1
     ti = 0
@@ -1080,6 +1081,14 @@ def read1(filename, select=True):
                         problem.expected = m[1]
                 continue
 
+            # block comment
+            if text[ti : ti + 2] == "/*":
+                ti += 2
+                while text[ti : ti + 2] != "*/":
+                    ti += 1
+                ti += 2
+                continue
+
             # word
             if c.isalpha() or c == "$":
                 i = ti
@@ -1090,7 +1099,7 @@ def read1(filename, select=True):
                 return
 
             # quote
-            if c in quotes:
+            if c in ("'", '"'):
                 i = ti
                 ti += 1
                 while text[ti] != c:
@@ -1099,25 +1108,6 @@ def read1(filename, select=True):
                     ti += 1
                 ti += 1
                 tok = text[i:ti]
-                return
-
-            # punctuation
-            if text[ti : ti + 3] in punct3:
-                tok = text[ti : ti + 3]
-                ti += 3
-                return
-            if text[ti : ti + 2] in punct2:
-                # block comment
-                if text[ti : ti + 2] == "/*":
-                    ti += 2
-                    while text[ti : ti + 2] != "*/":
-                        ti += 1
-                    ti += 2
-                    continue
-
-                # punctuation
-                tok = text[ti : ti + 2]
-                ti += 2
                 return
 
             # number
@@ -1149,6 +1139,14 @@ def read1(filename, select=True):
                 return
 
             # punctuation
+            if text[ti : ti + 3] in ("<=>", "<~>"):
+                tok = text[ti : ti + 3]
+                ti += 3
+                return
+            if text[ti : ti + 2] in ("!=", "=>", "<=", "~&", "~|"):
+                tok = text[ti : ti + 2]
+                ti += 2
+                return
             tok = c
             ti += 1
             return
@@ -1408,10 +1406,6 @@ def read1(filename, select=True):
             while not eat(")"):
                 ignore()
             return
-        if eat("["):
-            while not eat("]"):
-                ignore()
-            return
         lex()
 
     def selecting(name):
@@ -1509,6 +1503,8 @@ def read1(filename, select=True):
                 if isinstance(ty, tuple):
                     ty = ty[0]
                 typecheck(name, ty)
+            if tok == ">":
+                raise Inappropriate()
 
             while p:
                 expect(")")
@@ -1570,16 +1566,15 @@ def read1(filename, select=True):
             expect("]")
 
         # include
-        read1(tptp + "/" + filename1, select1)
+        read_tptp1(tptp + "/" + filename1, select1)
 
         # end
         expect(")")
         expect(".")
 
     lex()
-    fof_languages = ("fof", "tff")
     while tok:
-        if tok in fof_languages:
+        if tok in ("fof", "tff"):
             annotated_formula()
             continue
         if tok == "cnf":
@@ -1591,13 +1586,13 @@ def read1(filename, select=True):
         err("unknown language")
 
 
-def read(filename):
+def read_tptp(filename):
     global problem
     fn_types.clear()
     reset_formula_names()
     problem = Problem(filename)
     sys.setrecursionlimit(2000)
-    read1(filename)
+    read_tptp1(filename)
     cnf(problem)
     return problem
 
@@ -1759,10 +1754,12 @@ def test(filename):
     print(f"{filename:40s} ", end="", flush=True)
     try:
         start = time.time()
-        problem = read(filename)
+        problem = read_tptp(filename)
         print(
             f"{len(problem.formulas):7d} {len(problem.clauses):7d} {time.time()-start:10.3f}"
         )
+    except Inappropriate:
+        print("Inappropriate")
     except RecursionError:
         print("RecursionError")
 
