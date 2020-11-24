@@ -29,6 +29,8 @@ class DistinctObject:
         self.name = name
 
     def __eq__(self, other):
+        if not isinstance(other, DistinctObject):
+            return False
         return self.name == other.name
 
     def __str__(self):
