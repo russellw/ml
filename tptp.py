@@ -1046,11 +1046,14 @@ def read_tptp1(filename, select=True):
 
     # tokenizer
 
-    line = 1
     ti = 0
     tok = ""
 
     def err(msg):
+        line = 1
+        for i in range(ti):
+            if text[i] == "\n":
+                line += 1
         raise ValueError(f"{filename}:{line}: {repr(tok)}: {msg}")
 
     def lex():
@@ -1062,10 +1065,6 @@ def read_tptp1(filename, select=True):
             c = text[ti]
 
             # space
-            if c == "\n":
-                line += 1
-                ti += 1
-                continue
             if c.isspace():
                 ti += 1
                 continue
