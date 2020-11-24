@@ -3,8 +3,6 @@ import fractions
 
 # distinct objects
 
-distinct_objects = {}
-
 
 class DistinctObject:
     def __init__(self, name):
@@ -13,13 +11,8 @@ class DistinctObject:
     def __str__(self):
         return self.name
 
-
-def distinct_object(name):
-    if name in distinct_objects:
-        return distinct_objects[name]
-    a = DistinctObject(name)
-    distinct_objects[name] = a
-    return a
+    def __eq__(self, other):
+        return self.name == other.name
 
 
 # real number constants (must be rational, but separate type from Fraction)
@@ -734,6 +727,14 @@ class Problem:
 # test
 
 if __name__ == "__main__":
+    # test distinct objects
+    assert DistinctObject("a") == DistinctObject("a")
+    assert DistinctObject("a") != DistinctObject("b")
+    assert not (DistinctObject("a") != DistinctObject("a"))
+    assert not (DistinctObject("a") == DistinctObject("b"))
+
+    ########################################
+
     # test isomorphic
     r = Var("real")
     x = Var()
