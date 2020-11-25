@@ -1058,7 +1058,6 @@ def read_tptp1(filename, select=True):
 
     def lex():
         global expected
-        nonlocal line
         nonlocal ti
         nonlocal tok
         while ti < len(text):
