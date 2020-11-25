@@ -76,6 +76,11 @@ class Var:
         return self.name
 
 
+# types
+
+type_keywords = {"bool", "individual", "int", "rat", "real"}
+number_types = {"int", "rat", "real"}
+
 # terms
 
 
@@ -119,7 +124,6 @@ op_types = {
 }
 
 term_keywords = set(op_types.keys())
-type_keywords = {"bool", "individual", "int", "rat", "real"}
 
 fn_types = {}
 
@@ -151,18 +155,6 @@ def equation(a):
     if isinstance(a, tuple) and a[0] == "=":
         return a
     return "=", a, True
-
-
-def occurs(a, b, m):
-    assert isinstance(a, Var)
-    if a is b:
-        return True
-    if isinstance(b, tuple):
-        for c in b:
-            if occurs(a, c, m):
-                return True
-    if b in m:
-        return occurs(a, m[b], m)
 
 
 def free_vars(a):
@@ -262,6 +254,18 @@ def match(a, b, m):
             return m[a] == b
         m[a] = b
         return True
+
+
+def occurs(a, b, m):
+    assert isinstance(a, Var)
+    if a is b:
+        return True
+    if isinstance(b, tuple):
+        for c in b:
+            if occurs(a, c, m):
+                return True
+    if b in m:
+        return occurs(a, m[b], m)
 
 
 def quantify(a):
@@ -376,8 +380,6 @@ def unquantify(a):
 
 
 # simplify
-
-number_types = {"int", "rat", "real"}
 
 
 def simplify_add(a):
