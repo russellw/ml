@@ -22,20 +22,26 @@ def debug(x):
     print(f"{info.filename}:{info.function}:{info.lineno}: {repr(x)}", file=sys.stderr)
 
 
-######################################## logic
+######################################## terms
 
 
 class DistinctObject:
     def __init__(self, name):
         self.name = name
 
-    def __eq__(self, other):
-        if not isinstance(other, DistinctObject):
-            return False
-        return self.name == other.name
-
     def __str__(self):
         return self.name
+
+
+distinct_objects = {}
+
+
+def distinct_object(name):
+    if name in distinct_objects:
+        return distinct_objects[name]
+    a = DistinctObject(name)
+    distinct_objects[name] = a
+    return a
 
 
 # real number constants must be rational, but separate type from Fraction
@@ -43,89 +49,44 @@ class Real(fractions.Fraction):
     pass
 
 
-# variables
+# constants are just functions of arity zero
+class Fn:
+    def __init__(self, name):
+        self.name = name
 
-var_name_i = 0
-
-
-def reset_var_names():
-    global var_name_i
-    var_name_i = 0
-
-
-def set_var_name(x):
-    global var_name_i
-    if hasattr(x, "name"):
-        return
-    i = var_name_i
-    var_name_i += 1
-    if i < 26:
-        x.name = chr(65 + i)
-    else:
-        x.name = "Z" + str(i - 25)
+    def __str__(self):
+        return self.name
 
 
+fns = {}
+
+
+def fn(name):
+    if name in fns:
+        return fns[name]
+    a = Fn(name)
+    fns[name] = a
+    return a
+
+
+# named types are handled as functions
+types = {}
+
+
+def mktype(name):
+    if name in types:
+        return types[name]
+    a = Fn(name)
+    a.ty = "type"
+    types[name] = a
+    return a
+
+
+# first-order variables cannot be boolean
 class Var:
     def __init__(self, ty="individual"):
         assert ty != "bool"
         self.ty = ty
-
-    def __repr__(self):
-        if not hasattr(self, "name"):
-            set_var_name(self)
-        return self.name
-
-
-# types
-
-type_keywords = {"bool", "individual", "int", "rat", "real"}
-number_types = {"int", "rat", "real"}
-
-# terms
-
-
-def arithmetic_type(a):
-    return typeof(a[1])
-
-
-op_types = {
-    "*": arithmetic_type,
-    "+": arithmetic_type,
-    "-": arithmetic_type,
-    "/": arithmetic_type,
-    "<": "bool",
-    "<=": "bool",
-    "=>": "bool",
-    ">": "bool",
-    ">=": "bool",
-    "and": "bool",
-    "ceil": arithmetic_type,
-    "div-e": arithmetic_type,
-    "div-f": arithmetic_type,
-    "div-t": arithmetic_type,
-    "equiv": "bool",
-    "exists": "bool",
-    "floor": arithmetic_type,
-    "forall": "bool",
-    "int?": "bool",
-    "not": "bool",
-    "or": "bool",
-    "rat?": "bool",
-    "rem-e": arithmetic_type,
-    "rem-f": arithmetic_type,
-    "rem-t": arithmetic_type,
-    "round": arithmetic_type,
-    "to-int": "int",
-    "to-rat": "rat",
-    "to-real": "real",
-    "trunc": arithmetic_type,
-    "unary-": arithmetic_type,
-    "xor": "bool",
-}
-
-term_keywords = set(op_types.keys())
-
-fn_types = {}
 
 
 def const(a):
@@ -160,59 +121,29 @@ def equation(a):
 def free_vars(a):
     bound = set()
     free = []
+
+    def get_free_vars(a, bound, free):
+        if isinstance(a, tuple):
+            if a[0] in ("exists", "forall"):
+                bound = bound.copy()
+                for x in a[1]:
+                    bound.add(x)
+                get_free_vars(a[2], bound, free)
+                return
+            for b in a[1:]:
+                get_free_vars(b, bound, free)
+            return
+        if isinstance(a, Var):
+            if a not in bound and a not in free:
+                free.append(a)
+            return
+
     get_free_vars(a, bound, free)
     return free
 
 
-def get_free_vars(a, bound, free):
-    if isinstance(a, tuple):
-        if a[0] in ("exists", "forall"):
-            bound = bound.copy()
-            for x in a[1]:
-                bound.add(x)
-            get_free_vars(a[2], bound, free)
-            return
-        for b in a[1:]:
-            get_free_vars(b, bound, free)
-        return
-    if isinstance(a, Var):
-        if a not in bound and a not in free:
-            free.append(a)
-        return
-
-
-def get_fn(a, arity, m):
-    if a in term_keywords:
-        return
-    if a not in m:
-        m[a] = arity
-        return
-    if m[a] != arity:
-        m[a] = -1
-
-
-def get_fns(a, m):
-    if isinstance(a, tuple):
-        for b in a[1:]:
-            get_fns(b, m)
-        get_fn(a[0], len(a) - 1, m)
-        return
-    if isinstance(a, str):
-        get_fn(a, 0, m)
-
-
-def get_fns_clause(c, m):
-    for a in c.neg:
-        get_fns(a, m)
-    for a in c.pos:
-        get_fns(a, m)
-
-
-def get_fns_clauses(cs):
-    m = {}
-    for c in cs:
-        get_fns_clause(c, m)
-    return m
+def imp(a, b):
+    return "or", ("not", a), b
 
 
 def isomorphic(a, b, m):
@@ -304,31 +235,46 @@ def term_size(a):
     return 1
 
 
-def typecheck(a, ty):
-    if isinstance(a, tuple):
-        a = a[0]
-    if a in fn_types:
-        assert fn_types[a] == ty
-        return
-    fn_types[a] = ty
-
-
 def typeof(a):
     if isinstance(a, tuple):
-        o = a[0]
-        if o in op_types:
-            t = op_types[o]
-            if isinstance(t, str):
-                return t
-            return t(a)
-        if o in fn_types:
-            return fn_types[o]
-        return "individual"
+        return typeof(a[0])[0]
     if isinstance(a, str):
-        if a in fn_types:
-            return fn_types[a]
-        return "individual"
-    if isinstance(a, Var):
+        x = Var("type")
+        types = {
+            "*": (x, x, x),
+            "+": (x, x, x),
+            "-": (x, x, x),
+            "/": (x, x, x),
+            "<": ("bool", x, x),
+            "<=": ("bool", x, x),
+            ">": ("bool", x, x),
+            ">=": ("bool", x, x),
+            "=": ("bool", x, x),
+            "and": ("bool", "bool", "bool"),
+            "ceil": (x, x),
+            "div-e": (x, x, x),
+            "div-f": (x, x, x),
+            "div-t": (x, x, x),
+            "eqv": ("bool", "bool", "bool"),
+            "exists": ("bool", None, "bool"),
+            "floor": (x, x),
+            "forall": ("bool", None, "bool"),
+            "int?": ("bool", x),
+            "not": ("bool", "bool"),
+            "or": ("bool", "bool", "bool"),
+            "rat?": ("bool", x),
+            "rem-e": (x, x, x),
+            "rem-f": (x, x, x),
+            "rem-t": (x, x, x),
+            "round": (x, x),
+            "to-int": ("int", x),
+            "to-rat": ("rat", x),
+            "to-real": ("real", x),
+            "trunc": (x, x),
+            "unary-": (x, x),
+        }
+        return types[a]
+    if isinstance(a, Fn) or isinstance(a, Var):
         return a.ty
     if isinstance(a, DistinctObject):
         return "individual"
@@ -356,21 +302,21 @@ def unify(a, b, m):
         return True
     if a == b:
         return True
+
+    def unify_var(a, b, m):
+        if a in m:
+            return unify(m[a], b, m)
+        if b in m:
+            return unify(a, m[b], m)
+        if occurs(a, b, m):
+            return
+        m[a] = b
+        return True
+
     if isinstance(a, Var):
         return unify_var(a, b, m)
     if isinstance(b, Var):
         return unify_var(b, a, m)
-
-
-def unify_var(a, b, m):
-    if a in m:
-        return unify(m[a], b, m)
-    if b in m:
-        return unify(a, m[b], m)
-    if occurs(a, b, m):
-        return
-    m[a] = b
-    return True
 
 
 def unquantify(a):
@@ -379,14 +325,21 @@ def unquantify(a):
     return a
 
 
-# simplify
+def walk(a, f):
+    if isinstance(a, tuple):
+        for b in a:
+            walk(b, f)
+    f(a)
+
+
+######################################## simplify
 
 
 def simplify_add(a):
     x = a[1]
     y = a[2]
     ty = typeof(x)
-    if ty != typeof(y) or ty not in number_types:
+    if ty != typeof(y) or ty not in ("int", "rat", "real"):
         raise ValueError(
             str(x) + ":" + str(typeof(x)) + " vs " + str(y) + ":" + str(typeof(y))
         )
@@ -402,7 +355,7 @@ def simplify_sub(a):
     x = a[1]
     y = a[2]
     ty = typeof(x)
-    if ty != typeof(y) or ty not in number_types:
+    if ty != typeof(y) or ty not in ("int", "rat", "real"):
         raise ValueError(
             str(x) + ":" + str(typeof(x)) + " vs " + str(y) + ":" + str(typeof(y))
         )
@@ -418,7 +371,7 @@ def simplify_mul(a):
     x = a[1]
     y = a[2]
     ty = typeof(x)
-    if ty != typeof(y) or ty not in number_types:
+    if ty != typeof(y) or ty not in ("int", "rat", "real"):
         raise ValueError(
             str(x) + ":" + str(typeof(x)) + " vs " + str(y) + ":" + str(typeof(y))
         )
@@ -452,7 +405,7 @@ def simplify_ge(a):
     x = a[1]
     y = a[2]
     ty = typeof(x)
-    if ty != typeof(y) or ty not in number_types:
+    if ty != typeof(y) or ty not in ("int", "rat", "real"):
         raise ValueError(
             str(x) + ":" + str(typeof(x)) + "=" + str(y) + ":" + str(typeof(y))
         )
@@ -465,7 +418,7 @@ def simplify_gt(a):
     x = a[1]
     y = a[2]
     ty = typeof(x)
-    if ty != typeof(y) or ty not in number_types:
+    if ty != typeof(y) or ty not in ("int", "rat", "real"):
         raise ValueError(
             str(x) + ":" + str(typeof(x)) + "=" + str(y) + ":" + str(typeof(y))
         )
@@ -478,7 +431,7 @@ def simplify_le(a):
     x = a[1]
     y = a[2]
     ty = typeof(x)
-    if ty != typeof(y) or ty not in number_types:
+    if ty != typeof(y) or ty not in ("int", "rat", "real"):
         raise ValueError(
             str(x) + ":" + str(typeof(x)) + "=" + str(y) + ":" + str(typeof(y))
         )
@@ -491,7 +444,7 @@ def simplify_lt(a):
     x = a[1]
     y = a[2]
     ty = typeof(x)
-    if ty != typeof(y) or ty not in number_types:
+    if ty != typeof(y) or ty not in ("int", "rat", "real"):
         raise ValueError(
             str(x) + ":" + str(typeof(x)) + "=" + str(y) + ":" + str(typeof(y))
         )
@@ -524,7 +477,7 @@ def simplify(a):
     return a
 
 
-# formulas
+######################################## logic
 
 
 class Formula:
@@ -535,7 +488,6 @@ class Formula:
 
 
 formula_name_i = 0
-formulas_visited = set()
 
 
 def reset_formula_names():
@@ -554,33 +506,17 @@ def set_formula_name(c, name):
 
 
 def walk_proof(c, f):
-    formulas_visited.clear()
-    walk_proof1(c, f)
+    visited = set()
 
+    def rec(c):
+        if c in visited:
+            return
+        visited.add(c)
+        for d in c.parents:
+            rec(d)
+        f(c)
 
-def walk_proof1(c, f):
-    if c in formulas_visited:
-        return
-    formulas_visited.add(c)
-    for d in c.parents:
-        walk_proof1(d, f)
-    f(c)
-
-
-def proof_len(c):
-    n = 0
-    if not c:
-        return 0
-
-    def f(c):
-        nonlocal n
-        n += 1
-
-    walk_proof(c, f)
-    return n
-
-
-# clauses
+    rec(c, f)
 
 
 class Clause:
@@ -644,26 +580,26 @@ class Clause:
         return str(self.neg) + "=>" + str(self.pos)
 
 
-def term_contains_arithmetic(a):
+def term_contains_arith(a):
     if isinstance(a, tuple):
         for b in a:
-            if term_contains_arithmetic(b):
+            if term_contains_arith(b):
                 return True
-    return typeof(a) in number_types
+    return typeof(a) in ("int", "rat", "real")
 
 
-def clause_contains_arithmetic(c):
+def clause_contains_arith(c):
     for a in c.neg:
-        if term_contains_arithmetic(a):
+        if term_contains_arith(a):
             return True
     for a in c.pos:
-        if term_contains_arithmetic(a):
+        if term_contains_arith(a):
             return True
 
 
-def clauses_contain_arithmetic(cs):
+def clauses_contain_arith(cs):
     for c in cs:
-        if clause_contains_arithmetic(c):
+        if clause_contains_arith(c):
             return True
 
 
@@ -733,9 +669,6 @@ def transform_clauses(cs, f):
     return cs1
 
 
-# problems
-
-
 class Problem:
     def __init__(self, name):
         self.clauses = []
@@ -745,212 +678,6 @@ class Problem:
 
     def __str__(self):
         return self.name
-
-
-######################################## CNF
-
-
-def check_skolemi(a):
-    global skolemi
-    if isinstance(a, tuple):
-        for b in a:
-            check_skolemi(b)
-        return
-    if isinstance(a, str):
-        if a[:2] == "sK":
-            try:
-                skolemi = max(skolemi, int(a[2:]) + 1)
-            except ValueError:
-                pass
-        return
-
-
-def skolem(ty, v):
-    global skolemi
-    f = "sK" + str(skolemi)
-    skolemi += 1
-    typecheck(f, ty)
-    if v:
-        return (f,) + tuple(v)
-    return f
-
-
-def nnf(all_vars, exists_vars, pol, a):
-    if isinstance(a, tuple):
-        o = a[0]
-        if o == "not":
-            return nnf(all_vars, exists_vars, not pol, a[1])
-        if o == "=>":
-            return nnf(all_vars, exists_vars, pol, ("or", ("not", a[1]), a[2]))
-        if o in ("and", "or"):
-            if not pol:
-                o = "and" if o == "or" else "or"
-            r = [o]
-            for b in a[1:]:
-                r.append(nnf(all_vars, exists_vars, pol, b))
-            return tuple(r)
-        if o in ("exists", "forall"):
-            if not pol:
-                o = "exists" if o == "forall" else "forall"
-            if o == "exists":
-                exists_vars = dict(exists_vars)
-                for x in a[1]:
-                    exists_vars[x] = skolem(x.ty, all_vars.values())
-            else:
-                all_vars = all_vars.copy()
-                for x in a[1]:
-                    all_vars[x] = Var(x.ty)
-            return nnf(all_vars, exists_vars, pol, a[2])
-        if o in ("equiv", "xor"):
-            if o == "xor":
-                pol = not pol
-
-            # a1 => a2
-            b = (
-                "or",
-                nnf(all_vars, exists_vars, False, a[1]),
-                nnf(all_vars, exists_vars, pol, a[2]),
-            )
-
-            # a1 <= a2
-            c = (
-                "or",
-                nnf(all_vars, exists_vars, True, a[1]),
-                nnf(all_vars, exists_vars, not pol, a[2]),
-            )
-
-            # and
-            return "and", b, c
-        r = [a[0]]
-        for b in a[1:]:
-            r.append(nnf(all_vars, exists_vars, True, b))
-        a = tuple(r)
-    else:
-        if isinstance(a, Var):
-            if a in all_vars:
-                return all_vars[a]
-            if a in exists_vars:
-                return exists_vars[a]
-            raise ValueError(a)
-        if a is False:
-            return not pol
-        if a is True:
-            return pol
-    return a if pol else ("not", a)
-
-
-def rename(a):
-    b = skolem("bool", free_vars(a))
-    f = Formula(None, ("=>", b, a))
-    cnf1(f)
-    return b
-
-
-def distribute(a):
-    if isinstance(a, tuple):
-        o = a[0]
-        if o == "and":
-            # flat layer of AND
-            r = [o]
-            for b in a[1:]:
-                b = distribute(b)
-                if isinstance(b, tuple) and b[0] == "and":
-                    r.extend(b[1:])
-                    continue
-                r.append(b)
-            assert len(r) >= 3
-            return tuple(r)
-        if o == "or":
-            # flat layer of ANDs
-            ands = []
-            total = 1
-            for b in a[1:]:
-                b = distribute(b)
-                if isinstance(b, tuple) and b[0] == "and":
-                    n = len(b) - 1
-                    if total > 1 and n > 1 and total * n > 4:
-                        ands.append([rename(b)])
-                        continue
-                    ands.append(b[1:])
-                    total *= n
-                    continue
-                ands.append([b])
-
-            # cartesian product of ANDs
-            r = ["and"]
-            for c in itertools.product(*ands):
-                r.append((("or",) + tuple(c)))
-            if len(r) < 3:
-                return r[1]
-            return tuple(r)
-    return a
-
-
-def split(a, neg, pos):
-    if isinstance(a, tuple):
-        o = a[0]
-        assert o != "and"
-        if o == "or":
-            for b in a[1:]:
-                split(b, neg, pos)
-            return
-        if o == "not":
-            neg.append(a[1])
-            return
-    pos.append(a)
-
-
-def clause(f, a):
-    neg = []
-    pos = []
-    split(a, neg, pos)
-    c = Clause(None, neg, pos, f)
-    clauses.append(c)
-
-
-def cnf1(f):
-    # variables must be bound only for the first step
-    a = quantify(f.term)
-
-    # negation normal form includes several transformations that need to be done together
-    b = nnf({}, {}, True, a)
-    a = unquantify(a)
-    if not isomorphic(a, b, {}):
-        f = Formula(None, b, f)
-        a = b
-
-    # distribute OR down into AND
-    b = distribute(a)
-    if a != b:
-        f = Formula(None, b, f)
-        a = b
-
-    # split AND into clauses
-    if isinstance(a, tuple) and a[0] == "and":
-        for b in a[1:]:
-            clause(f, b)
-        return
-    clause(f, a)
-
-
-def cnf(problem):
-    global clauses
-    global skolemi
-
-    # check if existing function names would clash with Skolem function names
-    skolemi = 0
-    for f in problem.formulas:
-        check_skolemi(f.term)
-    for c in problem.clauses:
-        for a in c.neg:
-            check_skolemi(a)
-        for a in c.pos:
-            check_skolemi(a)
-
-    # convert
-    clauses = problem.clauses
-    for f in problem.formulas:
-        cnf1(f)
 
 
 ######################################## TPTP
@@ -1034,8 +761,6 @@ def weird_type(s):
 
 
 # parser
-
-
 class Inappropriate(Exception):
     pass
 
@@ -1047,7 +772,6 @@ def read_tptp1(filename, select=True):
         text += "\n"
 
     # tokenizer
-
     ti = 0
     tok = ""
 
@@ -1165,7 +889,6 @@ def read_tptp1(filename, select=True):
         lex()
 
     # terms
-
     bound = None
     free = {}
 
@@ -1205,7 +928,7 @@ def read_tptp1(filename, select=True):
         # distinct object
         if o[0] == '"':
             lex()
-            return DistinctObject(o)
+            return distinct_object(o)
 
         # number
         if o[0].isdigit() or o[0] == "-":
@@ -1381,16 +1104,16 @@ def read_tptp1(filename, select=True):
             return tuple(r)
         if o == "=>":
             lex()
-            return o, a, unitary_formula()
+            return imp(a, unitary_formula())
         if o == "<=":
             lex()
-            return "=>", unitary_formula(), a
+            return imp(unitary_formula(), a)
         if o == "<=>":
             lex()
-            return "equiv", a, unitary_formula()
+            return "eqv", a, unitary_formula()
         if o == "<~>":
             lex()
-            return "xor", a, unitary_formula()
+            return "not", ("eqv", a, unitary_formula())
         if o == "~&":
             lex()
             return "not", ("and", a, unitary_formula())
@@ -1400,7 +1123,6 @@ def read_tptp1(filename, select=True):
         return a
 
     # top level
-
     def ignore():
         if eat("("):
             while not eat(")"):
@@ -1574,11 +1296,11 @@ def read_tptp1(filename, select=True):
 
     lex()
     while tok:
-        if tok in ("fof", "tff"):
-            annotated_formula()
-            continue
         if tok == "cnf":
             annotated_clause()
+            continue
+        if tok in ("fof", "tff"):
+            annotated_formula()
             continue
         if tok == "include":
             include()
@@ -1588,19 +1310,32 @@ def read_tptp1(filename, select=True):
 
 def read_tptp(filename):
     global problem
-    fn_types.clear()
     reset_formula_names()
     problem = Problem(filename)
     sys.setrecursionlimit(2000)
     read_tptp1(filename)
-    cnf(problem)
     return problem
 
 
 # print
+var_name_i = 0
 
-defined_fns_inv = {v: k for k, v in defined_fns.items()}
-defined_types_inv = {v: k for k, v in defined_types.items()}
+
+def reset_var_names():
+    global var_name_i
+    var_name_i = 0
+
+
+def set_var_name(x):
+    global var_name_i
+    if hasattr(x, "name"):
+        return
+    i = var_name_i
+    var_name_i += 1
+    if i < 26:
+        x.name = chr(65 + i)
+    else:
+        x.name = "Z" + str(i - 25)
 
 
 def pr(a):
@@ -1619,25 +1354,27 @@ def prargs(a):
 def need_parens(a, parent):
     if not parent:
         return
-    if a[0] in ("=>", "and", "equiv", "or", "xor"):
-        return parent[0] in (
-            "=>",
-            "and",
-            "equiv",
-            "exists",
-            "forall",
-            "not",
-            "or",
-            "xor",
-        )
+    if a[0] in ("and", "eqv", "or"):
+        return parent[0] in ("and", "eqv", "exists", "forall", "not", "or",)
 
 
 def prterm(a, parent=None):
     if isinstance(a, tuple):
         o = a[0]
-        if o in defined_fns_inv:
-            pr(defined_fns_inv[o])
-            prargs(a)
+        if o == "=":
+            prterm(a[1])
+            pr("=")
+            prterm(a[2])
+            return
+        if o == "not":
+            if isinstance(a[1], tuple) and a[1][0] == "=":
+                a = a[1]
+                prterm(a[1])
+                pr("!=")
+                prterm(a[2])
+                return
+            pr("~")
+            prterm(a[1], a)
             return
         if o in ("exists", "forall"):
             if o == "exists":
@@ -1658,22 +1395,7 @@ def prterm(a, parent=None):
             pr("]:")
             prterm(a[2], a)
             return
-        if o == "=":
-            prterm(a[1])
-            pr("=")
-            prterm(a[2])
-            return
-        if o == "not":
-            if isinstance(a[1], tuple) and a[1][0] == "=":
-                a = a[1]
-                prterm(a[1])
-                pr("!=")
-                prterm(a[2])
-                return
-            pr("~")
-            prterm(a[1], a)
-            return
-        connectives = {"=>": "=>", "and": "&", "equiv": "<=>", "or": "|", "xor": "<~>"}
+        connectives = {"and": "&", "eqv": "<=>", "or": "|"}
         if o in connectives:
             if need_parens(a, parent):
                 pr("(")
@@ -1700,8 +1422,15 @@ def prterm(a, parent=None):
 
 
 def prtype(a):
-    if a in defined_types_inv:
-        pr(defined_types_inv[a])
+    if isinstance(a, str):
+        defined_types = {
+            "bool": "$o",
+            "individual": "$i",
+            "int": "$int",
+            "rat": "$rat",
+            "real": "$real",
+        }
+        pr(defined_types[a])
         return
     pr(a)
 
@@ -1743,11 +1472,187 @@ def prproof(c):
     walk_proof(c, prformula)
 
 
-# test
+######################################## CNF
+
+
+def cnf(problem):
+    def skolem(ty, v):
+        a = Fn()
+        a.ty = ty
+        if v:
+            return (a,) + tuple(v)
+        return a
+
+    def nnf(all_vars, exists_vars, pol, a):
+        if isinstance(a, tuple):
+            o = a[0]
+            if o == "not":
+                return nnf(all_vars, exists_vars, not pol, a[1])
+
+            if o == "and":
+                if not pol:
+                    o = "or"
+                r = [o]
+                for b in a[1:]:
+                    r.append(nnf(all_vars, exists_vars, pol, b))
+                return tuple(r)
+            if o == "or":
+                if not pol:
+                    o = "and"
+                r = [o]
+                for b in a[1:]:
+                    r.append(nnf(all_vars, exists_vars, pol, b))
+                return tuple(r)
+
+            if o == "exists":
+                if not pol:
+                    o = "forall"
+                exists_vars = exists_vars.copy()
+                for x in a[1]:
+                    exists_vars[x] = skolem(x.ty, all_vars.values())
+                return nnf(all_vars, exists_vars, pol, a[2])
+            if o == "forall":
+                if not pol:
+                    o = "exists"
+                all_vars = all_vars.copy()
+                for x in a[1]:
+                    all_vars[x] = Var(x.ty)
+                return nnf(all_vars, exists_vars, pol, a[2])
+
+            if o == "eqv":
+                # a1 => a2
+                x = (
+                    "or",
+                    nnf(all_vars, exists_vars, False, a[1]),
+                    nnf(all_vars, exists_vars, pol, a[2]),
+                )
+
+                # a1 <= a2
+                y = (
+                    "or",
+                    nnf(all_vars, exists_vars, True, a[1]),
+                    nnf(all_vars, exists_vars, not pol, a[2]),
+                )
+
+                # and
+                return "and", x, y
+
+            r = [a[0]]
+            for b in a[1:]:
+                r.append(nnf(all_vars, exists_vars, True, b))
+            a = tuple(r)
+        else:
+            if a is False:
+                return not pol
+            if a is True:
+                return pol
+            if isinstance(a, Var):
+                if a in all_vars:
+                    return all_vars[a]
+                if a in exists_vars:
+                    return exists_vars[a]
+                raise ValueError(a)
+        return a if pol else ("not", a)
+
+    def rename(a):
+        b = skolem("bool", free_vars(a))
+        f = Formula(None, imp(b, a))
+        convert(f)
+        return b
+
+    def distribute(a):
+        if isinstance(a, tuple):
+            o = a[0]
+            if o == "and":
+                # flat layer of AND
+                r = [o]
+                for b in a[1:]:
+                    b = distribute(b)
+                    if isinstance(b, tuple) and b[0] == "and":
+                        r.extend(b[1:])
+                        continue
+                    r.append(b)
+                assert len(r) >= 3
+                return tuple(r)
+            if o == "or":
+                # flat layer of ANDs
+                ands = []
+                total = 1
+                for b in a[1:]:
+                    b = distribute(b)
+                    if isinstance(b, tuple) and b[0] == "and":
+                        n = len(b) - 1
+                        if total > 1 and n > 1 and total * n > 4:
+                            ands.append([rename(b)])
+                            continue
+                        ands.append(b[1:])
+                        total *= n
+                        continue
+                    ands.append([b])
+
+                # cartesian product of ANDs
+                r = ["and"]
+                for c in itertools.product(*ands):
+                    r.append((("or",) + tuple(c)))
+                if len(r) < 3:
+                    return r[1]
+                return tuple(r)
+        return a
+
+    def split(a, neg, pos):
+        if isinstance(a, tuple):
+            o = a[0]
+            if o == "not":
+                neg.append(a[1])
+                return
+            if o == "or":
+                for b in a[1:]:
+                    split(b, neg, pos)
+                return
+            assert o != "and"
+        pos.append(a)
+
+    def clause(f, a):
+        neg = []
+        pos = []
+        split(a, neg, pos)
+        c = Clause(None, neg, pos, f)
+        clauses.append(c)
+
+    def convert(f):
+        # variables must be bound only for the first step
+        a = quantify(f.term)
+
+        # negation normal form includes several transformations that need to be done together
+        b = nnf({}, {}, True, a)
+        a = unquantify(a)
+        if not isomorphic(a, b, {}):
+            f = Formula(None, b, f)
+            a = b
+
+        # distribute OR down into AND
+        b = distribute(a)
+        if a != b:
+            f = Formula(None, b, f)
+            a = b
+
+        # split AND into clauses
+        if isinstance(a, tuple) and a[0] == "and":
+            for b in a[1:]:
+                clause(f, b)
+            return
+        clause(f, a)
+
+    clauses = problem.clauses
+    for f in problem.formulas:
+        convert(f)
+
+
+######################################## test
 
 
 def test(filename):
-    if os.path.splitext(filename)[1] not in (".ax", ".p"):
+    if os.path.splitext(filename)[1] != ".p":
         return
     if "^" in filename:
         return
@@ -1755,6 +1660,7 @@ def test(filename):
     try:
         start = time.time()
         problem = read_tptp(filename)
+        cnf(problem)
         print(
             f"{len(problem.formulas):7d} {len(problem.clauses):7d} {time.time()-start:10.3f}"
         )
