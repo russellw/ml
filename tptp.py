@@ -89,6 +89,15 @@ class Var:
         self.ty = ty
 
 
+def arity(a):
+    ty = typeof(a)
+    if isinstance(ty, tuple):
+        n = len(ty) - 1
+        assert n
+        return n
+    return 0
+
+
 def const(a):
     if isinstance(a, bool):
         return True
@@ -252,9 +261,9 @@ def typeof(a):
             "=": ("bool", x, x),
             "and": ("bool", "bool", "bool"),
             "ceil": (x, x),
-            "div-e": (x, x, x),
-            "div-f": (x, x, x),
-            "div-t": (x, x, x),
+            "div_e": (x, x, x),
+            "div_f": (x, x, x),
+            "div_t": (x, x, x),
             "eqv": ("bool", "bool", "bool"),
             "exists": ("bool", None, "bool"),
             "floor": (x, x),
@@ -263,13 +272,13 @@ def typeof(a):
             "not": ("bool", "bool"),
             "or": ("bool", "bool", "bool"),
             "rat?": ("bool", x),
-            "rem-e": (x, x, x),
-            "rem-f": (x, x, x),
-            "rem-t": (x, x, x),
+            "rem_e": (x, x, x),
+            "rem_f": (x, x, x),
+            "rem_t": (x, x, x),
             "round": (x, x),
-            "to-int": ("int", x),
-            "to-rat": ("rat", x),
-            "to-real": ("real", x),
+            "to_int": ("int", x),
+            "to_rat": ("rat", x),
+            "to_real": ("real", x),
             "trunc": (x, x),
             "unary-": (x, x),
         }
@@ -529,12 +538,6 @@ class Clause:
         for a in pos:
             check_tuples(a)
 
-        # check types
-        for a in neg:
-            typecheck(a, "bool")
-        for a in pos:
-            typecheck(a, "bool")
-
         # simplify and eliminate redundancy
         r = []
         for a in neg:
@@ -695,17 +698,17 @@ defined_fns = {
     "$lesseq": "<=",
     "$product": "*",
     "$quotient": "/",
-    "$quotient_e": "div-e",
-    "$quotient_f": "div-f",
-    "$quotient_t": "div-t",
-    "$remainder_e": "rem-e",
-    "$remainder_f": "rem-f",
-    "$remainder_t": "rem-t",
+    "$quotient_e": "div_e",
+    "$quotient_f": "div_f",
+    "$quotient_t": "div_t",
+    "$remainder_e": "rem_e",
+    "$remainder_f": "rem_f",
+    "$remainder_t": "rem_t",
     "$round": "round",
     "$sum": "+",
-    "$to_int": "to-int",
-    "$to_rat": "to-rat",
-    "$to_real": "to-real",
+    "$to_int": "to_int",
+    "$to_rat": "to_rat",
+    "$to_real": "to_real",
     "$truncate": "trunc",
     "$uminus": "unary-",
 }
@@ -876,7 +879,7 @@ def read_tptp1(filename, select=True):
             return
 
         # end of file
-        tok = ""
+        tok = None
 
     def eat(o):
         if tok == o:
@@ -885,45 +888,68 @@ def read_tptp1(filename, select=True):
 
     def expect(o):
         if tok != o:
-            err("expected '" + o + "'")
+            err(f"expected '{o}'")
         lex()
 
     # terms
     bound = None
     free = {}
 
-    def atom():
+    def read_name():
         o = tok
 
         # word
         if o[0].islower():
             lex()
-            if o in term_keywords:
-                return "'" + o + "'"
             return o
 
         # single quoted, equivalent to word
         if o[0] == "'":
             lex()
-            u = unquote(o)
-            if not weird(u):
-                return u
-            return o
+            return unquote(o)
 
-        # variable
-        if o[0].isupper():
+        # number
+        if o[0].isdigit() or o[0] == "-":
             lex()
-            b = bound
-            while b:
-                m = b[0]
-                if o in m:
-                    return m[o]
-                b = b[1]
-            if o in free:
-                return free[o]
-            a = Var()
-            free[o] = a
-            return a
+            return int(o)
+
+        err("expected name")
+
+    def args(n=0):
+        expect("(")
+        r = []
+        if tok != ")":
+            r.append(atomic_term())
+            while tok == ",":
+                lex()
+                r.append(atomic_term())
+        if n and len(r) != n:
+            err(f"expected {n} args")
+        expect(")")
+        return r
+
+    def atomic_term():
+        o = tok
+
+        # defined function
+        if o[0] == "$":
+            if eat("$false"):
+                return False
+            if eat("$true"):
+                return True
+            if o in defined_fns:
+                a = defined_fns[o]
+                lex()
+                return (a,) + tuple(args(arity(a)))
+            if eat("$distinct"):
+                r = args()
+                inequalities = ["and"]
+                for i in range(len(r)):
+                    for j in range(len(r)):
+                        if i != j:
+                            inequalities.append(("not", ("=", r[i], r[j])))
+                return tuple(inequalities)
+            err("unknown function")
 
         # distinct object
         if o[0] == '"':
@@ -940,43 +966,23 @@ def read_tptp1(filename, select=True):
                     return fractions.Fraction(o)
                 return Real(o)
 
-        err("expected term")
+        # variable
+        if o[0].isupper():
+            lex()
+            b = bound
+            while b:
+                m = b[0]
+                if o in m:
+                    return m[o]
+                b = b[1]
+            if o in free:
+                return free[o]
+            a = Var()
+            free[o] = a
+            return a
 
-    def args():
-        if tok != "(":
-            err("expected '('")
-        lex()
-        r = []
-        if tok != ")":
-            r.append(atomic_term())
-            while tok == ",":
-                lex()
-                r.append(atomic_term())
-        if tok != ")":
-            err("expected ')'")
-        lex()
-        return r
-
-    def atomic_term():
-        o = tok
-        if o[0] == "$":
-            if o in defined_fns:
-                lex()
-                return (defined_fns[o],) + tuple(args())
-            if eat("$distinct"):
-                r = args()
-                inequalities = ["and"]
-                for i in range(len(r)):
-                    for j in range(len(r)):
-                        if i != j:
-                            inequalities.append(("not", ("=", r[i], r[j])))
-                return tuple(inequalities)
-            if eat("$false"):
-                return False
-            if eat("$true"):
-                return True
-            err("unknown function")
-        a = atom()
+        # function
+        a = fn(read_name())
         if tok == "(":
             return (a,) + tuple(args())
         return a
@@ -1134,28 +1140,19 @@ def read_tptp1(filename, select=True):
         return select is True or name in select
 
     def annotated_clause():
-        atom()
-        if tok != "(":
-            err("expected '('")
         lex()
+        expect("(")
 
         # name
-        name = atom()
-        if tok != ",":
-            err("expected ','")
-        lex()
+        name = read_name()
+        expect(",")
 
         # role
-        role = atom()
-        if tok != ",":
-            err("expected ','")
-        lex()
+        role = read_name()
+        expect(",")
 
         # formula
-        p = False
-        if tok == "(":
-            lex()
-            p = True
+        parens = eat("(")
         neg = []
         pos = []
         while True:
@@ -1173,10 +1170,8 @@ def read_tptp1(filename, select=True):
             c.name = name
             c.role = role
             problem.clauses.append(c)
-        if p:
-            if tok != ")":
-                err("expected ')'")
-            lex()
+        if parens:
+            expect(")")
 
         # annotations
         if tok == ",":
@@ -1184,37 +1179,27 @@ def read_tptp1(filename, select=True):
                 ignore()
 
         # end
-        if tok != ")":
-            err("expected ')'")
-        lex()
-        if tok != ".":
-            err("expected '.'")
-        lex()
+        expect(")")
+        expect(".")
 
     def annotated_formula():
-        atom()
-        if tok != "(":
-            err("expected '('")
         lex()
+        expect("(")
 
         # name
-        name = atom()
-        if tok != ",":
-            err("expected ','")
-        lex()
+        name = read_name()
+        expect(",")
 
         # role
-        role = atom()
-        if tok != ",":
-            err("expected ','")
-        lex()
+        role = read_name()
+        expect(",")
 
         if role == "type":
-            p = 0
+            parens = 0
             while eat("("):
-                p += 1
+                parens += 1
 
-            name = atom()
+            name = read_name()
             expect(":")
             if eat("$tType"):
                 # type exists
@@ -1228,9 +1213,9 @@ def read_tptp1(filename, select=True):
             if tok == ">":
                 raise Inappropriate()
 
-            while p:
+            while parens:
                 expect(")")
-                p -= 1
+                parens -= 1
         else:
             # formula
             a = logic_formula()
@@ -1255,15 +1240,11 @@ def read_tptp1(filename, select=True):
                 ignore()
 
         # end
-        if tok != ")":
-            err("expected ')'")
-        lex()
-        if tok != ".":
-            err("expected '.'")
-        lex()
+        expect(")")
+        expect(".")
 
     def include():
-        atom()
+        lex()
         expect("(")
 
         # tptp
@@ -1272,7 +1253,7 @@ def read_tptp1(filename, select=True):
             err("TPTP environment variable not set")
 
         # file
-        filename1 = unquote(atom())
+        filename1 = read_name()
 
         # select
         select1 = select
@@ -1280,7 +1261,7 @@ def read_tptp1(filename, select=True):
             expect("[")
             select1 = []
             while True:
-                name = atom()
+                name = read_name()
                 if selecting(name):
                     select1.append(name)
                 if not eat(","):
