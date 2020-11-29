@@ -29,7 +29,7 @@ class DistinctObject:
     def __init__(self, name):
         self.name = name
 
-    def __str__(self):
+    def __repr__(self):
         return self.name
 
 
@@ -59,7 +59,7 @@ class Fn:
         if args:
             self.ty = (rty,) + tuple([typeof(a) for a in args])
 
-    def __str__(self):
+    def __repr__(self):
         return self.name
 
 
@@ -770,13 +770,10 @@ def transform_clauses(cs, f):
 
 class Problem:
     def __init__(self, name):
+        self.name = name
+        self.formulas = []
         self.clauses = []
         self.expected = None
-        self.formulas = []
-        self.name = name
-
-    def __str__(self):
-        return self.name
 
 
 ######################################## TPTP
