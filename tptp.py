@@ -656,51 +656,17 @@ def walk_proof(c, f):
 
 class Clause:
     def __init__(self, name, neg, pos, *parents):
-        self.parents = parents
-
         # check structure
         for a in neg:
             check_tuples(a)
         for a in pos:
             check_tuples(a)
-
-        # simplify and eliminate redundancy
-        r = []
-        for a in neg:
-            a = simplify(a)
-            if a is not True:
-                r.append(a)
-        neg = r
-
-        r = []
-        for a in pos:
-            a = simplify(a)
-            if a is not False:
-                r.append(a)
-        pos = r
-
-        # check structure
-        for a in neg:
-            check_tuples(a)
-        for a in pos:
-            check_tuples(a)
-
-        # tautology?
-        if False in neg:
-            set_true(self)
-            return
-        if True in pos:
-            set_true(self)
-            return
-        for a in neg:
-            if a in pos:
-                set_true(self)
-                return
 
         # ok
         set_formula_name(self, name)
         self.neg = tuple(neg)
         self.pos = tuple(pos)
+        self.parents = parents
 
     def __lt__(self, other):
         return clause_size(self) < clause_size(other)
@@ -1580,7 +1546,7 @@ def prproof(c):
 ######################################## CNF
 
 
-def cnf(problem):
+def cnf(formulas, clauses):
     def skolem(rty, args):
         a = Fn(None, rty, args)
         if args:
@@ -1747,9 +1713,17 @@ def cnf(problem):
             return
         clause(f, a)
 
-    clauses = problem.clauses
-    for f in problem.formulas:
+    for f in formulas:
         convert(f)
+
+
+######################################## read and prepare
+
+
+def read_problem(filename):
+    problem = read_tptp(filename)
+    cnf(problem.formulas, problem.clauses)
+    return problem
 
 
 ######################################## test
@@ -1763,8 +1737,7 @@ def test(filename):
     print(f"{filename:40s} ", end="", flush=True)
     try:
         start = time.time()
-        problem = read_tptp(filename)
-        cnf(problem)
+        problem = read_problem(filename)
         print(
             f"{len(problem.formulas):7d} {len(problem.clauses):7d} {time.time()-start:10.3f}"
         )
