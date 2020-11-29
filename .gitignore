@@ -1,6 +1,7 @@
 *.csv
 *.dot
 *.lst
+*.p
 *.png
 *.pth
 data/
