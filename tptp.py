@@ -53,6 +53,8 @@ class Real(fractions.Fraction):
 class Fn:
     def __init__(self, name, rty, args):
         self.name = name
+        if not rty:
+            return
         self.ty = rty
         if args:
             self.ty = (rty,) + tuple([typeof(a) for a in args])
@@ -79,7 +81,7 @@ types = {}
 def mktype(name):
     if name in types:
         return types[name]
-    a = Fn(name, "type", [])
+    a = Fn(name, None, [])
     types[name] = a
     return a
 
@@ -87,6 +89,8 @@ def mktype(name):
 # first-order variables cannot be boolean
 class Var:
     def __init__(self, ty="individual"):
+        if not ty:
+            return
         assert ty != "bool"
         self.ty = ty
 
@@ -293,47 +297,19 @@ def walk(a, f):
 # types
 def typeof(a):
     if isinstance(a, tuple):
-        ty = typeof(a[0])
-        assert isinstance(ty, tuple)
+        o = a[0]
+        if isinstance(o, str):
+            if o in ("exists", "forall", "=", "<", "<=", "and", "or", "int?", "rat?"):
+                return "bool"
+            if o.startswith("to-"):
+                return o[3:]
+            return typeof(a[1])
+        ty = typeof(o)
+        if not isinstance(ty, tuple):
+            raise ValueError(a)
         return ty[0]
     if isinstance(a, str):
-        # for predefined functions, a type variable means polymorphic
-        # as opposed to user-defined functions, where it means inferred
-        x = Var("type")
-        types = {
-            "*": (x, x, x),
-            "+": (x, x, x),
-            "-": (x, x, x),
-            "/": (x, x, x),
-            "<": ("bool", x, x),
-            "<=": ("bool", x, x),
-            ">": ("bool", x, x),
-            ">=": ("bool", x, x),
-            "=": ("bool", x, x),
-            "and": ("bool", "bool", "bool"),
-            "ceil": (x, x),
-            "div-e": (x, x, x),
-            "div-f": (x, x, x),
-            "div-t": (x, x, x),
-            "eqv": ("bool", "bool", "bool"),
-            "exists": ("bool", None, "bool"),
-            "floor": (x, x),
-            "forall": ("bool", None, "bool"),
-            "int?": ("bool", x),
-            "not": ("bool", "bool"),
-            "or": ("bool", "bool", "bool"),
-            "rat?": ("bool", x),
-            "rem-e": (x, x, x),
-            "rem-f": (x, x, x),
-            "rem-t": (x, x, x),
-            "round": (x, x),
-            "to_int": ("int", x),
-            "to_rat": ("rat", x),
-            "to_real": ("real", x),
-            "trunc": (x, x),
-            "unary-": (x, x),
-        }
-        return types[a]
+        raise ValueError(a)
     if isinstance(a, Fn) or isinstance(a, Var):
         return a.ty
     if isinstance(a, DistinctObject):
@@ -348,6 +324,34 @@ def typeof(a):
 # first step of type inference:
 # unify to figure out how all the unspecified types can be made consistent
 def type_unify(wanted, a, m):
+    # this version of unify skips the type check
+    # because it makes no sense to ask the type of a type
+    def unify(a, b, m):
+        if isinstance(a, tuple) and isinstance(b, tuple):
+            if len(a) != len(b):
+                return
+            for i in range(len(a)):
+                if not unify(a[i], b[i], m):
+                    return
+            return True
+        if a == b:
+            return True
+
+        def unify_var(a, b, m):
+            if a in m:
+                return unify(m[a], b, m)
+            if b in m:
+                return unify(a, m[b], m)
+            if occurs(a, b, m):
+                return
+            m[a] = b
+            return True
+
+        if isinstance(a, Var):
+            return unify_var(a, b, m)
+        if isinstance(b, Var):
+            return unify_var(b, a, m)
+
     if not unify(wanted, typeof(a), m):
         raise ValueError(f"{wanted} != typeof({a})")
     if isinstance(a, tuple):
@@ -798,9 +802,9 @@ defined_fns = {
     "$remainder_t": "rem-t",
     "$round": "round",
     "$sum": "+",
-    "$to_int": "to_int",
-    "$to_rat": "to_rat",
-    "$to_real": "to_real",
+    "$to_int": "to-int",
+    "$to_rat": "to-rat",
+    "$to_real": "to-real",
     "$truncate": "trunc",
     "$uminus": "unary-",
 }
@@ -1075,7 +1079,7 @@ def read_tptp1(filename, select=True):
 
         # function
         name = read_name()
-        return fn(name, Var("type"), args() if tok == "(" else [])
+        return fn(name, Var(None), args() if tok == "(" else [])
 
     def infix_unary():
         a = atomic_term()
@@ -1721,7 +1725,24 @@ def cnf(formulas, clauses):
 
 
 def read_problem(filename):
+    # read
     problem = read_tptp(filename)
+
+    # infer types
+    terms = []
+    for f in problem.formulas:
+        terms.append(f.term)
+    for c in problem.clauses:
+        terms.extend(c.neg + c.pos)
+    m = {}
+    for a in terms:
+        type_unify("bool", a, m)
+    for a in terms:
+        type_set(a, m)
+    for a in terms:
+        type_check("bool", a)
+
+    # convert to clause normal form
     cnf(problem.formulas, problem.clauses)
     return problem
 
