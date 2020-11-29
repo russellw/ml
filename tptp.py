@@ -51,8 +51,11 @@ class Real(fractions.Fraction):
 
 # constants are just functions of arity zero
 class Fn:
-    def __init__(self, name):
+    def __init__(self, name, rty, args):
         self.name = name
+        self.ty = rty
+        if args:
+            self.ty = (rty,) + tuple([typeof(a) for a in args])
 
     def __str__(self):
         return self.name
@@ -61,10 +64,10 @@ class Fn:
 fns = {}
 
 
-def fn(name):
+def fn(name, rty, args):
     if name in fns:
         return fns[name]
-    a = Fn(name)
+    a = Fn(name, rty, args)
     fns[name] = a
     return a
 
@@ -76,8 +79,7 @@ types = {}
 def mktype(name):
     if name in types:
         return types[name]
-    a = Fn(name)
-    a.ty = "type"
+    a = Fn(name, "type", [])
     types[name] = a
     return a
 
@@ -228,10 +230,7 @@ def subst(a, m):
     if a in m:
         return subst(m[a], m)
     if isinstance(a, tuple):
-        r = []
-        for b in a:
-            r.append(subst(b, m))
-        return tuple(r)
+        return tuple([subst(b, m) for b in a])
     return a
 
 
@@ -242,56 +241,6 @@ def term_size(a):
             n += term_size(b)
         return n
     return 1
-
-
-def typeof(a):
-    if isinstance(a, tuple):
-        return typeof(a[0])[0]
-    if isinstance(a, str):
-        x = Var("type")
-        types = {
-            "*": (x, x, x),
-            "+": (x, x, x),
-            "-": (x, x, x),
-            "/": (x, x, x),
-            "<": ("bool", x, x),
-            "<=": ("bool", x, x),
-            ">": ("bool", x, x),
-            ">=": ("bool", x, x),
-            "=": ("bool", x, x),
-            "and": ("bool", "bool", "bool"),
-            "ceil": (x, x),
-            "div_e": (x, x, x),
-            "div_f": (x, x, x),
-            "div_t": (x, x, x),
-            "eqv": ("bool", "bool", "bool"),
-            "exists": ("bool", None, "bool"),
-            "floor": (x, x),
-            "forall": ("bool", None, "bool"),
-            "int?": ("bool", x),
-            "not": ("bool", "bool"),
-            "or": ("bool", "bool", "bool"),
-            "rat?": ("bool", x),
-            "rem_e": (x, x, x),
-            "rem_f": (x, x, x),
-            "rem_t": (x, x, x),
-            "round": (x, x),
-            "to_int": ("int", x),
-            "to_rat": ("rat", x),
-            "to_real": ("real", x),
-            "trunc": (x, x),
-            "unary-": (x, x),
-        }
-        return types[a]
-    if isinstance(a, Fn) or isinstance(a, Var):
-        return a.ty
-    if isinstance(a, DistinctObject):
-        return "individual"
-    if isinstance(a, Real):
-        return "real"
-    if isinstance(a, fractions.Fraction):
-        return "rat"
-    return type(a).__name__
 
 
 def unequal(a, b):
@@ -339,6 +288,183 @@ def walk(a, f):
         for b in a:
             walk(b, f)
     f(a)
+
+
+# types
+def typeof(a):
+    if isinstance(a, tuple):
+        ty = typeof(a[0])
+        assert isinstance(ty, tuple)
+        return ty[0]
+    if isinstance(a, str):
+        # for predefined functions, a type variable means polymorphic
+        # as opposed to user-defined functions, where it means inferred
+        x = Var("type")
+        types = {
+            "*": (x, x, x),
+            "+": (x, x, x),
+            "-": (x, x, x),
+            "/": (x, x, x),
+            "<": ("bool", x, x),
+            "<=": ("bool", x, x),
+            ">": ("bool", x, x),
+            ">=": ("bool", x, x),
+            "=": ("bool", x, x),
+            "and": ("bool", "bool", "bool"),
+            "ceil": (x, x),
+            "div-e": (x, x, x),
+            "div-f": (x, x, x),
+            "div-t": (x, x, x),
+            "eqv": ("bool", "bool", "bool"),
+            "exists": ("bool", None, "bool"),
+            "floor": (x, x),
+            "forall": ("bool", None, "bool"),
+            "int?": ("bool", x),
+            "not": ("bool", "bool"),
+            "or": ("bool", "bool", "bool"),
+            "rat?": ("bool", x),
+            "rem-e": (x, x, x),
+            "rem-f": (x, x, x),
+            "rem-t": (x, x, x),
+            "round": (x, x),
+            "to_int": ("int", x),
+            "to_rat": ("rat", x),
+            "to_real": ("real", x),
+            "trunc": (x, x),
+            "unary-": (x, x),
+        }
+        return types[a]
+    if isinstance(a, Fn) or isinstance(a, Var):
+        return a.ty
+    if isinstance(a, DistinctObject):
+        return "individual"
+    if isinstance(a, Real):
+        return "real"
+    if isinstance(a, fractions.Fraction):
+        return "rat"
+    return type(a).__name__
+
+
+# first step of type inference:
+# unify to figure out how all the unspecified types can be made consistent
+def type_unify(wanted, a, m):
+    if not unify(wanted, typeof(a), m):
+        raise ValueError(f"{wanted} != typeof({a})")
+    if isinstance(a, tuple):
+        o = a[0]
+
+        # predefined function
+        if isinstance(o, str):
+            # quantifiers require body boolean
+            if o in ("exists", "forall"):
+                type_unify("bool", a[2], m)
+                return
+
+            # all arguments boolean
+            if o in ("and", "or", "eqv", "not"):
+                for i in range(1, len(a)):
+                    type_unify("bool", a[i], m)
+                return
+
+            # all arguments of the same type
+            actual = typeof(a[1])
+            for i in range(2, len(a)):
+                type_unify(actual, a[i], m)
+            return
+
+        # user-defined function
+        # we already unified the return type
+        # by virtue of unifying the type of the whole expression
+        # so now just need to unify parameters with arguments
+        ty = typeof(o)
+        assert isinstance(ty, tuple)
+        for i in range(1, len(a)):
+            unify(ty[i], a[i], m)
+        return
+
+
+# second step of type inference:
+# fill in actual types for all the type variables
+def type_set(a, m):
+    if isinstance(a, tuple):
+        for b in a:
+            type_set(b, m)
+        return
+    if isinstance(a, Fn) or isinstance(a, Var):
+        a.ty = subst(a.ty, m)
+        if isinstance(a.ty, tuple):
+            r = []
+            for b in a.ty:
+                if isinstance(b, Var):
+                    b = "individual"
+                r.append(b)
+            a.ty = tuple(r)
+            return
+        if isinstance(a.ty, Var):
+            a.ty = "individual"
+            return
+        return
+
+
+# third step of type inference:
+# check the types are correct
+def type_check(wanted, a):
+    if wanted != typeof(a):
+        raise ValueError(f"{wanted} != typeof({a})")
+    if isinstance(a, tuple):
+        o = a[0]
+
+        # predefined function
+        if isinstance(o, str):
+            # quantifiers require body boolean
+            if o in ("exists", "forall"):
+                for x in a[1]:
+                    if x.ty == "bool":
+                        raise ValueError(a)
+                type_check("bool", a[2])
+                return
+
+            # all arguments boolean
+            if o in ("and", "or", "eqv", "not"):
+                for i in range(1, len(a)):
+                    type_check("bool", a[i])
+                return
+
+            # all arguments int
+            if o in ("div-e", "div-f", "div-t", "rem-e", "rem-f", "rem-t"):
+                for i in range(1, len(a)):
+                    type_check("bool", a[i])
+                return
+
+            # all arguments of the same type
+            actual = typeof(a[1])
+            for i in range(2, len(a)):
+                type_check(actual, a[i])
+
+            # =
+            if o == "=":
+                return
+
+            # numbers
+            if actual not in ("int", "rat", "real"):
+                raise ValueError(a)
+
+            # rational or real
+            if o == "div" and actual == "int":
+                raise ValueError(a)
+            return
+
+        return
+    if isinstance(a, Fn):
+        if isinstance(a.ty, tuple):
+            for b in a.ty[1:]:
+                if b == "bool":
+                    raise ValueError(a)
+        return
+    if isinstance(a, Var):
+        if a.ty == "bool":
+            raise ValueError(a)
+        return
 
 
 ######################################## simplify
@@ -698,12 +824,12 @@ defined_fns = {
     "$lesseq": "<=",
     "$product": "*",
     "$quotient": "/",
-    "$quotient_e": "div_e",
-    "$quotient_f": "div_f",
-    "$quotient_t": "div_t",
-    "$remainder_e": "rem_e",
-    "$remainder_f": "rem_f",
-    "$remainder_t": "rem_t",
+    "$quotient_e": "div-e",
+    "$quotient_f": "div-f",
+    "$quotient_t": "div-t",
+    "$remainder_e": "rem-e",
+    "$remainder_f": "rem-f",
+    "$remainder_t": "rem-t",
     "$round": "round",
     "$sum": "+",
     "$to_int": "to_int",
@@ -926,7 +1052,7 @@ def read_tptp1(filename, select=True):
         if n and len(r) != n:
             err(f"expected {n} args")
         expect(")")
-        return r
+        return tuple(r)
 
     def atomic_term():
         o = tok
@@ -940,7 +1066,7 @@ def read_tptp1(filename, select=True):
             if o in defined_fns:
                 a = defined_fns[o]
                 lex()
-                return (a,) + tuple(args(arity(a)))
+                return (a,) + args(arity(a))
             if eat("$distinct"):
                 r = args()
                 inequalities = ["and"]
@@ -982,10 +1108,8 @@ def read_tptp1(filename, select=True):
             return a
 
         # function
-        a = fn(read_name())
-        if tok == "(":
-            return (a,) + tuple(args())
-        return a
+        name = read_name()
+        return fn(name, Var("type"), args() if tok == "(" else [])
 
     def infix_unary():
         a = atomic_term()
@@ -1457,11 +1581,10 @@ def prproof(c):
 
 
 def cnf(problem):
-    def skolem(ty, v):
-        a = Fn()
-        a.ty = ty
-        if v:
-            return (a,) + tuple(v)
+    def skolem(rty, args):
+        a = Fn(None, rty, args)
+        if args:
+            return (a,) + tuple(args)
         return a
 
     def nnf(all_vars, exists_vars, pol, a):
