@@ -1132,12 +1132,12 @@ def read_tptp1(filename, select=True):
 
     def compound_type():
         if eat("("):
-            r = [atomic_type()]
+            params = [atomic_type()]
             while eat("*"):
-                r.append(atomic_type())
+                params.append(atomic_type())
             expect(")")
             expect(">")
-            return (atomic_type(),) + tuple(r)
+            return (atomic_type(),) + tuple(params)
         ty = atomic_type()
         if eat(">"):
             return atomic_type(), ty
@@ -1149,8 +1149,7 @@ def read_tptp1(filename, select=True):
             err("expected variable")
         lex()
         ty = "individual"
-        if tok == ":":
-            lex()
+        if eat(":"):
             ty = atomic_type()
         a = Var(ty)
         bound[0][o] = a
@@ -1162,9 +1161,7 @@ def read_tptp1(filename, select=True):
         if o == "(":
             lex()
             a = logic_formula()
-            if tok != ")":
-                err("expected ')'")
-            lex()
+            expect(")")
             return a
         if o == "~":
             lex()
