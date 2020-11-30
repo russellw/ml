@@ -1738,6 +1738,7 @@ def cnf(formulas, clauses):
 
 def read_problem(filename):
     # read
+    fns.clear()
     problem = read_tptp(filename)
 
     # infer types
