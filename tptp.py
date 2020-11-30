@@ -57,10 +57,10 @@ class Real(fractions.Fraction):
 
 # constants are just functions of arity zero
 class Fn:
-    def __init__(self, name, rty, args):
+    def __init__(self, name=None):
         self.name = name
-        if not rty:
-            return
+
+    def type_args(rty, args):
         self.ty = rty
         if args:
             self.ty = (rty,) + tuple([typeof(a) for a in args])
@@ -69,13 +69,14 @@ class Fn:
         return self.name
 
 
+# TODO: do we need to track functions across problems?
 fns = {}
 
 
-def fn(name, rty, args):
+def fn(name):
     if name in fns:
         return fns[name]
-    a = Fn(name, rty, args)
+    a = Fn(name)
     fns[name] = a
     return a
 
@@ -87,14 +88,14 @@ types = {}
 def mktype(name):
     if name in types:
         return types[name]
-    a = Fn(name, None, [])
+    a = Fn(name)
     types[name] = a
     return a
 
 
 # first-order variables cannot be boolean
 class Var:
-    def __init__(self, ty="individual"):
+    def __init__(self, ty=None):
         if not ty:
             return
         assert ty != "bool"
@@ -1112,17 +1113,20 @@ def read_tptp1(filename, select=True):
                 b = b[1]
             if o in free:
                 return free[o]
-            a = Var()
+            a = Var("individual")
             free[o] = a
             return a
 
         # function
-        name = read_name()
+        a = fn(read_name())
         if tok == "(":
             s = args()
-            a = fn(name, Var(None), s)
+            if not hasattr(a, "ty"):
+                a.type_args(Var(), s)
             return (a,) + s
-        return fn(name, Var(None), [])
+        if not hasattr(a, "ty"):
+            a.ty = Var()
+        return a
 
     def infix_unary():
         a = atomic_term()
@@ -1584,7 +1588,8 @@ def prproof(c):
 
 def cnf(formulas, clauses):
     def skolem(rty, args):
-        a = Fn(None, rty, args)
+        a = Fn()
+        a.type_args(None, rty, args)
         if args:
             return (a,) + tuple(args)
         return a
