@@ -364,6 +364,7 @@ def type_unify(wanted, a, m):
             return unify_var(b, a, m)
 
     if not unify(wanted, typeof(a), m):
+        print(m)
         raise ValueError(f"{wanted} != typeof({a}): {typeof(a)}")
     if isinstance(a, tuple):
         o = a[0]
@@ -394,7 +395,7 @@ def type_unify(wanted, a, m):
         ty = typeof(o)
         assert isinstance(ty, tuple)
         for i in range(1, len(a)):
-            unify(ty[i], a[i], m)
+            type_unify(ty[i], a[i], m)
         return
 
 
