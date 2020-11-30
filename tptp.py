@@ -96,6 +96,36 @@ class Var:
 
 
 def arity(a):
+    if isinstance(a, str):
+        arities = {
+            "*": 2,
+            "+": 2,
+            "-": 2,
+            "/": 2,
+            "<": 2,
+            "<=": 2,
+            ">": 2,
+            ">=": 2,
+            "ceil": 1,
+            "div-e": 2,
+            "div-f": 2,
+            "div-t": 2,
+            "eqv": 2,
+            "floor": 1,
+            "int?": 1,
+            "not": 1,
+            "rat?": 1,
+            "rem-e": 2,
+            "rem-f": 2,
+            "rem-t": 2,
+            "round": 1,
+            "to-int": 1,
+            "to-rat": 1,
+            "to-real": 1,
+            "trunc": 1,
+            "unary-": 1,
+        }
+        return arities[a]
     ty = typeof(a)
     if isinstance(ty, tuple):
         n = len(ty) - 1
@@ -1020,7 +1050,7 @@ def read_tptp1(filename, select=True):
 
         err("expected name")
 
-    def args(n=0):
+    def args(n=-1):
         expect("(")
         r = []
         if tok != ")":
@@ -1028,7 +1058,7 @@ def read_tptp1(filename, select=True):
             while tok == ",":
                 lex()
                 r.append(atomic_term())
-        if n and len(r) != n:
+        if n > 0 and len(r) != n:
             err(f"expected {n} args")
         expect(")")
         return tuple(r)
