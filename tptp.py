@@ -22,6 +22,12 @@ def debug(x):
     print(f"{info.filename}:{info.function}:{info.lineno}: {repr(x)}", file=sys.stderr)
 
 
+def invert(m):
+    r = dict(map(reversed, m.items()))
+    assert len(r) == len(m)
+    return r
+
+
 ######################################## terms
 
 
@@ -93,45 +99,6 @@ class Var:
             return
         assert ty != "bool"
         self.ty = ty
-
-
-def arity(a):
-    if isinstance(a, str):
-        arities = {
-            "*": 2,
-            "+": 2,
-            "-": 2,
-            "/": 2,
-            "<": 2,
-            "<=": 2,
-            ">": 2,
-            ">=": 2,
-            "ceil": 1,
-            "div-e": 2,
-            "div-f": 2,
-            "div-t": 2,
-            "eqv": 2,
-            "floor": 1,
-            "int?": 1,
-            "not": 1,
-            "rat?": 1,
-            "rem-e": 2,
-            "rem-f": 2,
-            "rem-t": 2,
-            "round": 1,
-            "to-int": 1,
-            "to-rat": 1,
-            "to-real": 1,
-            "trunc": 1,
-            "unary-": 1,
-        }
-        return arities[a]
-    ty = typeof(a)
-    if isinstance(ty, tuple):
-        n = len(ty) - 1
-        assert n
-        return n
-    return 0
 
 
 def const(a):
@@ -825,8 +792,6 @@ defined_fns = {
     "$ceiling": "ceil",
     "$difference": "-",
     "$floor": "floor",
-    "$greater": ">",
-    "$greatereq": ">=",
     "$is_int": "int?",
     "$is_rat": "rat?",
     "$less": "<",
@@ -1068,22 +1033,57 @@ def read_tptp1(filename, select=True):
 
         # defined function
         if o[0] == "$":
+            # constant
             if eat("$false"):
                 return False
             if eat("$true"):
                 return True
+
+            # syntax sugar
+            if eat("$greater"):
+                s = args(2)
+                return "<", s[1], s[0]
+            if eat("$greatereq"):
+                s = args(2)
+                return "<=", s[1], s[0]
+            if eat("$distinct"):
+                s = args()
+                inequalities = ["and"]
+                for i in range(len(s)):
+                    for j in range(len(s)):
+                        if i != j:
+                            inequalities.append(("not", ("=", s[i], s[j])))
+                return tuple(inequalities)
+
+            # predefined function
             if o in defined_fns:
                 a = defined_fns[o]
                 lex()
-                return (a,) + args(arity(a))
-            if eat("$distinct"):
-                r = args()
-                inequalities = ["and"]
-                for i in range(len(r)):
-                    for j in range(len(r)):
-                        if i != j:
-                            inequalities.append(("not", ("=", r[i], r[j])))
-                return tuple(inequalities)
+                arities = {
+                    "*": 2,
+                    "+": 2,
+                    "-": 2,
+                    "/": 2,
+                    "<": 2,
+                    "<=": 2,
+                    "ceil": 1,
+                    "div-e": 2,
+                    "div-f": 2,
+                    "div-t": 2,
+                    "floor": 1,
+                    "int?": 1,
+                    "rat?": 1,
+                    "rem-e": 2,
+                    "rem-f": 2,
+                    "rem-t": 2,
+                    "round": 1,
+                    "to-int": 1,
+                    "to-rat": 1,
+                    "to-real": 1,
+                    "trunc": 1,
+                    "unary-": 1,
+                }
+                return (a,) + args(arities[a])
             err("unknown function")
 
         # distinct object
@@ -1538,14 +1538,7 @@ def prterm(a, parent=None):
 
 def prtype(a):
     if isinstance(a, str):
-        defined_types = {
-            "bool": "$o",
-            "individual": "$i",
-            "int": "$int",
-            "rat": "$rat",
-            "real": "$real",
-        }
-        pr(defined_types[a])
+        pr(invert(defined_types)[a])
         return
     pr(a)
 
