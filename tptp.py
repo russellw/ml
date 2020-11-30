@@ -162,8 +162,6 @@ def imp(a, b):
 
 
 def isomorphic(a, b, m):
-    if typeof(a) != typeof(b):
-        return
     if isinstance(a, tuple) and isinstance(b, tuple):
         if len(a) != len(b):
             return
@@ -258,7 +256,9 @@ def unify(a, b, m):
     if isinstance(a, tuple) and isinstance(b, tuple):
         if len(a) != len(b):
             return
-        for i in range(len(a)):
+        if a[0] != b[0]:
+            return
+        for i in range(1, len(a)):
             if not unify(a[i], b[i], m):
                 return
         return True
