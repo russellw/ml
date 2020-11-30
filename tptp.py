@@ -1337,15 +1337,14 @@ def read_tptp1(filename, select=True):
             expect(":")
             if eat("$tType"):
                 # type exists
-                pass
+                if tok == ">":
+                    raise Inappropriate()
             else:
                 # function has type
                 ty = compound_type()
                 if isinstance(ty, tuple):
                     ty = ty[0]
                 typecheck(name, ty)
-            if tok == ">":
-                raise Inappropriate()
 
             while parens:
                 expect(")")
