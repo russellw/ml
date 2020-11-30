@@ -1087,7 +1087,11 @@ def read_tptp1(filename, select=True):
 
         # function
         name = read_name()
-        return fn(name, Var(None), args() if tok == "(" else [])
+        if tok == "(":
+            s = args()
+            a = fn(name, Var(None), s)
+            return (a,) + s
+        return fn(name, Var(None), [])
 
     def infix_unary():
         a = atomic_term()
