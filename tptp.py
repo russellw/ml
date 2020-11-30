@@ -299,7 +299,18 @@ def typeof(a):
     if isinstance(a, tuple):
         o = a[0]
         if isinstance(o, str):
-            if o in ("exists", "forall", "=", "<", "<=", "and", "or", "int?", "rat?"):
+            if o in (
+                "exists",
+                "forall",
+                "eqv",
+                "=",
+                "<",
+                "<=",
+                "and",
+                "or",
+                "int?",
+                "rat?",
+            ):
                 return "bool"
             if o.startswith("to-"):
                 return o[3:]
