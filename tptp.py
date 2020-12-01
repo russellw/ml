@@ -60,7 +60,7 @@ class Fn:
     def __init__(self, name=None):
         self.name = name
 
-    def type_args(rty, args):
+    def type_args(self, rty, args):
         self.ty = rty
         if args:
             self.ty = (rty,) + tuple([typeof(a) for a in args])
@@ -447,7 +447,7 @@ def type_check(wanted, a):
             # all arguments int
             if o in ("div-e", "div-f", "div-t", "rem-e", "rem-f", "rem-t"):
                 for i in range(1, len(a)):
-                    type_check("bool", a[i])
+                    type_check("int", a[i])
                 return
 
             # all arguments of the same type
@@ -632,8 +632,8 @@ def simplify(a):
 class Formula:
     def __init__(self, name, term, *parents):
         set_formula_name(self, name)
-        self.parents = parents
         self.term = term
+        self.parents = parents
 
 
 formula_name_i = 0
@@ -844,26 +844,6 @@ def unquote(s):
     return s
 
 
-def weird(s):
-    if not s[0].islower():
-        return True
-    for c in s:
-        if not c.isalnum() and c != "_":
-            return True
-    if s in term_keywords:
-        return True
-
-
-def weird_type(s):
-    if not s[0].islower():
-        return True
-    for c in s:
-        if not c.isalnum() and c != "_":
-            return True
-    if s in type_keywords:
-        return True
-
-
 # parser
 class Inappropriate(Exception):
     pass
@@ -995,6 +975,39 @@ def read_tptp1(filename, select=True):
     # terms
     bound = None
     free = {}
+
+    def atomic_type():
+        o = tok
+
+        # predefined type
+        if o in defined_types:
+            lex()
+            return defined_types[o]
+
+        # user-defined type
+        if o[0].islower():
+            lex()
+            return mktype(o)
+
+        # single quoted, equivalent to word
+        if o[0] == "'":
+            lex()
+            return mktype(unquote(o))
+
+        err("expected type")
+
+    def compound_type():
+        if eat("("):
+            params = [atomic_type()]
+            while eat("*"):
+                params.append(atomic_type())
+            expect(")")
+            expect(">")
+            return (atomic_type(),) + tuple(params)
+        ty = atomic_type()
+        if eat(">"):
+            return atomic_type(), ty
+        return ty
 
     def read_name():
         o = tok
@@ -1139,44 +1152,6 @@ def read_tptp1(filename, select=True):
             return "not", ("=", a, atomic_term())
         return a
 
-    def atomic_type():
-        o = tok
-
-        # word
-        if o[0].islower():
-            lex()
-            if o in type_keywords:
-                return "'" + o + "'"
-            return o
-
-        # defined type
-        if o in defined_types:
-            lex()
-            return defined_types[o]
-
-        # single quoted, equivalent to word
-        if o[0] == "'":
-            lex()
-            u = unquote(o)
-            if not weird_type(u):
-                return u
-            return o
-
-        err("expected type")
-
-    def compound_type():
-        if eat("("):
-            params = [atomic_type()]
-            while eat("*"):
-                params.append(atomic_type())
-            expect(")")
-            expect(">")
-            return (atomic_type(),) + tuple(params)
-        ty = atomic_type()
-        if eat(">"):
-            return atomic_type(), ty
-        return ty
-
     def var():
         o = tok
         if not o[0].isupper():
@@ -1303,9 +1278,8 @@ def read_tptp1(filename, select=True):
                 break
             lex()
         if selecting(name):
-            c = Clause(None, neg, pos)
+            c = Clause(name, neg, pos)
             c.filename = filename
-            c.name = name
             c.role = role
             problem.clauses.append(c)
         if parens:
@@ -1345,10 +1319,13 @@ def read_tptp1(filename, select=True):
                     raise Inappropriate()
             else:
                 # function has type
+                a = fn(name)
                 ty = compound_type()
-                if isinstance(ty, tuple):
-                    ty = ty[0]
-                typecheck(name, ty)
+                if not hasattr(a, "ty"):
+                    a.ty = ty
+                else:
+                    if a.ty != ty:
+                        err("type mismatch")
 
             while parens:
                 expect(")")
@@ -1589,7 +1566,7 @@ def prproof(c):
 def cnf(formulas, clauses):
     def skolem(rty, args):
         a = Fn()
-        a.type_args(None, rty, args)
+        a.type_args(rty, args)
         if args:
             return (a,) + tuple(args)
         return a
