@@ -789,6 +789,14 @@ class Problem:
 ######################################## TPTP
 
 
+defined_types = {
+    "$o": "bool",
+    "$i": "individual",
+    "$int": "int",
+    "$rat": "rat",
+    "$real": "real",
+}
+
 defined_fns = {
     "$ceiling": "ceil",
     "$difference": "-",
@@ -814,14 +822,6 @@ defined_fns = {
     "$uminus": "unary-",
 }
 
-defined_types = {
-    "$o": "bool",
-    "$i": "individual",
-    "$int": "int",
-    "$rat": "rat",
-    "$real": "real",
-}
-
 
 def szs_success(s):
     if s in ("ContradictoryAxioms", "Theorem", "Unsatisfiable"):
@@ -836,12 +836,6 @@ def bool_szs(s):
     if s in ("CounterSatisfiable", "Satisfiable"):
         return True
     raise ValueError(s)
-
-
-def unquote(s):
-    if s[0] in ("'", '"'):
-        return s[1:-1]
-    return s
 
 
 # parser
@@ -976,25 +970,32 @@ def read_tptp1(filename, select=True):
     bound = None
     free = {}
 
-    def atomic_type():
+    def read_name():
         o = tok
 
-        # predefined type
-        if o in defined_types:
-            lex()
-            return defined_types[o]
-
-        # user-defined type
+        # word
         if o[0].islower():
             lex()
-            return mktype(o)
+            return o
 
         # single quoted, equivalent to word
         if o[0] == "'":
             lex()
-            return mktype(unquote(o))
+            return o[1:-1]
 
-        err("expected type")
+        # number
+        if o[0].isdigit() or o[0] == "-":
+            lex()
+            return int(o)
+
+        err("expected name")
+
+    def atomic_type():
+        o = tok
+        if o in defined_types:
+            lex()
+            return defined_types[o]
+        return mktype(read_name())
 
     def compound_type():
         if eat("("):
@@ -1008,26 +1009,6 @@ def read_tptp1(filename, select=True):
         if eat(">"):
             return atomic_type(), ty
         return ty
-
-    def read_name():
-        o = tok
-
-        # word
-        if o[0].islower():
-            lex()
-            return o
-
-        # single quoted, equivalent to word
-        if o[0] == "'":
-            lex()
-            return unquote(o)
-
-        # number
-        if o[0].isdigit() or o[0] == "-":
-            lex()
-            return int(o)
-
-        err("expected name")
 
     def args(n=-1):
         expect("(")
