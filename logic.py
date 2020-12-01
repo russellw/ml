@@ -159,26 +159,6 @@ def imp(a, b):
     return "or", ("not", a), b
 
 
-def isomorphic(a, b, m):
-    if isinstance(a, tuple) and isinstance(b, tuple):
-        if len(a) != len(b):
-            return
-        for i in range(len(a)):
-            if not isomorphic(a[i], b[i], m):
-                return
-        return True
-    if a == b:
-        return True
-    if isinstance(a, Var) and isinstance(b, Var):
-        if a in m and b in m:
-            return m[a] is m[b]
-        if a not in m and b not in m:
-            m[a] = b
-            m[b] = a
-            return True
-        return
-
-
 def match(a, b, m):
     if typeof(a) != typeof(b):
         return
@@ -1542,6 +1522,26 @@ def prproof(c):
 
 
 ######################################## CNF
+
+
+def isomorphic(a, b, m):
+    if isinstance(a, tuple) and isinstance(b, tuple):
+        if len(a) != len(b):
+            return
+        for i in range(len(a)):
+            if not isomorphic(a[i], b[i], m):
+                return
+        return True
+    if a == b:
+        return True
+    if isinstance(a, Var) and isinstance(b, Var):
+        if a in m and b in m:
+            return m[a] is m[b]
+        if a not in m and b not in m:
+            m[a] = b
+            m[b] = a
+            return True
+        return
 
 
 def cnf(formulas, clauses):
