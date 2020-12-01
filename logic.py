@@ -28,6 +28,12 @@ def invert(m):
     return r
 
 
+def remove(s, i):
+    s = list(s)
+    del s[i]
+    return s
+
+
 ######################################## terms
 
 
@@ -1741,6 +1747,77 @@ def read_problem(filename):
     # convert to clause normal form
     cnf(problem.formulas, problem.clauses)
     return problem
+
+
+######################################## subsumption
+
+
+class Timeout(Exception):
+    pass
+
+
+def subsumes(c, d):
+    # negative and positive literals must subsume separately
+    c1 = c.neg
+    c2 = c.pos
+    d1 = d.neg
+    d2 = d.pos
+
+    # longer clause cannot subsume shorter one
+    if len(c1) > len(d1) or len(c2) > len(d2):
+        return
+
+    # fewer literals typically fail faster, so try fewer side first
+    if len(c2) + len(d2) < len(c1) + len(d1):
+        c1, c2 = c2, c1
+        d1, d2 = d2, d1
+
+    # search with timeout
+    steps = 0
+
+    def search(c1, c2, d1, d2, m):
+        nonlocal steps
+
+        # worst-case time is exponential
+        # so give up if taking too long
+        if steps == 1000:
+            raise Timeout()
+        steps += 1
+
+        # matched everything in one polarity?
+        if not c1:
+            # matched everything in the other polarity?
+            if not c2:
+                return m
+
+            # try the other polarity
+            return search(c2, None, d2, None, m)
+
+        # try matching literals
+        for ci in range(len(c1)):
+            ce = equation(c1[ci])
+            for di in range(len(d1)):
+                de = equation(d1[di])
+
+                # try orienting equation one way
+                m1 = m.copy()
+                if match(ce[1], de[1], m1) and match(ce[2], de[2], m1):
+                    m1 = search(remove(c1, ci), c2, remove(d1, di), d2, m1)
+                    if m1 is not None:
+                        return m1
+
+                # and the other way
+                m1 = m.copy()
+                if match(ce[1], de[2], m1) and match(ce[2], de[1], m1):
+                    m1 = search(remove(c1, ci), c2, remove(d1, di), d2, m1)
+                    if m1 is not None:
+                        return m1
+
+    try:
+        m = search(c1, c2, d1, d2, {})
+        return m is not None
+    except Timeout:
+        pass
 
 
 ######################################## test

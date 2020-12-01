@@ -250,4 +250,144 @@ assert not match(b, x, m)
 
 ########################################
 
+# subsumption
+p = fn("p")
+p.ty = "bool"
+p1 = fn("p1")
+p1.ty = "bool", "individual"
+p2 = fn("p2")
+p2.ty = "bool", "individual", "individual"
+
+q = fn("q")
+q.ty = "bool"
+q1 = fn("q1")
+q1.ty = "bool", "individual"
+q2 = fn("q2")
+q2.ty = "bool", "individual", "individual"
+
+# false <= false
+c = Clause(None, [], [])
+d = Clause(None, [], [])
+assert subsumes(c, d)
+
+# false < p
+c = Clause(None, [], [])
+d = Clause(None, [], [p])
+assert subsumes(c, d)
+assert not subsumes(d, c)
+
+# p <= p
+c = Clause(None, [], [p])
+d = Clause(None, [], [p])
+assert subsumes(c, d)
+
+# !p <= !p
+c = Clause(None, [p], [])
+d = Clause(None, [p], [])
+assert subsumes(c, d)
+
+# p < p | p
+c = Clause(None, [], [p])
+d = Clause(None, [], [p, p])
+assert subsumes(c, d)
+assert not subsumes(d, c)
+
+# p !<= !p
+c = Clause(None, [], [p])
+d = Clause(None, [p], [])
+assert not subsumes(c, d)
+assert not subsumes(d, c)
+
+# p | q <= q | p
+c = Clause(None, [], [p, q])
+d = Clause(None, [], [q, p])
+assert subsumes(c, d)
+assert subsumes(d, c)
+
+# p | q < p | q | p
+c = Clause(None, [], [p, q])
+d = Clause(None, [], [p, q, p])
+assert subsumes(c, d)
+assert not subsumes(d, c)
+
+# p(a) | p(b) | q(a) | q(b) | <= p(a) | q(a) | p(b) | q(b)
+c = Clause(None, [], [(p1, a), (p1, b), (q1, a), (q1, b)])
+d = Clause(None, [], [(p1, a), (q1, a), (p1, b), (q1, b)])
+assert subsumes(c, d)
+assert subsumes(d, c)
+
+# p(x,y) < p(a,b)
+c = Clause(None, [], [(p2, x, y)])
+d = Clause(None, [], [(p2, a, b)])
+assert subsumes(c, d)
+assert not subsumes(d, c)
+
+# p(x,x) !<= p(a,b)
+c = Clause(None, [], [(p2, x, x)])
+d = Clause(None, [], [(p2, a, b)])
+assert not subsumes(c, d)
+assert not subsumes(d, c)
+
+# p(x) <= p(y)
+c = Clause(None, [], [(p1, x)])
+d = Clause(None, [], [(p1, y)])
+assert subsumes(c, d)
+assert subsumes(d, c)
+
+# p(x) | p(a(x)) | p(a(a(x))) <= p(y) | p(a(y)) | p(a(a(y)))
+c = Clause(None, [], [(p1, x), (p1, (f, x)), (p1, (f, (f, x)))])
+d = Clause(None, [], [(p1, y), (p1, (f, y)), (p1, (f, (f, y)))])
+assert subsumes(c, d)
+assert subsumes(d, c)
+
+# p(x) | p(a) < p(a) | p(b)
+c = Clause(None, [], [(p1, x), (p1, a)])
+d = Clause(None, [], [(p1, a), (p1, b)])
+assert subsumes(c, d)
+assert not subsumes(d, c)
+
+# p(x) | p(a(x)) <= p(a(y)) | p(y)
+c = Clause(None, [], [(p1, x), (p1, (f, x))])
+d = Clause(None, [], [(p1, (f, y)), (p1, y)])
+assert subsumes(c, d)
+assert subsumes(d, c)
+
+# p(x) | p(a(x)) | p(a(a(x))) <= p(a(a(y))) | p(a(y)) | p(y)
+c = Clause(None, [], [(p1, x), (p1, (f, x)), (p1, (f, (f, x)))])
+d = Clause(None, [], [(p1, (f, (f, y))), (p1, (f, y)), (p1, y)])
+assert subsumes(c, d)
+assert subsumes(d, c)
+
+# (a = x) < (a = b)
+c = Clause(None, [], [("=", a, x)])
+d = Clause(None, [], [("=", a, b)])
+assert subsumes(c, d)
+assert not subsumes(d, c)
+
+# (x = a) < (a = b)
+c = Clause(None, [], [("=", x, a)])
+d = Clause(None, [], [("=", a, b)])
+assert subsumes(c, d)
+assert not subsumes(d, c)
+
+# !p(y) | !p(x) | q(x) < !p(a) | !p(b) | q(b)
+c = Clause(None, [(p1, y), (p1, x)], [(q1, x)])
+d = Clause(None, [(p1, a), (p1, b)], [(q1, b)])
+assert subsumes(c, d)
+assert not subsumes(d, c)
+
+# !p(x) | !p(y) | q(x) < !p(a) | !p(b) | q(b)
+c = Clause(None, [(p1, x), (p1, y)], [(q1, x)])
+d = Clause(None, [(p1, a), (p1, b)], [(q1, b)])
+assert subsumes(c, d)
+assert not subsumes(d, c)
+
+# p(x,a(x)) !<= p(a(y),a(y))
+c = Clause(None, [], [(p1, x, (f, x))])
+d = Clause(None, [], [(p1, (f, y), (f, y))])
+assert not subsumes(c, d)
+assert not subsumes(d, c)
+
+########################################
+
 print("ok")
