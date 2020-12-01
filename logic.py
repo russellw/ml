@@ -981,6 +981,8 @@ def read_tptp1(filename, select=True):
         if o in defined_types:
             lex()
             return defined_types[o]
+        if tok == "$tType":
+            raise Inappropriate()
         return mktype(read_name())
 
     def compound_type():
@@ -1818,6 +1820,210 @@ def subsumes(c, d):
         return m is not None
     except Timeout:
         pass
+
+
+######################################## superposition
+
+# partial implementation of the superposition calculus
+# a full implementation would also implement an order on equations
+# e.g. lexicographic path ordering or Knuth-Bendix ordering
+def clause(m, neg, pos, *parents):
+    neg = subst(tuple(neg), m)
+    pos = subst(tuple(pos), m)
+    c = Clause(None, neg, pos, *parents)
+    etc.check_timeout()
+    if is_true(c):
+        return
+    if clause_size(c) > 10_000_000:
+        raise etc.ResourceOut()
+    clauses.append(c)
+
+
+def original(c):
+    if hasattr(c, "renamed"):
+        return c.parents[0]
+    return c
+
+
+# equality resolution
+# c | c0 != c1
+# ->
+# c/m
+# where
+# m = unify(c0, c1)
+
+# for each negative equation
+def resolution(c):
+    for ci in range(len(c.neg)):
+        _, c0, c1 = equation(c.neg[ci])
+        m = {}
+        if unify(c0, c1, m):
+            resolutionc(c, ci, m)
+
+
+# substitute and make new clause
+def resolutionc(c, ci, m):
+    neg = etc.remove(c.neg, ci)
+    pos = c.pos
+    clause(m, neg, pos, c)
+
+
+# equality factoring
+# c | c0 = c1 | c2 = c3
+# ->
+# (c | c0 = c1 | c1 != c3)/m
+# where
+# m = unify(c0, c2)
+
+# for each positive equation (both directions)
+def factoring(c):
+    for ci in range(len(c.pos)):
+        _, c0, c1 = equation(c.pos[ci])
+        factoring1(c, ci, c0, c1)
+        factoring1(c, ci, c1, c0)
+
+
+# for each positive equation (both directions) again
+def factoring1(c, ci, c0, c1):
+    for cj in range(len(c.pos)):
+        if cj == ci:
+            continue
+        _, c2, c3 = equation(c.pos[cj])
+        factoringc(c, c0, c1, cj, c2, c3)
+        factoringc(c, c0, c1, cj, c3, c2)
+
+
+# check, substitute and make new clause
+def factoringc(c, c0, c1, cj, c2, c3):
+    if not equatable(c1, c3):
+        return
+    m = {}
+    if not unify(c0, c2, m):
+        return
+    neg = c.neg + (("=", c1, c3),)
+    pos = etc.remove(c.pos, cj)
+    clause(m, neg, pos, c)
+
+
+# negative superposition
+# c | c0 = c1, d | d0(a) != d1
+# ->
+# (c | d | d0(c1) != d1)/m
+# where
+# m = unify(c0, a)
+# a not variable
+
+# for each positive equation in c (both directions)
+def superposition_neg(c, d):
+    for ci in range(len(c.pos)):
+        _, c0, c1 = equation(c.pos[ci])
+        superposition_neg1(c, d, ci, c0, c1)
+        superposition_neg1(c, d, ci, c1, c0)
+
+
+# for each negative equation in d (both directions)
+def superposition_neg1(c, d, ci, c0, c1):
+    if c0 is True:
+        return
+    for di in range(len(d.neg)):
+        _, d0, d1 = equation(d.neg[di])
+        superposition_neg2(c, d, ci, c0, c1, di, d0, d1, [], d0)
+        superposition_neg2(c, d, ci, c0, c1, di, d1, d0, [], d1)
+
+
+# descend into subterms
+def superposition_neg2(c, d, ci, c0, c1, di, d0, d1, path, a):
+    if isinstance(a, Var):
+        return
+    superposition_negc(c, d, ci, c0, c1, di, d0, d1, path, a)
+    if isinstance(a, tuple):
+        for i in range(1, len(a)):
+            path.append(i)
+            superposition_negc(c, d, ci, c0, c1, di, d0, d1, path, a[i])
+            path.pop()
+
+
+# check, substitute and make new clause
+def superposition_negc(c, d, ci, c0, c1, di, d0, d1, path, a):
+    m = {}
+    if not unify(c0, a, m):
+        return
+    neg = (
+        c.neg + tuple(etc.remove(d.neg, di)) + (("=", splice(d0, path, c1), d1),)
+    )
+    pos = tuple(etc.remove(c.pos, ci)) + d.pos
+    clause(m, neg, pos, original(c), original(d))
+
+
+# positive superposition
+# c | c0 = c1, d | d0(a) = d1
+# ->
+# (c | d | d0(c1) = d1)/m
+# where
+# m = unify(c0, a)
+# a not variable
+
+# for each positive equation in c (both directions)
+def superposition_pos(c, d):
+    for ci in range(len(c.pos)):
+        _, c0, c1 = equation(c.pos[ci])
+        superposition_pos1(c, d, ci, c0, c1)
+        superposition_pos1(c, d, ci, c1, c0)
+
+
+# for each positive equation in d (both directions)
+def superposition_pos1(c, d, ci, c0, c1):
+    if c0 is True:
+        return
+    for di in range(len(d.pos)):
+        _, d0, d1 = equation(d.pos[di])
+        superposition_pos2(c, d, ci, c0, c1, di, d0, d1, [], d0)
+        superposition_pos2(c, d, ci, c0, c1, di, d1, d0, [], d1)
+
+
+# descend into subterms
+def superposition_pos2(c, d, ci, c0, c1, di, d0, d1, path, a):
+    if isinstance(a, Var):
+        return
+    superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a)
+    if isinstance(a, tuple):
+        for i in range(1, len(a)):
+            path.append(i)
+            superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a[i])
+            path.pop()
+
+
+# check, substitute and make new clause
+def superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a):
+    m = {}
+    if not unify(c0, a, m):
+        return
+    neg = c.neg + d.neg
+    pos = (
+        etc.remove(c.pos, ci)
+        + etc.remove(d.pos, di)
+        + [("=", splice(d0, path, c1), d1)]
+    )
+    clause(m, neg, pos, original(c), original(d))
+
+
+
+# external interface
+# prover should call once
+# each step of its main loop
+def step(c, ds):
+    global clauses
+    clauses = []
+    resolution(c)
+    factoring(c)
+    for d in ds:
+        if hasattr(d, "dead"):
+            continue
+        superposition_neg(c, d)
+        superposition_neg(d, c)
+        superposition_pos(c, d)
+        superposition_pos(d, c)
+    return clauses
 
 
 ######################################## test
