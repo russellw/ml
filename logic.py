@@ -3,6 +3,7 @@ import fractions
 import inspect
 import itertools
 import os
+import process
 import re
 import sys
 import time
@@ -32,6 +33,29 @@ def remove(s, i):
     s = list(s)
     del s[i]
     return s
+
+
+######################################## limits
+
+
+class MemoryOut(Exception):
+    pass
+
+
+class Timeout(Exception):
+    pass
+
+
+def set_timeout(t=60):
+    global end_time
+    end_time = time.time() + t
+
+
+def check_limits():
+    if process.memory_info().wset > 10_000_000_000:
+        raise MemoryOut()
+    if time.time() > end_time:
+        raise Timeout()
 
 
 ######################################## terms
@@ -1756,10 +1780,6 @@ def read_problem(filename):
 ######################################## subsumption
 
 
-class Timeout(Exception):
-    pass
-
-
 def subsumes(c, d):
     # negative and positive literals must subsume separately
     c1 = c.neg
@@ -1830,14 +1850,14 @@ def subsumes(c, d):
 # a full implementation would also implement an order on equations
 # e.g. lexicographic path ordering or Knuth-Bendix ordering
 def clause(m, neg, pos, *parents):
+    check_limits()
     neg = subst(tuple(neg), m)
     pos = subst(tuple(pos), m)
     c = Clause(None, neg, pos, *parents)
-    etc.check_timeout()
     if is_true(c):
         return
     if clause_size(c) > 10_000_000:
-        raise etc.ResourceOut()
+        raise ResourceOut()
     clauses.append(c)
 
 
@@ -1865,7 +1885,7 @@ def resolution(c):
 
 # substitute and make new clause
 def resolutionc(c, ci, m):
-    neg = etc.remove(c.neg, ci)
+    neg = remove(c.neg, ci)
     pos = c.pos
     clause(m, neg, pos, c)
 
@@ -1903,7 +1923,7 @@ def factoringc(c, c0, c1, cj, c2, c3):
     if not unify(c0, c2, m):
         return
     neg = c.neg + (("=", c1, c3),)
-    pos = etc.remove(c.pos, cj)
+    pos = remove(c.pos, cj)
     clause(m, neg, pos, c)
 
 
@@ -1950,8 +1970,8 @@ def superposition_negc(c, d, ci, c0, c1, di, d0, d1, path, a):
     m = {}
     if not unify(c0, a, m):
         return
-    neg = c.neg + tuple(etc.remove(d.neg, di)) + (("=", splice(d0, path, c1), d1),)
-    pos = tuple(etc.remove(c.pos, ci)) + d.pos
+    neg = c.neg + tuple(remove(d.neg, di)) + (("=", splice(d0, path, c1), d1),)
+    pos = tuple(remove(c.pos, ci)) + d.pos
     clause(m, neg, pos, original(c), original(d))
 
 
@@ -1999,11 +2019,7 @@ def superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a):
     if not unify(c0, a, m):
         return
     neg = c.neg + d.neg
-    pos = (
-        etc.remove(c.pos, ci)
-        + etc.remove(d.pos, di)
-        + [("=", splice(d0, path, c1), d1)]
-    )
+    pos = remove(c.pos, ci) + remove(d.pos, di) + [("=", splice(d0, path, c1), d1)]
     clause(m, neg, pos, original(c), original(d))
 
 
