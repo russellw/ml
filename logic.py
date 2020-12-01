@@ -1282,6 +1282,8 @@ def read_tptp1(filename, select=True):
 
             name = read_name()
             expect(":")
+            if tok == "!":
+                raise Inappropriate()
             if eat("$tType"):
                 # type exists
                 if tok == ">":
@@ -1948,9 +1950,7 @@ def superposition_negc(c, d, ci, c0, c1, di, d0, d1, path, a):
     m = {}
     if not unify(c0, a, m):
         return
-    neg = (
-        c.neg + tuple(etc.remove(d.neg, di)) + (("=", splice(d0, path, c1), d1),)
-    )
+    neg = c.neg + tuple(etc.remove(d.neg, di)) + (("=", splice(d0, path, c1), d1),)
     pos = tuple(etc.remove(c.pos, ci)) + d.pos
     clause(m, neg, pos, original(c), original(d))
 
@@ -2005,7 +2005,6 @@ def superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a):
         + [("=", splice(d0, path, c1), d1)]
     )
     clause(m, neg, pos, original(c), original(d))
-
 
 
 # external interface
