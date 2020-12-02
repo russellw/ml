@@ -771,7 +771,8 @@ def bool_szs(s):
 
 # parser
 class Inappropriate(Exception):
-    pass
+    def __init__(self):
+        super().__init__("Inappropriate")
 
 
 def read_tptp1(filename, select=True):
