@@ -581,6 +581,36 @@ class Clause:
         self.pos = tuple(pos)
         self.parents = parents
 
+    def simplify(self):
+        # simplify terms
+        neg = map(simplify, self.neg)
+        pos = map(simplify, self.pos)
+
+        # eliminate redundancy
+        neg = filter(lambda a: a != True, neg)
+        pos = filter(lambda a: a != False, pos)
+
+        # reify iterators
+        neg = tuple(neg)
+        pos = tuple(pos)
+
+        # check for tautology
+        if False in neg or True in pos:
+            neg = ()
+            pos(True,)
+        else:
+            for a in neg:
+                if a in pos:
+                    neg = ()
+                    pos(True,)
+
+        # did anything change?
+        if neg == self.neg and pos == self.pos:
+            return self
+
+        # derived clause
+        return Clause(None, neg, pos, self)
+
     def __lt__(self, other):
         return clause_size(self) < clause_size(other)
 
@@ -1012,6 +1042,10 @@ def read_tptp1(filename, select=True):
             free[o] = a
             return a
 
+        # higher-order terms
+        if tok == "!":
+            raise Inappropriate()
+
         # function
         a = fn(read_name())
         if tok == "(":
@@ -1196,13 +1230,13 @@ def read_tptp1(filename, select=True):
 
             name = read_name()
             expect(":")
-            if tok == "!":
-                raise Inappropriate()
             if eat("$tType"):
                 # type exists
                 if tok == ">":
                     raise Inappropriate()
             else:
+                if tok in ("!", "["):
+                    raise Inappropriate()
                 # function has type
                 a = fn(name)
                 ty = compound_type()
