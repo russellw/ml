@@ -42,13 +42,13 @@ def remove(s, i):
 
 
 class MemoryOut(Exception):
-    def __str__(self):
-        return "MemoryOut"
+    def __init__(self):
+        super().__init__("MemoryOut")
 
 
 class Timeout(Exception):
-    def __str__(self):
-        return "Timeout"
+    def __init__(self):
+        super().__init__("Timeout")
 
 
 def set_timeout(t=60):
