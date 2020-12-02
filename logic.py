@@ -1300,6 +1300,7 @@ def read_tptp1(filename, select=True):
         expect(",")
 
         if role == "type":
+            # type declaration
             parens = 0
             while eat("("):
                 parens += 1
@@ -1335,10 +1336,9 @@ def read_tptp1(filename, select=True):
                 c.role = role
                 if role == "conjecture":
                     if hasattr(problem, "conjecture"):
-                        raise ValueError("multiple conjectures")
+                        err("multiple conjectures")
                     problem.conjecture = c
-                    a = "not", a
-                    c = Formula(name, unquantify(a), c)
+                    c = Formula(name, ("not", a), c)
                     c.filename = filename
                     c.role = "negated_conjecture"
                 problem.formulas.append(c)
