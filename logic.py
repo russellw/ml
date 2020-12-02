@@ -1,5 +1,6 @@
 import argparse
 import fractions
+import heapq
 import inspect
 import itertools
 import os
@@ -229,6 +230,18 @@ def quantify(a):
     v = free_vars(a)
     if v:
         return "forall", v, a
+    return a
+
+
+def rename_vars(a, m):
+    if isinstance(a, tuple):
+        return tuple([rename_vars(b, m) for b in a])
+    if isinstance(a, Var):
+        if a in m:
+            return m[a]
+        b = Var(a.ty)
+        m[a] = b
+        return b
     return a
 
 
@@ -530,13 +543,6 @@ def type_check(wanted, a):
 ######################################## logic
 
 
-class Formula:
-    def __init__(self, name, term, *parents):
-        set_formula_name(self, name)
-        self.term = term
-        self.parents = parents
-
-
 formula_name_i = 0
 
 
@@ -555,33 +561,40 @@ def set_formula_name(c, name):
     c.name = name
 
 
-def walk_proof(c, f):
-    visited = set()
-
-    def rec(c):
-        if c in visited:
-            return
-        visited.add(c)
-        for d in c.parents:
-            rec(d)
-        f(c)
-
-    rec(c, f)
+class Formula:
+    def __init__(self, name, term, *parents):
+        set_formula_name(self, name)
+        self.term = term
+        self.parents = parents
 
 
 class Clause:
     def __init__(self, name, neg, pos, *parents):
-        # check structure
         for a in neg:
             check_tuples(a)
         for a in pos:
             check_tuples(a)
-
-        # ok
         set_formula_name(self, name)
         self.neg = tuple(neg)
         self.pos = tuple(pos)
         self.parents = parents
+
+    def __lt__(self, other):
+        return self.size() < other.size()
+
+    def __repr__(self):
+        return str(self.neg) + "=>" + str(self.pos)
+
+    def false(self):
+        return self.neg, self.pos == (), ()
+
+    def rename_vars(self):
+        m = {}
+        neg = [rename_vars(a, m) for a in self.neg]
+        pos = [rename_vars(a, m) for a in self.pos]
+        c = Clause("renamed", neg, pos, self)
+        c.renamed = True
+        return c
 
     def simplify(self):
         # simplify terms
@@ -607,106 +620,31 @@ class Clause:
                     pos(True,)
 
         # did anything change?
-        if neg == self.neg and pos == self.pos:
+        if (neg, pos) == (self.neg, self.pos):
             return self
 
         # derived clause
         return Clause(None, neg, pos, self)
 
-    def __lt__(self, other):
-        return clause_size(self) < clause_size(other)
+    def size(self):
+        return term_size(c.neg + c.pos)
 
-    def __repr__(self):
-        return str(self.neg) + "=>" + str(self.pos)
-
-
-def term_contains_arith(a):
-    if isinstance(a, tuple):
-        for b in a:
-            if term_contains_arith(b):
-                return True
-    return typeof(a) in ("int", "rat", "real")
+    def true(self):
+        return self.neg, self.pos == (), (True,)
 
 
-def clause_contains_arith(c):
-    for a in c.neg:
-        if term_contains_arith(a):
-            return True
-    for a in c.pos:
-        if term_contains_arith(a):
-            return True
+def walk_proof(c, f):
+    visited = set()
 
+    def rec(c):
+        if c in visited:
+            return
+        visited.add(c)
+        for d in c.parents:
+            rec(d)
+        f(c)
 
-def clauses_contain_arith(cs):
-    for c in cs:
-        if clause_contains_arith(c):
-            return True
-
-
-def clause_size(c):
-    return term_size(c.neg) + term_size(c.pos)
-
-
-def is_false(c):
-    return not c.neg and not c.pos
-
-
-def is_true(c):
-    return not c.neg and c.pos == (True,)
-
-
-def rename_vars(c):
-    m = {}
-
-    neg = []
-    for a in c.neg:
-        neg.append(rename_vars1(a, m))
-
-    pos = []
-    for a in c.pos:
-        pos.append(rename_vars1(a, m))
-
-    c = Clause("renamed", neg, pos, c)
-    c.renamed = True
-    return c
-
-
-def rename_vars1(a, m):
-    if isinstance(a, tuple):
-        r = []
-        for b in a:
-            r.append(rename_vars1(b, m))
-        return tuple(r)
-    if isinstance(a, Var):
-        if a in m:
-            return m[a]
-        b = Var(a.ty)
-        m[a] = b
-        return b
-    return a
-
-
-def set_true(c):
-    c.name = "tautology"
-    c.neg = ()
-    c.pos = (True,)
-
-
-def transform_clause(c, f):
-    neg = []
-    for a in c.neg:
-        neg.append(f(a))
-    pos = []
-    for a in c.pos:
-        pos.append(f(a))
-    return Clause(c.name, neg, pos)
-
-
-def transform_clauses(cs, f):
-    cs1 = []
-    for c in cs:
-        cs1.append(transform_clause(c, f))
-    return cs1
+    rec(c, f)
 
 
 class Problem:
@@ -1753,27 +1691,43 @@ def subsumes(c, d):
         pass
 
 
+def forward_subsumes(ds, c):
+    for d in ds:
+        if hasattr(d, "dead"):
+            continue
+        if subsumes(d, c):
+            return True
+
+
+def backward_subsume(c, ds):
+    for d in ds:
+        if hasattr(d, "dead"):
+            continue
+        if subsumes(c, d):
+            d.dead = True
+
+
 ######################################## superposition
 
 # partial implementation of the superposition calculus
 # a full implementation would also implement an order on equations
 # e.g. lexicographic path ordering or Knuth-Bendix ordering
+def original(c):
+    if hasattr(c, "renamed"):
+        return c.parents[0]
+    return c
+
+
 def clause(m, neg, pos, *parents):
     check_limits()
     neg = subst(tuple(neg), m)
     pos = subst(tuple(pos), m)
     c = Clause(None, neg, pos, *parents)
-    if is_true(c):
+    if c.true():
         return
-    if clause_size(c) > 10_000_000:
+    if c.size() > 10_000_000:
         raise ResourceOut()
     clauses.append(c)
-
-
-def original(c):
-    if hasattr(c, "renamed"):
-        return c.parents[0]
-    return c
 
 
 # equality resolution
@@ -1932,22 +1886,64 @@ def superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a):
     clause(m, neg, pos, original(c), original(d))
 
 
-# external interface
-# prover should call once
-# each step of its main loop
-def step(c, ds):
+# superposition is incomplete on arithmetic
+def contains_arithmetic(a):
+    if isinstance(a, tuple):
+        for b in a:
+            if contains_arithmetic(b):
+                return True
+    return typeof(a) in ("int", "rat", "real")
+
+
+def solve(cs):
     global clauses
-    clauses = []
-    resolution(c)
-    factoring(c)
-    for d in ds:
-        if hasattr(d, "dead"):
+    unprocessed = cs.copy()
+    heapq.heapify(unprocessed)
+    processed = []
+    while unprocessed:
+        # given clause
+        g = heapq.heappop(unprocessed)
+
+        # subsumption
+        if hasattr(g, "dead"):
             continue
-        superposition_neg(c, d)
-        superposition_neg(d, c)
-        superposition_pos(c, d)
-        superposition_pos(d, c)
-    return clauses
+
+        # solved?
+        if g.false():
+            return "Unsatisfiable", g
+
+        # match/unify assume clauses have disjoint variable names
+        c = g.rename_vars()
+
+        # subsumption
+        if forward_subsumes(processed, c):
+            continue
+        if forward_subsumes(unprocessed, c):
+            continue
+        backward_subsume(c, processed)
+        backward_subsume(c, unprocessed)
+
+        # may need to match g with itself
+        processed.append(g)
+
+        # generate new clauses
+        clauses = []
+        resolution(c)
+        factoring(c)
+        for d in processed:
+            if hasattr(d, "dead"):
+                continue
+            superposition_neg(c, d)
+            superposition_neg(d, c)
+            superposition_pos(c, d)
+            superposition_pos(d, c)
+        for c in clauses:
+            heapq.heappush(unprocessed, c)
+    for c in cs:
+        for a in c.neg + c.pos:
+            if contains_arithmetic(a):
+                return "GaveUp", None
+    return "Satisfiable", None
 
 
 ######################################## test
@@ -1958,16 +1954,34 @@ def test(filename):
         return
     if "^" in filename:
         return
-    print(f"{filename:40s} ", end="", flush=True)
+    print(f"% {filename}")
     try:
         set_timeout()
         start = time.time()
         problem = read_problem(filename)
-        print(
-            f"{len(problem.formulas):7d} {len(problem.clauses):7d} {time.time()-start:10.3f}"
-        )
+        print(f"% {len(problem.formulas)} formulas")
+        print(f"% {len(problem.clauses)} clauses")
+        r, proof = solve(problem.clauses)
+        if hasattr(problem, "conjecture"):
+            if r == "Satisfiable":
+                r = "CounterSatisfiable"
+            elif r == "Unsatisfiable":
+                r = "Theorem"
+        print(f"% SZS status {r}")
+        if proof:
+            prproof(proof)
+        if szs_success(r) and problem.expected and r != problem.expected:
+            if problem.expected == "ContradictoryAxioms" and r in (
+                "Theorem",
+                "Unsatisfiable",
+            ):
+                pass
+            else:
+                raise ValueError(f"{r} != {problem.expected}")
     except (Inappropriate, RecursionError, Timeout) as e:
         print(e)
+    print(f"% {time.time()-start:.3f} seconds")
+    print()
 
 
 def do_file(filename, f):
