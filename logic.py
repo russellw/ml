@@ -627,7 +627,7 @@ class Clause:
         return Clause(None, neg, pos, self)
 
     def size(self):
-        return term_size(c.neg + c.pos)
+        return term_size(self.neg + self.pos)
 
     def true(self):
         return self.neg, self.pos == (), (True,)
@@ -644,7 +644,7 @@ def walk_proof(c, f):
             rec(d)
         f(c)
 
-    rec(c, f)
+    rec(c)
 
 
 class Problem:
