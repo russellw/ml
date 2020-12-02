@@ -3,10 +3,13 @@ import fractions
 import inspect
 import itertools
 import os
-import process
 import re
 import sys
 import time
+
+import psutil
+
+process = psutil.Process()
 
 
 def check_tuples(a):
@@ -224,6 +227,37 @@ def quantify(a):
     v = free_vars(a)
     if v:
         return "forall", v, a
+    return a
+
+
+def simplify(a):
+    if isinstance(a, tuple):
+        a = tuple(map(simplify, a))
+        o = a[0]
+        if o in ("+", "-", "/", "*"):
+            x = a[1]
+            y = a[2]
+            if const(x) and const(y):
+                ty = typeof(x)
+                a = eval(f"x{o}y")
+                if ty == "real":
+                    return Real(a)
+            return a
+        if o in ("<", "<="):
+            x = a[1]
+            y = a[2]
+            if const(x) and const(y):
+                ty = typeof(x)
+                return eval(f"x{o}y")
+            return a
+        if o == "=":
+            x = a[1]
+            y = a[2]
+            if x == y:
+                return True
+            if unequal(x, y):
+                return False
+            return a
     return a
 
 
@@ -489,151 +523,6 @@ def type_check(wanted, a):
         if a.ty == "bool":
             raise ValueError(a)
         return
-
-
-######################################## simplify
-
-
-def simplify_add(a):
-    x = a[1]
-    y = a[2]
-    ty = typeof(x)
-    if ty != typeof(y) or ty not in ("int", "rat", "real"):
-        raise ValueError(
-            str(x) + ":" + str(typeof(x)) + " vs " + str(y) + ":" + str(typeof(y))
-        )
-    if const(x) and const(y):
-        r = x + y
-        if ty == "real":
-            r = Real(r)
-        return r
-    return a
-
-
-def simplify_sub(a):
-    x = a[1]
-    y = a[2]
-    ty = typeof(x)
-    if ty != typeof(y) or ty not in ("int", "rat", "real"):
-        raise ValueError(
-            str(x) + ":" + str(typeof(x)) + " vs " + str(y) + ":" + str(typeof(y))
-        )
-    if const(x) and const(y):
-        r = x - y
-        if ty == "real":
-            r = Real(r)
-        return r
-    return a
-
-
-def simplify_mul(a):
-    x = a[1]
-    y = a[2]
-    ty = typeof(x)
-    if ty != typeof(y) or ty not in ("int", "rat", "real"):
-        raise ValueError(
-            str(x) + ":" + str(typeof(x)) + " vs " + str(y) + ":" + str(typeof(y))
-        )
-    if const(x) and const(y):
-        r = x * y
-        if ty == "real":
-            r = Real(r)
-        return r
-    return a
-
-
-def simplify_eq(a):
-    x = a[1]
-    y = a[2]
-    if typeof(x) != typeof(y):
-        raise ValueError(
-            str(x) + ":" + str(typeof(x)) + "=" + str(y) + ":" + str(typeof(y))
-        )
-    if not equatable(x, y):
-        raise ValueError(str(x) + "=" + str(y))
-    if x == y:
-        return True
-    if unequal(x, y):
-        return False
-    if y is True:
-        return x
-    return a
-
-
-def simplify_ge(a):
-    x = a[1]
-    y = a[2]
-    ty = typeof(x)
-    if ty != typeof(y) or ty not in ("int", "rat", "real"):
-        raise ValueError(
-            str(x) + ":" + str(typeof(x)) + "=" + str(y) + ":" + str(typeof(y))
-        )
-    if const(x) and const(y):
-        return x >= y
-    return a
-
-
-def simplify_gt(a):
-    x = a[1]
-    y = a[2]
-    ty = typeof(x)
-    if ty != typeof(y) or ty not in ("int", "rat", "real"):
-        raise ValueError(
-            str(x) + ":" + str(typeof(x)) + "=" + str(y) + ":" + str(typeof(y))
-        )
-    if const(x) and const(y):
-        return x > y
-    return a
-
-
-def simplify_le(a):
-    x = a[1]
-    y = a[2]
-    ty = typeof(x)
-    if ty != typeof(y) or ty not in ("int", "rat", "real"):
-        raise ValueError(
-            str(x) + ":" + str(typeof(x)) + "=" + str(y) + ":" + str(typeof(y))
-        )
-    if const(x) and const(y):
-        return x <= y
-    return a
-
-
-def simplify_lt(a):
-    x = a[1]
-    y = a[2]
-    ty = typeof(x)
-    if ty != typeof(y) or ty not in ("int", "rat", "real"):
-        raise ValueError(
-            str(x) + ":" + str(typeof(x)) + "=" + str(y) + ":" + str(typeof(y))
-        )
-    if const(x) and const(y):
-        return x < y
-    return a
-
-
-op_simplify = {
-    "+": simplify_add,
-    "-": simplify_sub,
-    "*": simplify_mul,
-    "=": simplify_eq,
-    ">": simplify_gt,
-    ">=": simplify_ge,
-    "<": simplify_lt,
-    "<=": simplify_le,
-}
-
-
-def simplify(a):
-    if isinstance(a, tuple):
-        o = a[0]
-        r = [o]
-        for b in a[1:]:
-            r.append(simplify(b))
-        a = tuple(r)
-        if o in op_simplify:
-            return op_simplify[o](a)
-    return a
 
 
 ######################################## logic
