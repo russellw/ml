@@ -899,9 +899,6 @@ def read_tptp1(filename, select=True):
         lex()
 
     # terms
-    bound = None
-    free = {}
-
     def read_name():
         o = tok
 
@@ -944,20 +941,22 @@ def read_tptp1(filename, select=True):
             return atomic_type(), ty
         return ty
 
-    def args(n=-1):
+    free = {}
+
+    def args(bound, n=-1):
         expect("(")
         r = []
         if tok != ")":
-            r.append(atomic_term())
+            r.append(atomic_term(bound))
             while tok == ",":
                 lex()
-                r.append(atomic_term())
+                r.append(atomic_term(bound))
         if n > 0 and len(r) != n:
             err(f"expected {n} args")
         expect(")")
         return tuple(r)
 
-    def atomic_term():
+    def atomic_term(bound):
         o = tok
 
         # defined function
@@ -970,10 +969,10 @@ def read_tptp1(filename, select=True):
 
             # syntax sugar
             if eat("$greater"):
-                s = args(2)
+                s = args(bound, 2)
                 return "<", s[1], s[0]
             if eat("$greatereq"):
-                s = args(2)
+                s = args(bound, 2)
                 return "<=", s[1], s[0]
             if eat("$distinct"):
                 s = args()
@@ -1012,7 +1011,7 @@ def read_tptp1(filename, select=True):
                     "trunc": 1,
                     "unary-": 1,
                 }
-                return (a,) + args(arities[a])
+                return (a,) + args(bound, arities[a])
             err("unknown function")
 
         # distinct object
@@ -1033,12 +1032,8 @@ def read_tptp1(filename, select=True):
         # variable
         if o[0].isupper():
             lex()
-            b = bound
-            while b:
-                m = b[0]
-                if o in m:
-                    return m[o]
-                b = b[1]
+            if o in bound:
+                return bound[o]
             if o in free:
                 return free[o]
             a = Var("individual")
@@ -1052,7 +1047,7 @@ def read_tptp1(filename, select=True):
         # function
         a = fn(read_name())
         if tok == "(":
-            s = args()
+            s = args(bound)
             if not hasattr(a, "ty"):
                 a.type_args(Var(), s)
             return (a,) + s
@@ -1060,18 +1055,18 @@ def read_tptp1(filename, select=True):
             a.ty = Var()
         return a
 
-    def infix_unary():
-        a = atomic_term()
+    def infix_unary(bound):
+        a = atomic_term(bound)
         o = tok
         if o == "=":
             lex()
-            return "=", a, atomic_term()
+            return "=", a, atomic_term(bound)
         if o == "!=":
             lex()
-            return "not", ("=", a, atomic_term())
+            return "not", ("=", a, atomic_term(bound))
         return a
 
-    def var():
+    def var(bound):
         o = tok
         if not o[0].isupper():
             err("expected variable")
@@ -1080,84 +1075,70 @@ def read_tptp1(filename, select=True):
         if eat(":"):
             ty = atomic_type()
         a = Var(ty)
-        bound[0][o] = a
+        bound[o] = a
         return a
 
-    def unitary_formula():
-        nonlocal bound
+    def unitary_formula(bound):
         o = tok
         if o == "(":
             lex()
-            a = logic_formula()
+            a = logic_formula(bound)
             expect(")")
             return a
         if o == "~":
             lex()
-            return "not", unitary_formula()
+            return "not", unitary_formula(bound)
         if o in ("!", "?"):
             o = "exists" if o == "?" else "forall"
             lex()
 
-            # save variable environment
-            old = bound
-            bound = {}, bound
-
             # variables
-            if tok != "[":
-                err("expected '['")
-            lex()
+            bound = bound.copy()
+            expect("[")
             v = []
-            v.append(var())
+            v.append(var(bound))
             while tok == ",":
                 lex()
-                v.append(var())
-            if tok != "]":
-                err("expected ']'")
-            lex()
+                v.append(var(bound))
+            expect("]")
 
             # body
-            if tok != ":":
-                err("expected ':'")
-            lex()
-            a = o, tuple(v), unitary_formula()
-
-            # restore variable environment
-            bound = old
-
+            expect(":")
+            a = o, tuple(v), unitary_formula(bound)
             return a
-        return infix_unary()
+        return infix_unary(bound)
 
-    def logic_formula():
-        a = unitary_formula()
+    def logic_formula(bound):
+        a = unitary_formula(bound)
         o = tok
         if o == "&":
             r = ["and", a]
             while eat("&"):
-                r.append(unitary_formula())
+                r.append(unitary_formula(bound))
             return tuple(r)
         if o == "|":
             r = ["or", a]
             while eat("|"):
-                r.append(unitary_formula())
+                r.append(unitary_formula(bound))
             return tuple(r)
         if o == "=>":
             lex()
-            return imp(a, unitary_formula())
+            return imp(a, unitary_formula(bound))
         if o == "<=":
             lex()
-            return imp(unitary_formula(), a)
+            return imp(unitary_formula(bound), a)
         if o == "<=>":
             lex()
-            return "eqv", a, unitary_formula()
+            return "eqv", a, unitary_formula(bound)
         if o == "<~>":
             lex()
-            return "not", ("eqv", a, unitary_formula())
+            return "not", ("eqv", a, unitary_formula(bound))
         if o == "~&":
             lex()
-            return "not", ("and", a, unitary_formula())
+            return "not", ("and", a, unitary_formula(bound))
         if o == "~|":
             lex()
-            return "not", ("or", a, unitary_formula())
+            return "not", ("or", a, unitary_formula(bound))
         return a
 
     # top level
@@ -1188,7 +1169,7 @@ def read_tptp1(filename, select=True):
         neg = []
         pos = []
         while True:
-            a = unitary_formula()
+            a = unitary_formula({})
             if isinstance(a, tuple) and a[0] == "not":
                 neg.append(a[1])
             else:
@@ -1254,7 +1235,7 @@ def read_tptp1(filename, select=True):
                 parens -= 1
         else:
             # formula
-            a = logic_formula()
+            a = logic_formula({})
             assert not free
             if selecting(name):
                 c = Formula(name, unquantify(a))
@@ -1312,6 +1293,7 @@ def read_tptp1(filename, select=True):
 
     lex()
     while tok:
+        free.clear()
         if tok == "cnf":
             annotated_clause()
             continue
@@ -1328,7 +1310,7 @@ def read_tptp(filename):
     global problem
     reset_formula_names()
     problem = Problem(filename)
-    sys.setrecursionlimit(2000)
+    sys.setrecursionlimit(10000)
     read_tptp1(filename)
     return problem
 
