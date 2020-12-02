@@ -42,11 +42,13 @@ def remove(s, i):
 
 
 class MemoryOut(Exception):
-    pass
+    def __str__(self):
+        return "MemoryOut"
 
 
 class Timeout(Exception):
-    pass
+    def __str__(self):
+        return "Timeout"
 
 
 def set_timeout(t=60):
@@ -1510,6 +1512,7 @@ def cnf(formulas, clauses):
         return a
 
     def nnf(all_vars, exists_vars, pol, a):
+        check_limits()
         if isinstance(a, tuple):
             o = a[0]
             if o == "not":
@@ -1974,15 +1977,14 @@ def test(filename):
         return
     print(f"{filename:40s} ", end="", flush=True)
     try:
+        set_timeout()
         start = time.time()
         problem = read_problem(filename)
         print(
             f"{len(problem.formulas):7d} {len(problem.clauses):7d} {time.time()-start:10.3f}"
         )
-    except Inappropriate:
-        print("Inappropriate")
-    except RecursionError:
-        print("RecursionError")
+    except (Inappropriate, RecursionError, Timeout) as e:
+        print(e)
 
 
 def do_file(filename, f):
