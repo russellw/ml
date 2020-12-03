@@ -1963,10 +1963,10 @@ def solve(cs):
     return "Satisfiable", None
 
 
-######################################## test
+######################################## top level
 
 
-def test(filename):
+def solve_file(filename):
     if os.path.splitext(filename)[1] != ".p":
         return
     if "^" in filename:
@@ -1976,7 +1976,8 @@ def test(filename):
         set_timeout()
         start = time.time()
         problem = read_problem(filename)
-        print(f"% {len(problem.formulas)} formulas")
+        if problem.formulas:
+            print(f"% {len(problem.formulas)} formulas")
         print(f"% {len(problem.clauses)} clauses")
         r, proof = solve(problem.clauses)
         if hasattr(problem, "conjecture"):
@@ -2020,7 +2021,7 @@ def do_files(files, f):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="TPTP parser")
+    parser = argparse.ArgumentParser(description="theorem prover")
     parser.add_argument("files", nargs="+")
     args = parser.parse_args()
-    do_files(args.files, test)
+    do_files(args.files, solve_file)
