@@ -1735,7 +1735,7 @@ def clause(m, neg, pos, *parents):
     check_limits()
     neg = subst(tuple(neg), m)
     pos = subst(tuple(pos), m)
-    c = Clause(None, neg, pos, *parents)
+    c = Clause(None, neg, pos, *map(original, parents))
     if c.term() is True:
         return
     if c.size() > 10_000_000:
