@@ -507,6 +507,7 @@ def type_check(wanted, a):
             if o in ("div-e", "div-f", "div-t", "rem-e", "rem-f", "rem-t"):
                 for i in range(1, len(a)):
                     type_check("int", a[i])
+
                 return
 
             # all arguments of the same type
@@ -586,7 +587,7 @@ class Clause:
         return str(self.neg) + "=>" + str(self.pos)
 
     def false(self):
-        return self.neg, self.pos == (), ()
+        return (self.neg, self.pos) == ((), ())
 
     def rename_vars(self):
         m = {}
@@ -611,13 +612,11 @@ class Clause:
 
         # check for tautology
         if False in neg or True in pos:
-            neg = ()
-            pos(True,)
+            neg, pos = (), (True,)
         else:
             for a in neg:
                 if a in pos:
-                    neg = ()
-                    pos(True,)
+                    neg, pos = (), (True,)
 
         # did anything change?
         if (neg, pos) == (self.neg, self.pos):
@@ -630,7 +629,7 @@ class Clause:
         return term_size(self.neg + self.pos)
 
     def true(self):
-        return self.neg, self.pos == (), (True,)
+        return (self.neg, self.pos) == ((), (True,))
 
 
 def walk_proof(c, f):
