@@ -737,6 +737,7 @@ class Inappropriate(Exception):
 
 def read_tptp1(filename, select=True):
     global expected
+    fname = os.path.basename(filename)
     text = open(filename).read()
     if text and text[-1] != "\n":
         text += "\n"
@@ -1139,7 +1140,7 @@ def read_tptp1(filename, select=True):
             lex()
         if selecting(name):
             c = Clause(name, neg, pos)
-            c.filename = filename
+            c.fname = fname
             c.role = role
             problem.clauses.append(c)
         if parens:
@@ -1198,17 +1199,16 @@ def read_tptp1(filename, select=True):
             a = logic_formula({})
             assert not free
             if selecting(name):
-                c = Formula(name, unquantify(a))
-                c.filename = filename
-                c.role = role
+                F = Formula(name, unquantify(a))
+                F.fname = fname
+                F.role = role
                 if role == "conjecture":
                     if hasattr(problem, "conjecture"):
                         err("multiple conjectures")
-                    problem.conjecture = c
-                    c = Formula(name, ("not", a), c)
-                    c.filename = filename
-                    c.role = "negated_conjecture"
-                problem.formulas.append(c)
+                    problem.conjecture = F
+                    F = Formula(name, ("not", a), F)
+                    F.role = "negated_conjecture"
+                problem.formulas.append(F)
 
         # annotations
         if tok == ",":
@@ -1401,17 +1401,30 @@ def prformula(c):
     else:
         pr("fof")
     pr("(")
+
+    # name
     pr(c.name)
     pr(", ")
+
+    # role
     if hasattr(c, "role"):
         pr(c.role)
     else:
         pr("plain")
     pr(", ")
+
+    # content
     a = c.term()
     if isinstance(c, Formula):
         a = quantify(a)
     prterm(a)
+    pr(", ")
+
+    # source
+    if hasattr(c, "fname"):
+        pr(f"file('{c.fname}',{c.name})")
+
+    # end
     print(").")
 
 
