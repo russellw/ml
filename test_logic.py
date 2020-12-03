@@ -1,3 +1,5 @@
+import fractions
+
 from logic import *
 
 # test distinct objects
@@ -390,8 +392,15 @@ assert not subsumes(d, c)
 
 ########################################
 
+assert typeof(fractions.Fraction("1/3")) == "rat"
+assert typeof(Real("1/3")) == "real"
+
 # simplify
 assert simplify(("+", 1, 2)) == 3
+assert simplify(
+    ("+", fractions.Fraction("1/3"), fractions.Fraction("1/3"))
+) == fractions.Fraction("2/3")
+assert simplify(("+", Real("1/3"), Real("1/3"))) == Real("2/3")
 
 ########################################
 
