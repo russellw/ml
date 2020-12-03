@@ -1961,14 +1961,6 @@ def do_file(filename):
             do_file(s)
         return
 
-    # unknown file type
-    if os.path.splitext(filename)[1] != ".p":
-        return
-
-    # higher-order logic not supported
-    if "^" in filename:
-        return
-
     # try to solve
     start = time.time()
     set_timeout()
