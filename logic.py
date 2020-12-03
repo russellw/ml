@@ -36,7 +36,7 @@ def invert(m):
 def remove(s, i):
     s = list(s)
     del s[i]
-    return s
+    return tuple(s)
 
 
 ######################################## limits
@@ -1846,8 +1846,8 @@ def superposition_negc(c, d, ci, c0, c1, di, d0, d1, path, a):
     m = {}
     if not unify(c0, a, m):
         return
-    neg = c.neg + tuple(remove(d.neg, di)) + (equation_atom(splice(d0, path, c1), d1),)
-    pos = tuple(remove(c.pos, ci)) + d.pos
+    neg = c.neg + remove(d.neg, di) + (equation_atom(splice(d0, path, c1), d1),)
+    pos = remove(c.pos, ci) + d.pos
     clause(m, neg, pos, original(c), original(d))
 
 
@@ -1898,7 +1898,7 @@ def superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a):
     pos = (
         remove(c.pos, ci)
         + remove(d.pos, di)
-        + [equation_atom(splice(d0, path, c1), d1)]
+        + (equation_atom(splice(d0, path, c1), d1),)
     )
     clause(m, neg, pos, original(c), original(d))
 
