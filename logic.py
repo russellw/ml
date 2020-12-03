@@ -172,6 +172,12 @@ def equation(a):
     return "=", a, True
 
 
+def equation_atom(a, b):
+    if b is True:
+        return a
+    return "=", a, b
+
+
 def free_vars(a):
     bound = set()
     free = []
@@ -1792,7 +1798,7 @@ def factoringc(c, c0, c1, cj, c2, c3):
     m = {}
     if not unify(c0, c2, m):
         return
-    neg = c.neg + (("=", c1, c3),)
+    neg = c.neg + (equation_atom(c1, c3),)
     pos = remove(c.pos, cj)
     clause(m, neg, pos, c)
 
@@ -1840,7 +1846,7 @@ def superposition_negc(c, d, ci, c0, c1, di, d0, d1, path, a):
     m = {}
     if not unify(c0, a, m):
         return
-    neg = c.neg + tuple(remove(d.neg, di)) + (("=", splice(d0, path, c1), d1),)
+    neg = c.neg + tuple(remove(d.neg, di)) + (equation_atom(splice(d0, path, c1), d1),)
     pos = tuple(remove(c.pos, ci)) + d.pos
     clause(m, neg, pos, original(c), original(d))
 
@@ -1889,7 +1895,11 @@ def superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a):
     if not unify(c0, a, m):
         return
     neg = c.neg + d.neg
-    pos = remove(c.pos, ci) + remove(d.pos, di) + [("=", splice(d0, path, c1), d1)]
+    pos = (
+        remove(c.pos, ci)
+        + remove(d.pos, di)
+        + [equation_atom(splice(d0, path, c1), d1)]
+    )
     clause(m, neg, pos, original(c), original(d))
 
 
