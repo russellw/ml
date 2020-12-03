@@ -92,8 +92,19 @@ class Real(fractions.Fraction):
 
 
 # constants are just functions of arity zero
+skolem_name_i = 0
+
+
 class Fn:
     def __init__(self, name=None):
+        global skolem_name_i
+        if name is None:
+            skolem_name_i += 1
+            name = f"sk{skolem_name_i}"
+        else:
+            m = re.match(r"sK\d+", name)
+            if m:
+                skolem_name_i = max(skolem_name_i, int(m[1]))
         self.name = name
 
     def type_args(self, rty, args):
@@ -107,6 +118,12 @@ class Fn:
 
 # TODO: do we need to track functions across problems?
 fns = {}
+
+
+def clear_fns():
+    global skolem_name_i
+    fns.clear()
+    skolem_name_i = 0
 
 
 def fn(name):
@@ -362,7 +379,9 @@ def walk(a, f):
     f(a)
 
 
-# types
+######################################## types
+
+
 def typeof(a):
     if isinstance(a, tuple):
         o = a[0]
@@ -579,8 +598,11 @@ def set_formula_name(c, name):
 class Formula:
     def __init__(self, name, term, *parents):
         set_formula_name(self, name)
-        self.term = term
+        self.__term = term
         self.parents = parents
+
+    def term(self):
+        return self.__term
 
 
 class Clause:
@@ -599,9 +621,6 @@ class Clause:
 
     def __repr__(self):
         return str(self.neg) + "=>" + str(self.pos)
-
-    def false(self):
-        return (self.neg, self.pos) == ((), ())
 
     def rename_vars(self):
         m = {}
@@ -642,8 +661,13 @@ class Clause:
     def size(self):
         return term_size(self.neg + self.pos)
 
-    def true(self):
-        return (self.neg, self.pos) == ((), (True,))
+    def term(self):
+        r = tuple([("not", a) for a in self.neg]) + self.pos
+        if not r:
+            return False
+        if len(r) == 1:
+            return r[0]
+        return ("or",) + r
 
 
 def walk_proof(c, f):
@@ -1384,22 +1408,10 @@ def prformula(c):
     else:
         pr("plain")
     pr(", ")
-    if isinstance(c, Clause):
-        i = 0
-        for a in c.neg:
-            if i:
-                pr(" | ")
-            i = 1
-            prterm(("not", a))
-        for a in c.pos:
-            if i:
-                pr(" | ")
-            i = 1
-            prterm(a)
-        if not c.neg and not c.pos:
-            pr("$false")
-    else:
-        prterm(quantify(c.term))
+    a = c.term()
+    if isinstance(c, Formula):
+        a = quantify(a)
+    prterm(a)
     print(").")
 
 
@@ -1512,8 +1524,7 @@ def cnf(formulas, clauses):
 
     def rename(a):
         b = skolem("bool", free_vars(a))
-        f = Formula(None, imp(b, a))
-        convert(f)
+        convert(Formula(None, imp(b, a)))
         return b
 
     def distribute(a):
@@ -1568,39 +1579,39 @@ def cnf(formulas, clauses):
             assert o != "and"
         pos.append(a)
 
-    def clause(f, a):
+    def clause(F, a):
         neg = []
         pos = []
         split(a, neg, pos)
-        c = Clause(None, neg, pos, f)
+        c = Clause(None, neg, pos, F)
         clauses.append(c)
 
-    def convert(f):
+    def convert(F):
         # variables must be bound only for the first step
-        a = quantify(f.term)
+        a = quantify(F.term())
 
         # negation normal form includes several transformations that need to be done together
         b = nnf({}, {}, True, a)
         a = unquantify(a)
         if not isomorphic(a, b, {}):
-            f = Formula(None, b, f)
+            F = Formula(None, b, F)
             a = b
 
         # distribute OR down into AND
         b = distribute(a)
         if a != b:
-            f = Formula(None, b, f)
+            F = Formula(None, b, F)
             a = b
 
         # split AND into clauses
         if isinstance(a, tuple) and a[0] == "and":
             for b in a[1:]:
-                clause(f, b)
+                clause(F, b)
             return
-        clause(f, a)
+        clause(F, a)
 
-    for f in formulas:
-        convert(f)
+    for F in formulas:
+        convert(F)
 
 
 ######################################## read and prepare
@@ -1608,15 +1619,11 @@ def cnf(formulas, clauses):
 
 def read_problem(filename):
     # read
-    fns.clear()
+    clear_fns()
     problem = read_tptp(filename)
 
     # infer types
-    terms = []
-    for f in problem.formulas:
-        terms.append(f.term)
-    for c in problem.clauses:
-        terms.extend(c.neg + c.pos)
+    terms = [c.term() for c in problem.formulas + problem.clauses]
     m = {}
     for a in terms:
         type_unify("bool", a, m)
@@ -1729,7 +1736,7 @@ def clause(m, neg, pos, *parents):
     neg = subst(tuple(neg), m)
     pos = subst(tuple(pos), m)
     c = Clause(None, neg, pos, *parents)
-    if c.true():
+    if c.term() is True:
         return
     if c.size() > 10_000_000:
         raise ResourceOut()
@@ -1919,7 +1926,7 @@ def solve(cs):
             continue
 
         # solved?
-        if g.false():
+        if g.term() is False:
             return "Unsatisfiable", g
 
         # match/unify assume clauses have disjoint variable names
