@@ -376,17 +376,20 @@ def typeof(a):
         if not isinstance(ty, tuple):
             raise ValueError(a)
         return ty[0]
-    if isinstance(a, str):
-        raise ValueError(a)
     if isinstance(a, Fn) or isinstance(a, Var):
         return a.ty
+    if isinstance(a, bool):
+        return "bool"
     if isinstance(a, DistinctObject):
         return "individual"
+    if isinstance(a, int):
+        return "int"
+    # as subclass, Real must be checked before Fraction
     if isinstance(a, Real):
         return "real"
     if isinstance(a, fractions.Fraction):
         return "rat"
-    return type(a).__name__
+    raise ValueError(a)
 
 
 # first step of type inference:
@@ -1888,7 +1891,7 @@ def superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a):
 # superposition is incomplete on arithmetic
 def contains_arithmetic(a):
     if isinstance(a, tuple):
-        for b in a:
+        for b in a[1:]:
             if contains_arithmetic(b):
                 return True
     return typeof(a) in ("int", "rat", "real")
