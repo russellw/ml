@@ -705,21 +705,6 @@ defined_fns = {
 }
 
 
-def szs_success(s):
-    if s in ("ContradictoryAxioms", "Theorem", "Unsatisfiable"):
-        return True
-    if s in ("CounterSatisfiable", "Satisfiable"):
-        return True
-
-
-def bool_szs(s):
-    if s in ("ContradictoryAxioms", "Theorem", "Unsatisfiable"):
-        return False
-    if s in ("CounterSatisfiable", "Satisfiable"):
-        return True
-    raise ValueError(s)
-
-
 # parser
 class Inappropriate(Exception):
     def __init__(self):
@@ -1966,15 +1951,31 @@ def solve(cs):
 ######################################## top level
 
 
-def solve_file(filename):
+def do_file(filename):
+    global attempted
+    global solved
+
+    # list file
+    if os.path.splitext(filename)[1] == ".lst":
+        for s in read_lines(filename):
+            do_file(s)
+        return
+
+    # unknown file type
     if os.path.splitext(filename)[1] != ".p":
         return
+
+    # higher-order logic not supported
     if "^" in filename:
         return
+
+    # try to solve
+    start = time.time()
+    set_timeout()
+    attempted += 1
+    fname = os.path.basename(filename)
     print(f"% {filename}")
     try:
-        set_timeout()
-        start = time.time()
         problem = read_problem(filename)
         if problem.formulas:
             print(f"% {len(problem.formulas)} formulas")
@@ -1985,43 +1986,44 @@ def solve_file(filename):
                 r = "CounterSatisfiable"
             elif r == "Unsatisfiable":
                 r = "Theorem"
-        print(f"% SZS status {r}")
+        print(f"% SZS status {r} for {fname}")
         if proof:
             prproof(proof)
-        if szs_success(r) and problem.expected and r != problem.expected:
-            if problem.expected == "ContradictoryAxioms" and r in (
-                "Theorem",
-                "Unsatisfiable",
-            ):
-                pass
-            else:
-                raise ValueError(f"{r} != {problem.expected}")
+        if r in (
+            "Theorem",
+            "Unsatisfiable",
+            "ContradictoryAxioms",
+            "Satisfiable",
+            "CounterSatisfiable",
+        ):
+            solved += 1
+            if problem.expected and r != problem.expected:
+                if problem.expected == "ContradictoryAxioms" and r in (
+                    "Theorem",
+                    "Unsatisfiable",
+                ):
+                    pass
+                else:
+                    raise ValueError(f"{r} != {problem.expected}")
     except (Inappropriate, RecursionError, Timeout) as e:
-        print(e)
-    print(f"% {time.time()-start:.3f} seconds")
+        print(f"% SZS status {e} for {fname}")
+    print(f"% {time.time() - start:.3f} seconds")
     print()
-
-
-def do_file(filename, f):
-    if os.path.splitext(filename)[1] == ".lst":
-        for s in read_lines(filename):
-            do_file(s, f)
-        return
-    f(filename)
-
-
-def do_files(files, f):
-    for fname in files:
-        if os.path.isfile(fname):
-            do_file(fname, f)
-            continue
-        for root, dirs, files in os.walk(fname):
-            for filename in files:
-                do_file(os.path.join(root, filename), f)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="theorem prover")
     parser.add_argument("files", nargs="+")
     args = parser.parse_args()
-    do_files(args.files, solve_file)
+    start = time.time()
+    attempted = 0
+    solved = 0
+    for filename in args.files:
+        if os.path.isfile(filename):
+            do_file(filename)
+            continue
+        for root, dirs, files in os.walk(filename):
+            for fname in files:
+                do_file(os.path.join(root, fname))
+    print(f"% solved {solved}/{attempted} = {solved*100/attempted}%")
+    print(f"% {time.time() - start:.3f} seconds")
