@@ -1957,8 +1957,8 @@ def do_file(filename):
 
     # list file
     if os.path.splitext(filename)[1] == ".lst":
-        for s in read_lines(filename):
-            do_file(s)
+        for s in open(filename).readlines():
+            do_file(s.strip())
         return
 
     # try to solve
