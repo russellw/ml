@@ -137,6 +137,11 @@ class Var:
         assert ty != "bool"
         self.ty = ty
 
+    def __repr__(self):
+        if not hasattr(self, "name"):
+            return "Var"
+        return self.name
+
 
 def const(a):
     if isinstance(a, bool):
