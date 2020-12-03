@@ -1,6 +1,6 @@
 import fractions
 
-from logic import *
+from prover import *
 
 # test distinct objects
 assert distinct_object("a") == distinct_object("a")
