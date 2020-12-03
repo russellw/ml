@@ -1295,11 +1295,26 @@ def need_parens(a, parent):
 def prterm(a, parent=None):
     if isinstance(a, tuple):
         o = a[0]
+        # infix
         if o == "=":
             prterm(a[1])
             pr("=")
             prterm(a[2])
             return
+        connectives = {"and": "&", "eqv": "<=>", "or": "|"}
+        if o in connectives:
+            if need_parens(a, parent):
+                pr("(")
+            assert len(a) >= 3
+            prterm(a[1], a)
+            for i in range(2, len(a)):
+                pr(f" {connectives[o]} ")
+                prterm(a[i], a)
+            if need_parens(a, parent):
+                pr(")")
+            return
+
+        # prefix/infix
         if o == "not":
             if isinstance(a[1], tuple) and a[1][0] == "=":
                 a = a[1]
@@ -1310,6 +1325,8 @@ def prterm(a, parent=None):
             pr("~")
             prterm(a[1], a)
             return
+
+        # prefix
         if o in ("exists", "forall"):
             if o == "exists":
                 pr("?")
@@ -1329,19 +1346,10 @@ def prterm(a, parent=None):
             pr("]:")
             prterm(a[2], a)
             return
-        connectives = {"and": "&", "eqv": "<=>", "or": "|"}
-        if o in connectives:
-            if need_parens(a, parent):
-                pr("(")
-            assert len(a) >= 3
-            prterm(a[1], a)
-            for i in range(2, len(a)):
-                pr(f" {connectives[o]} ")
-                prterm(a[i], a)
-            if need_parens(a, parent):
-                pr(")")
-            return
-        pr(o)
+        if isinstance(o, str):
+            pr(invert(defined_fns)[o])
+        else:
+            pr(o)
         prargs(a)
         return
     if a is False:
@@ -1899,7 +1907,7 @@ def contains_arithmetic(a):
 
 def solve(cs):
     global clauses
-    unprocessed = cs.copy()
+    unprocessed = [c.simplify() for c in cs]
     heapq.heapify(unprocessed)
     processed = []
     while unprocessed:
