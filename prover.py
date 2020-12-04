@@ -102,7 +102,7 @@ class Fn:
             skolem_name_i += 1
             name = f"sk{skolem_name_i}"
         else:
-            m = re.match(r"sK\d+", name)
+            m = re.match(r"sK(\d+)", name)
             if m:
                 skolem_name_i = max(skolem_name_i, int(m[1]))
         self.name = name
