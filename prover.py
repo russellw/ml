@@ -657,7 +657,7 @@ class Clause:
             return self
 
         # derived clause
-        return Clause(None, neg, pos, self)
+        return Clause(None, neg, pos, "simplify", self)
 
     def size(self):
         return term_size(self.neg + self.pos)
@@ -1765,7 +1765,7 @@ def clause(m, neg, pos, inference, *parents):
     check_limits()
     neg = subst(tuple(neg), m)
     pos = subst(tuple(pos), m)
-    c = Clause(None, neg, pos, inference, *map(original, parents))
+    c = Clause(None, neg, pos, inference, *map(original, parents)).simplify()
     if c.term() is True:
         return
     if c.size() > 10_000_000:
