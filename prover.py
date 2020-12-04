@@ -599,8 +599,7 @@ class Formula:
     def __init__(self, name, term, inference=None, *parents):
         set_formula_name(self, name)
         self.__term = term
-        if inference:
-            self.inference = inference
+        self.inference = inference
         self.parents = parents
 
     def term(self):
@@ -616,8 +615,7 @@ class Clause:
         set_formula_name(self, name)
         self.neg = tuple(neg)
         self.pos = tuple(pos)
-        if inference:
-            self.inference = inference
+        self.inference = inference
         self.parents = parents
 
     def __lt__(self, other):
@@ -1426,7 +1424,7 @@ def prformula(c):
     # source
     if hasattr(c, "fname"):
         pr(f"file('{c.fname}',{c.name})")
-    elif hasattr(c, "inference"):
+    elif c.inference:
         pr(f"inference({c.inference},[status(")
         if c.inference == "negate":
             pr("cth")
