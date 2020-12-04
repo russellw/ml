@@ -3,6 +3,10 @@ import subprocess
 from prover import *
 
 
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
 def prformula(c):
     reset_var_names()
     pr("fof")
@@ -79,6 +83,8 @@ def do_file(filename):
     print()
     for c in conclusion.proof():
         if c.parents:
+            if c.inference == "negate":
+                continue
             sys.stdout = open("1.p", "w")
             for d in c.parents:
                 d.role = "axiom"
@@ -86,8 +92,12 @@ def do_file(filename):
             c.role = "conjecture"
             prformula(c)
             sys.stdout.close()
-            process = subprocess.Popen(["bin/eprover", "1.p"], stdout=subprocess.PIPE)
-            stdout = process.communicate()[0]
+            p = subprocess.Popen(["bin/eprover", "1.p"], stdout=subprocess.PIPE)
+            s = p.stdout.read()
+            s = str(s, "utf-8")
+            if "SZS status Theorem" in s:
+                continue
+            eprint(s)
             break
 
 
