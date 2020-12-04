@@ -1751,6 +1751,7 @@ def backward_subsume(c, ds):
 
 ######################################## superposition
 
+
 # partial implementation of the superposition calculus
 # a full implementation would also implement an order on equations
 # e.g. lexicographic path ordering or Knuth-Bendix ordering
