@@ -229,7 +229,9 @@ def match(a, b, m):
     if isinstance(a, tuple) and isinstance(b, tuple):
         if len(a) != len(b):
             return
-        for i in range(len(a)):
+        if a[0] != b[0]:
+            return
+        for i in range(1, len(a)):
             if not match(a[i], b[i], m):
                 return
         return True
