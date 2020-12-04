@@ -1333,9 +1333,9 @@ def prterm(a, parent=None):
             if need_parens(a, parent):
                 pr("(")
             assert len(a) >= 3
-            prterm(a[1], a)
-            for i in range(2, len(a)):
-                pr(f" {connectives[o]} ")
+            for i in range(1, len(a)):
+                if i > 1:
+                    pr(f" {connectives[o]} ")
                 prterm(a[i], a)
             if need_parens(a, parent):
                 pr(")")
