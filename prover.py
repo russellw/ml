@@ -626,6 +626,21 @@ class Clause:
     def __repr__(self):
         return str(self.neg) + "=>" + str(self.pos)
 
+    def proof(self):
+        visited = set()
+        r = []
+
+        def rec(c):
+            if c in visited:
+                return
+            visited.add(c)
+            for d in c.parents:
+                rec(d)
+            r.append(c)
+
+        rec(self)
+        return r
+
     def rename_vars(self):
         m = {}
         neg = [rename_vars(a, m) for a in self.neg]
@@ -671,20 +686,6 @@ class Clause:
         if len(r) == 1:
             return r[0]
         return ("or",) + r
-
-
-def walk_proof(c, f):
-    visited = set()
-
-    def rec(c):
-        if c in visited:
-            return
-        visited.add(c)
-        for d in c.parents:
-            rec(d)
-        f(c)
-
-    rec(c)
 
 
 class Problem:
@@ -1448,10 +1449,6 @@ def prformula(c):
     print(").")
 
 
-def prproof(c):
-    walk_proof(c, prformula)
-
-
 ######################################## CNF
 
 
@@ -2019,15 +2016,16 @@ def do_file(filename):
         if problem.formulas:
             print(f"% {len(problem.formulas)} formulas")
         print(f"% {len(problem.clauses)} clauses")
-        r, proof = solve(problem.clauses)
+        r, conclusion = solve(problem.clauses)
         if hasattr(problem, "conjecture"):
             if r == "Satisfiable":
                 r = "CounterSatisfiable"
             elif r == "Unsatisfiable":
                 r = "Theorem"
         print(f"% SZS status {r} for {fname}")
-        if proof:
-            prproof(proof)
+        if conclusion:
+            for c in conclusion.proof():
+                prformula(c)
         if r in (
             "Theorem",
             "Unsatisfiable",
