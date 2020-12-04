@@ -4,6 +4,7 @@
 *.p
 *.png
 *.pth
+bin/
 data/
 satlib/
 tsplib/
