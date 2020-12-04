@@ -58,7 +58,7 @@ def set_timeout(t=60):
 
 
 def check_limits():
-    if process.memory_info().wset > 10_000_000_000:
+    if process.memory_info().rss > 10_000_000_000:
         raise MemoryOut()
     if time.time() > end_time:
         raise Timeout()

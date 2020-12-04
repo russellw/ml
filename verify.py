@@ -1,4 +1,31 @@
+import subprocess
+
 from prover import *
+
+
+def prformula(c):
+    reset_var_names()
+    pr("fof")
+    pr("(")
+
+    # name
+    pr(c.name)
+    pr(", ")
+
+    # role
+    if hasattr(c, "role"):
+        pr(c.role)
+    else:
+        pr("plain")
+    pr(", ")
+
+    # content
+    a = c.term()
+    a = quantify(a)
+    prterm(a)
+
+    # end
+    print(").")
 
 
 def do_file(filename):
@@ -59,6 +86,8 @@ def do_file(filename):
             c.role = "conjecture"
             prformula(c)
             sys.stdout.close()
+            process = subprocess.Popen(["bin/eprover", "1.p"], stdout=subprocess.PIPE)
+            stdout = process.communicate()[0]
             break
 
 
