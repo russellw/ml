@@ -596,9 +596,11 @@ def set_formula_name(c, name):
 
 
 class Formula:
-    def __init__(self, name, term, *parents):
+    def __init__(self, name, term, inference=None, *parents):
         set_formula_name(self, name)
         self.__term = term
+        if inference:
+            self.inference = inference
         self.parents = parents
 
     def term(self):
@@ -606,7 +608,7 @@ class Formula:
 
 
 class Clause:
-    def __init__(self, name, neg, pos, *parents):
+    def __init__(self, name, neg, pos, inference=None, *parents):
         for a in neg:
             check_tuples(a)
         for a in pos:
@@ -614,6 +616,8 @@ class Clause:
         set_formula_name(self, name)
         self.neg = tuple(neg)
         self.pos = tuple(pos)
+        if inference:
+            self.inference = inference
         self.parents = parents
 
     def __lt__(self, other):
@@ -626,8 +630,7 @@ class Clause:
         m = {}
         neg = [rename_vars(a, m) for a in self.neg]
         pos = [rename_vars(a, m) for a in self.pos]
-        c = Clause("renamed", neg, pos, self)
-        c.renamed = True
+        c = Clause("*RENAMED*", neg, pos, "rename_vars", self)
         return c
 
     def simplify(self):
@@ -1206,7 +1209,7 @@ def read_tptp1(filename, select=True):
                     if hasattr(problem, "conjecture"):
                         err("multiple conjectures")
                     problem.conjecture = F
-                    F = Formula(name, ("not", a), F)
+                    F = Formula(name, ("not", a), "negate", F)
                     F.role = "negated_conjecture"
                 problem.formulas.append(F)
 
@@ -1423,6 +1426,23 @@ def prformula(c):
     # source
     if hasattr(c, "fname"):
         pr(f"file('{c.fname}',{c.name})")
+    elif hasattr(c, "inference"):
+        pr(f"inference({c.inference},[status(")
+        if c.inference == "negate":
+            pr("cth")
+        else:
+            # TODO:
+            # if a formula introduces new symbols
+            # then it is only equisatisfiable
+            pr("thm")
+        pr(")],[")
+        for i in range(len(c.parents)):
+            if i:
+                pr(",")
+            pr(c.parents[i].name)
+        pr("])")
+    else:
+        pr("introduced(definition)")
 
     # end
     print(").")
@@ -1596,8 +1616,7 @@ def cnf(formulas, clauses):
         neg = []
         pos = []
         split(a, neg, pos)
-        c = Clause(None, neg, pos, F)
-        clauses.append(c)
+        clauses.append(Clause(None, neg, pos, "split", F))
 
     def convert(F):
         # variables must be bound only for the first step
@@ -1607,13 +1626,13 @@ def cnf(formulas, clauses):
         b = nnf({}, {}, True, a)
         a = unquantify(a)
         if not isomorphic(a, b, {}):
-            F = Formula(None, b, F)
+            F = Formula(None, b, "nnf", F)
             a = b
 
         # distribute OR down into AND
         b = distribute(a)
         if a != b:
-            F = Formula(None, b, F)
+            F = Formula(None, b, "distribute", F)
             a = b
 
         # split AND into clauses
@@ -1739,16 +1758,16 @@ def backward_subsume(c, ds):
 # a full implementation would also implement an order on equations
 # e.g. lexicographic path ordering or Knuth-Bendix ordering
 def original(c):
-    if hasattr(c, "renamed"):
+    if c.inference == "rename_vars":
         return c.parents[0]
     return c
 
 
-def clause(m, neg, pos, *parents):
+def clause(m, neg, pos, inference, *parents):
     check_limits()
     neg = subst(tuple(neg), m)
     pos = subst(tuple(pos), m)
-    c = Clause(None, neg, pos, *map(original, parents))
+    c = Clause(None, neg, pos, inference, *map(original, parents))
     if c.term() is True:
         return
     if c.size() > 10_000_000:
@@ -1776,7 +1795,7 @@ def resolution(c):
 def resolutionc(c, ci, m):
     neg = remove(c.neg, ci)
     pos = c.pos
-    clause(m, neg, pos, c)
+    clause(m, neg, pos, "resolve", c)
 
 
 # equality factoring
@@ -1813,7 +1832,7 @@ def factoringc(c, c0, c1, cj, c2, c3):
         return
     neg = c.neg + (equation_atom(c1, c3),)
     pos = remove(c.pos, cj)
-    clause(m, neg, pos, c)
+    clause(m, neg, pos, "factor", c)
 
 
 # negative superposition
@@ -1861,7 +1880,7 @@ def superposition_negc(c, d, ci, c0, c1, di, d0, d1, path, a):
         return
     neg = c.neg + remove(d.neg, di) + (equation_atom(splice(d0, path, c1), d1),)
     pos = remove(c.pos, ci) + d.pos
-    clause(m, neg, pos, original(c), original(d))
+    clause(m, neg, pos, "ns", original(c), original(d))
 
 
 # positive superposition
@@ -1913,7 +1932,7 @@ def superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a):
         + remove(d.pos, di)
         + (equation_atom(splice(d0, path, c1), d1),)
     )
-    clause(m, neg, pos, original(c), original(d))
+    clause(m, neg, pos, "ps", original(c), original(d))
 
 
 # superposition is incomplete on arithmetic
