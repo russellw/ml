@@ -604,11 +604,26 @@ class Formula:
         self.inference = inference
         self.parents = parents
 
+    def proof(self):
+        visited = set()
+        r = []
+
+        def rec(c):
+            if c in visited:
+                return
+            visited.add(c)
+            for d in c.parents:
+                rec(d)
+            r.append(c)
+
+        rec(self)
+        return r
+
     def term(self):
         return self.__term
 
 
-class Clause:
+class Clause(Formula):
     def __init__(self, name, neg, pos, inference=None, *parents):
         for a in neg:
             check_tuples(a)
@@ -625,21 +640,6 @@ class Clause:
 
     def __repr__(self):
         return str(self.neg) + "=>" + str(self.pos)
-
-    def proof(self):
-        visited = set()
-        r = []
-
-        def rec(c):
-            if c in visited:
-                return
-            visited.add(c)
-            for d in c.parents:
-                rec(d)
-            r.append(c)
-
-        rec(self)
-        return r
 
     def rename_vars(self):
         m = {}
