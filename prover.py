@@ -1509,37 +1509,29 @@ def cnf(formulas, clauses):
             o = a[0]
             if o == "not":
                 return nnf(all_vars, exists_vars, not pol, a[1])
-
             if o == "and":
                 if not pol:
                     o = "or"
-                r = [o]
-                for b in a[1:]:
-                    r.append(nnf(all_vars, exists_vars, pol, b))
-                return tuple(r)
+                return (o,) + tuple([nnf(all_vars, exists_vars, pol, b) for b in a[1:]])
             if o == "or":
                 if not pol:
                     o = "and"
-                r = [o]
-                for b in a[1:]:
-                    r.append(nnf(all_vars, exists_vars, pol, b))
-                return tuple(r)
-
-            if o == "exists":
+                return (o,) + tuple([nnf(all_vars, exists_vars, pol, b) for b in a[1:]])
+            if o in ("exists", "forall"):
                 if not pol:
-                    o = "forall"
-                exists_vars = exists_vars.copy()
-                for x in a[1]:
-                    exists_vars[x] = skolem(x.ty, all_vars.values())
+                    if o == "exists":
+                        o = "forall"
+                    else:
+                        o = "exists"
+                if o == "exists":
+                    exists_vars = exists_vars.copy()
+                    for x in a[1]:
+                        exists_vars[x] = skolem(x.ty, all_vars.values())
+                else:
+                    all_vars = all_vars.copy()
+                    for x in a[1]:
+                        all_vars[x] = Var(x.ty)
                 return nnf(all_vars, exists_vars, pol, a[2])
-            if o == "forall":
-                if not pol:
-                    o = "exists"
-                all_vars = all_vars.copy()
-                for x in a[1]:
-                    all_vars[x] = Var(x.ty)
-                return nnf(all_vars, exists_vars, pol, a[2])
-
             if o == "eqv":
                 # a1 => a2
                 x = (
@@ -1557,7 +1549,6 @@ def cnf(formulas, clauses):
 
                 # and
                 return "and", x, y
-
             r = [a[0]]
             for b in a[1:]:
                 r.append(nnf(all_vars, exists_vars, True, b))
