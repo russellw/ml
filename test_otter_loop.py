@@ -260,8 +260,8 @@ def occurs(a, b, m):
     if a is b:
         return True
     if isinstance(b, tuple):
-        for bi in b:
-            if occurs(a, bi, m):
+        for c in b:
+            if occurs(a, c, m):
                 return True
     if b in m:
         return occurs(a, m[b], m)
@@ -598,14 +598,14 @@ def reset_formula_names():
     formula_name_i = 0
 
 
-def set_formula_name(F, name):
+def set_formula_name(c, name):
     global formula_name_i
     if name is None:
         name = formula_name_i
         formula_name_i += 1
     elif isinstance(name, int):
         formula_name_i = max(formula_name_i, name + 1)
-    F.name = name
+    c.name = name
 
 
 class Formula:
@@ -619,13 +619,13 @@ class Formula:
         visited = set()
         r = []
 
-        def rec(F):
-            if F in visited:
+        def rec(c):
+            if c in visited:
                 return
-            visited.add(F)
-            for G in F.parents:
-                rec(G)
-            r.append(F)
+            visited.add(c)
+            for d in c.parents:
+                rec(d)
+            r.append(c)
 
         rec(self)
         return r
@@ -673,7 +673,8 @@ class Clause(Formula):
         m = {}
         neg = [rename_vars(a, m) for a in self.neg]
         pos = [rename_vars(a, m) for a in self.pos]
-        return Clause("*RENAMED*", neg, pos, "rename_vars", self)
+        c = Clause("*RENAMED*", neg, pos, "rename_vars", self)
+        return c
 
     def simplify(self):
         # simplify terms
@@ -1431,41 +1432,41 @@ def prtype(a):
     pr(a)
 
 
-def prformula(F):
+def prformula(c):
     reset_var_names()
-    if isinstance(F, Clause):
+    if isinstance(c, Clause):
         pr("cnf")
     else:
         pr("fof")
     pr("(")
 
     # name
-    pr(F.name)
+    pr(c.name)
     pr(", ")
 
     # role
-    if hasattr(F, "role"):
-        pr(F.role)
+    if hasattr(c, "role"):
+        pr(c.role)
     else:
         pr("plain")
     pr(", ")
 
     # content
-    a = F.term()
-    if isinstance(F, Formula):
+    a = c.term()
+    if isinstance(c, Formula):
         a = quantify(a)
     prterm(a)
     pr(", ")
 
     # source
-    if hasattr(F, "fname"):
-        pr(f"file('{F.fname}',{F.name})")
-    elif F.inference:
-        pr(f"inference({F.inference},[status({F.status()})],[")
-        for i in range(len(F.parents)):
+    if hasattr(c, "fname"):
+        pr(f"file('{c.fname}',{c.name})")
+    elif c.inference:
+        pr(f"inference({c.inference},[status({c.status()})],[")
+        for i in range(len(c.parents)):
             if i:
                 pr(",")
-            pr(F.parents[i].name)
+            pr(c.parents[i].name)
         pr("])")
     else:
         pr("introduced(definition)")
@@ -1605,8 +1606,8 @@ def cnf(formulas, clauses):
 
                 # cartesian product of ANDs
                 r = ["and"]
-                for x in itertools.product(*ands):
-                    r.append((("or",) + tuple(x)))
+                for c in itertools.product(*ands):
+                    r.append((("or",) + tuple(c)))
                 if len(r) < 3:
                     return r[1]
                 return tuple(r)
@@ -1668,7 +1669,7 @@ def read_problem(filename):
     problem = read_tptp(filename)
 
     # infer types
-    terms = [F.term() for F in problem.formulas + problem.clauses]
+    terms = [c.term() for c in problem.formulas + problem.clauses]
     m = {}
     for a in terms:
         type_unify("bool", a, m)
