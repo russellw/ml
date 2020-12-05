@@ -1305,7 +1305,8 @@ def read_tptp(filename):
     global problem
     reset_formula_names()
     problem = Problem(filename)
-    sys.setrecursionlimit(10000)
+    # numbers larger than 2000 silently fail
+    sys.setrecursionlimit(2000)
     read_tptp1(filename)
     return problem
 
@@ -2057,8 +2058,10 @@ def do_file(filename):
                     pass
                 else:
                     raise ValueError(f"{r} != {problem.expected}")
-    except (Inappropriate, RecursionError, Timeout) as e:
+    except (Inappropriate, Timeout) as e:
         print(f"% SZS status {e} for {fname}")
+    except RecursionError:
+        print(f"% SZS status ResourceOut for {fname}")
     print(f"% {time.time() - start:.3f} seconds")
     print()
 
