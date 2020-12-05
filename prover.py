@@ -117,20 +117,20 @@ class Fn:
 
 
 # TODO: do we need to track functions across problems?
-fns = {}
+__fns = {}
 
 
 def clear_fns():
     global skolem_name_i
-    fns.clear()
+    __fns.clear()
     skolem_name_i = 0
 
 
 def fn(name):
-    if name in fns:
-        return fns[name]
+    if name in __fns:
+        return __fns[name]
     a = Fn(name)
-    fns[name] = a
+    __fns[name] = a
     return a
 
 
@@ -193,6 +193,17 @@ def equation_atom(a, b):
     if b is True:
         return a
     return "=", a, b
+
+
+def fns(a):
+    s = set()
+
+    def get_fn(a):
+        if isinstance(a, Fn):
+            s.add(a)
+
+    walk(get_fn, a)
+    return s
 
 
 def free_vars(a):
@@ -374,10 +385,10 @@ def unquantify(a):
     return a
 
 
-def walk(a, f):
+def walk(f, a):
     if isinstance(a, tuple):
         for b in a:
-            walk(b, f)
+            walk(f, b)
     f(a)
 
 
@@ -618,6 +629,26 @@ class Formula:
 
         rec(self)
         return r
+
+    def status(self):
+        # input data or definition is logical data
+        if not self.parents:
+            return "lda"
+
+        # negated conjecture is counterequivalent
+        if self.inference == "negate":
+            return "ceq"
+
+        # if a formula introduces new symbols, then it is only equisatisfiable
+        # this happens during subformula renaming in CNF conversion
+        if len(self.parents) == 1 and not fns(self.term()).issubset(
+            fns(self.parents[0].term())
+        ):
+            return "esa"
+
+        # formula is a theorem of parents
+        # could also be equivalent; don't currently bother distinguishing that case
+        return "thm"
 
     def term(self):
         return self.__term
@@ -1428,15 +1459,7 @@ def prformula(c):
     if hasattr(c, "fname"):
         pr(f"file('{c.fname}',{c.name})")
     elif c.inference:
-        pr(f"inference({c.inference},[status(")
-        if c.inference == "negate":
-            pr("cth")
-        else:
-            # TODO:
-            # if a formula introduces new symbols
-            # then it is only equisatisfiable
-            pr("thm")
-        pr(")],[")
+        pr(f"inference({c.inference},[status({c.status()})],[")
         for i in range(len(c.parents)):
             if i:
                 pr(",")

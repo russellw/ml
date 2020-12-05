@@ -82,23 +82,22 @@ def do_file(filename):
     print(f"% {time.time() - start:.3f} seconds")
     print()
     for c in conclusion.proof():
-        if c.parents:
-            if c.inference == "negate":
-                continue
-            sys.stdout = open("1.p", "w")
-            for d in c.parents:
-                d.role = "axiom"
-                prformula(d)
-            c.role = "conjecture"
-            prformula(c)
-            sys.stdout.close()
-            p = subprocess.Popen(["bin/eprover", "1.p"], stdout=subprocess.PIPE)
-            s = p.stdout.read()
-            s = str(s, "utf-8")
-            if "SZS status Theorem" in s:
-                continue
-            eprint(s)
-            break
+        if c.status() not in ("eqv", "thm"):
+            continue
+        sys.stdout = open("1.p", "w")
+        for d in c.parents:
+            d.role = "axiom"
+            prformula(d)
+        c.role = "conjecture"
+        prformula(c)
+        sys.stdout.close()
+        p = subprocess.Popen(["bin/eprover", "1.p"], stdout=subprocess.PIPE)
+        s = p.stdout.read()
+        s = str(s, "utf-8")
+        if "Proof found!" in s:
+            continue
+        eprint(s)
+        break
 
 
 do_file(sys.argv[1])
