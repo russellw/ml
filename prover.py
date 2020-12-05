@@ -669,9 +669,6 @@ class Clause(Formula):
     def __lt__(self, other):
         return self.size() < other.size()
 
-    def __repr__(self):
-        return str(self.neg) + "=>" + str(self.pos)
-
     def rename_vars(self):
         m = {}
         neg = [rename_vars(a, m) for a in self.neg]
@@ -724,7 +721,6 @@ class Problem:
         self.name = name
         self.formulas = []
         self.clauses = []
-        self.expected = None
 
 
 ######################################## TPTP
@@ -771,7 +767,6 @@ class Inappropriate(Exception):
 
 
 def read_tptp1(filename, select=True):
-    global expected
     global header
     fname = os.path.basename(filename)
     text = open(filename).read()
@@ -790,7 +785,6 @@ def read_tptp1(filename, select=True):
         raise ValueError(f"{filename}:{line}: {repr(tok)}: {msg}")
 
     def lex():
-        global expected
         nonlocal ti
         nonlocal tok
         while ti < len(text):
@@ -810,7 +804,7 @@ def read_tptp1(filename, select=True):
                     print(text[i:ti])
                     if text[ti : ti + 2] == "\n\n":
                         print()
-                if problem.expected is None:
+                if not hasattr(problem, "expected"):
                     m = re.match(r"%\s*Status\s*:\s*(\w+)", text[i:ti])
                     if m:
                         problem.expected = m[1]
@@ -2057,7 +2051,7 @@ def do_file(filename):
             "CounterSatisfiable",
         ):
             solved += 1
-            if problem.expected and r != problem.expected:
+            if hasattr(problem, "expected") and r != problem.expected:
                 if problem.expected == "ContradictoryAxioms" and r in (
                     "Theorem",
                     "Unsatisfiable",
