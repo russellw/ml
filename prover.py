@@ -1256,7 +1256,7 @@ def read_tptp1(filename, select=True):
                     if hasattr(problem, "conjecture"):
                         err("multiple conjectures")
                     problem.conjecture = F
-                    F = Formula(name, ("not", a), "negate", F)
+                    F = Formula(None, ("not", a), "negate", F)
                     F.role = "negated_conjecture"
                 problem.formulas.append(F)
 
