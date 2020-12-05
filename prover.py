@@ -10,6 +10,22 @@ import time
 
 import psutil
 
+# naming conventions:
+# C, D  clauses
+# F, G  formulas
+# a, b  terms
+# c     character
+# e     exception
+# f     function
+# i, j  indexes
+# m     dict (aka map)
+# n     integer
+# o     operator
+# r     result
+# s     collection, string
+# v     collection of variables
+# x, y  variables, terms or any values
+
 process = psutil.Process()
 
 
@@ -52,9 +68,9 @@ class Timeout(Exception):
         super().__init__("Timeout")
 
 
-def set_timeout(t=60):
+def set_timeout(seconds=60):
     global end_time
-    end_time = time.time() + t
+    end_time = time.time() + seconds
 
 
 def check_limits():
@@ -1172,10 +1188,10 @@ def read_tptp1(filename, select=True):
                 break
             lex()
         if selecting(name):
-            c = Clause(name, neg, pos)
-            c.fname = fname
-            c.role = role
-            problem.clauses.append(c)
+            C = Clause(name, neg, pos)
+            C.fname = fname
+            C.role = role
+            problem.clauses.append(C)
         if parens:
             expect(")")
 
@@ -1497,6 +1513,8 @@ def isomorphic(a, b, m):
         return
 
 
+# something of an open question:
+# https://stackoverflow.com/questions/53718986/converting-first-order-logic-to-cnf-without-exponential-blowup
 def cnf(formulas, clauses):
     def skolem(rty, args):
         a = Fn()
@@ -1684,13 +1702,14 @@ def read_problem(filename):
 
 ######################################## subsumption
 
-
-def subsumes(c, d):
+# something of an open question:
+# https://stackoverflow.com/questions/54043747/clause-subsumption-algorithm
+def subsumes(C, D):
     # negative and positive literals must subsume separately
-    c1 = c.neg
-    c2 = c.pos
-    d1 = d.neg
-    d2 = d.pos
+    c1 = C.neg
+    c2 = C.pos
+    d1 = D.neg
+    d2 = D.pos
 
     # longer clause cannot subsume shorter one
     if len(c1) > len(d1) or len(c2) > len(d2):
@@ -1749,20 +1768,20 @@ def subsumes(c, d):
         pass
 
 
-def forward_subsumes(ds, c):
-    for d in ds:
-        if hasattr(d, "dead"):
+def forward_subsumes(Ds, C):
+    for D in Ds:
+        if hasattr(D, "dead"):
             continue
-        if subsumes(d, c):
+        if subsumes(D, C):
             return True
 
 
-def backward_subsume(c, ds):
-    for d in ds:
-        if hasattr(d, "dead"):
+def backward_subsume(C, Ds):
+    for D in Ds:
+        if hasattr(D, "dead"):
             continue
-        if subsumes(c, d):
-            d.dead = True
+        if subsumes(C, D):
+            D.dead = True
 
 
 ######################################## superposition
@@ -1771,182 +1790,182 @@ def backward_subsume(c, ds):
 # partial implementation of the superposition calculus
 # a full implementation would also implement an order on equations
 # e.g. lexicographic path ordering or Knuth-Bendix ordering
-def original(c):
-    if c.inference == "rename_vars":
-        return c.parents[0]
-    return c
+def original(C):
+    if C.inference == "rename_vars":
+        return C.parents[0]
+    return C
 
 
 def clause(m, neg, pos, inference, *parents):
     check_limits()
     neg = subst(tuple(neg), m)
     pos = subst(tuple(pos), m)
-    c = Clause(None, neg, pos, inference, *map(original, parents)).simplify()
-    if c.term() is True:
+    C = Clause(None, neg, pos, inference, *map(original, parents)).simplify()
+    if C.term() is True:
         return
-    if c.size() > 10_000_000:
+    if C.size() > 10_000_000:
         raise ResourceOut()
-    clauses.append(c)
+    clauses.append(C)
 
 
 # equality resolution
-# c | c0 != c1
+# C | c0 != c1
 # ->
-# c/m
+# C/m
 # where
 # m = unify(c0, c1)
 
 # for each negative equation
-def resolution(c):
-    for ci in range(len(c.neg)):
-        _, c0, c1 = equation(c.neg[ci])
+def resolution(C):
+    for ci in range(len(C.neg)):
+        _, c0, c1 = equation(C.neg[ci])
         m = {}
         if unify(c0, c1, m):
-            resolutionc(c, ci, m)
+            resolutionc(C, ci, m)
 
 
 # substitute and make new clause
-def resolutionc(c, ci, m):
-    neg = remove(c.neg, ci)
-    pos = c.pos
-    clause(m, neg, pos, "resolve", c)
+def resolutionc(C, ci, m):
+    neg = remove(C.neg, ci)
+    pos = C.pos
+    clause(m, neg, pos, "resolve", C)
 
 
 # equality factoring
-# c | c0 = c1 | c2 = c3
+# C | c0 = c1 | c2 = c3
 # ->
-# (c | c0 = c1 | c1 != c3)/m
+# (C | c0 = c1 | c1 != c3)/m
 # where
 # m = unify(c0, c2)
 
 # for each positive equation (both directions)
-def factoring(c):
-    for ci in range(len(c.pos)):
-        _, c0, c1 = equation(c.pos[ci])
-        factoring1(c, ci, c0, c1)
-        factoring1(c, ci, c1, c0)
+def factoring(C):
+    for ci in range(len(C.pos)):
+        _, c0, c1 = equation(C.pos[ci])
+        factoring1(C, ci, c0, c1)
+        factoring1(C, ci, c1, c0)
 
 
 # for each positive equation (both directions) again
-def factoring1(c, ci, c0, c1):
-    for cj in range(len(c.pos)):
+def factoring1(C, ci, c0, c1):
+    for cj in range(len(C.pos)):
         if cj == ci:
             continue
-        _, c2, c3 = equation(c.pos[cj])
-        factoringc(c, c0, c1, cj, c2, c3)
-        factoringc(c, c0, c1, cj, c3, c2)
+        _, c2, c3 = equation(C.pos[cj])
+        factoringc(C, c0, c1, cj, c2, c3)
+        factoringc(C, c0, c1, cj, c3, c2)
 
 
 # check, substitute and make new clause
-def factoringc(c, c0, c1, cj, c2, c3):
+def factoringc(C, c0, c1, cj, c2, c3):
     if not equatable(c1, c3):
         return
     m = {}
     if not unify(c0, c2, m):
         return
-    neg = c.neg + (equation_atom(c1, c3),)
-    pos = remove(c.pos, cj)
-    clause(m, neg, pos, "factor", c)
+    neg = C.neg + (equation_atom(c1, c3),)
+    pos = remove(C.pos, cj)
+    clause(m, neg, pos, "factor", C)
 
 
 # negative superposition
-# c | c0 = c1, d | d0(a) != d1
+# C | c0 = c1, D | d0(a) != d1
 # ->
-# (c | d | d0(c1) != d1)/m
+# (C | D | d0(c1) != d1)/m
 # where
 # m = unify(c0, a)
 # a not variable
 
-# for each positive equation in c (both directions)
-def superposition_neg(c, d):
-    for ci in range(len(c.pos)):
-        _, c0, c1 = equation(c.pos[ci])
-        superposition_neg1(c, d, ci, c0, c1)
-        superposition_neg1(c, d, ci, c1, c0)
+# for each positive equation in C (both directions)
+def superposition_neg(C, D):
+    for ci in range(len(C.pos)):
+        _, c0, c1 = equation(C.pos[ci])
+        superposition_neg1(C, D, ci, c0, c1)
+        superposition_neg1(C, D, ci, c1, c0)
 
 
-# for each negative equation in d (both directions)
-def superposition_neg1(c, d, ci, c0, c1):
+# for each negative equation in D (both directions)
+def superposition_neg1(C, D, ci, c0, c1):
     if c0 is True:
         return
-    for di in range(len(d.neg)):
-        _, d0, d1 = equation(d.neg[di])
-        superposition_neg2(c, d, ci, c0, c1, di, d0, d1, [], d0)
-        superposition_neg2(c, d, ci, c0, c1, di, d1, d0, [], d1)
+    for di in range(len(D.neg)):
+        _, d0, d1 = equation(D.neg[di])
+        superposition_neg2(C, D, ci, c0, c1, di, d0, d1, [], d0)
+        superposition_neg2(C, D, ci, c0, c1, di, d1, d0, [], d1)
 
 
 # descend into subterms
-def superposition_neg2(c, d, ci, c0, c1, di, d0, d1, path, a):
+def superposition_neg2(C, D, ci, c0, c1, di, d0, d1, path, a):
     if isinstance(a, Var):
         return
-    superposition_negc(c, d, ci, c0, c1, di, d0, d1, path, a)
+    superposition_negc(C, D, ci, c0, c1, di, d0, d1, path, a)
     if isinstance(a, tuple):
         for i in range(1, len(a)):
             path.append(i)
-            superposition_negc(c, d, ci, c0, c1, di, d0, d1, path, a[i])
+            superposition_negc(C, D, ci, c0, c1, di, d0, d1, path, a[i])
             path.pop()
 
 
 # check, substitute and make new clause
-def superposition_negc(c, d, ci, c0, c1, di, d0, d1, path, a):
+def superposition_negc(C, D, ci, c0, c1, di, d0, d1, path, a):
     m = {}
     if not unify(c0, a, m):
         return
-    neg = c.neg + remove(d.neg, di) + (equation_atom(splice(d0, path, c1), d1),)
-    pos = remove(c.pos, ci) + d.pos
-    clause(m, neg, pos, "ns", original(c), original(d))
+    neg = C.neg + remove(D.neg, di) + (equation_atom(splice(d0, path, c1), d1),)
+    pos = remove(C.pos, ci) + D.pos
+    clause(m, neg, pos, "ns", original(C), original(D))
 
 
 # positive superposition
-# c | c0 = c1, d | d0(a) = d1
+# C | c0 = c1, D | d0(a) = d1
 # ->
-# (c | d | d0(c1) = d1)/m
+# (C | D | d0(c1) = d1)/m
 # where
 # m = unify(c0, a)
 # a not variable
 
-# for each positive equation in c (both directions)
-def superposition_pos(c, d):
-    for ci in range(len(c.pos)):
-        _, c0, c1 = equation(c.pos[ci])
-        superposition_pos1(c, d, ci, c0, c1)
-        superposition_pos1(c, d, ci, c1, c0)
+# for each positive equation in C (both directions)
+def superposition_pos(C, D):
+    for ci in range(len(C.pos)):
+        _, c0, c1 = equation(C.pos[ci])
+        superposition_pos1(C, D, ci, c0, c1)
+        superposition_pos1(C, D, ci, c1, c0)
 
 
-# for each positive equation in d (both directions)
-def superposition_pos1(c, d, ci, c0, c1):
+# for each positive equation in D (both directions)
+def superposition_pos1(C, D, ci, c0, c1):
     if c0 is True:
         return
-    for di in range(len(d.pos)):
-        _, d0, d1 = equation(d.pos[di])
-        superposition_pos2(c, d, ci, c0, c1, di, d0, d1, [], d0)
-        superposition_pos2(c, d, ci, c0, c1, di, d1, d0, [], d1)
+    for di in range(len(D.pos)):
+        _, d0, d1 = equation(D.pos[di])
+        superposition_pos2(C, D, ci, c0, c1, di, d0, d1, [], d0)
+        superposition_pos2(C, D, ci, c0, c1, di, d1, d0, [], d1)
 
 
 # descend into subterms
-def superposition_pos2(c, d, ci, c0, c1, di, d0, d1, path, a):
+def superposition_pos2(C, D, ci, c0, c1, di, d0, d1, path, a):
     if isinstance(a, Var):
         return
-    superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a)
+    superposition_posc(C, D, ci, c0, c1, di, d0, d1, path, a)
     if isinstance(a, tuple):
         for i in range(1, len(a)):
             path.append(i)
-            superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a[i])
+            superposition_posc(C, D, ci, c0, c1, di, d0, d1, path, a[i])
             path.pop()
 
 
 # check, substitute and make new clause
-def superposition_posc(c, d, ci, c0, c1, di, d0, d1, path, a):
+def superposition_posc(C, D, ci, c0, c1, di, d0, d1, path, a):
     m = {}
     if not unify(c0, a, m):
         return
-    neg = c.neg + d.neg
+    neg = C.neg + D.neg
     pos = (
-        remove(c.pos, ci)
-        + remove(d.pos, di)
+        remove(C.pos, ci)
+        + remove(D.pos, di)
         + (equation_atom(splice(d0, path, c1), d1),)
     )
-    clause(m, neg, pos, "ps", original(c), original(d))
+    clause(m, neg, pos, "ps", original(C), original(D))
 
 
 # superposition is incomplete on arithmetic
@@ -1958,11 +1977,15 @@ def contains_arithmetic(a):
     return typeof(a) in ("int", "rat", "real")
 
 
-def solve(cs):
+def solve(Cs):
     global clauses
-    unprocessed = [c.simplify() for c in cs]
+    unprocessed = [C.simplify() for C in Cs]
     heapq.heapify(unprocessed)
     processed = []
+
+    # Otter loop
+    # in tests performs about as well as Discount loop
+    # and uses less memory
     while unprocessed:
         # given clause
         g = heapq.heappop(unprocessed)
@@ -1976,34 +1999,36 @@ def solve(cs):
             return "Unsatisfiable", g
 
         # match/unify assume clauses have disjoint variable names
-        c = g.rename_vars()
+        C = g.rename_vars()
 
         # subsumption
-        if forward_subsumes(processed, c):
+        if forward_subsumes(processed, C):
             continue
-        if forward_subsumes(unprocessed, c):
+        if forward_subsumes(unprocessed, C):
             continue
-        backward_subsume(c, processed)
-        backward_subsume(c, unprocessed)
+        backward_subsume(C, processed)
+        backward_subsume(C, unprocessed)
 
         # may need to match g with itself
         processed.append(g)
 
         # generate new clauses
         clauses = []
-        resolution(c)
-        factoring(c)
-        for d in processed:
-            if hasattr(d, "dead"):
+        resolution(C)
+        factoring(C)
+        for D in processed:
+            if hasattr(D, "dead"):
                 continue
-            superposition_neg(c, d)
-            superposition_neg(d, c)
-            superposition_pos(c, d)
-            superposition_pos(d, c)
-        for c in clauses:
-            heapq.heappush(unprocessed, c)
-    for c in cs:
-        for a in c.neg + c.pos:
+            superposition_neg(C, D)
+            superposition_neg(D, C)
+            superposition_pos(C, D)
+            superposition_pos(D, C)
+        for C in clauses:
+            heapq.heappush(unprocessed, C)
+
+    # first-order logic is not complete on arithmetic
+    for C in Cs:
+        for a in C.neg + C.pos:
             if contains_arithmetic(a):
                 return "GaveUp", None
     return "Satisfiable", None
@@ -2040,8 +2065,8 @@ def do_file(filename):
                 r = "Theorem"
         print(f"% SZS status {r} for {fname}")
         if conclusion:
-            for c in conclusion.proof():
-                prformula(c)
+            for C in conclusion.proof():
+                prformula(C)
         if r in (
             "Theorem",
             "Unsatisfiable",
