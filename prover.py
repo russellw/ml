@@ -23,6 +23,7 @@ import psutil
 # o     operator
 # r     result
 # s     collection, string
+# t     type
 # v     collection of variables
 # x, y  variables, terms or any values
 
@@ -123,10 +124,10 @@ class Fn:
                 skolem_name_i = max(skolem_name_i, int(m[1]))
         self.name = name
 
-    def type_args(self, rty, args):
-        self.ty = rty
+    def type_args(self, rt, args):
+        self.t = rt
         if args:
-            self.ty = (rty,) + tuple([typeof(a) for a in args])
+            self.t = (rt,) + tuple([typeof(a) for a in args])
 
     def __repr__(self):
         return self.name
@@ -164,11 +165,11 @@ def mktype(name):
 
 # first-order variables cannot be boolean
 class Var:
-    def __init__(self, ty=None):
-        if not ty:
+    def __init__(self, t=None):
+        if not t:
             return
-        assert ty != "bool"
-        self.ty = ty
+        assert t != "bool"
+        self.t = t
 
     def __repr__(self):
         if not hasattr(self, "name"):
@@ -188,13 +189,13 @@ def const(a):
 
 
 def equatable(a, b):
-    ty = typeof(a)
-    if ty != typeof(b):
+    t = typeof(a)
+    if t != typeof(b):
         return
     # normally first-order logic doesn't allow equality on predicates
     # superposition calculus makes a special exception
     # for the pseudo-equation p=true
-    if ty == "bool":
+    if t == "bool":
         return b is True
     return True
 
@@ -296,7 +297,7 @@ def rename_vars(a, m):
     if isinstance(a, Var):
         if a in m:
             return m[a]
-        b = Var(a.ty)
+        b = Var(a.t)
         m[a] = b
         return b
     return a
@@ -310,16 +311,16 @@ def simplify(a):
             x = a[1]
             y = a[2]
             if const(x) and const(y):
-                ty = typeof(x)
+                t = typeof(x)
                 a = eval(f"x{o}y")
-                if ty == "real":
+                if t == "real":
                     return Real(a)
             return a
         if o in ("<", "<="):
             x = a[1]
             y = a[2]
             if const(x) and const(y):
-                ty = typeof(x)
+                t = typeof(x)
                 return eval(f"x{o}y")
             return a
         if o == "=":
@@ -431,12 +432,12 @@ def typeof(a):
             if o.startswith("to-"):
                 return o[3:]
             return typeof(a[1])
-        ty = typeof(o)
-        if not isinstance(ty, tuple):
+        t = typeof(o)
+        if not isinstance(t, tuple):
             raise ValueError(a)
-        return ty[0]
+        return t[0]
     if isinstance(a, Fn) or isinstance(a, Var):
-        return a.ty
+        return a.t
     if isinstance(a, bool):
         return "bool"
     if isinstance(a, DistinctObject):
@@ -511,10 +512,10 @@ def type_unify(wanted, a, m):
         # we already unified the return type
         # by virtue of unifying the type of the whole expression
         # so now just need to unify parameters with arguments
-        ty = typeof(o)
-        assert isinstance(ty, tuple)
+        t = typeof(o)
+        assert isinstance(t, tuple)
         for i in range(1, len(a)):
-            type_unify(ty[i], a[i], m)
+            type_unify(t[i], a[i], m)
         return
 
 
@@ -526,17 +527,17 @@ def type_set(a, m):
             type_set(b, m)
         return
     if isinstance(a, Fn) or isinstance(a, Var):
-        a.ty = subst(a.ty, m)
-        if isinstance(a.ty, tuple):
+        a.t = subst(a.t, m)
+        if isinstance(a.t, tuple):
             r = []
-            for b in a.ty:
+            for b in a.t:
                 if isinstance(b, Var):
                     b = "individual"
                 r.append(b)
-            a.ty = tuple(r)
+            a.t = tuple(r)
             return
-        if isinstance(a.ty, Var):
-            a.ty = "individual"
+        if isinstance(a.t, Var):
+            a.t = "individual"
             return
         return
 
@@ -554,7 +555,7 @@ def type_check(wanted, a):
             # quantifiers require body boolean
             if o in ("exists", "forall"):
                 for x in a[1]:
-                    if x.ty == "bool":
+                    if x.t == "bool":
                         raise ValueError(a)
                 type_check("bool", a[2])
                 return
@@ -592,13 +593,13 @@ def type_check(wanted, a):
 
         return
     if isinstance(a, Fn):
-        if isinstance(a.ty, tuple):
-            for b in a.ty[1:]:
+        if isinstance(a.t, tuple):
+            for b in a.t[1:]:
                 if b == "bool":
                     raise ValueError(a)
         return
     if isinstance(a, Var):
-        if a.ty == "bool":
+        if a.t == "bool":
             raise ValueError(a)
         return
 
@@ -946,10 +947,10 @@ def read_tptp1(filename, select=True):
             expect(")")
             expect(">")
             return (atomic_type(),) + tuple(params)
-        ty = atomic_type()
+        t = atomic_type()
         if eat(">"):
-            return atomic_type(), ty
-        return ty
+            return atomic_type(), t
+        return t
 
     free = {}
 
@@ -1058,11 +1059,11 @@ def read_tptp1(filename, select=True):
         a = fn(read_name())
         if tok == "(":
             s = args(bound)
-            if not hasattr(a, "ty"):
+            if not hasattr(a, "t"):
                 a.type_args(Var(), s)
             return (a,) + s
-        if not hasattr(a, "ty"):
-            a.ty = Var()
+        if not hasattr(a, "t"):
+            a.t = Var()
         return a
 
     def infix_unary(bound):
@@ -1081,10 +1082,10 @@ def read_tptp1(filename, select=True):
         if not o[0].isupper():
             err("expected variable")
         lex()
-        ty = "individual"
+        t = "individual"
         if eat(":"):
-            ty = atomic_type()
-        a = Var(ty)
+            t = atomic_type()
+        a = Var(t)
         bound[o] = a
         return a
 
@@ -1233,11 +1234,11 @@ def read_tptp1(filename, select=True):
                     raise Inappropriate()
                 # function has type
                 a = fn(name)
-                ty = compound_type()
-                if not hasattr(a, "ty"):
-                    a.ty = ty
+                t = compound_type()
+                if not hasattr(a, "t"):
+                    a.t = t
                 else:
-                    if a.ty != ty:
+                    if a.t != t:
                         err("type mismatch")
 
             while parens:
@@ -1417,9 +1418,9 @@ def prterm(a, parent=None):
                 x = v[i]
                 set_var_name(x)
                 pr(x)
-                if x.ty != "individual":
+                if x.t != "individual":
                     pr(":")
-                    prtype(x.ty)
+                    prtype(x.t)
             pr("]:")
             prterm(a[2], a)
             return
@@ -1516,9 +1517,9 @@ def isomorphic(a, b, m):
 # something of an open question:
 # https://stackoverflow.com/questions/53718986/converting-first-order-logic-to-cnf-without-exponential-blowup
 def cnf(formulas, clauses):
-    def skolem(rty, args):
+    def skolem(rt, args):
         a = Fn()
-        a.type_args(rty, args)
+        a.type_args(rt, args)
         if args:
             return (a,) + tuple(args)
         return a
@@ -1546,11 +1547,11 @@ def cnf(formulas, clauses):
                 if o == "exists":
                     exists_vars = exists_vars.copy()
                     for x in a[1]:
-                        exists_vars[x] = skolem(x.ty, all_vars.values())
+                        exists_vars[x] = skolem(x.t, all_vars.values())
                 else:
                     all_vars = all_vars.copy()
                     for x in a[1]:
-                        all_vars[x] = Var(x.ty)
+                        all_vars[x] = Var(x.t)
                 return nnf(all_vars, exists_vars, pol, a[2])
             if o == "eqv":
                 # a1 => a2
