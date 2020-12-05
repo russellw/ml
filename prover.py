@@ -772,6 +772,7 @@ class Inappropriate(Exception):
 
 def read_tptp1(filename, select=True):
     global expected
+    global header
     fname = os.path.basename(filename)
     text = open(filename).read()
     if text and text[-1] != "\n":
@@ -805,6 +806,10 @@ def read_tptp1(filename, select=True):
                 i = ti
                 while text[ti] != "\n":
                     ti += 1
+                if header:
+                    print(text[i:ti])
+                    if text[ti : ti + 2] == "\n\n":
+                        print()
                 if problem.expected is None:
                     m = re.match(r"%\s*Status\s*:\s*(\w+)", text[i:ti])
                     if m:
@@ -1287,6 +1292,7 @@ def read_tptp1(filename, select=True):
         expect(".")
 
     lex()
+    header = False
     while tok:
         free.clear()
         if tok == "cnf":
@@ -1302,9 +1308,11 @@ def read_tptp1(filename, select=True):
 
 
 def read_tptp(filename):
+    global header
     global problem
-    reset_formula_names()
+    header = True
     problem = Problem(filename)
+    reset_formula_names()
     # numbers larger than 2000 silently fail
     sys.setrecursionlimit(2000)
     read_tptp1(filename)
@@ -2026,7 +2034,6 @@ def do_file(filename):
     set_timeout()
     attempted += 1
     fname = os.path.basename(filename)
-    print(f"% {filename}")
     try:
         problem = read_problem(filename)
         if problem.formulas:
