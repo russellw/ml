@@ -801,7 +801,7 @@ def read_tptp1(filename, select=True):
                 continue
 
             # line comment
-            if c == "%":
+            if c in ("%", "#"):
                 i = ti
                 while text[ti] != "\n":
                     ti += 1

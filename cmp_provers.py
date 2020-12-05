@@ -60,7 +60,7 @@ def do_file(filename):
     except (Inappropriate, RecursionError, Timeout) as e:
         print(f"prover.py says {e}")
     p = subprocess.Popen(
-        ["bin/eprover", "-l", "0", "--generated-limit=1000000", filename],
+        ["bin/eprover", "-l", "0", "--generated-limit=100000", filename],
         stdout=subprocess.PIPE,
     )
     for s in p.stdout.readlines():
