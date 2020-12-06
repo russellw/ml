@@ -55,6 +55,7 @@ def remove(s, i):
 
 ######################################## logging
 
+
 logger = logging.getLogger()
 logger.addHandler(
     logging.FileHandler(datetime.datetime.now().strftime("logs/%Y-%m-%d %H%M%S.log"))
@@ -80,6 +81,7 @@ def debug(a):
 
 
 prn(sys.argv)
+prn()
 
 
 ######################################## limits
@@ -1488,7 +1490,7 @@ def prformula(F):
 
     # content
     a = F.term()
-    if isinstance(F, Formula):
+    if not isinstance(F, Clause):
         a = quantify(a)
     prterm(a)
     pr(", ")
