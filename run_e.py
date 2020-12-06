@@ -57,7 +57,7 @@ def do_file(filename):
             ["bin/eprover", "--auto", filename],
             capture_output=True,
             encoding="utf-8",
-            timeout=10,
+            timeout=60,
             check=True,
         )
         prn(p.stdout)
