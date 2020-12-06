@@ -787,20 +787,20 @@ def read_dimacs(filename):
         if s[0] == "p":
             continue
         for word in s.split():
+            atoms = pos
+            if word[0] == "-":
+                atoms = neg
+                word = word[1:]
+
             if word == "0":
                 problem.clauses.append(Clause(None, neg, pos))
                 neg = []
                 pos = []
                 continue
 
-            atoms = pos
-            if word[0] == "-":
-                atoms = neg
-                word = word[1:]
-
+            int(word)
             a = fn(word)
-            if not hasattr(a, "t"):
-                a.t = Var()
+            a.t = "bool"
             atoms.append(a)
     if neg or pos:
         problem.clauses.append(Clause(None, neg, pos))
