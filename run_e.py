@@ -70,7 +70,8 @@ def do_file(filename):
         if p.returncode == 9 and "GaveUp" in p.stdout:
             pass
         else:
-            raise p
+            prn("Error")
+            prn(p.stderr)
 
 
 if __name__ == "__main__":
