@@ -30,6 +30,8 @@ import psutil
 # x, y  variables, terms or any values
 
 process = psutil.Process()
+# numbers larger than 2000 silently fail
+sys.setrecursionlimit(2000)
 
 
 def check_tuples(a):
@@ -764,6 +766,46 @@ class Problem:
         self.clauses = []
 
 
+######################################## Dimacs
+
+
+def read_dimacs(filename):
+    global header
+    neg = []
+    pos = []
+    for s in open(filename):
+        if s[0] in ("c", "\n"):
+            if header:
+                prn(s[:-1])
+            if not hasattr(problem, "expected"):
+                if "UNSAT" in s:
+                    problem.expected = "Unsatisfiable"
+                elif "SAT" in s:
+                    problem.expected = "Satisfiable"
+            continue
+        header = False
+        if s[0] == "p":
+            continue
+        for word in s.split():
+            if word == "0":
+                problem.clauses.append(Clause(None, neg, pos))
+                neg = []
+                pos = []
+                continue
+
+            atoms = pos
+            if word[0] == "-":
+                atoms = neg
+                word = word[1:]
+
+            a = fn(word)
+            if not hasattr(a, "t"):
+                a.t = Var()
+            atoms.append(a)
+    if neg or pos:
+        problem.clauses.append(Clause(None, neg, pos))
+
+
 ######################################## TPTP
 
 
@@ -807,7 +849,7 @@ class Inappropriate(Exception):
         super().__init__("Inappropriate")
 
 
-def read_tptp1(filename, select=True):
+def read_tptp(filename, select=True):
     global header
     fname = os.path.basename(filename)
     text = open(filename).read()
@@ -1320,7 +1362,7 @@ def read_tptp1(filename, select=True):
             expect("]")
 
         # include
-        read_tptp1(tptp + "/" + filename1, select1)
+        read_tptp(tptp + "/" + filename1, select1)
 
         # end
         expect(")")
@@ -1340,18 +1382,6 @@ def read_tptp1(filename, select=True):
             include()
             continue
         err("unknown language")
-
-
-def read_tptp(filename):
-    global header
-    global problem
-    header = True
-    problem = Problem()
-    reset_formula_names()
-    # numbers larger than 2000 silently fail
-    sys.setrecursionlimit(2000)
-    read_tptp1(filename)
-    return problem
 
 
 # print
@@ -1703,9 +1733,20 @@ def cnf(formulas, clauses):
 
 
 def read_problem(filename):
-    # read
+    global header
+    global problem
+
+    # init
     clear_fns()
-    problem = read_tptp(filename)
+    header = True
+    problem = Problem()
+    reset_formula_names()
+
+    # read
+    if os.path.splitext(filename)[1] == ".cnf":
+        read_dimacs(filename)
+    else:
+        read_tptp(filename)
 
     # infer types
     terms = [F.term() for F in problem.formulas + problem.clauses]
