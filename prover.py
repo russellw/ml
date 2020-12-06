@@ -2106,7 +2106,7 @@ def do_file(filename):
 
     # list file
     if os.path.splitext(filename)[1] == ".lst":
-        for s in open(filename).readlines():
+        for s in open(filename):
             do_file(s.strip())
         return
 
