@@ -15,7 +15,7 @@ import psutil
 # naming conventions:
 # C, D  clauses
 # F, G  formulas
-# a, b  terms
+# a, b  terms or any values
 # c     character
 # e     exception
 # f     function
@@ -39,11 +39,6 @@ def check_tuples(a):
         return
     if isinstance(a, list):
         raise ValueError(a)
-
-
-def debug(x):
-    info = inspect.getframeinfo(inspect.currentframe().f_back)
-    print(f"{info.filename}:{info.function}:{info.lineno}: {repr(x)}", file=sys.stderr)
 
 
 def invert(m):
@@ -78,6 +73,10 @@ def prn(a=""):
     global pr_buf
     logger.info(pr_buf + str(a))
     pr_buf = ""
+
+
+def debug(a):
+    logger.debug(str(a), stack_info=True)
 
 
 prn(sys.argv)
