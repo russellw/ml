@@ -757,8 +757,7 @@ class Clause(Formula):
 
 
 class Problem:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
         self.formulas = []
         self.clauses = []
 
@@ -1345,7 +1344,7 @@ def read_tptp(filename):
     global header
     global problem
     header = True
-    problem = Problem(filename)
+    problem = Problem()
     reset_formula_names()
     # numbers larger than 2000 silently fail
     sys.setrecursionlimit(2000)
