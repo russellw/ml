@@ -1,8 +1,10 @@
 import argparse
+import datetime
 import fractions
 import heapq
 import inspect
 import itertools
+import logging
 import os
 import re
 import sys
@@ -54,6 +56,31 @@ def remove(s, i):
     s = list(s)
     del s[i]
     return tuple(s)
+
+
+######################################## logging
+
+logger = logging.getLogger()
+logger.addHandler(
+    logging.FileHandler(datetime.datetime.now().strftime("logs/%Y-%m-%d %H%M%S.log"))
+)
+logger.addHandler(logging.StreamHandler(sys.stdout))
+logger.setLevel(logging.DEBUG)
+pr_buf = ""
+
+
+def pr(a):
+    global pr_buf
+    pr_buf += str(a)
+
+
+def prn(a=""):
+    global pr_buf
+    logger.info(pr_buf + str(a))
+    pr_buf = ""
+
+
+prn(sys.argv)
 
 
 ######################################## limits
@@ -484,7 +511,6 @@ def type_unify(wanted, a, m):
             return unify_var(b, a, m)
 
     if not unify(wanted, typeof(a), m):
-        print(m)
         raise ValueError(f"{wanted} != typeof({a}): {typeof(a)}")
     if isinstance(a, tuple):
         o = a[0]
@@ -817,9 +843,9 @@ def read_tptp1(filename, select=True):
                 while text[ti] != "\n":
                     ti += 1
                 if header:
-                    print(text[i:ti])
+                    prn(text[i:ti])
                     if text[ti : ti + 2] == "\n\n":
-                        print()
+                        prn()
                 if not hasattr(problem, "expected"):
                     m = re.match(r"%\s*Status\s*:\s*(\w+)", text[i:ti])
                     if m:
@@ -1350,10 +1376,6 @@ def set_var_name(x):
         x.name = "Z" + str(i - 25)
 
 
-def pr(a):
-    print(a, end="")
-
-
 def prargs(a):
     pr("(")
     for i in range(1, len(a)):
@@ -1488,7 +1510,7 @@ def prformula(F):
         pr("introduced(definition)")
 
     # end
-    print(").")
+    prn(").")
 
 
 ######################################## CNF
@@ -2056,15 +2078,15 @@ def do_file(filename):
     try:
         problem = read_problem(filename)
         if problem.formulas:
-            print(f"% {len(problem.formulas)} formulas")
-        print(f"% {len(problem.clauses)} clauses")
+            prn(f"% {len(problem.formulas)} formulas")
+        prn(f"% {len(problem.clauses)} clauses")
         r, conclusion = solve(problem.clauses)
         if hasattr(problem, "conjecture"):
             if r == "Satisfiable":
                 r = "CounterSatisfiable"
             elif r == "Unsatisfiable":
                 r = "Theorem"
-        print(f"% SZS status {r} for {fname}")
+        prn(f"% SZS status {r} for {fname}")
         if conclusion:
             for C in conclusion.proof():
                 prformula(C)
@@ -2085,11 +2107,11 @@ def do_file(filename):
                 else:
                     raise ValueError(f"{r} != {problem.expected}")
     except (Inappropriate, Timeout) as e:
-        print(f"% SZS status {e} for {fname}")
+        prn(f"% SZS status {e} for {fname}")
     except RecursionError:
-        print(f"% SZS status ResourceOut for {fname}")
-    print(f"% {time.time() - start:.3f} seconds")
-    print()
+        prn(f"% SZS status ResourceOut for {fname}")
+    prn(f"% {time.time() - start:.3f} seconds")
+    prn()
 
 
 if __name__ == "__main__":
@@ -2106,5 +2128,5 @@ if __name__ == "__main__":
         for root, dirs, files in os.walk(filename):
             for fname in files:
                 do_file(os.path.join(root, fname))
-    print(f"% solved {solved}/{attempted} = {solved*100/attempted}%")
-    print(f"% {time.time() - start:.3f} seconds")
+    prn(f"% solved {solved}/{attempted} = {solved*100/attempted}%")
+    prn(f"% {time.time() - start:.3f} seconds")
