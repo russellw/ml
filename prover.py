@@ -640,19 +640,9 @@ def reset_formula_names():
     formula_name_i = 0
 
 
-def set_formula_name(F, name):
-    global formula_name_i
-    if name is None:
-        name = formula_name_i
-        formula_name_i += 1
-    elif isinstance(name, int):
-        formula_name_i = max(formula_name_i, name + 1)
-    F.name = name
-
-
 class Formula:
     def __init__(self, name, term, inference=None, *parents):
-        set_formula_name(self, name)
+        self.set_name(name)
         self.__term = term
         self.inference = inference
         self.parents = parents
@@ -671,6 +661,15 @@ class Formula:
 
         rec(self)
         return r
+
+    def set_name(self, name):
+        global formula_name_i
+        if name is None:
+            name = formula_name_i
+            formula_name_i += 1
+        elif isinstance(name, int):
+            formula_name_i = max(formula_name_i, name + 1)
+        self.name = name
 
     def status(self):
         # input data or definition is logical data
@@ -702,7 +701,7 @@ class Clause(Formula):
             check_tuples(a)
         for a in pos:
             check_tuples(a)
-        set_formula_name(self, name)
+        self.set_name(name)
         self.neg = tuple(neg)
         self.pos = tuple(pos)
         self.inference = inference
