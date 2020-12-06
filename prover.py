@@ -2076,9 +2076,6 @@ def do_file(filename):
     fname = os.path.basename(filename)
     try:
         problem = read_problem(filename)
-        if problem.formulas:
-            prn(f"% {len(problem.formulas)} formulas")
-        prn(f"% {len(problem.clauses)} clauses")
         r, conclusion = solve(problem.clauses)
         if hasattr(problem, "conjecture"):
             if r == "Satisfiable":
@@ -2127,5 +2124,5 @@ if __name__ == "__main__":
         for root, dirs, files in os.walk(filename):
             for fname in files:
                 do_file(os.path.join(root, fname))
-    prn(f"% solved {solved}/{attempted} = {solved*100/attempted}%")
-    prn(f"% {time.time() - start:.3f} seconds")
+    prn(f"solved {solved}/{attempted} = {solved*100/attempted}%")
+    prn(f"{time.time() - start:.3f} seconds")
