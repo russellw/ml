@@ -1,14 +1,16 @@
 *.csv
 *.dot
+*.iml
 *.lst
 *.p
 *.png
 *.pth
+.idea/
+TPTP/
 bin/
 data/
 satlib/
 tsplib/
-TPTP/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
