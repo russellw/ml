@@ -1,12 +1,12 @@
 package prover;
 
 public enum Kind {
-    BOOLEAN,
-    CONSTANT,
-    INDIVIDUAL,
-    INTEGER,
-    RATIONAL,
-    REAL,
-    FUNCTION,
-    VARIABLE,
+  BOOLEAN,
+  CONSTANT,
+  INDIVIDUAL,
+  INTEGER,
+  RATIONAL,
+  REAL,
+  FUNCTION,
+  VARIABLE,
 }

@@ -1418,7 +1418,7 @@ def need_parens(a, parent):
     if not parent:
         return
     if a[0] in ("and", "eqv", "or"):
-        return parent[0] in ("and", "eqv", "exists", "forall", "not", "or",)
+        return parent[0] in ("and", "eqv", "exists", "forall", "not", "or")
 
 
 def prterm(a, parent=None):
