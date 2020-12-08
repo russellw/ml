@@ -1,0 +1,14 @@
+package prover;
+
+public enum Tag {
+    ATOM,
+    CONST_FALSE,
+    CONST_INTEGER,
+    CONST_RATIONAL,
+    CONST_REAL,
+    CONST_TRUE,
+    DISTINCT_OBJECT,
+    FUNC,
+    LIST,
+    VAR,
+}

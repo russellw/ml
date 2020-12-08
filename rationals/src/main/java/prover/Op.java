@@ -1,0 +1,38 @@
+package prover;
+
+public enum Op {
+    ADD,
+    ALL,
+    AND,
+    CEIL,
+    DIVIDE,
+    DIVIDE_EUCLIDEAN,
+    DIVIDE_FLOOR,
+    DIVIDE_TRUNCATE,
+    EQ,
+    EQV,
+    EXISTS,
+    FLOOR,
+    IF,
+    IS_INTEGER,
+    IS_RATIONAL,
+    LESS,
+    LESS_EQ,
+    MULTIPLY,
+    NEGATE,
+    NOT,
+    OR,
+    REMAINDER_EUCLIDEAN,
+    REMAINDER_FLOOR,
+    REMAINDER_TRUNCATE,
+    ROUND,
+    SUBTRACT,
+    TO_INTEGER,
+    TO_RATIONAL,
+    TO_REAL,
+    TRUNCATE,
+
+    // Not a known operator
+    ATOM,
+    CALL,
+}
