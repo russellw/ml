@@ -4,7 +4,7 @@ import torch.nn as nn
 # data
 Xs = []
 ys = []
-n = 10
+n = 5
 for i in range(n):
     i1 = i / n
     for j in range(n):
@@ -15,6 +15,11 @@ for i in range(n):
 # torch tensors
 X_tensor = torch.tensor(Xs)
 y_tensor = torch.tensor(ys)
+
+# https://stackoverflow.com/questions/65219569/pytorch-gives-incorrect-results-due-to-broadcasting
+new_shape = (len(ys), 1)
+y_tensor = y_tensor.view(new_shape)
+print(y_tensor.shape)
 
 # hyperparameters
 in_features = len(Xs[0])
