@@ -21,6 +21,12 @@ y_ar = np.array(y_df, dtype=np.float32)
 X_tensor = torch.from_numpy(X_ar)
 y_tensor = torch.from_numpy(y_ar)
 
+# https://stackoverflow.com/questions/65219569/pytorch-gives-incorrect-results-due-to-broadcasting
+print(y_tensor.shape)
+new_shape = (26, 1)
+y_tensor = y_tensor.view(new_shape)
+print(y_tensor.shape)
+
 # hyperparameters
 in_features = X_ar.shape[1]
 hidden_size = 100
