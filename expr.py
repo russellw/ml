@@ -1,3 +1,4 @@
+import math
 import random
 
 import torch
@@ -5,8 +6,8 @@ import torch.nn as nn
 
 random.seed(0)
 
-ops = "and", "or", "not"
-leaves = True, False
+ops = "+", "-", "*", "/", "sqrt"
+leaves = 0.0, 1.0
 punct = "(", ")"
 
 tokens = {}
@@ -15,7 +16,7 @@ for a in ops + leaves + punct:
 
 
 def arity(o):
-    if o == "not":
+    if o == "sqrt":
         return 1
     return 2
 
@@ -29,27 +30,24 @@ def randcode(depth):
 
 def evaluate(a):
     if isinstance(a, list) or isinstance(a, tuple):
-        a = list(map(evaluate, a))
-        o = a[0]
-        x = a[1]
-        if arity(o) == 1:
-            return eval(f"{o} x")
-        y = a[2]
-        return eval(f"x {o} y")
+        try:
+            a = list(map(evaluate, a))
+            o = a[0]
+            x = a[1]
+            if o == "sqrt":
+                return math.sqrt(x)
+            y = a[2]
+            return eval(f"x {o} y")
+        except (ValueError, ZeroDivisionError):
+            return 0.0
     return a
 
 
-# gather samples
-n = 1000
-no = []
-yes = []
-while len(no) < n or len(yes) < n:
-    a = randcode(3)
-    r = yes if evaluate(a) else no
-    if len(r) < n:
-        r.append(a)
+# generate samples
+exprs = [randcode(3) for i in range(1000)]
+outputs = list(map(evaluate, exprs))
 
-# serialize
+# serialize exprs
 def serial(a):
     r = []
 
@@ -66,19 +64,17 @@ def serial(a):
     return r
 
 
-no = list(map(serial, no))
-yes = list(map(serial, yes))
+exprs = list(map(serial, exprs))
 
 # translate tokens to corresponding numbers
 def translate(s):
     return [tokens[c] for c in s]
 
 
-no = list(map(translate, no))
-yes = list(map(translate, yes))
+exprs = list(map(translate, exprs))
 
 # pad each string with EOF to make them all the same length
-maxlen = max(map(len, no + yes))
+maxlen = max(map(len, exprs))
 # maxlen = 50
 
 
@@ -87,8 +83,7 @@ def pad(s):
     return s + [len(tokens)] * (maxlen - len(s))
 
 
-no = list(map(pad, no))
-yes = list(map(pad, yes))
+exprs = list(map(pad, exprs))
 
 # convert string of numbers to one-hot channels
 nchannels = len(tokens) + 1
@@ -102,30 +97,19 @@ def one_hot(s):
     return r
 
 
-no = list(map(one_hot, no))
-yes = list(map(one_hot, yes))
+exprs = list(map(one_hot, exprs))
 
-# convert data to x/y tensors
-def interleave(s, t):
-    assert len(s) == len(t)
-    r = []
-    for i in range(len(s)):
-        r.append(s[i])
-        r.append(t[i])
-    return r
-
-
-def tensors(no, yes):
-    assert len(no) == len(yes)
-    x = torch.tensor(interleave(no, yes), dtype=torch.float32)
-    y = torch.tensor([0, 1] * len(no), dtype=torch.float32)
+# convert to x/y tensors
+def tensors(exprs, outputs):
+    x = torch.tensor(exprs, dtype=torch.float32)
+    y = torch.tensor(outputs, dtype=torch.float32)
     y = y.view((y.shape[0], 1))
     return x, y
 
 
-n = len(no) * 3 // 4
-train_data = tensors(no[:n], yes[:n])
-test_data = tensors(no[n:], yes[n:])
+n = len(exprs) * 4 // 5
+train_data = tensors(exprs[:n], outputs[:n])
+test_data = tensors(exprs[n:], outputs[n:])
 
 # hyperparameters
 in_features = maxlen * nchannels
@@ -146,7 +130,7 @@ class Net(nn.Module):
 
 
 model = Net()
-criterion = nn.BCEWithLogitsLoss()
+criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
 
 # train
