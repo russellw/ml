@@ -7,6 +7,7 @@ import skopt
 import torch
 import torch.nn as nn
 
+process = psutil.Process()
 random.seed(0)
 
 ops = "+", "-", "*", "/", "sqrt"
@@ -77,7 +78,8 @@ exprs = list(map(translate, exprs))
 
 # pad each string with EOF to make them all the same length
 maxlen = max(map(len, exprs))
-# maxlen = 50
+print(f"maxlen: {maxlen}")
+print()
 
 
 def pad(s):
@@ -140,11 +142,8 @@ optims = {
     "SGD": torch.optim.SGD,
 }
 
-# hyperparameters
-in_features = maxlen * nchannels
-hidden_size = 100
-
 space = [
+    skopt.space.Integer(1, 1000, name="hidden1"),
     skopt.space.Categorical(optim_names, name="optim"),
     skopt.space.Real(10 ** -4, 0.5, "log-uniform", name="lr"),
 ]
@@ -162,12 +161,12 @@ def optim(hparams):
 
 
 class Net(nn.Module):
-    def __init__(self):
+    def __init__(self, hidden1):
         super(Net, self).__init__()
         self.relu = nn.ReLU()
 
-        self.layer1 = nn.Linear(in_features, hidden_size)
-        self.out = nn.Linear(hidden_size, 1)
+        self.layer1 = nn.Linear(nchannels * maxlen, hidden1)
+        self.out = nn.Linear(hidden1, 1)
 
     def forward(self, x):
         x = self.relu(self.layer1(x))
@@ -185,8 +184,9 @@ def train(hparams):
         count += 1
     print(hparams)
 
-    model = Net()
+    model = Net(hparam(hparams, "hidden1"))
     optimizer = optim(hparams)(model.parameters(), lr=hparam(hparams, "lr"))
+    print(f"{process.memory_info().rss:,} bytes")
 
     epochs = 1000
     for epoch in range(epochs + 1):
@@ -213,13 +213,10 @@ start = time.time()
 
 # search hyperparameters
 # n_calls defaults to 100
-res = skopt.gp_minimize(train, space, n_calls=10)
+res = skopt.gp_minimize(train, space, n_calls=100)
 
 # train once more with best hyperparameters
 count = "final"
 train(res.x)
 
-# stats
-process = psutil.Process()
-print(f"{process.memory_info().rss:,} bytes")
 print(f"{time.time() - start:.3f} seconds")
