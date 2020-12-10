@@ -221,5 +221,5 @@ train(res.x)
 
 # stats
 process = psutil.Process()
-print(f"{process.memory_info().rss} bytes")
+print(f"{process.memory_info().rss:,} bytes")
 print(f"{time.time() - start:.3f} seconds")
