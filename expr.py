@@ -1,6 +1,9 @@
 import math
 import random
+import time
 
+import psutil
+import skopt
 import torch
 import torch.nn as nn
 
@@ -43,11 +46,10 @@ def evaluate(a):
     return a
 
 
-# generate samples
 exprs = [randcode(3) for i in range(1000)]
 outputs = list(map(evaluate, exprs))
 
-# serialize exprs
+
 def serial(a):
     r = []
 
@@ -66,7 +68,7 @@ def serial(a):
 
 exprs = list(map(serial, exprs))
 
-# translate tokens to corresponding numbers
+
 def translate(s):
     return [tokens[c] for c in s]
 
@@ -99,7 +101,7 @@ def one_hot(s):
 
 exprs = list(map(one_hot, exprs))
 
-# convert to x/y tensors
+
 def tensors(exprs, outputs):
     x = torch.tensor(exprs, dtype=torch.float32)
     y = torch.tensor(outputs, dtype=torch.float32)
@@ -107,15 +109,58 @@ def tensors(exprs, outputs):
     return x, y
 
 
-n = len(exprs) * 4 // 5
-train_data = tensors(exprs[:n], outputs[:n])
-test_data = tensors(exprs[n:], outputs[n:])
+n = len(exprs)
+train_x, train_y = tensors(exprs[: n * 3 // 5], outputs[: n * 3 // 5])
+valid_x, valid_y = tensors(
+    exprs[n * 3 // 5 : n * 4 // 5], outputs[n * 3 // 5 : n * 4 // 5]
+)
+test_x, test_y = tensors(exprs[n * 4 // 5 :], outputs[n * 4 // 5 :])
+
+optim_names = [
+    "Adadelta",
+    "Adagrad",
+    "Adam",
+    "Adamax",
+    "ASGD",
+    "RMSprop",
+    "Rprop",
+    "SGD",
+]
+
+# LBFGS needs an extra closure parameter
+# SparseAdam does not support dense gradients, please consider Adam instead
+optims = {
+    "Adadelta": torch.optim.Adadelta,
+    "Adagrad": torch.optim.Adagrad,
+    "Adam": torch.optim.Adam,
+    "Adamax": torch.optim.Adamax,
+    "ASGD": torch.optim.ASGD,
+    "RMSprop": torch.optim.RMSprop,
+    "Rprop": torch.optim.Rprop,
+    "SGD": torch.optim.SGD,
+}
 
 # hyperparameters
 in_features = maxlen * nchannels
 hidden_size = 100
 
-# model
+space = [
+    skopt.space.Categorical(optim_names, name="optim"),
+    skopt.space.Real(10 ** -4, 0.5, "log-uniform", name="lr"),
+]
+
+
+def hparam(hparams, name):
+    for i in range(len(hparams)):
+        if space[i].name == name:
+            return hparams[i]
+    raise ValueError(name)
+
+
+def optim(hparams):
+    return optims[hparam(hparams, "optim")]
+
+
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -129,30 +174,52 @@ class Net(nn.Module):
         return self.out(x)
 
 
-model = Net()
 criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
+count = 0
 
-# train
-x, y = train_data
-epochs = 1000
-for epoch in range(1, epochs + 1):
-    # forward
-    output = model(x)
-    cost = criterion(output, y)
 
-    # backward
-    optimizer.zero_grad()
-    cost.backward()
-    optimizer.step()
+def train(hparams):
+    global count
+    print(count)
+    if isinstance(count, int):
+        count += 1
+    print(hparams)
 
-    # print progress
-    if epoch % (epochs // 10) == 0:
-        print(f"{epoch:6d} {cost.item():10f}")
-print()
+    model = Net()
+    optimizer = optim(hparams)(model.parameters(), lr=hparam(hparams, "lr"))
 
-# test
-x, y = test_data
-output = model(x)
-cost = criterion(output, y)
-print(f"       {cost.item():10f}")
+    epochs = 1000
+    for epoch in range(epochs + 1):
+        # print progress
+        if epoch % (epochs // 10) == 0:
+            train_cost = criterion(model(train_x), train_y).item()
+            valid_cost = criterion(model(valid_x), valid_y).item()
+            test_cost = criterion(model(test_x), test_y).item()
+            print(f"{epoch:6d} {train_cost:10f} {valid_cost:10f} {test_cost:10f}")
+
+        # forward
+        output = model(train_x)
+        cost = criterion(output, train_y)
+
+        # backward
+        optimizer.zero_grad()
+        cost.backward()
+        optimizer.step()
+    print()
+    return valid_cost
+
+
+start = time.time()
+
+# search hyperparameters
+# n_calls defaults to 100
+res = skopt.gp_minimize(train, space, n_calls=10)
+
+# train once more with best hyperparameters
+count = "final"
+train(res.x)
+
+# stats
+process = psutil.Process()
+print(f"{process.memory_info().rss} bytes")
+print(f"{time.time() - start:.3f} seconds")
