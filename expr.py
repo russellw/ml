@@ -1,5 +1,8 @@
+import datetime
+import logging
 import math
 import random
+import sys
 import time
 
 import psutil
@@ -9,6 +12,24 @@ import torch.nn as nn
 
 process = psutil.Process()
 random.seed(0)
+
+logger = logging.getLogger()
+logger.addHandler(
+    logging.FileHandler(datetime.datetime.now().strftime("logs/%Y-%m-%d %H%M%S.log"))
+)
+logger.addHandler(logging.StreamHandler(sys.stdout))
+logger.setLevel(logging.DEBUG)
+
+
+def prn(a=""):
+    logger.info(str(a))
+
+
+def debug(a):
+    logger.debug(str(a), stack_info=True)
+
+
+prn(sys.argv)
 
 ops = "+", "-", "*", "/", "sqrt"
 leaves = 0.0, 1.0
@@ -78,8 +99,8 @@ exprs = list(map(translate, exprs))
 
 # pad each string with EOF to make them all the same length
 maxlen = max(map(len, exprs))
-print(f"maxlen: {maxlen}")
-print()
+prn(f"maxlen: {maxlen}")
+prn()
 
 
 def pad(s):
@@ -112,22 +133,17 @@ def tensors(exprs, outputs):
 
 
 n = len(exprs)
-train_x, train_y = tensors(exprs[: n * 3 // 5], outputs[: n * 3 // 5])
-valid_x, valid_y = tensors(
-    exprs[n * 3 // 5 : n * 4 // 5], outputs[n * 3 // 5 : n * 4 // 5]
-)
-test_x, test_y = tensors(exprs[n * 4 // 5 :], outputs[n * 4 // 5 :])
+valid_i = n * 3 // 5
+test_i = n * 4 // 5
+train_x, train_y = tensors(exprs[:valid_i], outputs[:valid_i])
+valid_x, valid_y = tensors(exprs[valid_i:test_i], outputs[valid_i:test_i])
+test_x, test_y = tensors(exprs[test_i:], outputs[test_i:])
 
-optim_names = [
-    "Adadelta",
-    "Adagrad",
-    "Adam",
-    "Adamax",
-    "ASGD",
-    "RMSprop",
-    "Rprop",
-    "SGD",
-]
+activations = {
+    "ReLU": nn.ReLU,
+    "Sigmoid": nn.Sigmoid,
+    "Tanh": nn.Tanh,
+}
 
 # LBFGS needs an extra closure parameter
 # SparseAdam does not support dense gradients, please consider Adam instead
@@ -144,7 +160,8 @@ optims = {
 
 space = [
     skopt.space.Integer(1, 1000, name="hidden1"),
-    skopt.space.Categorical(optim_names, name="optim"),
+    skopt.space.Categorical(activations.keys(), name="activation"),
+    skopt.space.Categorical(optims.keys(), name="optim"),
     skopt.space.Real(10 ** -4, 0.5, "log-uniform", name="lr"),
 ]
 
@@ -156,20 +173,16 @@ def hparam(hparams, name):
     raise ValueError(name)
 
 
-def optim(hparams):
-    return optims[hparam(hparams, "optim")]
-
-
 class Net(nn.Module):
-    def __init__(self, hidden1):
+    def __init__(self, hidden1, activation):
         super(Net, self).__init__()
-        self.relu = nn.ReLU()
+        self.activation = activation()
 
         self.layer1 = nn.Linear(nchannels * maxlen, hidden1)
         self.out = nn.Linear(hidden1, 1)
 
     def forward(self, x):
-        x = self.relu(self.layer1(x))
+        x = self.activation(self.layer1(x))
         return self.out(x)
 
 
@@ -179,23 +192,24 @@ count = 0
 
 def train(hparams):
     global count
-    print(count)
+    prn(count)
     if isinstance(count, int):
         count += 1
-    print(hparams)
+    prn(hparams)
 
-    model = Net(hparam(hparams, "hidden1"))
-    optimizer = optim(hparams)(model.parameters(), lr=hparam(hparams, "lr"))
-    print(f"{process.memory_info().rss:,} bytes")
+    model = Net(hparam(hparams, "hidden1"), activations[hparam(hparams, "activation")])
+    optim = optims[hparam(hparams, "optim")]
+    optimizer = optim(model.parameters(), lr=hparam(hparams, "lr"))
+    prn(f"{process.memory_info().rss:,} bytes")
 
     epochs = 1000
     for epoch in range(epochs + 1):
-        # print progress
+        # show progress
         if epoch % (epochs // 10) == 0:
             train_cost = criterion(model(train_x), train_y).item()
             valid_cost = criterion(model(valid_x), valid_y).item()
             test_cost = criterion(model(test_x), test_y).item()
-            print(f"{epoch:6d} {train_cost:10f} {valid_cost:10f} {test_cost:10f}")
+            prn(f"{epoch:6d} {train_cost:10f} {valid_cost:10f} {test_cost:10f}")
 
         # forward
         output = model(train_x)
@@ -205,7 +219,7 @@ def train(hparams):
         optimizer.zero_grad()
         cost.backward()
         optimizer.step()
-    print()
+    prn()
     return valid_cost
 
 
@@ -219,4 +233,4 @@ res = skopt.gp_minimize(train, space, n_calls=100)
 count = "final"
 train(res.x)
 
-print(f"{time.time() - start:.3f} seconds")
+prn(f"{time.time() - start:.3f} seconds")
