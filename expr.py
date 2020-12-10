@@ -10,6 +10,8 @@ import skopt
 import torch
 import torch.nn as nn
 
+start = time.time()
+
 process = psutil.Process()
 random.seed(0)
 
@@ -68,8 +70,11 @@ def evaluate(a):
     return a
 
 
-exprs = [randcode(3) for i in range(1000)]
+exprs = [randcode(3) for i in range(10000)]
+prn(exprs[:10])
+
 outputs = list(map(evaluate, exprs))
+prn(outputs[:10])
 
 
 def serial(a):
@@ -100,7 +105,6 @@ exprs = list(map(translate, exprs))
 # pad each string with EOF to make them all the same length
 maxlen = max(map(len, exprs))
 prn(f"maxlen: {maxlen}")
-prn()
 
 
 def pad(s):
@@ -187,6 +191,7 @@ class Net(nn.Module):
 
 criterion = nn.MSELoss()
 count = 0
+prn()
 
 
 def train(hparams):
@@ -221,8 +226,6 @@ def train(hparams):
     prn()
     return valid_cost
 
-
-start = time.time()
 
 # search hyperparameters
 # n_calls defaults to 100
