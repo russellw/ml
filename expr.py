@@ -142,7 +142,6 @@ test_x, test_y = tensors(exprs[test_i:], outputs[test_i:])
 activations = {
     "ReLU": nn.ReLU,
     "Sigmoid": nn.Sigmoid,
-    "Tanh": nn.Tanh,
 }
 
 # LBFGS needs an extra closure parameter
