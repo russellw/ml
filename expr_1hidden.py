@@ -190,7 +190,6 @@ optims = {
 
 space = [
     skopt.space.Integer(1, 1000, name="hidden1"),
-    skopt.space.Integer(1, 1000, name="hidden2"),
     skopt.space.Categorical(activations.keys(), name="activation"),
     skopt.space.Categorical(optims.keys(), name="optim"),
     skopt.space.Real(10 ** -4, 0.5, "log-uniform", name="lr"),
@@ -205,17 +204,15 @@ def hparam(hparams, name):
 
 
 class Net(nn.Module):
-    def __init__(self, hidden1, hidden2, activation):
+    def __init__(self, hidden1, activation):
         super(Net, self).__init__()
         self.activation = activation()
 
         self.layer1 = nn.Linear(nchannels * maxlen, hidden1)
-        self.layer2 = nn.Linear(hidden1, hidden2)
-        self.out = nn.Linear(hidden2, 1)
+        self.out = nn.Linear(hidden1, 1)
 
     def forward(self, x):
         x = self.activation(self.layer1(x))
-        x = self.activation(self.layer2(x))
         return self.out(x)
 
 
@@ -231,11 +228,7 @@ def train(hparams):
         count += 1
     prn(hparams)
 
-    model = Net(
-        hparam(hparams, "hidden1"),
-        hparam(hparams, "hidden2"),
-        activations[hparam(hparams, "activation")],
-    )
+    model = Net(hparam(hparams, "hidden1"), activations[hparam(hparams, "activation")])
     optim = optims[hparam(hparams, "optim")]
     optimizer = optim(model.parameters(), lr=hparam(hparams, "lr"))
     prn(f"{process.memory_info().rss:,} bytes")
@@ -269,6 +262,4 @@ res = skopt.gp_minimize(train, space, n_calls=100)
 count = "final"
 train(res.x)
 
-seconds = time.time() - start
-prn(f"{seconds:.3f} seconds")
-prn(datetime.timedelta(seconds=seconds))
+prn(f"{time.time() - start:.3f} seconds")
