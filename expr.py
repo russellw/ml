@@ -143,9 +143,36 @@ train_x, train_y = tensors(exprs[:valid_i], outputs[:valid_i])
 valid_x, valid_y = tensors(exprs[valid_i:test_i], outputs[valid_i:test_i])
 test_x, test_y = tensors(exprs[test_i:], outputs[test_i:])
 
+# https://pytorch.org/docs/stable/nn.html#non-linear-activations-weighted-sum-nonlinearity
+# the commented out ones are inapplicable, need extra parameters, or blew up in testing
 activations = {
+    # "AdaptiveLogSoftmaxWithLoss": nn.AdaptiveLogSoftmaxWithLoss,
+    # "CELU": nn.CELU,
+    "ELU": nn.ELU,
+    "GELU": nn.GELU,
+    "Hardshrink": nn.Hardshrink,
+    "Hardsigmoid": nn.Hardsigmoid,
+    # "Hardswish": nn.Hardswish,
+    "Hardtanh": nn.Hardtanh,
+    "LeakyReLU": nn.LeakyReLU,
+    "LogSigmoid": nn.LogSigmoid,
+    # "LogSoftmax": nn.LogSoftmax,
+    # "MultiheadAttention": nn.MultiheadAttention,
+    "PReLU": nn.PReLU,
+    "RReLU": nn.RReLU,
     "ReLU": nn.ReLU,
+    "ReLU6": nn.ReLU6,
+    # "SELU": nn.SELU,
     "Sigmoid": nn.Sigmoid,
+    # "Softmax": nn.Softmax,
+    # "Softmax2d": nn.Softmax2d,
+    # "Softmin": nn.Softmin,
+    "Softplus": nn.Softplus,
+    # "Softshrink": nn.Softshrink,
+    "Softsign": nn.Softsign,
+    # "Tanh": nn.Tanh,
+    "Tanhshrink": nn.Tanhshrink,
+    # "Threshold": nn.Threshold,
 }
 
 # LBFGS needs an extra closure parameter
