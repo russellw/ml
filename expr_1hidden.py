@@ -262,4 +262,6 @@ res = skopt.gp_minimize(train, space, n_calls=100)
 count = "final"
 train(res.x)
 
-prn(f"{time.time() - start:.3f} seconds")
+seconds = time.time() - start
+prn(f"{seconds:.3f} seconds")
+prn(datetime.timedelta(seconds=seconds))

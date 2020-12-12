@@ -5,15 +5,12 @@ import random
 import sys
 import time
 
-import psutil
 import skopt
 import torch
 import torch.nn as nn
 
-start = time.time()
-
-process = psutil.Process()
 random.seed(0)
+start = time.time()
 
 logger = logging.getLogger()
 logger.addHandler(
@@ -104,7 +101,6 @@ exprs = list(map(translate, exprs))
 
 # pad each string with EOF to make them all the same length
 maxlen = max(map(len, exprs))
-prn(f"maxlen: {maxlen}")
 
 
 def pad(s):
@@ -121,8 +117,7 @@ nchannels = len(tokens) + 1
 def one_hot(s):
     r = []
     for i in range(nchannels):
-        r.extend([int(x == i) for x in s])
-        # r.append([int(x == i) for x in s])
+        r.append([int(x == i) for x in s])
     return r
 
 
@@ -140,6 +135,7 @@ n = len(exprs)
 valid_i = n * 3 // 5
 test_i = n * 4 // 5
 train_x, train_y = tensors(exprs[:valid_i], outputs[:valid_i])
+prn(f"{train_x.shape} -> {train_y.shape}")
 valid_x, valid_y = tensors(exprs[valid_i:test_i], outputs[valid_i:test_i])
 test_x, test_y = tensors(exprs[test_i:], outputs[test_i:])
 
@@ -189,8 +185,7 @@ optims = {
 }
 
 space = [
-    skopt.space.Integer(1, 1000, name="hidden1"),
-    skopt.space.Integer(1, 1000, name="hidden2"),
+    skopt.space.Integer(1, 1000, name="fc1"),
     skopt.space.Categorical(activations.keys(), name="activation"),
     skopt.space.Categorical(optims.keys(), name="optim"),
     skopt.space.Real(10 ** -4, 0.5, "log-uniform", name="lr"),
@@ -205,17 +200,18 @@ def hparam(hparams, name):
 
 
 class Net(nn.Module):
-    def __init__(self, hidden1, hidden2, activation):
+    def __init__(self, fc1, activation):
         super(Net, self).__init__()
         self.activation = activation()
 
-        self.layer1 = nn.Linear(nchannels * maxlen, hidden1)
-        self.layer2 = nn.Linear(hidden1, hidden2)
-        self.out = nn.Linear(hidden2, 1)
+        self.conv1 = nn.Conv1d(nchannels, 1, 3)
+        self.fc1 = nn.Linear(maxlen - 2, fc1)
+        self.out = nn.Linear(fc1, 1)
 
     def forward(self, x):
-        x = self.activation(self.layer1(x))
-        x = self.activation(self.layer2(x))
+        x = self.activation(self.conv1(x))
+        x = torch.flatten(x, 1)
+        x = self.activation(self.fc1(x))
         return self.out(x)
 
 
@@ -231,14 +227,9 @@ def train(hparams):
         count += 1
     prn(hparams)
 
-    model = Net(
-        hparam(hparams, "hidden1"),
-        hparam(hparams, "hidden2"),
-        activations[hparam(hparams, "activation")],
-    )
+    model = Net(hparam(hparams, "fc1"), activations[hparam(hparams, "activation")],)
     optim = optims[hparam(hparams, "optim")]
     optimizer = optim(model.parameters(), lr=hparam(hparams, "lr"))
-    prn(f"{process.memory_info().rss:,} bytes")
 
     epochs = 1000
     for epoch in range(epochs + 1):
