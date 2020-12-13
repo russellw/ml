@@ -158,7 +158,7 @@ activations = {
     "LogSigmoid": nn.LogSigmoid,
     # "LogSoftmax": nn.LogSoftmax,
     # "MultiheadAttention": nn.MultiheadAttention,
-    "PReLU": nn.PReLU,
+    # "PReLU": nn.PReLU,
     "RReLU": nn.RReLU,
     "ReLU": nn.ReLU,
     "ReLU6": nn.ReLU6,
