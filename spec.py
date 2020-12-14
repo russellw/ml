@@ -77,7 +77,7 @@ def simplify(a):
                 if y == 1:
                     return x
             elif o in ("//", "%"):
-                if y == 0:
+                if x == 0 or y == 0:
                     return 0
                 if y == 1:
                     return x
@@ -115,7 +115,7 @@ def accepts(spec, c):
     return True
 
 
-candidates = [randcode(leaves, 5) for i in range(100)]
+candidates = [randcode(leaves, 5) for i in range(1000)]
 
 
 def difficulty(spec):
@@ -166,7 +166,7 @@ best = spec
 best_score = difficulty(spec)
 pr(best_score)
 pr()
-for i in range(1000):
+for i in range(10000):
     spec = mutate_spec(best)
     score = difficulty(spec)
     if score > best_score:
@@ -176,6 +176,7 @@ for i in range(1000):
         for c in candidates:
             if accepts(spec, c):
                 pr(c)
+                pr(simplify(c))
                 for x in range(ntests):
                     m = {"x": x}
                     m["y"] = evaluate(m, c)
