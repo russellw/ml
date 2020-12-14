@@ -148,7 +148,7 @@ test_x, test_y = tensors(exprs[test_i:], outputs[test_i:])
 activations = {
     # "AdaptiveLogSoftmaxWithLoss": nn.AdaptiveLogSoftmaxWithLoss,
     # "CELU": nn.CELU,
-    "ELU": nn.ELU,
+    # "ELU": nn.ELU,
     "GELU": nn.GELU,
     "Hardshrink": nn.Hardshrink,
     "Hardsigmoid": nn.Hardsigmoid,
@@ -159,7 +159,7 @@ activations = {
     # "LogSoftmax": nn.LogSoftmax,
     # "MultiheadAttention": nn.MultiheadAttention,
     # "PReLU": nn.PReLU,
-    "RReLU": nn.RReLU,
+    # "RReLU": nn.RReLU,
     "ReLU": nn.ReLU,
     "ReLU6": nn.ReLU6,
     # "SELU": nn.SELU,
