@@ -26,7 +26,7 @@ def debug(a):
 pr(sys.argv)
 
 
-ops = "+", "-", "*", "//", "%", "==", "<", "<=", "and", "or", "not"
+ops = "+", "-", "*", "//", "%", "==", "<", "<=", "not"
 leaves = 0, 1, "x"
 
 
@@ -81,18 +81,6 @@ def simplify(a):
                     return 0
                 if y == 1:
                     return x
-            elif o == "and":
-                if x == 0 or y == 0:
-                    return 0
-                if const(x) and x:
-                    return y
-            elif o == "or":
-                if x == 0:
-                    return y
-                if y == 0:
-                    return x
-                if const(x) and x:
-                    return x
             return [o, x, y]
         except ZeroDivisionError:
             return 0
@@ -105,26 +93,35 @@ def evaluate(m, a):
             o = a[0]
             x = evaluate(m, a[1])
             if o == "not":
-                return not x
+                return int(not x)
             y = evaluate(m, a[2])
-            return eval(f"x {o} y")
+            return int(eval(f"x {o} y"))
         except ZeroDivisionError:
             return 0
     if isinstance(a, str):
         return m[a]
     return a
 
-candidates=[randcode(leaves, 5)for i in range(100)]
-ntests=10
+
+ntests = 10
+
+
+def accepts(spec, c):
+    for x in range(ntests):
+        m = {"x": x}
+        m["y"] = evaluate(m, c)
+        if not evaluate(m, spec):
+            return False
+    return True
+
+
+candidates = [randcode(leaves, 5) for i in range(100)]
+
 
 def difficulty(spec):
-    for c in candidates:
-        for x in range(ntests):
-            m = {"x": x}
-            m["y"] = evaluate(m, c)
-            if not evaluate(m, spec):
-                break
-        else:
+    for i in range(len(candidates)):
+        c = candidates[i]
+        if accepts(spec, c):
             return i
     return -1
 
@@ -161,30 +158,34 @@ def mutate_spec(a):
     return mutate(leaves + ("y",), a)
 
 
-def hillclimb(a):
-    pr(a)
-    best = a
-    best_score = difficulty(a)
-    for i in range(100):
-        b = mutate_spec(a)
-        score = difficulty(b)
-        if score > best_score:
-            pr(b)
-            pr(simplify(b))
-            for c in candidates:
+pr()
+spec = randcode(leaves + ("y",), 5)
+pr(spec)
+pr(simplify(spec))
+best = spec
+best_score = difficulty(spec)
+pr(best_score)
+pr()
+for i in range(1000):
+    spec = mutate_spec(best)
+    score = difficulty(spec)
+    if score > best_score:
+        pr(spec)
+        pr(simplify(spec))
+        pr(score)
+        for c in candidates:
+            if accepts(spec, c):
                 pr(c)
                 for x in range(ntests):
                     m = {"x": x}
                     m["y"] = evaluate(m, c)
-                    pr(m)
-                    pr(evaluate(m, spec))
-            pr()
-            best = b
-            best_score = score
-
-
-pr()
-hillclimb(randcode(leaves + ("y",), 5), difficulty, mutate_spec)
+                    pr(f"{m}: {evaluate(m, spec)}")
+                break
+        else:
+            raise Exception()
+        pr()
+        best = spec
+        best_score = score
 
 
 seconds = time.time() - start
