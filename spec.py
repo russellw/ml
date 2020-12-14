@@ -114,11 +114,12 @@ def evaluate(m, a):
         return m[a]
     return a
 
+candidates=[randcode(leaves, 5)for i in range(100)]
+ntests=10
 
 def difficulty(spec):
-    for i in range(100):
-        c = randcode(leaves, 5)
-        for x in range(10):
+    for c in candidates:
+        for x in range(ntests):
             m = {"x": x}
             m["y"] = evaluate(m, c)
             if not evaluate(m, spec):
@@ -160,23 +161,30 @@ def mutate_spec(a):
     return mutate(leaves + ("y",), a)
 
 
-def hillclimb(a, f, mutate):
+def hillclimb(a):
     pr(a)
     best = a
-    best_score = f(a)
+    best_score = difficulty(a)
     for i in range(100):
-        b = mutate(a)
-        score = f(b)
+        b = mutate_spec(a)
+        score = difficulty(b)
         if score > best_score:
             pr(b)
             pr(simplify(b))
+            for c in candidates:
+                pr(c)
+                for x in range(ntests):
+                    m = {"x": x}
+                    m["y"] = evaluate(m, c)
+                    pr(m)
+                    pr(evaluate(m, spec))
+            pr()
             best = b
             best_score = score
 
 
 pr()
 hillclimb(randcode(leaves + ("y",), 5), difficulty, mutate_spec)
-pr()
 
 
 seconds = time.time() - start
