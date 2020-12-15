@@ -8,7 +8,7 @@ public class Main {
     for (var i = 0; i < 10; i++) {
       var a = Code.rand(Code.leaves(), 3);
       System.out.println(a);
-      System.out.println(Interpreter.eval(map, a));
+      System.out.println(Code.eval(map, a));
       System.out.println();
     }
   }
