@@ -24,6 +24,6 @@ public final class Code {
     var r = new ArrayList<>(n + 1);
     r.add(op);
     for (var i = 0; i < n; i++) r.add(rand(leaves, depth - 1));
-    return r;
+    return Array.ofAll(r);
   }
 }
