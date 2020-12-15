@@ -21,5 +21,13 @@ public class CodeTest {
     assertEquals(Code.eval(map, Array.of(Op.MUL, 2, 3)), 6);
     assertEquals(Code.eval(map, Array.of(Op.DIV, 10, 3)), 3);
     assertEquals(Code.eval(map, Array.of(Op.REM, 10, 3)), 1);
+    assertEquals(Code.eval(map, Array.of(Op.EQ, 10, 10)), true);
+    assertEquals(Code.eval(map, Array.of(Op.EQ, 10, 11)), false);
+    assertEquals(Code.eval(map, Array.of(Op.LT, 1, 1)), false);
+    assertEquals(Code.eval(map, Array.of(Op.LT, 1, 2)), true);
+    assertEquals(Code.eval(map, Array.of(Op.LT, 2, 1)), false);
+    assertEquals(Code.eval(map, Array.of(Op.LE, 1, 1)), true);
+    assertEquals(Code.eval(map, Array.of(Op.LE, 1, 2)), true);
+    assertEquals(Code.eval(map, Array.of(Op.LE, 2, 1)), false);
   }
 }

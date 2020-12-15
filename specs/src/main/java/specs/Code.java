@@ -18,7 +18,9 @@ public final class Code {
   }
 
   private static boolean constant(Object a) {
-    return a instanceof Integer;
+    if (a instanceof Boolean) return true;
+    if (a instanceof Integer) return true;
+    return false;
   }
 
   public static Object simplify(Object a) {
@@ -40,47 +42,29 @@ public final class Code {
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
     var op = (Op) a1.get(0);
-    try {
-      switch (op) {
-        case ADD:
-          {
-            var x = (int) eval(map, a1.get(1));
-            var y = (int) eval(map, a1.get(2));
-            return x + y;
-          }
-        case SUB:
-          {
-            var x = (int) eval(map, a1.get(1));
-            var y = (int) eval(map, a1.get(2));
-            return x - y;
-          }
-        case MUL:
-          {
-            var x = (int) eval(map, a1.get(1));
-            var y = (int) eval(map, a1.get(2));
-            return x * y;
-          }
-        case DIV:
-          {
-            var x = (int) eval(map, a1.get(1));
-            var y = (int) eval(map, a1.get(2));
-            return x / y;
-          }
-        case REM:
-          {
-            var x = (int) eval(map, a1.get(1));
-            var y = (int) eval(map, a1.get(2));
-            return x % y;
-          }
-        case EQ:
-          {
-            var x = eval(map, a1.get(1));
-            var y = eval(map, a1.get(2));
-            return x.equals(y);
-          }
-      }
-    } catch (ArithmeticException e) {
-      return 0;
+    switch (op) {
+      case ADD:
+        return (int) eval(map, a1.get(1)) + (int) eval(map, a1.get(2));
+      case SUB:
+        return (int) eval(map, a1.get(1)) - (int) eval(map, a1.get(2));
+      case MUL:
+        return (int) eval(map, a1.get(1)) * (int) eval(map, a1.get(2));
+      case DIV:
+        return (int) eval(map, a1.get(1)) / (int) eval(map, a1.get(2));
+      case REM:
+        return (int) eval(map, a1.get(1)) % (int) eval(map, a1.get(2));
+      case EQ:
+        return eval(map, a1.get(1)).equals(eval(map, a1.get(2)));
+      case LT:
+        return (int) eval(map, a1.get(1)) < (int) eval(map, a1.get(2));
+      case LE:
+        return (int) eval(map, a1.get(1)) <= (int) eval(map, a1.get(2));
+      case AND:
+        return (boolean) eval(map, a1.get(1)) && (boolean) eval(map, a1.get(2));
+      case OR:
+        return (boolean) eval(map, a1.get(1)) || (boolean) eval(map, a1.get(2));
+      case NOT:
+        return !(boolean) eval(map, a1.get(1));
     }
     throw new IllegalArgumentException(a.toString());
   }

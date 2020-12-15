@@ -7,4 +7,9 @@ public enum Op {
   DIV,
   REM,
   EQ,
+  LT,
+  LE,
+  AND,
+  OR,
+  NOT,
 }
