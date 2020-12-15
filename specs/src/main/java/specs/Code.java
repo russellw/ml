@@ -1,6 +1,7 @@
 package specs;
 
 import io.vavr.collection.Array;
+import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import java.util.ArrayList;
@@ -10,16 +11,27 @@ public final class Code {
   private static Random random = new Random();
 
   private static int arity(Op op) {
+    switch (op) {
+      case NOT:
+      case HEAD:
+      case TAIL:
+        return 1;
+    }
     return 2;
   }
 
   public static Seq<Object> leaves() {
-    return Array.of(0, 1);
+    return Array.of(0, 1, List.empty());
   }
 
   private static boolean constant(Object a) {
     if (a instanceof Boolean) return true;
     if (a instanceof Integer) return true;
+    if (a instanceof Seq) {
+      var a1 = (Seq) a;
+      for (var b : a1) if (!constant(b)) return false;
+      return true;
+    }
     return false;
   }
 
@@ -65,6 +77,18 @@ public final class Code {
         return (boolean) eval(map, a1.get(1)) || (boolean) eval(map, a1.get(2));
       case NOT:
         return !(boolean) eval(map, a1.get(1));
+      case HEAD:
+        return ((Seq) eval(map, a1.get(1))).head();
+      case TAIL:
+        return ((Seq) eval(map, a1.get(1))).tail();
+      case CONS:
+        {
+          var x = eval(map, a1.get(1));
+          var s = (Seq) eval(map, a1.get(2));
+          @SuppressWarnings("unchecked")
+          var r = s.prepend(x);
+          return r;
+        }
     }
     throw new IllegalArgumentException(a.toString());
   }

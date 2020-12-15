@@ -12,4 +12,7 @@ public enum Op {
   AND,
   OR,
   NOT,
+  HEAD,
+  TAIL,
+  CONS,
 }

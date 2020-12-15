@@ -10,7 +10,7 @@ public class Main {
       System.out.println(a);
       try {
         System.out.println(Code.eval(map, a));
-      } catch (ArithmeticException | ClassCastException e) {
+      } catch (ArithmeticException | ClassCastException | IndexOutOfBoundsException e) {
         System.out.println(e.toString());
       }
       System.out.println();
