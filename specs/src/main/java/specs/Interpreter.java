@@ -7,8 +7,8 @@ public final class Interpreter {
   public Object eval(Map<Object, Object> map, Object a) {
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
-    var o = (Op) a1.get(0);
-    switch (o) {
+    var op = (Op) a1.get(0);
+    switch (op) {
       case ADD:
         {
           var x = (int) eval(map, a1.get(1));

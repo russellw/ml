@@ -7,7 +7,6 @@ import io.vavr.collection.HashMap;
 import org.junit.Test;
 
 public class InterpreterTest {
-
   @Test
   public void eval() {
     var it = new Interpreter();
