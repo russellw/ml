@@ -9,7 +9,7 @@ start = time.time()
 
 logger = logging.getLogger()
 logger.addHandler(
-    logging.FileHandler(datetime.datetime.now().strftime("logs/%Y-%m-%d %H%M%S.log"))
+    logging.FileHandler(datetime.datetime.now().strftime("logs/%Y-%m-%d-%H%M%S.log"))
 )
 logger.addHandler(logging.StreamHandler(sys.stdout))
 logger.setLevel(logging.DEBUG)

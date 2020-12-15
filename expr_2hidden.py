@@ -149,7 +149,7 @@ activations = {
     # "AdaptiveLogSoftmaxWithLoss": nn.AdaptiveLogSoftmaxWithLoss,
     # "CELU": nn.CELU,
     # "ELU": nn.ELU,
-    "GELU": nn.GELU,
+    # "GELU": nn.GELU,
     "Hardshrink": nn.Hardshrink,
     "Hardsigmoid": nn.Hardsigmoid,
     # "Hardswish": nn.Hardswish,
