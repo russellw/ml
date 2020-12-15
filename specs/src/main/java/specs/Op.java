@@ -6,4 +6,5 @@ public enum Op {
   MUL,
   DIV,
   REM,
+  EQ,
 }

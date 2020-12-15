@@ -16,6 +16,14 @@ public final class Code {
     return Array.of(0, 1);
   }
 
+  private static boolean constant(Object a) {
+    return a instanceof Integer;
+  }
+
+  public static Object simplify(Object a) {
+    return a;
+  }
+
   public static Object rand(Seq<Object> leaves, int depth) {
     if (depth == 0 || random.nextInt(5) == 0) return leaves.get(random.nextInt(leaves.size()));
     var ops = Op.values();

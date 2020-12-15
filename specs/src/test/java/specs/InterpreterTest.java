@@ -9,13 +9,12 @@ import org.junit.Test;
 public class InterpreterTest {
   @Test
   public void eval() {
-    var it = new Interpreter();
     var map = HashMap.empty();
-    assertEquals(it.eval(map, 0), 0);
-    assertEquals(it.eval(map, Array.of(Op.ADD, 1, 2)), 3);
-    assertEquals(it.eval(map, Array.of(Op.SUB, 1, 2)), -1);
-    assertEquals(it.eval(map, Array.of(Op.MUL, 2, 3)), 6);
-    assertEquals(it.eval(map, Array.of(Op.DIV, 10, 3)), 3);
-    assertEquals(it.eval(map, Array.of(Op.REM, 10, 3)), 1);
+    assertEquals(Interpreter.eval(map, 0), 0);
+    assertEquals(Interpreter.eval(map, Array.of(Op.ADD, 1, 2)), 3);
+    assertEquals(Interpreter.eval(map, Array.of(Op.SUB, 1, 2)), -1);
+    assertEquals(Interpreter.eval(map, Array.of(Op.MUL, 2, 3)), 6);
+    assertEquals(Interpreter.eval(map, Array.of(Op.DIV, 10, 3)), 3);
+    assertEquals(Interpreter.eval(map, Array.of(Op.REM, 10, 3)), 1);
   }
 }

@@ -4,7 +4,7 @@ import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 
 public final class Interpreter {
-  public Object eval(Map<Object, Object> map, Object a) {
+  public static Object eval(Map<Object, Object> map, Object a) {
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
     var op = (Op) a1.get(0);
@@ -39,6 +39,12 @@ public final class Interpreter {
             var x = (int) eval(map, a1.get(1));
             var y = (int) eval(map, a1.get(2));
             return x % y;
+          }
+        case EQ:
+          {
+            var x = eval(map, a1.get(1));
+            var y = eval(map, a1.get(2));
+            return x.equals(y);
           }
       }
     } catch (ArithmeticException e) {
