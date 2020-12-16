@@ -40,7 +40,11 @@ public final class Code {
               return type;
             }
           case LAMBDA:
-            return typeof(env.prepend(a1.get(1)), a1.get(2));
+            {
+              var param = a1.get(1);
+              var body = a1.get(2);
+              return Array.of(param, typeof(env.prepend(param), body));
+            }
           case ARG:
             return env.get((int) a1.get(1));
         }
