@@ -2,12 +2,33 @@ package lambda;
 
 import io.vavr.collection.Array;
 import io.vavr.collection.Seq;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 import java.util.function.Function;
 
 public final class Code {
   private static Random random = new Random();
+
+  public static Object rand(Seq env, Object type, int depth) {
+    if (depth == 0 || random.nextInt() % 4 == 0) {
+      var leaves = new ArrayList<>();
+      if (type instanceof Symbol)
+        switch ((Symbol) type) {
+          case BOOL:
+            leaves.add(false);
+            leaves.add(true);
+            break;
+          case INT:
+            leaves.add(0);
+            leaves.add(1);
+            break;
+        }
+      for (var a : Symbol.values()) if (combine(typeof(env, a), type) != null) leaves.add(a);
+      return leaves.get(random.nextInt(leaves.size()));
+    }
+    throw new IllegalArgumentException();
+  }
 
   private static Object combine(Object type1, Object type2) {
     if (Objects.equals(type1, type2)) return type1;
@@ -43,15 +64,16 @@ public final class Code {
             {
               var param = a1.get(1);
               var body = a1.get(2);
-              return Array.of(param, typeof(env.prepend(param), body));
+              return Array.of(Symbol.FUNCTION, param, typeof(env.prepend(param), body));
             }
           case ARG:
             return env.get((int) a1.get(1));
         }
       var functionType = (Seq) typeof(env, a1.head());
       if (functionType == null) return null;
-      if (combine(typeof(env, a1.get(1)), functionType.head()) == null) return null;
-      return functionType.get(1);
+      if (functionType.head() != Symbol.FUNCTION) return null;
+      if (combine(typeof(env, a1.get(1)), functionType.get(1)) == null) return null;
+      return functionType.get(2);
     }
     if (a instanceof Symbol)
       switch ((Symbol) a) {
@@ -60,18 +82,21 @@ public final class Code {
         case MUL:
         case DIV:
         case REM:
-          return Array.of(Symbol.INT, Array.of(Symbol.INT, Symbol.INT));
+          return Array.of(
+              Symbol.FUNCTION, Symbol.INT, Array.of(Symbol.FUNCTION, Symbol.INT, Symbol.INT));
         case NOT:
-          return Array.of(Symbol.BOOL, Symbol.BOOL);
+          return Array.of(Symbol.FUNCTION, Symbol.BOOL, Symbol.BOOL);
         case LE:
         case LT:
-          return Array.of(Symbol.INT, Array.of(Symbol.INT, Symbol.BOOL));
+          return Array.of(
+              Symbol.FUNCTION, Symbol.INT, Array.of(Symbol.FUNCTION, Symbol.INT, Symbol.BOOL));
         case HEAD:
-          return Array.of(Symbol.LIST, Symbol.OBJECT);
+          return Array.of(Symbol.FUNCTION, Symbol.LIST, Symbol.OBJECT);
         case TAIL:
-          return Array.of(Symbol.LIST, Symbol.LIST);
+          return Array.of(Symbol.FUNCTION, Symbol.LIST, Symbol.LIST);
         case CONS:
-          return Array.of(Symbol.OBJECT, Array.of(Symbol.LIST, Symbol.LIST));
+          return Array.of(
+              Symbol.FUNCTION, Symbol.OBJECT, Array.of(Symbol.FUNCTION, Symbol.LIST, Symbol.LIST));
       }
     if (a instanceof Integer) return Symbol.INT;
     if (a instanceof Boolean) return Symbol.BOOL;

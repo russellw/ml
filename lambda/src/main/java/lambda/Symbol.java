@@ -22,4 +22,5 @@ public enum Symbol {
   LAMBDA,
   ARG,
   IF,
+  FUNCTION,
 }
