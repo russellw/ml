@@ -21,4 +21,5 @@ public enum Symbol {
   OBJECT,
   LAMBDA,
   ARG,
+  IF,
 }
