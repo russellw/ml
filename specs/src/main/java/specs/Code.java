@@ -1,9 +1,6 @@
 package specs;
 
-import io.vavr.collection.Array;
-import io.vavr.collection.List;
-import io.vavr.collection.Map;
-import io.vavr.collection.Seq;
+import io.vavr.collection.*;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
@@ -75,6 +72,7 @@ public final class Code {
   private static boolean constant(Object a) {
     if (a instanceof Boolean) return true;
     if (a instanceof Integer) return true;
+    if (a instanceof Op) return true;
     if (a instanceof Seq) {
       var a1 = (Seq) a;
       for (var b : a1) if (!constant(b)) return false;
@@ -84,7 +82,10 @@ public final class Code {
   }
 
   public static Object simplify(Object a) {
-    return a;
+    if (!(a instanceof Seq)) return a;
+    var a1 = (Seq) a;
+    for (var b : a1) if (!constant(b)) return a;
+    return eval(HashMap.empty(), a);
   }
 
   public static Object rand(Seq<Object> leaves, int depth) {

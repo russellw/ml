@@ -10,11 +10,13 @@ public class Main {
       var a = Code.rand(Code.leaves(), 3);
       System.out.println(a);
       try {
+        System.out.println(Code.simplify(a));
         System.out.println(Code.eval(map, a));
       } catch (ArithmeticException
           | ClassCastException
           | IndexOutOfBoundsException
-          | NoSuchElementException e) {
+          | NoSuchElementException
+          | UnsupportedOperationException e) {
         System.out.println(e.toString());
       }
       System.out.println();
