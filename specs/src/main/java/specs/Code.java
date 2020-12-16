@@ -18,8 +18,8 @@ public final class Code {
   public static Object typeof(Object a) {
     if (a instanceof Boolean) return BasicType.BOOL;
     if (a instanceof Integer) return BasicType.INT;
-    if (a instanceof Op)
-      switch ((Op) a) {
+    if (a instanceof Symbol)
+      switch ((Symbol) a) {
         case ADD:
         case SUB:
         case MUL:
@@ -55,7 +55,7 @@ public final class Code {
     return ft.head();
   }
 
-  private static int arity(Op op) {
+  private static int arity(Symbol op) {
     switch (op) {
       case NOT:
       case HEAD:
@@ -72,7 +72,7 @@ public final class Code {
   private static boolean constant(Object a) {
     if (a instanceof Boolean) return true;
     if (a instanceof Integer) return true;
-    if (a instanceof Op) return true;
+    if (a instanceof Symbol) return true;
     if (a instanceof Seq) {
       var a1 = (Seq) a;
       for (var b : a1) if (!constant(b)) return false;
@@ -90,7 +90,7 @@ public final class Code {
 
   public static Object rand(Seq<Object> leaves, int depth) {
     if (depth == 0 || random.nextInt(5) == 0) return leaves.get(random.nextInt(leaves.size()));
-    var ops = Op.values();
+    var ops = Symbol.values();
     var op = ops[random.nextInt(ops.length)];
     var n = arity(op);
     var r = new ArrayList<>(n + 1);
@@ -103,7 +103,7 @@ public final class Code {
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
     if (a1.isEmpty()) return a;
-    var op = (Op) a1.head();
+    var op = (Symbol) a1.head();
     switch (op) {
       case ADD:
         return (int) eval(map, a1.get(1)) + (int) eval(map, a1.get(2));

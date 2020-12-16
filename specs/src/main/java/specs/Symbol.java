@@ -1,6 +1,6 @@
 package specs;
 
-public enum Op {
+public enum Symbol {
   ADD,
   SUB,
   MUL,
