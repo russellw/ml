@@ -51,26 +51,24 @@ public class CodeTest {
 
   @Test
   public void typeof() {
-    assertEquals(Code.typeof(1), BasicType.INT);
-    assertEquals(Code.typeof(true), BasicType.BOOL);
-    assertEquals(Code.typeof(Array.empty()), BasicType.LIST);
-    assertEquals(Code.typeof(Array.of(Symbol.ADD, 1, 2)), BasicType.INT);
-    assertEquals(Code.typeof(Array.of(Symbol.SUB, 1, 2)), BasicType.INT);
-    assertEquals(Code.typeof(Array.of(Symbol.MUL, 2, 3)), BasicType.INT);
-    assertEquals(Code.typeof(Array.of(Symbol.DIV, 10, 3)), BasicType.INT);
-    assertEquals(Code.typeof(Array.of(Symbol.REM, 10, 3)), BasicType.INT);
-    assertEquals(Code.typeof(Array.of(Symbol.EQ, 10, 10)), BasicType.BOOL);
-    assertEquals(Code.typeof(Array.of(Symbol.LT, 1, 1)), BasicType.BOOL);
-    assertEquals(Code.typeof(Array.of(Symbol.LE, 1, 1)), BasicType.BOOL);
-    assertEquals(Code.typeof(Array.of(Symbol.AND, false, false)), BasicType.BOOL);
-    assertEquals(Code.typeof(Array.of(Symbol.OR, false, false)), BasicType.BOOL);
-    assertEquals(Code.typeof(Array.of(Symbol.NOT, false)), BasicType.BOOL);
-    assertEquals(Code.typeof(Array.of(Symbol.CONS, 1, List.empty())), BasicType.LIST);
+    assertEquals(Code.typeof(1), Symbol.INT);
+    assertEquals(Code.typeof(true), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.empty()), Symbol.LIST);
+    assertEquals(Code.typeof(Array.of(Symbol.ADD, 1, 2)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.SUB, 1, 2)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.MUL, 2, 3)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.DIV, 10, 3)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.REM, 10, 3)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.EQ, 10, 10)), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.LT, 1, 1)), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.LE, 1, 1)), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.AND, false, false)), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.OR, false, false)), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.NOT, false)), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.CONS, 1, List.empty())), Symbol.LIST);
     assertEquals(
-        Code.typeof(Array.of(Symbol.HEAD, Array.of(Symbol.CONS, 1, Array.empty()))),
-        BasicType.OBJECT);
+        Code.typeof(Array.of(Symbol.HEAD, Array.of(Symbol.CONS, 1, Array.empty()))), Symbol.OBJECT);
     assertEquals(
-        Code.typeof(Array.of(Symbol.TAIL, Array.of(Symbol.CONS, 1, Array.empty()))),
-        BasicType.LIST);
+        Code.typeof(Array.of(Symbol.TAIL, Array.of(Symbol.CONS, 1, Array.empty()))), Symbol.LIST);
   }
 }

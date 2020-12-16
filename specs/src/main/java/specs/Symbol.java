@@ -15,4 +15,8 @@ public enum Symbol {
   HEAD,
   TAIL,
   CONS,
+  BOOL,
+  INT,
+  LIST,
+  OBJECT,
 }

@@ -8,16 +8,16 @@ import java.util.Random;
 public final class Code {
   private static Random random = new Random();
 
-  private static Object combine(Object t, Object u) {
-    if (Objects.equals(t, u)) return t;
-    if (t == BasicType.OBJECT) return u;
-    if (u == BasicType.OBJECT) return t;
+  private static Object combine(Object type1, Object type2) {
+    if (Objects.equals(type1, type2)) return type1;
+    if (type1 == Symbol.OBJECT) return type2;
+    if (type2 == Symbol.OBJECT) return type1;
     return null;
   }
 
   public static Object typeof(Object a) {
-    if (a instanceof Boolean) return BasicType.BOOL;
-    if (a instanceof Integer) return BasicType.INT;
+    if (a instanceof Boolean) return Symbol.BOOL;
+    if (a instanceof Integer) return Symbol.INT;
     if (a instanceof Symbol)
       switch ((Symbol) a) {
         case ADD:
@@ -25,34 +25,34 @@ public final class Code {
         case MUL:
         case DIV:
         case REM:
-          return Array.of(BasicType.INT, BasicType.INT, BasicType.INT);
+          return Array.of(Symbol.INT, Symbol.INT, Symbol.INT);
         case AND:
         case OR:
-          return Array.of(BasicType.BOOL, BasicType.BOOL, BasicType.BOOL);
+          return Array.of(Symbol.BOOL, Symbol.BOOL, Symbol.BOOL);
         case NOT:
-          return Array.of(BasicType.BOOL, BasicType.BOOL);
+          return Array.of(Symbol.BOOL, Symbol.BOOL);
         case LE:
         case LT:
-          return Array.of(BasicType.BOOL, BasicType.INT, BasicType.INT);
+          return Array.of(Symbol.BOOL, Symbol.INT, Symbol.INT);
         case EQ:
-          return Array.of(BasicType.BOOL, BasicType.OBJECT, BasicType.OBJECT);
+          return Array.of(Symbol.BOOL, Symbol.OBJECT, Symbol.OBJECT);
         case HEAD:
-          return Array.of(BasicType.OBJECT, BasicType.LIST);
+          return Array.of(Symbol.OBJECT, Symbol.LIST);
         case TAIL:
-          return Array.of(BasicType.LIST, BasicType.LIST);
+          return Array.of(Symbol.LIST, Symbol.LIST);
         case CONS:
-          return Array.of(BasicType.LIST, BasicType.OBJECT, BasicType.LIST);
+          return Array.of(Symbol.LIST, Symbol.OBJECT, Symbol.LIST);
       }
     var a1 = (Seq) a;
-    if (a1.isEmpty()) return BasicType.LIST;
-    var ft = (Seq) typeof(a1.head());
-    if (ft == null) return null;
-    if (a1.size() != ft.size()) return null;
+    if (a1.isEmpty()) return Symbol.LIST;
+    var ftype = (Seq) typeof(a1.head());
+    if (ftype == null) return null;
+    if (a1.size() != ftype.size()) return null;
     for (var i = 1; i < a1.size(); i++) {
-      var t = combine(typeof(a1.get(i)), ft.get(i));
-      if (t == null) return null;
+      var type = combine(typeof(a1.get(i)), ftype.get(i));
+      if (type == null) return null;
     }
-    return ft.head();
+    return ftype.head();
   }
 
   private static int arity(Symbol op) {
@@ -90,8 +90,8 @@ public final class Code {
 
   public static Object rand(Seq<Object> leaves, int depth) {
     if (depth == 0 || random.nextInt(5) == 0) return leaves.get(random.nextInt(leaves.size()));
-    var ops = Symbol.values();
-    var op = ops[random.nextInt(ops.length)];
+    var symbols = Symbol.values();
+    var op = symbols[random.nextInt(symbols.length)];
     var n = arity(op);
     var r = new ArrayList<>(n + 1);
     r.add(op);
