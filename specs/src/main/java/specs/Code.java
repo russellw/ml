@@ -5,10 +5,58 @@ import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 
 public final class Code {
   private static Random random = new Random();
+
+  private static Object combine(Object t, Object u) {
+    if (Objects.equals(t, u)) return t;
+    if (t == BasicType.OBJECT) return u;
+    if (u == BasicType.OBJECT) return t;
+    return null;
+  }
+
+  public static Object typeof(Object a) {
+    if (a instanceof Boolean) return BasicType.BOOL;
+    if (a instanceof Integer) return BasicType.INT;
+    if (a instanceof Op)
+      switch ((Op) a) {
+        case ADD:
+        case SUB:
+        case MUL:
+        case DIV:
+        case REM:
+          return Array.of(BasicType.INT, BasicType.INT, BasicType.INT);
+        case AND:
+        case OR:
+          return Array.of(BasicType.BOOL, BasicType.BOOL, BasicType.BOOL);
+        case NOT:
+          return Array.of(BasicType.BOOL, BasicType.BOOL);
+        case LE:
+        case LT:
+          return Array.of(BasicType.BOOL, BasicType.INT, BasicType.INT);
+        case EQ:
+          return Array.of(BasicType.BOOL, BasicType.OBJECT, BasicType.OBJECT);
+        case HEAD:
+          return Array.of(BasicType.OBJECT, BasicType.LIST);
+        case TAIL:
+          return Array.of(BasicType.LIST, BasicType.LIST);
+        case CONS:
+          return Array.of(BasicType.LIST, BasicType.OBJECT, BasicType.LIST);
+      }
+    var a1 = (Seq) a;
+    if (a1.isEmpty()) return BasicType.LIST;
+    var ft = (Seq) typeof(a1.head());
+    if (ft == null) return null;
+    if (a1.size() != ft.size()) return null;
+    for (var i = 1; i < a1.size(); i++) {
+      var t = combine(typeof(a1.get(i)), ft.get(i));
+      if (t == null) return null;
+    }
+    return ft.head();
+  }
 
   private static int arity(Op op) {
     switch (op) {
@@ -53,7 +101,8 @@ public final class Code {
   public static Object eval(Map<Object, Object> map, Object a) {
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
-    var op = (Op) a1.get(0);
+    if (a1.isEmpty()) return a;
+    var op = (Op) a1.head();
     switch (op) {
       case ADD:
         return (int) eval(map, a1.get(1)) + (int) eval(map, a1.get(2));

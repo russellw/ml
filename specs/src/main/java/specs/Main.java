@@ -1,6 +1,7 @@
 package specs;
 
 import io.vavr.collection.HashMap;
+import java.util.NoSuchElementException;
 
 public class Main {
   public static void main(String[] args) {
@@ -10,7 +11,10 @@ public class Main {
       System.out.println(a);
       try {
         System.out.println(Code.eval(map, a));
-      } catch (ArithmeticException | ClassCastException | IndexOutOfBoundsException e) {
+      } catch (ArithmeticException
+          | ClassCastException
+          | IndexOutOfBoundsException
+          | NoSuchElementException e) {
         System.out.println(e.toString());
       }
       System.out.println();
