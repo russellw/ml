@@ -3,7 +3,6 @@ package lambda;
 import io.vavr.collection.Array;
 import io.vavr.collection.Seq;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Random;
 import java.util.function.Function;
 
@@ -30,10 +29,25 @@ public final class Code {
     throw new IllegalArgumentException();
   }
 
-  private static Object combine(Object type1, Object type2) {
-    if (Objects.equals(type1, type2)) return type1;
-    if (type1 == Symbol.OBJECT) return type2;
-    if (type2 == Symbol.OBJECT) return type1;
+  private static Object combine(Object t, Object u) {
+    if (t == u) return t;
+    if (t == Symbol.OBJECT) return u;
+    if (u == Symbol.OBJECT) return t;
+    if (t instanceof Seq) {
+      var t1 = (Seq) t;
+      if (u instanceof Seq) {
+        var u1 = (Seq) u;
+        var n = t1.size();
+        if (n != u1.size()) return null;
+        var r = new Object[n];
+        for (var i = 0; i < n; i++) {
+          var v = combine(t1.get(i), u1.get(i));
+          if (v == null) return null;
+          r[i] = v;
+        }
+        return Array.of(r);
+      }
+    }
     return null;
   }
 
