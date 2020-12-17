@@ -33,7 +33,7 @@ public final class Code {
         if (accepts(type, argType)) leaves.add(Array.of(Symbol.ARG, i));
         i++;
       }
-      if (leaves.isEmpty()) throw new IllegalArgumentException(type.toString());
+      if (leaves.isEmpty()) throw new GaveUp(type.toString());
       return leaves.get(random.nextInt(leaves.size()));
     }
 
@@ -55,7 +55,7 @@ public final class Code {
       case 2:
         {
           var test = rand(env, Symbol.BOOL, depth);
-          var a = rand(env, Symbol.OBJECT, depth);
+          var a = rand(env, type, depth);
           var b = rand(env, typeof(env, a), depth);
           return Array.of(Symbol.IF, test, a, b);
         }
@@ -66,18 +66,9 @@ public final class Code {
 
     // function call
     var f = rand(env, Array.of(Symbol.FUNCTION, Symbol.OBJECT, type), depth);
-    var functionType = typeof(env, f);
-    Object argType;
-    if (functionType == Symbol.OBJECT) argType = Symbol.OBJECT;
-    else {
-      if (!(functionType instanceof Seq))
-        throw new IllegalStateException(type.toString() + ": " + f + ": " + functionType);
-      var functionType1 = (Seq) functionType;
-      if (functionType1.head() != Symbol.FUNCTION)
-        throw new IllegalStateException(type.toString() + ": " + f + ": " + functionType);
-      argType = functionType1.get(1);
-    }
-    var a = rand(env, argType, depth);
+    var functionType = (Seq) typeof(env, f);
+    assert functionType.head() == Symbol.FUNCTION;
+    var a = rand(env, functionType.get(1), depth);
     return Array.of(f, a);
   }
 
