@@ -1,28 +1,30 @@
 package lambda;
 
 import io.vavr.collection.Array;
+import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.Function;
 
 public final class Code {
-  private static Random random = new Random();
+  private static Random random = new Random(0);
 
   public static Object rand(Seq env, Object type, int depth) {
+    // random.nextInt() % n where n is a power of 2, avoids a divide instruction
     if (depth == 0 || random.nextInt() % 4 == 0) {
       var leaves = new ArrayList<>();
-      if (type instanceof Symbol)
-        switch ((Symbol) type) {
-          case BOOL:
-            leaves.add(false);
-            leaves.add(true);
-            break;
-          case INT:
-            leaves.add(0);
-            leaves.add(1);
-            break;
-        }
+      if (type == Symbol.BOOL || type == Symbol.OBJECT) {
+        leaves.add(false);
+        leaves.add(true);
+      }
+      if (type == Symbol.INT || type == Symbol.OBJECT) {
+        leaves.add(0);
+        leaves.add(1);
+      }
+      if (type == Symbol.LIST || type == Symbol.OBJECT) {
+        leaves.add(List.empty());
+      }
       for (var a : Symbol.values()) if (combine(typeof(env, a), type) != null) leaves.add(a);
       // despite being lists rather than atoms, argument references count as leaves
       // because they do not contain subexpressions; the index is a constant
@@ -31,9 +33,50 @@ public final class Code {
         if (combine(argType, type) != null) leaves.add(Array.of(Symbol.ARG, i));
         i++;
       }
+      if (leaves.isEmpty()) throw new IllegalArgumentException(type.toString());
       return leaves.get(random.nextInt(leaves.size()));
     }
-    throw new IllegalArgumentException();
+
+    // compound expression
+    depth--;
+
+    // special forms
+    switch (random.nextInt() % 8) {
+      case 0:
+        if (type != Symbol.BOOL) break;
+        return Array.of(Symbol.AND, rand(env, Symbol.BOOL, depth), rand(env, Symbol.BOOL, depth));
+      case 1:
+        {
+          if (type != Symbol.BOOL) break;
+          var a = rand(env, Symbol.OBJECT, depth);
+          var b = rand(env, typeof(env, a), depth);
+          return Array.of(Symbol.EQ, a, b);
+        }
+      case 2:
+        {
+          var test = rand(env, Symbol.BOOL, depth);
+          var a = rand(env, Symbol.OBJECT, depth);
+          var b = rand(env, typeof(env, a), depth);
+          return Array.of(Symbol.IF, test, a, b);
+        }
+      case 3:
+        if (type != Symbol.BOOL) break;
+        return Array.of(Symbol.OR, rand(env, Symbol.BOOL, depth), rand(env, Symbol.BOOL, depth));
+    }
+
+    // function call
+    var f = rand(env, Array.of(Symbol.FUNCTION, Symbol.OBJECT, type), depth);
+    var functionType = typeof(env, f);
+    Object argType;
+    if (functionType == Symbol.OBJECT) argType = Symbol.OBJECT;
+    else {
+      var functionType1 = (Seq) functionType;
+      if (functionType1 == null || functionType1.head() != Symbol.FUNCTION)
+        throw new IllegalStateException(f.toString() + ": " + functionType);
+      argType = functionType1.get(1);
+    }
+    var a = rand(env, argType, depth);
+    return Array.of(f, a);
   }
 
   private static Object combine(Object t, Object u) {
@@ -121,7 +164,7 @@ public final class Code {
       }
     if (a instanceof Integer) return Symbol.INT;
     if (a instanceof Boolean) return Symbol.BOOL;
-    throw new IllegalArgumentException(a.toString());
+    return Symbol.SYMBOL;
   }
 
   @SuppressWarnings("unchecked")

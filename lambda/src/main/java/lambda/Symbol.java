@@ -23,4 +23,5 @@ public enum Symbol {
   ARG,
   IF,
   FUNCTION,
+  SYMBOL,
 }
