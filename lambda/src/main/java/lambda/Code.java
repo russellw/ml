@@ -111,15 +111,15 @@ public final class Code {
         switch ((Symbol) o) {
           case AND:
           case OR:
-            if (typeof(env, a1.get(1)) != Symbol.BOOL) return null;
-            if (typeof(env, a1.get(2)) != Symbol.BOOL) return null;
+            if (combine(typeof(env, a1.get(1)), Symbol.BOOL) == null) return null;
+            if (combine(typeof(env, a1.get(2)), Symbol.BOOL) == null) return null;
             return Symbol.BOOL;
           case EQ:
             if (combine(typeof(env, a1.get(1)), typeof(env, a1.get(2))) == null) return null;
             return Symbol.BOOL;
           case IF:
             {
-              if (typeof(env, a1.get(1)) != Symbol.BOOL) return null;
+              if (combine(typeof(env, a1.get(1)), Symbol.BOOL) == null) return null;
               var type = typeof(env, a1.get(2));
               if (combine(type, typeof(env, a1.get(3))) == null) return null;
               return type;
@@ -133,11 +133,12 @@ public final class Code {
           case ARG:
             return env.get((int) a1.get(1));
         }
-      var functionType = (Seq) typeof(env, a1.head());
-      if (functionType == null) return null;
-      if (functionType.head() != Symbol.FUNCTION) return null;
-      if (combine(typeof(env, a1.get(1)), functionType.get(1)) == null) return null;
-      return functionType.get(2);
+      var functionType = typeof(env, a1.head());
+      if (functionType == null || functionType == Symbol.OBJECT) return functionType;
+      var functionType1 = (Seq) functionType;
+      if (functionType1.head() != Symbol.FUNCTION) return null;
+      if (combine(typeof(env, a1.get(1)), functionType1.get(1)) == null) return null;
+      return functionType1.get(2);
     }
     if (a instanceof Symbol)
       switch ((Symbol) a) {
