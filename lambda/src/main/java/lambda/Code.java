@@ -70,8 +70,10 @@ public final class Code {
     Object argType;
     if (functionType == Symbol.OBJECT) argType = Symbol.OBJECT;
     else {
+      if (!(functionType instanceof Seq))
+        throw new IllegalStateException(f.toString() + ": " + functionType);
       var functionType1 = (Seq) functionType;
-      if (functionType1 == null || functionType1.head() != Symbol.FUNCTION)
+      if (functionType1.head() != Symbol.FUNCTION)
         throw new IllegalStateException(f.toString() + ": " + functionType);
       argType = functionType1.get(1);
     }
