@@ -24,6 +24,13 @@ public final class Code {
             break;
         }
       for (var a : Symbol.values()) if (combine(typeof(env, a), type) != null) leaves.add(a);
+      // despite being lists rather than atoms, argument references count as leaves
+      // because they do not contain subexpressions; the index is a constant
+      var i = 0;
+      for (var argType : env) {
+        if (combine(argType, type) != null) leaves.add(Array.of(Symbol.ARG, i));
+        i++;
+      }
       return leaves.get(random.nextInt(leaves.size()));
     }
     throw new IllegalArgumentException();
