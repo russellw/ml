@@ -71,10 +71,10 @@ public final class Code {
     if (functionType == Symbol.OBJECT) argType = Symbol.OBJECT;
     else {
       if (!(functionType instanceof Seq))
-        throw new IllegalStateException(f.toString() + ": " + functionType);
+        throw new IllegalStateException(type.toString() + ": " + f + ": " + functionType);
       var functionType1 = (Seq) functionType;
       if (functionType1.head() != Symbol.FUNCTION)
-        throw new IllegalStateException(f.toString() + ": " + functionType);
+        throw new IllegalStateException(type.toString() + ": " + f + ": " + functionType);
       argType = functionType1.get(1);
     }
     var a = rand(env, argType, depth);
@@ -90,17 +90,13 @@ public final class Code {
       if (u instanceof Seq) {
         var u1 = (Seq) u;
         var n = t1.size();
-        if (n != u1.size()) return null;
+        if (n != u1.size()) throw new TypeError(t + " != " + u);
         var r = new Object[n];
-        for (var i = 0; i < n; i++) {
-          var v = combine(t1.get(i), u1.get(i));
-          if (v == null) return null;
-          r[i] = v;
-        }
+        for (var i = 0; i < n; i++) r[i] = combine(t1.get(i), u1.get(i));
         return Array.of(r);
       }
     }
-    return null;
+    throw new TypeError(t + " != " + u);
   }
 
   @SuppressWarnings("unchecked")
@@ -113,17 +109,17 @@ public final class Code {
         switch ((Symbol) o) {
           case AND:
           case OR:
-            if (combine(typeof(env, a1.get(1)), Symbol.BOOL) == null) return null;
-            if (combine(typeof(env, a1.get(2)), Symbol.BOOL) == null) return null;
+            combine(typeof(env, a1.get(1)), Symbol.BOOL);
+            combine(typeof(env, a1.get(2)), Symbol.BOOL);
             return Symbol.BOOL;
           case EQ:
-            if (combine(typeof(env, a1.get(1)), typeof(env, a1.get(2))) == null) return null;
+            combine(typeof(env, a1.get(1)), typeof(env, a1.get(2)));
             return Symbol.BOOL;
           case IF:
             {
-              if (combine(typeof(env, a1.get(1)), Symbol.BOOL) == null) return null;
+              combine(typeof(env, a1.get(1)), Symbol.BOOL);
               var type = typeof(env, a1.get(2));
-              if (combine(type, typeof(env, a1.get(3))) == null) return null;
+              combine(type, typeof(env, a1.get(3)));
               return type;
             }
           case LAMBDA:
@@ -136,10 +132,10 @@ public final class Code {
             return env.get((int) a1.get(1));
         }
       var functionType = typeof(env, a1.head());
-      if (functionType == null || functionType == Symbol.OBJECT) return functionType;
+      if (functionType == Symbol.OBJECT) return Symbol.OBJECT;
       var functionType1 = (Seq) functionType;
-      if (functionType1.head() != Symbol.FUNCTION) return null;
-      if (combine(typeof(env, a1.get(1)), functionType1.get(1)) == null) return null;
+      if (functionType1.head() != Symbol.FUNCTION) throw new TypeError(a.toString());
+      combine(typeof(env, a1.get(1)), functionType1.get(1));
       return functionType1.get(2);
     }
     if (a instanceof Symbol)
