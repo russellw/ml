@@ -14,23 +14,23 @@ public final class Code {
     // random.nextInt() % n where n is a power of 2, avoids a divide instruction
     if (depth == 0 || random.nextInt() % 4 == 0) {
       var leaves = new ArrayList<>();
-      if (type == Symbol.BOOL || type == Symbol.OBJECT) {
+      if (accepts(type, Symbol.BOOL)) {
         leaves.add(false);
         leaves.add(true);
       }
-      if (type == Symbol.INT || type == Symbol.OBJECT) {
+      if (accepts(type, Symbol.INT)) {
         leaves.add(0);
         leaves.add(1);
       }
-      if (type == Symbol.LIST || type == Symbol.OBJECT) {
+      if (accepts(type, Symbol.LIST)) {
         leaves.add(List.empty());
       }
-      for (var a : Symbol.values()) if (combine(typeof(env, a), type) != null) leaves.add(a);
+      for (var symbol : Symbol.values()) if (accepts(type, typeof(env, symbol))) leaves.add(symbol);
       // despite being lists rather than atoms, argument references count as leaves
       // because they do not contain subexpressions; the index is a constant
       var i = 0;
       for (var argType : env) {
-        if (combine(argType, type) != null) leaves.add(Array.of(Symbol.ARG, i));
+        if (accepts(type, argType)) leaves.add(Array.of(Symbol.ARG, i));
         i++;
       }
       if (leaves.isEmpty()) throw new IllegalArgumentException(type.toString());
@@ -43,11 +43,11 @@ public final class Code {
     // special forms
     switch (random.nextInt() % 8) {
       case 0:
-        if (type != Symbol.BOOL) break;
+        if (!accepts(type, Symbol.BOOL)) break;
         return Array.of(Symbol.AND, rand(env, Symbol.BOOL, depth), rand(env, Symbol.BOOL, depth));
       case 1:
         {
-          if (type != Symbol.BOOL) break;
+          if (!accepts(type, Symbol.BOOL)) break;
           var a = rand(env, Symbol.OBJECT, depth);
           var b = rand(env, typeof(env, a), depth);
           return Array.of(Symbol.EQ, a, b);
@@ -60,7 +60,7 @@ public final class Code {
           return Array.of(Symbol.IF, test, a, b);
         }
       case 3:
-        if (type != Symbol.BOOL) break;
+        if (!accepts(type, Symbol.BOOL)) break;
         return Array.of(Symbol.OR, rand(env, Symbol.BOOL, depth), rand(env, Symbol.BOOL, depth));
     }
 
@@ -79,6 +79,26 @@ public final class Code {
     }
     var a = rand(env, argType, depth);
     return Array.of(f, a);
+  }
+
+  private static void accept(Object paramType, Object argType) {
+    if (!accepts(paramType, argType)) throw new TypeError(paramType + " != " + argType);
+  }
+
+  private static boolean accepts(Object paramType, Object argType) {
+    if (paramType == argType) return true;
+    if (paramType == Symbol.OBJECT) return true;
+    if (paramType instanceof Seq) {
+      var paramType1 = (Seq) paramType;
+      if (argType instanceof Seq) {
+        var argType1 = (Seq) argType;
+        var n = paramType1.size();
+        if (n != argType1.size()) return false;
+        for (var i = 0; i < n; i++) if (!accepts(paramType1.get(i), argType1.get(i))) return false;
+        return true;
+      }
+    }
+    return false;
   }
 
   private static Object combine(Object t, Object u) {
@@ -109,34 +129,28 @@ public final class Code {
         switch ((Symbol) o) {
           case AND:
           case OR:
-            combine(typeof(env, a1.get(1)), Symbol.BOOL);
-            combine(typeof(env, a1.get(2)), Symbol.BOOL);
+            accept(Symbol.BOOL, typeof(env, a1.get(1)));
+            accept(Symbol.BOOL, typeof(env, a1.get(2)));
             return Symbol.BOOL;
           case EQ:
             combine(typeof(env, a1.get(1)), typeof(env, a1.get(2)));
             return Symbol.BOOL;
           case IF:
-            {
-              combine(typeof(env, a1.get(1)), Symbol.BOOL);
-              var type = typeof(env, a1.get(2));
-              combine(type, typeof(env, a1.get(3)));
-              return type;
-            }
+            accept(Symbol.BOOL, typeof(env, a1.get(1)));
+            return combine(typeof(env, a1.get(2)), typeof(env, a1.get(3)));
           case LAMBDA:
             {
-              var param = a1.get(1);
+              var paramType = a1.get(1);
               var body = a1.get(2);
-              return Array.of(Symbol.FUNCTION, param, typeof(env.prepend(param), body));
+              return Array.of(Symbol.FUNCTION, paramType, typeof(env.prepend(paramType), body));
             }
           case ARG:
             return env.get((int) a1.get(1));
         }
-      var functionType = typeof(env, a1.head());
-      if (functionType == Symbol.OBJECT) return Symbol.OBJECT;
-      var functionType1 = (Seq) functionType;
-      if (functionType1.head() != Symbol.FUNCTION) throw new TypeError(a.toString());
-      combine(typeof(env, a1.get(1)), functionType1.get(1));
-      return functionType1.get(2);
+      var functionType = (Seq) typeof(env, a1.head());
+      if (functionType.head() != Symbol.FUNCTION) throw new TypeError(a.toString());
+      accept(functionType.get(1), typeof(env, a1.get(1)));
+      return functionType.get(2);
     }
     if (a instanceof Symbol)
       switch ((Symbol) a) {
