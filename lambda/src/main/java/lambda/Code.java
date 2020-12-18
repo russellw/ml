@@ -459,7 +459,17 @@ public final class Code {
         default:
           throw new IllegalArgumentException(a.toString());
       }
-    return a;
+    var f = (Seq) simplify(env, a1.head());
+    var x = simplify(env, a1.get(1));
+    if (f.head() == Symbol.LAMBDA) {
+      var x1 = unquote(x);
+      if (x1 != null) {
+        var paramType = f.get(1);
+        var body = f.get(2);
+        return simplify(env.prepend(new Variable(paramType, quote(x1))), body);
+      }
+    }
+    return Array.of(f, x);
   }
 
   @SuppressWarnings("unchecked")
