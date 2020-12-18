@@ -286,7 +286,6 @@ public final class Code {
             var y = simplify(env, a1.get(2));
             if (x instanceof Integer) {
               var x1 = (int) x;
-              if (x1 == 0) return y;
               if (y instanceof Integer) {
                 var y1 = (int) y;
                 return x1 - y1;
