@@ -2,6 +2,7 @@ package lambda;
 
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
+import java.util.NoSuchElementException;
 
 public class Main {
   public static void main(String[] args) {
@@ -12,11 +13,14 @@ public class Main {
         try {
           var a = Code.rand(env, type, 4);
           if (!(a instanceof Seq)) continue;
+          var b = Code.eval(env, a);
           System.out.println(a);
-          a = Code.eval(env, a);
-          System.out.println(a);
+          System.out.println(b);
           System.out.println();
-        } catch (GaveUp ignored) {
+        } catch (ArithmeticException
+            | GaveUp
+            | NoSuchElementException
+            | UnsupportedOperationException ignored) {
         }
   }
 }

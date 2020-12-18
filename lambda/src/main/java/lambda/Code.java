@@ -25,7 +25,6 @@ public final class Code {
       if (accepts(type, Symbol.LIST)) {
         leaves.add(List.empty());
       }
-      for (var symbol : Symbol.values()) if (accepts(type, typeof(env, symbol))) leaves.add(symbol);
       // despite being lists rather than atoms, argument references count as leaves
       // because they do not contain subexpressions; the index is a constant
       var i = 0;
@@ -40,36 +39,66 @@ public final class Code {
     // compound expression
     depth--;
 
-    // special forms
-    switch (random.nextInt() % 16) {
-      case 0:
-        if (!accepts(type, Symbol.BOOL)) break;
-        return Array.of(Symbol.AND, rand(env, Symbol.BOOL, depth), rand(env, Symbol.BOOL, depth));
-      case 1:
-        {
-          if (!accepts(type, Symbol.BOOL)) break;
-          var a = rand(env, Symbol.OBJECT, depth);
-          var b = rand(env, typeof(env, a), depth);
-          return Array.of(Symbol.EQ, a, b);
-        }
-      case 2:
-        {
-          var test = rand(env, Symbol.BOOL, depth);
-          var a = rand(env, type, depth);
-          var b = rand(env, typeof(env, a), depth);
-          return Array.of(Symbol.IF, test, a, b);
-        }
-      case 3:
-        if (!accepts(type, Symbol.BOOL)) break;
-        return Array.of(Symbol.OR, rand(env, Symbol.BOOL, depth), rand(env, Symbol.BOOL, depth));
+    // function call
+    if (random.nextInt() % 2 == 0) {
+      var f = rand(env, Array.of(Symbol.FUNCTION, Symbol.OBJECT, type), depth);
+      var functionType = (Seq) typeof(env, f);
+      assert functionType.head() == Symbol.FUNCTION;
+      var a = rand(env, functionType.get(1), depth);
+      return Array.of(f, a);
     }
 
-    // function call
-    var f = rand(env, Array.of(Symbol.FUNCTION, Symbol.OBJECT, type), depth);
-    var functionType = (Seq) typeof(env, f);
-    assert functionType.head() == Symbol.FUNCTION;
-    var a = rand(env, functionType.get(1), depth);
-    return Array.of(f, a);
+    // special forms
+    for (var i = 0; i < 1000; i++) {
+      var symbols = Symbol.values();
+      var o = symbols[random.nextInt(symbols.length)];
+      switch (o) {
+        case LAMBDA:
+          break;
+        case NOT:
+          if (!accepts(type, Symbol.BOOL)) break;
+          return Array.of(o, rand(env, Symbol.BOOL, depth));
+        case ADD:
+        case SUB:
+        case MUL:
+        case DIV:
+        case REM:
+          if (!accepts(type, Symbol.INT)) break;
+          return Array.of(o, rand(env, Symbol.INT, depth), rand(env, Symbol.INT, depth));
+        case LE:
+        case LT:
+          if (!accepts(type, Symbol.BOOL)) break;
+          return Array.of(o, rand(env, Symbol.INT, depth), rand(env, Symbol.INT, depth));
+        case AND:
+        case OR:
+          if (!accepts(type, Symbol.BOOL)) break;
+          return Array.of(o, rand(env, Symbol.BOOL, depth), rand(env, Symbol.BOOL, depth));
+        case HEAD:
+          if (!accepts(type, Symbol.OBJECT)) break;
+          return Array.of(o, rand(env, Symbol.LIST, depth));
+        case TAIL:
+          if (!accepts(type, Symbol.LIST)) break;
+          return Array.of(o, rand(env, Symbol.LIST, depth));
+        case CONS:
+          if (!accepts(type, Symbol.LIST)) break;
+          return Array.of(o, rand(env, Symbol.OBJECT, depth), rand(env, Symbol.LIST, depth));
+        case EQ:
+          {
+            if (!accepts(type, Symbol.BOOL)) break;
+            var a = rand(env, Symbol.OBJECT, depth);
+            var b = rand(env, typeof(env, a), depth);
+            return Array.of(o, a, b);
+          }
+        case IF:
+          {
+            var test = rand(env, Symbol.BOOL, depth);
+            var a = rand(env, type, depth);
+            var b = rand(env, typeof(env, a), depth);
+            return Array.of(o, test, a, b);
+          }
+      }
+    }
+    throw new GaveUp(type.toString());
   }
 
   private static void accept(Object paramType, Object argType) {
