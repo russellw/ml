@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import io.vavr.collection.Array;
 import io.vavr.collection.List;
+import io.vavr.collection.Seq;
 import java.util.NoSuchElementException;
 import org.junit.Test;
 
@@ -107,10 +108,9 @@ public class CodeTest {
         try {
           var a = Code.rand(List.empty(), type, 4);
           assertEquals(Code.typeof(List.empty(), a), type);
-          assertEquals(Code.typeof(List.empty(), Code.simplify(List.empty(), a)), type);
-          assertEquals(Code.typeof(List.empty(), Code.eval(List.empty(), a)), type);
-          assertEquals(
-              Code.eval(List.empty(), a), Code.eval(List.empty(), Code.simplify(List.empty(), a)));
+          var b = Code.simplify(List.empty(), a);
+          assertEquals(Code.typeof(List.empty(), b), type);
+          assert !(b instanceof Seq);
         } catch (ArithmeticException
             | GaveUp
             | NoSuchElementException

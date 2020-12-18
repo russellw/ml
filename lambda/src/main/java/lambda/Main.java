@@ -7,13 +7,12 @@ import java.util.NoSuchElementException;
 public class Main {
   public static void main(String[] args) {
     var types = new Object[] {Symbol.BOOL, Symbol.INT};
-    var env = List.empty();
     for (var type : types)
       for (var i = 0; i < 1000; i++)
         try {
-          var a = Code.rand(env, type, 4);
+          var a = Code.rand(List.empty(), type, 4);
           if (!(a instanceof Seq)) continue;
-          var b = Code.eval(env, a);
+          var b = Code.simplify(List.empty(), a);
           System.out.println(a);
           System.out.println(b);
           System.out.println();

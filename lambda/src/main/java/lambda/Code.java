@@ -453,8 +453,8 @@ public final class Code {
           {
             var x = simplify(env, a1.get(1));
             var y = simplify(env, a1.get(2));
-            // if (x.equals(y)) return true;
-            // if(constant(x)&&constant(y))return false;
+            if (x.equals(y)) return true;
+            if (unquote(x) != null && unquote(y) != null) return false;
             return Array.of(o, x, y);
           }
         default:
