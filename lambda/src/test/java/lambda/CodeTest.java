@@ -102,7 +102,11 @@ public class CodeTest {
 
   @Test
   public void simplify() {
+    var x = Array.of(Symbol.ARG, 1);
+    var y = Array.of(Symbol.ARG, 0);
     assertEquals(Code.simplify(1), 1);
     assertEquals(Code.simplify(call(Symbol.ADD, 1, 2)), 3);
+    assertEquals(Code.simplify(Array.of(Symbol.EQ, x, x)), true);
+    assertEquals(Code.simplify(Array.of(Symbol.EQ, x, y)), Array.of(Symbol.EQ, x, y));
   }
 }
