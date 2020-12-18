@@ -456,6 +456,8 @@ public final class Code {
             // if(constant(x)&&constant(y))return false;
             return Array.of(o, x, y);
           }
+        default:
+          throw new IllegalArgumentException(a.toString());
       }
     return a;
   }
