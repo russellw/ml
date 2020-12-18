@@ -236,6 +236,32 @@ public final class Code {
             var body = simplify(env.prepend(new Variable(paramType)), a1.get(2));
             return Array.of(o, paramType, body);
           }
+        case LT:
+          {
+            var x = simplify(env, a1.get(1));
+            var y = simplify(env, a1.get(2));
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 < y1;
+              }
+            }
+            return Array.of(o, x, y);
+          }
+        case LE:
+          {
+            var x = simplify(env, a1.get(1));
+            var y = simplify(env, a1.get(2));
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 <= y1;
+              }
+            }
+            return Array.of(o, x, y);
+          }
         case ADD:
           {
             var x = simplify(env, a1.get(1));
@@ -251,6 +277,88 @@ public final class Code {
             if (y instanceof Integer) {
               var y1 = (int) y;
               if (y1 == 0) return x;
+            }
+            return Array.of(o, x, y);
+          }
+        case SUB:
+          {
+            var x = simplify(env, a1.get(1));
+            var y = simplify(env, a1.get(2));
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (x1 == 0) return y;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 - y1;
+              }
+            }
+            if (y instanceof Integer) {
+              var y1 = (int) y;
+              if (y1 == 0) return x;
+            }
+            return Array.of(o, x, y);
+          }
+        case DIV:
+          {
+            var x = simplify(env, a1.get(1));
+            var y = simplify(env, a1.get(2));
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (x1 == 0) return 0;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 / y1;
+              }
+            }
+            if (y instanceof Integer) {
+              var y1 = (int) y;
+              if (y1 == 1) return x;
+            }
+            return Array.of(o, x, y);
+          }
+        case REM:
+          {
+            var x = simplify(env, a1.get(1));
+            var y = simplify(env, a1.get(2));
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (x1 == 0) return 0;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 % y1;
+              }
+            }
+            if (y instanceof Integer) {
+              var y1 = (int) y;
+              if (y1 == 1) return 0;
+            }
+            return Array.of(o, x, y);
+          }
+        case MUL:
+          {
+            var x = simplify(env, a1.get(1));
+            var y = simplify(env, a1.get(2));
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              switch (x1) {
+                case 0:
+                  return 0;
+                case 1:
+                  return y;
+              }
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 * y1;
+              }
+            }
+            if (y instanceof Integer) {
+              var y1 = (int) y;
+              switch (y1) {
+                case 0:
+                  return 0;
+                case 1:
+                  return x;
+              }
             }
             return Array.of(o, x, y);
           }
@@ -271,6 +379,13 @@ public final class Code {
             if (x == Boolean.FALSE) return y;
             if (y == Boolean.FALSE) return x;
             return Array.of(o, x, y);
+          }
+        case NOT:
+          {
+            var x = simplify(env, a1.get(1));
+            if (x == Boolean.FALSE) return true;
+            if (x == Boolean.TRUE) return false;
+            return Array.of(o, x);
           }
         case IF:
           {

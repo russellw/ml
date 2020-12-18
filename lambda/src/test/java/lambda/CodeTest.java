@@ -107,6 +107,30 @@ public class CodeTest {
     var y = Array.of(Symbol.ARG, 0);
     assertEquals(Code.simplify(List.empty(), 1), 1);
     assertEquals(Code.simplify(List.empty(), Array.of(Symbol.ADD, 1, 2)), 3);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.SUB, 1, (Object) 2)), -1);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.MUL, 2, (Object) 3)), 6);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.DIV, 10, (Object) 3)), 3);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.REM, 10, (Object) 3)), 1);
+    // assertEquals(Code.simplify(List.empty(), Array.of(Symbol.EQ, 10, 10)), true);
+    // assertEquals(Code.simplify(List.empty(), Array.of(Symbol.EQ, 10, 11)), false);
+    // assertEquals(Code.simplify(List.empty(), Array.of(Symbol.EQ, List.empty(), Array.empty())),
+    // true);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LT, 1, (Object) 1)), false);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LT, 1, (Object) 2)), true);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LT, 2, (Object) 1)), false);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LE, 1, (Object) 1)), true);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LE, 1, (Object) 2)), true);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LE, 2, (Object) 1)), false);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.AND, false, false)), false);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.AND, false, true)), false);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.AND, true, false)), false);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.AND, true, true)), true);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.OR, false, false)), false);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.OR, false, true)), true);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.OR, true, false)), true);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.OR, true, true)), true);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.NOT, false)), true);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.NOT, true)), false);
     // assertEquals(Code.simplify(Array.of(Symbol.EQ, x, x)), true);
     assertEquals(
         Code.simplify(
