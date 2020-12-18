@@ -118,6 +118,32 @@ public final class Code {
       var o = a1.head();
       if (o instanceof Symbol)
         switch ((Symbol) o) {
+          case HEAD:
+            accept(Symbol.LIST, typeof(env, a1.get(1)));
+            return Symbol.OBJECT;
+          case TAIL:
+            accept(Symbol.LIST, typeof(env, a1.get(1)));
+            return Symbol.LIST;
+          case CONS:
+            accept(Symbol.OBJECT, typeof(env, a1.get(1)));
+            accept(Symbol.LIST, typeof(env, a1.get(2)));
+            return Symbol.LIST;
+          case LE:
+          case LT:
+            accept(Symbol.INT, typeof(env, a1.get(1)));
+            accept(Symbol.INT, typeof(env, a1.get(2)));
+            return Symbol.BOOL;
+          case ADD:
+          case SUB:
+          case MUL:
+          case DIV:
+          case REM:
+            accept(Symbol.INT, typeof(env, a1.get(1)));
+            accept(Symbol.INT, typeof(env, a1.get(2)));
+            return Symbol.INT;
+          case NOT:
+            accept(Symbol.BOOL, typeof(env, a1.get(1)));
+            return Symbol.BOOL;
           case AND:
           case OR:
             accept(Symbol.BOOL, typeof(env, a1.get(1)));
@@ -143,32 +169,10 @@ public final class Code {
       accept(functionType.get(1), typeof(env, a1.get(1)));
       return functionType.get(2);
     }
-    if (a instanceof Symbol)
-      switch ((Symbol) a) {
-        case ADD:
-        case SUB:
-        case MUL:
-        case DIV:
-        case REM:
-          return Array.of(
-              Symbol.FUNCTION, Symbol.INT, Array.of(Symbol.FUNCTION, Symbol.INT, Symbol.INT));
-        case NOT:
-          return Array.of(Symbol.FUNCTION, Symbol.BOOL, Symbol.BOOL);
-        case LE:
-        case LT:
-          return Array.of(
-              Symbol.FUNCTION, Symbol.INT, Array.of(Symbol.FUNCTION, Symbol.INT, Symbol.BOOL));
-        case HEAD:
-          return Array.of(Symbol.FUNCTION, Symbol.LIST, Symbol.OBJECT);
-        case TAIL:
-          return Array.of(Symbol.FUNCTION, Symbol.LIST, Symbol.LIST);
-        case CONS:
-          return Array.of(
-              Symbol.FUNCTION, Symbol.OBJECT, Array.of(Symbol.FUNCTION, Symbol.LIST, Symbol.LIST));
-      }
-    if (a instanceof Integer) return Symbol.INT;
     if (a instanceof Boolean) return Symbol.BOOL;
-    return Symbol.SYMBOL;
+    if (a instanceof Integer) return Symbol.INT;
+    if (a instanceof Symbol) return Symbol.SYMBOL;
+    throw new IllegalArgumentException(a.toString());
   }
 
   @SuppressWarnings("unchecked")
@@ -234,56 +238,55 @@ public final class Code {
 
   @SuppressWarnings("unchecked")
   public static Object eval(Seq env, Object a) {
-    if (a instanceof Seq) {
-      var a1 = (Seq) a;
-      if (a1.isEmpty()) return a;
-      var o = a1.head();
-      if (o instanceof Symbol)
-        switch ((Symbol) o) {
-          case IF:
-            return (boolean) eval(env, a1.get(1)) ? eval(env, a1.get(2)) : eval(env, a1.get(3));
-          case AND:
-            return (boolean) eval(env, a1.get(1)) && (boolean) eval(env, a1.get(2));
-          case OR:
-            return (boolean) eval(env, a1.get(1)) || (boolean) eval(env, a1.get(2));
-          case EQ:
-            return eval(env, a1.get(1)).equals(eval(env, a1.get(2)));
-          case LAMBDA:
-            {
-              var body = a1.get(2);
-              return (Function) x -> eval(env.prepend(x), body);
-            }
-          case ARG:
-            return env.get((int) a1.get(1));
-        }
-      o = eval(env, o);
-      return ((Function) o).apply(eval(env, a1.get(1)));
-    }
-    if (a instanceof Symbol)
-      switch ((Symbol) a) {
+    if (!(a instanceof Seq)) return a;
+    var a1 = (Seq) a;
+    if (a1.isEmpty()) return a;
+    var o = a1.head();
+    if (o instanceof Symbol)
+      switch ((Symbol) o) {
+        case IF:
+          return (boolean) eval(env, a1.get(1)) ? eval(env, a1.get(2)) : eval(env, a1.get(3));
+        case AND:
+          return (boolean) eval(env, a1.get(1)) && (boolean) eval(env, a1.get(2));
+        case OR:
+          return (boolean) eval(env, a1.get(1)) || (boolean) eval(env, a1.get(2));
+        case EQ:
+          return eval(env, a1.get(1)).equals(eval(env, a1.get(2)));
+        case LAMBDA:
+          {
+            var body = a1.get(2);
+            return (Function) x -> eval(env.prepend(x), body);
+          }
+        case ARG:
+          return env.get((int) a1.get(1));
         case ADD:
-          return (Function) x -> (Function) y -> (int) x + (int) y;
+          return (int) eval(env, a1.get(1)) + (int) eval(env, a1.get(2));
         case SUB:
-          return (Function) x -> (Function) y -> (int) x - (int) y;
+          return (int) eval(env, a1.get(1)) - (int) eval(env, a1.get(2));
         case MUL:
-          return (Function) x -> (Function) y -> (int) x * (int) y;
+          return (int) eval(env, a1.get(1)) * (int) eval(env, a1.get(2));
         case DIV:
-          return (Function) x -> (Function) y -> (int) x / (int) y;
+          return (int) eval(env, a1.get(1)) / (int) eval(env, a1.get(2));
         case REM:
-          return (Function) x -> (Function) y -> (int) x % (int) y;
+          return (int) eval(env, a1.get(1)) % (int) eval(env, a1.get(2));
         case LE:
-          return (Function) x -> (Function) y -> (int) x <= (int) y;
+          return (int) eval(env, a1.get(1)) <= (int) eval(env, a1.get(2));
         case LT:
-          return (Function) x -> (Function) y -> (int) x < (int) y;
+          return (int) eval(env, a1.get(1)) < (int) eval(env, a1.get(2));
         case NOT:
-          return (Function) x -> !(boolean) x;
+          return !(boolean) eval(env, a1.get(1));
         case HEAD:
-          return (Function) x -> ((Seq) x).head();
+          return ((Seq) eval(env, a1.get(1))).head();
         case TAIL:
-          return (Function) x -> ((Seq) x).tail();
+          return ((Seq) eval(env, a1.get(1))).tail();
         case CONS:
-          return (Function) x -> (Function) y -> ((Seq) y).prepend(x);
+          {
+            var x = eval(env, a1.get(1));
+            var y = (Seq) eval(env, a1.get(2));
+            return y.prepend(x);
+          }
       }
-    return a;
+    o = eval(env, o);
+    return ((Function) o).apply(eval(env, a1.get(1)));
   }
 }
