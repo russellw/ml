@@ -41,7 +41,7 @@ public final class Code {
     depth--;
 
     // special forms
-    switch (random.nextInt() % 8) {
+    switch (random.nextInt() % 16) {
       case 0:
         if (!accepts(type, Symbol.BOOL)) break;
         return Array.of(Symbol.AND, rand(env, Symbol.BOOL, depth), rand(env, Symbol.BOOL, depth));
@@ -169,6 +169,23 @@ public final class Code {
     if (a instanceof Integer) return Symbol.INT;
     if (a instanceof Boolean) return Symbol.BOOL;
     return Symbol.SYMBOL;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Object simplify(Object a) {
+    if (!(a instanceof Seq)) return a;
+    var a1 = (Seq) a;
+    if (a1.isEmpty()) return a;
+    var o = a1.head();
+    if (o instanceof Symbol)
+      switch ((Symbol) o) {
+        case LAMBDA:
+        case ARG:
+          return a;
+      }
+    a1 = a1.map(Code::simplify);
+    if (a1.forAll(b -> !(b instanceof Seq))) return eval(List.empty(), a1);
+    return a1;
   }
 
   @SuppressWarnings("unchecked")

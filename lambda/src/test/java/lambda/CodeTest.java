@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import io.vavr.collection.Array;
 import io.vavr.collection.List;
+import java.util.NoSuchElementException;
 import org.junit.Test;
 
 public class CodeTest {
@@ -81,5 +82,27 @@ public class CodeTest {
     assertEquals(
         Code.typeof(env, Array.of(lambda(Symbol.INT, Array.of(Symbol.ARG, 0)), 2)), Symbol.INT);
     assertEquals(Code.typeof(env, Array.of(Symbol.IF, true, 1, 2)), Symbol.INT);
+  }
+
+  @Test
+  public void rand() {
+    var types = new Object[] {Symbol.BOOL, Symbol.INT};
+    var env = List.empty();
+    for (var type : types)
+      for (var i = 0; i < 100; i++)
+        try {
+          var a = Code.rand(env, type, 4);
+          assertEquals(Code.typeof(env, a), type);
+          assertEquals(Code.typeof(env, Code.simplify(a)), type);
+          assertEquals(Code.typeof(env, Code.eval(env, a)), type);
+          assertEquals(Code.eval(env, a), Code.eval(env, Code.simplify(a)));
+        } catch (ArithmeticException | GaveUp | NoSuchElementException ignored) {
+        }
+  }
+
+  @Test
+  public void simplify() {
+    assertEquals(Code.simplify(1), 1);
+    assertEquals(Code.simplify(call(Symbol.ADD, 1, 2)), 3);
   }
 }
