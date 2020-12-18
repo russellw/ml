@@ -197,7 +197,8 @@ public final class Code {
             accept(Symbol.BOOL, typeof(env, a1.get(2)));
             return Symbol.BOOL;
           case EQ:
-            combine(typeof(env, a1.get(1)), typeof(env, a1.get(2)));
+            typeof(env, a1.get(1));
+            typeof(env, a1.get(2));
             return Symbol.BOOL;
           case IF:
             accept(Symbol.BOOL, typeof(env, a1.get(1)));
