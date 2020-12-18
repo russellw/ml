@@ -10,6 +10,7 @@ import java.util.function.Function;
 public final class Code {
   private static Random random = new Random(0);
 
+  @SuppressWarnings("unchecked")
   public static Object rand(Seq env, Object type, int depth) {
     // random.nextInt() % n where n is a power of 2, avoids a divide instruction
     if (depth == 0 || random.nextInt() % 4 == 0) {
@@ -54,7 +55,15 @@ public final class Code {
       var o = symbols[random.nextInt(symbols.length)];
       switch (o) {
         case LAMBDA:
-          break;
+          {
+            if (!(type instanceof Seq)) break;
+            var type1 = (Seq) type;
+            if (type1.head() != Symbol.FUNCTION) break;
+            var paramType = type1.get(1);
+            var returnType = type1.get(2);
+            var body = rand(env.prepend(paramType), returnType, depth);
+            return Array.of(o, paramType, body);
+          }
         case NOT:
           if (!accepts(type, Symbol.BOOL)) break;
           return Array.of(o, rand(env, Symbol.BOOL, depth));
@@ -188,14 +197,17 @@ public final class Code {
             {
               var paramType = a1.get(1);
               var body = a1.get(2);
-              return Array.of(Symbol.FUNCTION, paramType, typeof(env.prepend(paramType), body));
+              var returnType = typeof(env.prepend(paramType), body);
+              return Array.of(Symbol.FUNCTION, paramType, returnType);
             }
           case ARG:
             return env.get((int) a1.get(1));
         }
       var functionType = (Seq) typeof(env, a1.head());
       if (functionType.head() != Symbol.FUNCTION) throw new TypeError(a.toString());
-      accept(functionType.get(1), typeof(env, a1.get(1)));
+      var paramType = functionType.get(1);
+      var argType = typeof(env, a1.get(1));
+      accept(paramType, argType);
       return functionType.get(2);
     }
     if (a instanceof Boolean) return Symbol.BOOL;
