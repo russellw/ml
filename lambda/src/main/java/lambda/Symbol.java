@@ -24,4 +24,5 @@ public enum Symbol {
   IF,
   FUNCTION,
   SYMBOL,
+  QUOTE,
 }

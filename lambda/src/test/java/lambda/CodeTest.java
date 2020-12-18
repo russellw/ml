@@ -23,7 +23,14 @@ public class CodeTest {
     assertEquals(Code.eval(env, Array.of(Symbol.REM, 10, (Object) 3)), 1);
     assertEquals(Code.eval(env, Array.of(Symbol.EQ, 10, 10)), true);
     assertEquals(Code.eval(env, Array.of(Symbol.EQ, 10, 11)), false);
-    assertEquals(Code.eval(env, Array.of(Symbol.EQ, List.empty(), Array.empty())), true);
+    assertEquals(
+        Code.eval(
+            env,
+            Array.of(
+                Symbol.EQ,
+                Array.of(Symbol.QUOTE, List.empty()),
+                Array.of(Symbol.QUOTE, Array.empty()))),
+        true);
     assertEquals(Code.eval(env, Array.of(Symbol.LT, 1, (Object) 1)), false);
     assertEquals(Code.eval(env, Array.of(Symbol.LT, 1, (Object) 2)), true);
     assertEquals(Code.eval(env, Array.of(Symbol.LT, 2, (Object) 1)), false);
@@ -40,11 +47,21 @@ public class CodeTest {
     assertEquals(Code.eval(env, Array.of(Symbol.OR, true, true)), true);
     assertEquals(Code.eval(env, Array.of(Symbol.NOT, false)), true);
     assertEquals(Code.eval(env, Array.of(Symbol.NOT, true)), false);
-    assertEquals(Code.eval(env, Array.of(Symbol.CONS, 1, List.empty())), Array.of(1));
-    assertEquals(Code.eval(env, Array.of(Symbol.CONS, 1, Array.empty())), List.of(1));
-    assertEquals(Code.eval(env, Array.of(Symbol.HEAD, Array.of(Symbol.CONS, 1, Array.empty()))), 1);
     assertEquals(
-        Code.eval(env, Array.of(Symbol.TAIL, Array.of(Symbol.CONS, 1, Array.empty()))),
+        Code.eval(env, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty()))),
+        Array.of(1));
+    assertEquals(
+        Code.eval(env, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, Array.empty()))),
+        List.of(1));
+    assertEquals(
+        Code.eval(
+            env,
+            Array.of(Symbol.HEAD, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty())))),
+        1);
+    assertEquals(
+        Code.eval(
+            env,
+            Array.of(Symbol.TAIL, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty())))),
         List.empty());
     assertEquals(Code.eval(env, Array.of(lambda(Symbol.INT, 1), 2)), 1);
     assertEquals(Code.eval(env, Array.of(lambda(Symbol.INT, Array.of(Symbol.ARG, 0)), 2)), 2);

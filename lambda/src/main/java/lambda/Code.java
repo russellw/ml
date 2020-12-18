@@ -24,7 +24,7 @@ public final class Code {
         leaves.add(1);
       }
       if (accepts(type, Symbol.LIST)) {
-        leaves.add(List.empty());
+        leaves.add(Array.of(Symbol.QUOTE, List.empty()));
       }
       // despite being lists rather than atoms, argument references count as leaves
       // because they do not contain subexpressions; the index is a constant
@@ -156,6 +156,15 @@ public final class Code {
       var o = a1.head();
       if (o instanceof Symbol)
         switch ((Symbol) o) {
+          case QUOTE:
+            {
+              var x = a1.get(1);
+              if (x instanceof Seq) return Symbol.LIST;
+              if (x instanceof Boolean) return Symbol.BOOL;
+              if (x instanceof Integer) return Symbol.INT;
+              if (x instanceof Symbol) return Symbol.SYMBOL;
+              throw new IllegalArgumentException(a.toString());
+            }
           case HEAD:
             accept(Symbol.LIST, typeof(env, a1.get(1)));
             return Symbol.OBJECT;
@@ -219,7 +228,6 @@ public final class Code {
   public static Object simplify(Seq<Variable> env, Object a) {
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
-    if (a1.isEmpty()) return a;
     var o = a1.head();
     if (o instanceof Symbol)
       switch ((Symbol) o) {
@@ -417,10 +425,11 @@ public final class Code {
   public static Object eval(Seq env, Object a) {
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
-    if (a1.isEmpty()) return a;
     var o = a1.head();
     if (o instanceof Symbol)
       switch ((Symbol) o) {
+        case QUOTE:
+          return a1.get(1);
         case IF:
           return (boolean) eval(env, a1.get(1)) ? eval(env, a1.get(2)) : eval(env, a1.get(3));
         case AND:
