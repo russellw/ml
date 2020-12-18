@@ -184,7 +184,6 @@ public final class Code {
           return a;
       }
     a1 = a1.map(Code::simplify);
-    if (a1.forAll(Code::constant)) return eval(List.empty(), a1);
     o = a1.head();
     if (o instanceof Symbol)
       switch ((Symbol) o) {
@@ -220,7 +219,8 @@ public final class Code {
           {
             var x = a1.get(1);
             var y = a1.get(2);
-            if (x.equals(y)) return true;
+            // if (x.equals(y)) return true;
+            // if(constant(x)&&constant(y))return false;
             break;
           }
       }
