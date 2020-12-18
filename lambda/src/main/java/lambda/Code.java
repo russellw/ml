@@ -33,8 +33,8 @@ public final class Code {
         if (accepts(type, argType)) leaves.add(Array.of(Symbol.ARG, i));
         i++;
       }
-      if (leaves.isEmpty()) throw new GaveUp(type.toString());
-      return leaves.get(random.nextInt(leaves.size()));
+      if (!leaves.isEmpty()) return leaves.get(random.nextInt(leaves.size()));
+      if (depth == 0) throw new GaveUp(type.toString());
     }
 
     // compound expression
@@ -221,15 +221,8 @@ public final class Code {
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
     if (a1.isEmpty()) return a;
-    var o = a1.head();
-    if (o instanceof Symbol)
-      switch ((Symbol) o) {
-        case LAMBDA:
-        case ARG:
-          return a;
-      }
     a1 = a1.map(Code::simplify);
-    o = a1.head();
+    var o = a1.head();
     if (o instanceof Symbol)
       switch ((Symbol) o) {
         case AND:

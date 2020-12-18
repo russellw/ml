@@ -87,7 +87,7 @@ public class CodeTest {
     var types = new Object[] {Symbol.BOOL, Symbol.INT};
     var env = List.empty();
     for (var type : types)
-      for (var i = 0; i < 1000; i++)
+      for (var i = 0; i < 10000; i++)
         try {
           var a = Code.rand(env, type, 4);
           assertEquals(Code.typeof(env, a), type);
