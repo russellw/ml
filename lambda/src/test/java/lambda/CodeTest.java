@@ -89,14 +89,17 @@ public class CodeTest {
     var types = new Object[] {Symbol.BOOL, Symbol.INT};
     var env = List.empty();
     for (var type : types)
-      for (var i = 0; i < 100; i++)
+      for (var i = 0; i < 100000; i++)
         try {
           var a = Code.rand(env, type, 4);
           assertEquals(Code.typeof(env, a), type);
           assertEquals(Code.typeof(env, Code.simplify(a)), type);
           assertEquals(Code.typeof(env, Code.eval(env, a)), type);
           assertEquals(Code.eval(env, a), Code.eval(env, Code.simplify(a)));
-        } catch (ArithmeticException | GaveUp | NoSuchElementException ignored) {
+        } catch (ArithmeticException
+            | GaveUp
+            | NoSuchElementException
+            | UnsupportedOperationException ignored) {
         }
   }
 

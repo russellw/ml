@@ -188,6 +188,34 @@ public final class Code {
     o = a1.head();
     if (o instanceof Symbol)
       switch ((Symbol) o) {
+        case AND:
+          {
+            var x = a1.get(1);
+            var y = a1.get(2);
+            if (x == Boolean.FALSE || y == Boolean.FALSE) return false;
+            if (x == Boolean.TRUE) return y;
+            if (y == Boolean.TRUE) return x;
+            break;
+          }
+        case OR:
+          {
+            var x = a1.get(1);
+            var y = a1.get(2);
+            if (x == Boolean.TRUE || y == Boolean.TRUE) return true;
+            if (x == Boolean.FALSE) return y;
+            if (y == Boolean.FALSE) return x;
+            break;
+          }
+        case IF:
+          {
+            var test = a1.get(1);
+            var x = a1.get(2);
+            var y = a1.get(3);
+            if (x.equals(y)) return x;
+            if (test == Boolean.TRUE) return x;
+            if (test == Boolean.FALSE) return y;
+            break;
+          }
         case EQ:
           {
             var x = a1.get(1);
