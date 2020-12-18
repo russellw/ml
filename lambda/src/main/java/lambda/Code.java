@@ -216,53 +216,82 @@ public final class Code {
     throw new IllegalArgumentException(a.toString());
   }
 
-  @SuppressWarnings("unchecked")
-  public static Object simplify(Object a) {
+  public static Object simplify(Seq<Variable> env, Object a) {
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
     if (a1.isEmpty()) return a;
-    a1 = a1.map(Code::simplify);
     var o = a1.head();
     if (o instanceof Symbol)
       switch ((Symbol) o) {
+        case ARG:
+          {
+            var i = (int) a1.get(1);
+            var value = env.get(i).value;
+            if (value == null) return a;
+            return value;
+          }
+        case LAMBDA:
+          {
+            var paramType = a1.get(1);
+            var body = simplify(env.prepend(new Variable(paramType)), a1.get(2));
+            return Array.of(o, paramType, body);
+          }
+        case ADD:
+          {
+            var x = simplify(env, a1.get(1));
+            var y = simplify(env, a1.get(2));
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (x1 == 0) return y;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 + y1;
+              }
+            }
+            if (y instanceof Integer) {
+              var y1 = (int) y;
+              if (y1 == 0) return x;
+            }
+            return Array.of(o, x, y);
+          }
         case AND:
           {
-            var x = a1.get(1);
-            var y = a1.get(2);
+            var x = simplify(env, a1.get(1));
+            var y = simplify(env, a1.get(2));
             if (x == Boolean.FALSE || y == Boolean.FALSE) return false;
             if (x == Boolean.TRUE) return y;
             if (y == Boolean.TRUE) return x;
-            break;
+            return Array.of(o, x, y);
           }
         case OR:
           {
-            var x = a1.get(1);
-            var y = a1.get(2);
+            var x = simplify(env, a1.get(1));
+            var y = simplify(env, a1.get(2));
             if (x == Boolean.TRUE || y == Boolean.TRUE) return true;
             if (x == Boolean.FALSE) return y;
             if (y == Boolean.FALSE) return x;
-            break;
+            return Array.of(o, x, y);
           }
         case IF:
           {
-            var test = a1.get(1);
-            var x = a1.get(2);
-            var y = a1.get(3);
+            var test = simplify(env, a1.get(1));
+            var x = simplify(env, a1.get(2));
+            var y = simplify(env, a1.get(3));
             if (x.equals(y)) return x;
             if (test == Boolean.TRUE) return x;
             if (test == Boolean.FALSE) return y;
-            break;
+            return Array.of(o, test, x, y);
           }
         case EQ:
           {
-            var x = a1.get(1);
-            var y = a1.get(2);
+            var x = simplify(env, a1.get(1));
+            var y = simplify(env, a1.get(2));
             // if (x.equals(y)) return true;
             // if(constant(x)&&constant(y))return false;
-            break;
+            return Array.of(o, x, y);
           }
       }
-    return a1;
+    return a;
   }
 
   private static boolean constant(Object a) {

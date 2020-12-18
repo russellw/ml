@@ -85,15 +85,15 @@ public class CodeTest {
   @Test
   public void rand() {
     var types = new Object[] {Symbol.BOOL, Symbol.INT};
-    var env = List.empty();
     for (var type : types)
       for (var i = 0; i < 10000; i++)
         try {
-          var a = Code.rand(env, type, 4);
-          assertEquals(Code.typeof(env, a), type);
-          assertEquals(Code.typeof(env, Code.simplify(a)), type);
-          assertEquals(Code.typeof(env, Code.eval(env, a)), type);
-          assertEquals(Code.eval(env, a), Code.eval(env, Code.simplify(a)));
+          var a = Code.rand(List.empty(), type, 4);
+          assertEquals(Code.typeof(List.empty(), a), type);
+          assertEquals(Code.typeof(List.empty(), Code.simplify(List.empty(), a)), type);
+          assertEquals(Code.typeof(List.empty(), Code.eval(List.empty(), a)), type);
+          assertEquals(
+              Code.eval(List.empty(), a), Code.eval(List.empty(), Code.simplify(List.empty(), a)));
         } catch (ArithmeticException
             | GaveUp
             | NoSuchElementException
@@ -105,8 +105,12 @@ public class CodeTest {
   public void simplify() {
     var x = Array.of(Symbol.ARG, 1);
     var y = Array.of(Symbol.ARG, 0);
-    assertEquals(Code.simplify(1), 1);
+    assertEquals(Code.simplify(List.empty(), 1), 1);
+    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.ADD, 1, 2)), 3);
     // assertEquals(Code.simplify(Array.of(Symbol.EQ, x, x)), true);
-    assertEquals(Code.simplify(Array.of(Symbol.EQ, x, y)), Array.of(Symbol.EQ, x, y));
+    assertEquals(
+        Code.simplify(
+            List.of(new Variable(Symbol.INT), new Variable(Symbol.INT)), Array.of(Symbol.EQ, x, y)),
+        Array.of(Symbol.EQ, x, y));
   }
 }
