@@ -153,5 +153,22 @@ public class CodeTest {
         Code.simplify(
             List.of(new Variable(Symbol.INT), new Variable(Symbol.INT)), Array.of(Symbol.EQ, x, y)),
         Array.of(Symbol.EQ, x, y));
+    assertEquals(
+        Code.simplify(List.empty(), Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty()))),
+        Code.quote(Array.of(1)));
+    assertEquals(
+        Code.simplify(
+            List.empty(), Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, Array.empty()))),
+        Code.quote(List.of(1)));
+    assertEquals(
+        Code.simplify(
+            List.empty(),
+            Array.of(Symbol.HEAD, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty())))),
+        1);
+    assertEquals(
+        Code.simplify(
+            List.empty(),
+            Array.of(Symbol.TAIL, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty())))),
+        Code.quote(List.empty()));
   }
 }

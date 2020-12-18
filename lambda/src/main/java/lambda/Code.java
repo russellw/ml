@@ -24,7 +24,7 @@ public final class Code {
         leaves.add(1);
       }
       if (accepts(type, Symbol.LIST)) {
-        leaves.add(Array.of(Symbol.QUOTE, List.empty()));
+        leaves.add(quote(List.empty()));
       }
       // despite being lists rather than atoms, argument references count as leaves
       // because they do not contain subexpressions; the index is a constant
@@ -225,12 +225,56 @@ public final class Code {
     throw new IllegalArgumentException(a.toString());
   }
 
+  private static Object unquote(Object a) {
+    if (!(a instanceof Seq)) return a;
+    var a1 = (Seq) a;
+    if (a1.head() == Symbol.QUOTE) return a1.get(1);
+    return null;
+  }
+
+  public static Object quote(Object a) {
+    if (a instanceof Seq) return Array.of(Symbol.QUOTE, a);
+    return a;
+  }
+
+  @SuppressWarnings("unchecked")
   public static Object simplify(Seq<Variable> env, Object a) {
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
     var o = a1.head();
     if (o instanceof Symbol)
       switch ((Symbol) o) {
+        case QUOTE:
+          return quote(a1.get(1));
+        case HEAD:
+          {
+            var x = (Seq) simplify(env, a1.get(1));
+            if (x.head() == Symbol.QUOTE) {
+              var x1 = (Seq) x.get(1);
+              return quote(x1.head());
+            }
+            return Array.of(o, x);
+          }
+        case TAIL:
+          {
+            var x = (Seq) simplify(env, a1.get(1));
+            if (x.head() == Symbol.QUOTE) {
+              var x1 = (Seq) x.get(1);
+              return quote(x1.tail());
+            }
+            return Array.of(o, x);
+          }
+        case CONS:
+          {
+            var x = simplify(env, a1.get(1));
+            var y = (Seq) simplify(env, a1.get(2));
+            var x1 = unquote(x);
+            if (x1 != null && y.head() == Symbol.QUOTE) {
+              var y1 = (Seq) y.get(1);
+              return quote(y1.prepend(x1));
+            }
+            return Array.of(o, x, y);
+          }
         case ARG:
           {
             var i = (int) a1.get(1);
@@ -414,11 +458,6 @@ public final class Code {
           }
       }
     return a;
-  }
-
-  private static boolean constant(Object a) {
-    if (a instanceof Seq) return ((Seq) a).isEmpty();
-    return true;
   }
 
   @SuppressWarnings("unchecked")
