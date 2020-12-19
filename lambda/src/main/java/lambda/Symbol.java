@@ -25,4 +25,5 @@ public enum Symbol {
   FUNCTION,
   SYMBOL,
   QUOTE,
+  CALL,
 }
