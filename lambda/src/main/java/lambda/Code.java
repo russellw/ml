@@ -348,6 +348,7 @@ public final class Code {
               var y1 = (int) y;
               if (y1 == 0) return x;
             }
+            if (x.equals(y)) return 0;
             return Array.of(o, x, y);
           }
         case DIV:
