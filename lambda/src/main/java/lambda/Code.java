@@ -231,10 +231,14 @@ public final class Code {
       return;
     }
     var a1 = (Seq) a;
-    print(a1.head());
+    if (a1.head() == Symbol.ARG) {
+      print(a1.head());
+      System.out.print(a1.get(1));
+      return;
+    }
     System.out.print('(');
-    for (var i = 1; i < a1.size(); i++) {
-      if (i > 1) System.out.print(',');
+    for (var i = 0; i < a1.size(); i++) {
+      if (i > 0) System.out.print(' ');
       print(a1.get(i));
     }
     System.out.print(')');
@@ -380,6 +384,7 @@ public final class Code {
             var y1 = (int) y;
             if (y1 == 1) return x;
           }
+          if (x.equals(y)) return 1;
           return Array.of(o, x, y);
         }
       case REM:
@@ -398,6 +403,7 @@ public final class Code {
             var y1 = (int) y;
             if (y1 == 1) return 0;
           }
+          if (x.equals(y)) return 0;
           return Array.of(o, x, y);
         }
       case MUL:
@@ -469,6 +475,8 @@ public final class Code {
           var y = simplify(env, a1.get(2));
           if (x.equals(y)) return true;
           if (unquote(x) != null && unquote(y) != null) return false;
+          if (x == Boolean.TRUE) return y;
+          if (y == Boolean.TRUE) return x;
           return Array.of(o, x, y);
         }
       case CALL:
