@@ -220,6 +220,26 @@ public final class Code {
     throw new IllegalArgumentException(a.toString());
   }
 
+  public static void println(Object a) {
+    print(a);
+    System.out.println();
+  }
+
+  public static void print(Object a) {
+    if (!(a instanceof Seq)) {
+      System.out.print(a);
+      return;
+    }
+    var a1 = (Seq) a;
+    print(a1.head());
+    System.out.print('(');
+    for (var i = 1; i < a1.size(); i++) {
+      if (i > 1) System.out.print(',');
+      print(a1.get(i));
+    }
+    System.out.print(')');
+  }
+
   private static Object unquote(Object a) {
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;

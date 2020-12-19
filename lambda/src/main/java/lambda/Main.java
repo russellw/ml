@@ -2,6 +2,7 @@ package lambda;
 
 import io.vavr.collection.Array;
 import io.vavr.collection.List;
+import io.vavr.collection.Seq;
 import java.util.NoSuchElementException;
 
 public class Main {
@@ -9,9 +10,10 @@ public class Main {
     for (var i = 0; i < 1000; i++)
       try {
         var a = Code.rand(List.empty(), Array.of(Symbol.FUNCTION, Symbol.INT, Symbol.BOOL), 4);
-        var b = Code.simplify(List.empty(), a);
-        System.out.println(a);
-        System.out.println(b);
+        var b = (Seq) Code.simplify(List.empty(), a);
+        if (!(b.get(2) instanceof Seq)) continue;
+        Code.println(a);
+        Code.println(b);
         System.out.println();
       } catch (ArithmeticException
           | GaveUp
