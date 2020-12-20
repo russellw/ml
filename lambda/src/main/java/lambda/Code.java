@@ -14,193 +14,298 @@ public final class Code {
       new Pattern[] {
         new Pattern(Symbol.ADD, 0, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.ADD, X, 0) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
+          }
+        },
+        new Pattern(Symbol.ADD, X, Y) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = map.get(X).get();
+            var y = map.get(Y).get();
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 + y1;
+              }
+            }
+            return null;
+          }
+        },
+        new Pattern(Symbol.SUB, X, Y) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = map.get(X).get();
+            var y = map.get(Y).get();
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 - y1;
+              }
+            }
+            return null;
+          }
+        },
+        new Pattern(Symbol.MUL, X, Y) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = map.get(X).get();
+            var y = map.get(Y).get();
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 * y1;
+              }
+            }
+            return null;
+          }
+        },
+        new Pattern(Symbol.DIV, X, Y) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = map.get(X).get();
+            var y = map.get(Y).get();
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 / y1;
+              }
+            }
+            return null;
+          }
+        },
+        new Pattern(Symbol.REM, X, Y) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = map.get(X).get();
+            var y = map.get(Y).get();
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 % y1;
+              }
+            }
+            return null;
+          }
+        },
+        new Pattern(Symbol.LT, X, Y) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = map.get(X).get();
+            var y = map.get(Y).get();
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 < y1;
+              }
+            }
+            return null;
+          }
+        },
+        new Pattern(Symbol.LE, X, Y) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = map.get(X).get();
+            var y = map.get(Y).get();
+            if (x instanceof Integer) {
+              var x1 = (int) x;
+              if (y instanceof Integer) {
+                var y1 = (int) y;
+                return x1 <= y1;
+              }
+            }
+            return null;
           }
         },
         new Pattern(Symbol.SUB, X, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return 0;
           }
         },
         new Pattern(Symbol.SUB, X, 0) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.MUL, 0, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return 0;
           }
         },
         new Pattern(Symbol.MUL, X, 0) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return 0;
           }
         },
         new Pattern(Symbol.MUL, 1, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.MUL, X, 1) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.DIV, 0, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return 0;
           }
         },
         new Pattern(Symbol.DIV, X, 1) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.DIV, X, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return 1;
           }
         },
         new Pattern(Symbol.REM, 0, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return 0;
           }
         },
         new Pattern(Symbol.REM, X, 1) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return 0;
           }
         },
         new Pattern(Symbol.REM, X, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return 0;
           }
         },
         new Pattern(Symbol.NOT, false) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return true;
           }
         },
         new Pattern(Symbol.NOT, true) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return false;
           }
         },
         new Pattern(Symbol.AND, X, false) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return false;
           }
         },
         new Pattern(Symbol.AND, false, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return false;
           }
         },
         new Pattern(Symbol.AND, X, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.AND, true, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.AND, X, true) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.OR, X, false) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.OR, false, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.OR, X, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.OR, true, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return true;
           }
         },
         new Pattern(Symbol.OR, X, true) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return true;
           }
         },
         new Pattern(Symbol.EQ, X, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return true;
           }
         },
         new Pattern(Symbol.LT, X, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return false;
           }
         },
         new Pattern(Symbol.LE, X, X) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return true;
           }
         },
         new Pattern(Symbol.IF, X, Y, Y) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return Y;
           }
         },
         new Pattern(Symbol.IF, true, X, Y) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return X;
           }
         },
         new Pattern(Symbol.IF, false, X, Y) {
           @Override
-          Object output() {
+          Object output(Map<Variable, Object> map) {
             return Y;
           }
         },
@@ -510,7 +615,7 @@ public final class Code {
     // Patterns
     for (; ; ) {
       var old = a;
-      for (var p : patterns) a = p.transform(a);
+      for (var p : patterns) a = p.transform(a, env);
       if (a.equals(old)) break;
     }
 
@@ -537,20 +642,6 @@ public final class Code {
       case CONS:
         assert y != null;
         return quote(((Seq) y).prepend(x));
-      case LT:
-        return (int) x < (int) y;
-      case LE:
-        return (int) x <= (int) y;
-      case ADD:
-        return (int) x + (int) y;
-      case SUB:
-        return (int) x - (int) y;
-      case DIV:
-        return (int) x / (int) y;
-      case REM:
-        return (int) x % (int) y;
-      case MUL:
-        return (int) x * (int) y;
       case EQ:
         // X=X evaluates to true
         // Therefore to have got this far:
@@ -559,7 +650,6 @@ public final class Code {
         // Therefore they must be actually unequal
         return false;
     }
-    // TODO: throw an exception here
     return a;
   }
 
