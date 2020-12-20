@@ -483,7 +483,7 @@ public final class Code {
       case LAMBDA:
         {
           var param = (Variable) a1.get(1);
-          var body = simplify(env.put(param, null), a1.get(2));
+          var body = simplify(env, a1.get(2));
           return Array.of(o, param, body);
         }
       case QUOTE:
