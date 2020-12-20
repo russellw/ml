@@ -28,105 +28,84 @@ public final class Code {
           @Override
           Object output(Map<Variable, Object> map) {
             var x = map.get(X).get();
+            if (!(x instanceof Integer)) return null;
+            var x1 = (int) x;
             var y = map.get(Y).get();
-            if (x instanceof Integer) {
-              var x1 = (int) x;
-              if (y instanceof Integer) {
-                var y1 = (int) y;
-                return x1 + y1;
-              }
-            }
-            return null;
+            if (!(y instanceof Integer)) return null;
+            var y1 = (int) y;
+            return x1 + y1;
           }
         },
         new Pattern(Symbol.SUB, X, Y) {
           @Override
           Object output(Map<Variable, Object> map) {
             var x = map.get(X).get();
+            if (!(x instanceof Integer)) return null;
+            var x1 = (int) x;
             var y = map.get(Y).get();
-            if (x instanceof Integer) {
-              var x1 = (int) x;
-              if (y instanceof Integer) {
-                var y1 = (int) y;
-                return x1 - y1;
-              }
-            }
-            return null;
+            if (!(y instanceof Integer)) return null;
+            var y1 = (int) y;
+            return x1 - y1;
           }
         },
         new Pattern(Symbol.MUL, X, Y) {
           @Override
           Object output(Map<Variable, Object> map) {
             var x = map.get(X).get();
+            if (!(x instanceof Integer)) return null;
+            var x1 = (int) x;
             var y = map.get(Y).get();
-            if (x instanceof Integer) {
-              var x1 = (int) x;
-              if (y instanceof Integer) {
-                var y1 = (int) y;
-                return x1 * y1;
-              }
-            }
-            return null;
+            if (!(y instanceof Integer)) return null;
+            var y1 = (int) y;
+            return x1 * y1;
           }
         },
         new Pattern(Symbol.DIV, X, Y) {
           @Override
           Object output(Map<Variable, Object> map) {
             var x = map.get(X).get();
+            if (!(x instanceof Integer)) return null;
+            var x1 = (int) x;
             var y = map.get(Y).get();
-            if (x instanceof Integer) {
-              var x1 = (int) x;
-              if (y instanceof Integer) {
-                var y1 = (int) y;
-                return x1 / y1;
-              }
-            }
-            return null;
+            if (!(y instanceof Integer)) return null;
+            var y1 = (int) y;
+            return x1 / y1;
           }
         },
         new Pattern(Symbol.REM, X, Y) {
           @Override
           Object output(Map<Variable, Object> map) {
             var x = map.get(X).get();
+            if (!(x instanceof Integer)) return null;
+            var x1 = (int) x;
             var y = map.get(Y).get();
-            if (x instanceof Integer) {
-              var x1 = (int) x;
-              if (y instanceof Integer) {
-                var y1 = (int) y;
-                return x1 % y1;
-              }
-            }
-            return null;
+            if (!(y instanceof Integer)) return null;
+            var y1 = (int) y;
+            return x1 % y1;
           }
         },
         new Pattern(Symbol.LT, X, Y) {
           @Override
           Object output(Map<Variable, Object> map) {
             var x = map.get(X).get();
+            if (!(x instanceof Integer)) return null;
+            var x1 = (int) x;
             var y = map.get(Y).get();
-            if (x instanceof Integer) {
-              var x1 = (int) x;
-              if (y instanceof Integer) {
-                var y1 = (int) y;
-                return x1 < y1;
-              }
-            }
-            return null;
+            if (!(y instanceof Integer)) return null;
+            var y1 = (int) y;
+            return x1 < y1;
           }
         },
         new Pattern(Symbol.LE, X, Y) {
           @Override
           Object output(Map<Variable, Object> map) {
             var x = map.get(X).get();
+            if (!(x instanceof Integer)) return null;
+            var x1 = (int) x;
             var y = map.get(Y).get();
-            if (x instanceof Integer) {
-              var x1 = (int) x;
-              if (y instanceof Integer) {
-                var y1 = (int) y;
-                return x1 <= y1;
-              }
-            }
-            return null;
+            if (!(y instanceof Integer)) return null;
+            var y1 = (int) y;
+            return x1 <= y1;
           }
         },
         new Pattern(Symbol.SUB, X, X) {
