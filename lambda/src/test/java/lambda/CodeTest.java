@@ -2,9 +2,7 @@ package lambda;
 
 import static org.junit.Assert.*;
 
-import io.vavr.collection.Array;
-import io.vavr.collection.List;
-import io.vavr.collection.Seq;
+import io.vavr.collection.*;
 import java.util.NoSuchElementException;
 import org.junit.Test;
 
@@ -116,5 +114,110 @@ public class CodeTest {
             List.empty(),
             Array.of(Symbol.TAIL, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty())))),
         Code.quote(List.empty()));
+  }
+
+  @Test
+  public void match() {
+    // Subset of unify; tests adapted from unification tests
+    // https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
+    // Gives different results in several cases
+    // In particular, has no notion of an occurs check
+    var a = "a";
+    var b = "b";
+    var f = "f";
+    var g = "g";
+    var x = new Variable(Symbol.INT);
+    var y = new Variable(Symbol.INT);
+    var z = new Variable(Symbol.INT);
+    Map<Variable, Object> map;
+
+    // Succeeds. (tautology)
+    map = Code.match(a, a, HashMap.empty());
+    assertNotNull(map);
+    assertEquals(map.size(), 0);
+
+    // a and b do not match
+    map = Code.match(a, b, HashMap.empty());
+    assertNull(map);
+
+    // Succeeds. (tautology)
+    map = Code.match(x, x, HashMap.empty());
+    assertNotNull(map);
+    assertEquals(map.size(), 0);
+
+    // x is unified with the constant a
+    map = Code.match(a, x, HashMap.empty());
+    assertNull(map);
+
+    // x and y are aliased
+    map = Code.match(x, y, HashMap.empty());
+    assertNotNull(map);
+    assertEquals(map.size(), 1);
+    assertEquals(Code.replace(x, map), Code.replace(y, map));
+
+    // function and constant symbols match, x is unified with the constant b
+    map =
+        Code.match(Array.of(Symbol.CALL, f, a, x), Array.of(Symbol.CALL, f, a, b), HashMap.empty());
+    assertNotNull(map);
+    assertEquals(map.size(), 1);
+    assertEquals(Code.replace(x, map), b);
+
+    // f and g do not match
+    map = Code.match(Array.of(Symbol.CALL, f, a), Array.of(Symbol.CALL, g, a), HashMap.empty());
+    assertNull(map);
+
+    // x and y are aliased
+    map = Code.match(Array.of(Symbol.CALL, f, x), Array.of(Symbol.CALL, f, y), HashMap.empty());
+    assertNotNull(map);
+    assertEquals(map.size(), 1);
+    assertEquals(Code.replace(x, map), Code.replace(y, map));
+
+    // f and g do not match
+    map = Code.match(Array.of(Symbol.CALL, f, x), Array.of(Symbol.CALL, g, y), HashMap.empty());
+    assertNull(map);
+
+    // Fails. The f function symbols have different arity
+    map = Code.match(Array.of(Symbol.CALL, f, x), Array.of(Symbol.CALL, f, y, z), HashMap.empty());
+    assertNull(map);
+
+    // Unifies y with the term g(x)
+    map =
+        Code.match(
+            Array.of(Symbol.CALL, f, Array.of(Symbol.CALL, g, x)),
+            Array.of(Symbol.CALL, f, y),
+            HashMap.empty());
+    assertNull(map);
+
+    // Unifies x with constant a, and y with the term g(a)
+    map =
+        Code.match(
+            Array.of(Symbol.CALL, f, Array.of(Symbol.CALL, g, x), x),
+            Array.of(Symbol.CALL, f, y, a),
+            HashMap.empty());
+    assertNull(map);
+
+    // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs
+    // check).
+    map = Code.match(x, Array.of(Symbol.CALL, f, x), HashMap.empty());
+    assertNotNull(map);
+    assertEquals(map.size(), 1);
+
+    // Both x and y are unified with the constant a
+    map = Code.match(x, y, HashMap.empty());
+    map = Code.match(y, a, map);
+    assertNotNull(map);
+    assertEquals(map.size(), 2);
+    assertEquals(Code.replace(x, map), a);
+    assertEquals(Code.replace(y, map), a);
+
+    // As above (order of equations in set doesn't matter)
+    map = Code.match(a, y, HashMap.empty());
+    assertNull(map);
+
+    // Fails. a and b do not match, so x can't be unified with both
+    map = Code.match(x, a, HashMap.empty());
+    assertNotNull(map);
+    map = Code.match(b, x, map);
+    assertNull(map);
   }
 }

@@ -2,6 +2,7 @@ package lambda;
 
 import io.vavr.collection.Array;
 import io.vavr.collection.List;
+import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import java.util.ArrayList;
 import java.util.Random;
@@ -25,7 +26,7 @@ public final class Code {
       if (accepts(type, Symbol.LIST)) {
         leaves.add(quote(List.empty()));
       }
-      // despite being lists rather than atoms, argument references count as leaves
+      // Despite being lists rather than atoms, argument references count as leaves
       // because they do not contain subexpressions; the index is a constant
       var i = 0;
       for (var argType : env) {
@@ -495,5 +496,44 @@ public final class Code {
         }
     }
     throw new IllegalArgumentException(a.toString());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Object replace(Object a, Map<Variable, Object> map) {
+    if (a instanceof Seq) {
+      var a1 = (Seq) a;
+      return a1.map(b -> replace(b, map));
+    }
+    if (a instanceof Variable) {
+      var a1 = (Variable) a;
+      var a2 = map.get(a1);
+      if (a2 != null) return replace(a2, map);
+    }
+    return a;
+  }
+
+  public static Map<Variable, Object> match(Object a, Object b, Map<Variable, Object> map) {
+    if (a == b) return map;
+    if (a instanceof Variable) {
+      var a1 = (Variable) a;
+      var a2 = map.get(a1);
+      if (a2 == null) return map.put(a1, b);
+      if (b.equals(a2)) return map;
+      return null;
+    }
+    if (a instanceof Seq) {
+      var a1 = (Seq) a;
+      if (b instanceof Seq) {
+        var b1 = (Seq) b;
+        var n = a1.size();
+        if (n != b1.size()) return null;
+        for (var i = 0; i < n; i++) {
+          map = match(a1.get(i), b1.get(i), map);
+          if (map == null) return null;
+        }
+      }
+    }
+    if (a.equals(b)) return map;
+    return null;
   }
 }
