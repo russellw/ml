@@ -621,6 +621,9 @@ public final class Code {
         {
           var x = a1.get(1);
           var y = a1.get(2);
+          // X=X evaluates to true
+          // Therefore to have got this far, arguments must be syntactically unequal
+          // Therefore if they are constants, they must be actually unequal
           if (unquote(x) != null && unquote(y) != null) return false;
           break;
         }
