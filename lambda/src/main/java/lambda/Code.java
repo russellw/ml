@@ -23,6 +23,18 @@ public final class Code {
             return X;
           }
         },
+        new Pattern(Symbol.NOT, false) {
+          @Override
+          Object output() {
+            return true;
+          }
+        },
+        new Pattern(Symbol.NOT, true) {
+          @Override
+          Object output() {
+            return false;
+          }
+        },
       };
   private static Random random = new Random(0);
 
@@ -497,13 +509,6 @@ public final class Code {
           if (y == Boolean.FALSE) return x;
           return Array.of(o, x, y);
         }
-      case NOT:
-        {
-          var x = simplify(env, a1.get(1));
-          if (x == Boolean.FALSE) return true;
-          if (x == Boolean.TRUE) return false;
-          return Array.of(o, x);
-        }
       case IF:
         {
           var test = simplify(env, a1.get(1));
@@ -539,7 +544,7 @@ public final class Code {
           return Array.of(o, f, x);
         }
     }
-    throw new IllegalArgumentException(a.toString());
+    return a;
   }
 
   @SuppressWarnings("unchecked")
