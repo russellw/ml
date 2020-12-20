@@ -24,6 +24,43 @@ public final class Code {
             return X;
           }
         },
+        new Pattern(Symbol.EQ, X, Y) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = unquote(map.get(X).get());
+            if (x == null) return null;
+            var y = unquote(map.get(Y).get());
+            if (y == null) return null;
+            return x.equals(y);
+          }
+        },
+        new Pattern(Symbol.CONS, X, Y) {
+          @Override
+          @SuppressWarnings("unchecked")
+          Object output(Map<Variable, Object> map) {
+            var x = unquote(map.get(X).get());
+            if (x == null) return null;
+            var y = unquote(map.get(Y).get());
+            if (y == null) return null;
+            return quote(((Seq) y).prepend(x));
+          }
+        },
+        new Pattern(Symbol.HEAD, X) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = unquote(map.get(X).get());
+            if (x == null) return null;
+            return quote(((Seq) x).head());
+          }
+        },
+        new Pattern(Symbol.TAIL, X) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = unquote(map.get(X).get());
+            if (x == null) return null;
+            return quote(((Seq) x).tail());
+          }
+        },
         new Pattern(Symbol.ADD, X, Y) {
           @Override
           Object output(Map<Variable, Object> map) {
@@ -595,41 +632,8 @@ public final class Code {
     for (; ; ) {
       var old = a;
       for (var p : patterns) a = p.transform(a, env);
-      if (a.equals(old)) break;
+      if (a.equals(old)) return a;
     }
-
-    // Constant
-    if (!(a instanceof Seq)) return a;
-
-    // Compound
-    a1 = (Seq) a;
-    o = (Symbol) a1.head();
-
-    // Evaluate if possible
-    var x = unquote(a1.get(1));
-    if (x == null) return a;
-    Object y = null;
-    if (a1.size() > 2) {
-      y = unquote(a1.get(2));
-      if (y == null) return a;
-    }
-    switch (o) {
-      case HEAD:
-        return quote(((Seq) x).head());
-      case TAIL:
-        return quote(((Seq) x).tail());
-      case CONS:
-        assert y != null;
-        return quote(((Seq) y).prepend(x));
-      case EQ:
-        // X=X evaluates to true
-        // Therefore to have got this far:
-        // Arguments must be syntactically unequal
-        // Arguments must be constants
-        // Therefore they must be actually unequal
-        return false;
-    }
-    return a;
   }
 
   @SuppressWarnings("unchecked")
