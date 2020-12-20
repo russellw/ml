@@ -404,20 +404,46 @@ public final class Code {
   }
 
   public static void println(Object a) {
-    print(a);
+    print(a, new java.util.HashMap<>());
     System.out.println();
   }
 
-  public static void print(Object a) {
+  private static String variableName(int i) {
+    if (i < 26) return Character.toString('A' + i);
+    return "Z" + (i - 25);
+  }
+
+  private static void print(Object a, java.util.Map<Variable, String> map) {
+    if (a instanceof Variable) {
+      var a1 = (Variable) a;
+      var name = map.get(a1);
+      if (name == null) {
+        name = variableName(map.size());
+        map.put(a1, name);
+      }
+      System.out.print(name);
+      return;
+    }
     if (!(a instanceof Seq)) {
       System.out.print(a);
       return;
     }
     var a1 = (Seq) a;
+    if (a1.head() == Symbol.LAMBDA) {
+      System.out.print('{');
+      var param = (Variable) a1.get(1);
+      print(param, map);
+      System.out.print(':');
+      print(param.type, map);
+      System.out.print(' ');
+      print(a1.get(2), map);
+      System.out.print('}');
+      return;
+    }
     System.out.print('(');
     for (var i = 0; i < a1.size(); i++) {
       if (i > 0) System.out.print(' ');
-      print(a1.get(i));
+      print(a1.get(i), map);
     }
     System.out.print(')');
   }
