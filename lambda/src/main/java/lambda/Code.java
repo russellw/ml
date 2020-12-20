@@ -506,7 +506,7 @@ public final class Code {
     }
     if (a instanceof Variable) {
       var a1 = (Variable) a;
-      var a2 = map.get(a1);
+      var a2 = map.getOrElse(a1, null);
       if (a2 != null) return replace(a2, map);
     }
     return a;
@@ -516,9 +516,9 @@ public final class Code {
     if (a == b) return map;
     if (a instanceof Variable) {
       var a1 = (Variable) a;
-      var a2 = map.get(a1);
+      var a2 = map.getOrElse(a1, null);
       if (a2 == null) return map.put(a1, b);
-      if (b.equals(a2)) return map;
+      if (a2.equals(b)) return map;
       return null;
     }
     if (a instanceof Seq) {
