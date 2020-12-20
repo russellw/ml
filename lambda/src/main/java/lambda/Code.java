@@ -1,17 +1,26 @@
 package lambda;
 
-import io.vavr.collection.Array;
-import io.vavr.collection.List;
-import io.vavr.collection.Map;
-import io.vavr.collection.Seq;
+import io.vavr.collection.*;
 import java.util.ArrayList;
 import java.util.Random;
 
 public final class Code {
+  private static Variable B = new Variable(null);
   private static Variable X = new Variable(null);
   private static Variable Y = new Variable(null);
   private static Pattern[] patterns =
       new Pattern[] {
+        new Pattern(Symbol.CALL, Array.of(Symbol.LAMBDA, X, B), Y) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var body = map.get(B).get();
+            var x = (Variable) map.get(X).get();
+            var y = map.get(Y).get();
+            var body1 = replace(body, HashMap.of(x, y));
+            if (size(body1) > size(body) + 4) return null;
+            return body1;
+          }
+        },
         new Pattern(Symbol.ADD, 0, X) {
           @Override
           Object output(Map<Variable, Object> map) {
@@ -599,25 +608,8 @@ public final class Code {
     var a1 = (Seq) a;
     var o = (Symbol) a1.head();
 
-    // Special forms
-    switch (o) {
-      case QUOTE:
-        return quote(a1.get(1));
-      case CALL:
-        {
-          var x = (Seq) a1.get(1);
-          var y = a1.get(2);
-          if (x.head() == Symbol.LAMBDA) {
-            var y1 = unquote(y);
-            if (y1 != null) {
-              var paramType = x.get(1);
-              var body = x.get(2);
-              // return simplify(env.prepend(new Variable(paramType, quote(y1))), body);
-            }
-          }
-          break;
-        }
-    }
+    // Special syntax
+    if (o == Symbol.QUOTE) return quote(a1.get(1));
 
     // Simplify subterms
     a = a1.map(b -> simplify(env, b));
@@ -668,5 +660,13 @@ public final class Code {
     }
     if (a.equals(b)) return map;
     return null;
+  }
+
+  private static int size(Object a) {
+    if (!(a instanceof Seq)) return 1;
+    var a1 = (Seq) a;
+    var n = 0;
+    for (var b : a1) n += size(b);
+    return n;
   }
 }
