@@ -8,43 +8,37 @@ import org.junit.Test;
 
 public class CodeTest {
   private static Object lambda(Object type, Object body) {
-    return Array.of(Symbol.LAMBDA, type, body);
+    return Array.of(Symbol.LAMBDA, new Variable(type), body);
   }
 
   @Test
   public void typeof() {
-    var env = List.empty();
-    assertEquals(Code.typeof(env, 1), Symbol.INT);
-    assertEquals(Code.typeof(env, true), Symbol.BOOL);
-    assertEquals(Code.typeof(env, Array.of(Symbol.ADD, 1, (Object) 2)), Symbol.INT);
-    assertEquals(Code.typeof(env, Array.of(Symbol.SUB, 1, (Object) 2)), Symbol.INT);
-    assertEquals(Code.typeof(env, Array.of(Symbol.MUL, 2, (Object) 3)), Symbol.INT);
-    assertEquals(Code.typeof(env, Array.of(Symbol.DIV, 10, (Object) 3)), Symbol.INT);
-    assertEquals(Code.typeof(env, Array.of(Symbol.REM, 10, (Object) 3)), Symbol.INT);
-    assertEquals(Code.typeof(env, Array.of(Symbol.EQ, 10, 10)), Symbol.BOOL);
-    assertEquals(Code.typeof(env, Array.of(Symbol.LT, 1, (Object) 1)), Symbol.BOOL);
-    assertEquals(Code.typeof(env, Array.of(Symbol.LE, 1, (Object) 1)), Symbol.BOOL);
-    assertEquals(Code.typeof(env, Array.of(Symbol.AND, false, false)), Symbol.BOOL);
-    assertEquals(Code.typeof(env, Array.of(Symbol.OR, false, false)), Symbol.BOOL);
-    assertEquals(Code.typeof(env, Array.of(Symbol.NOT, false)), Symbol.BOOL);
+    assertEquals(Code.typeof(1), Symbol.INT);
+    assertEquals(Code.typeof(true), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.ADD, 1, (Object) 2)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.SUB, 1, (Object) 2)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.MUL, 2, (Object) 3)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.DIV, 10, (Object) 3)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.REM, 10, (Object) 3)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.EQ, 10, 10)), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.LT, 1, (Object) 1)), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.LE, 1, (Object) 1)), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.AND, false, false)), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.OR, false, false)), Symbol.BOOL);
+    assertEquals(Code.typeof(Array.of(Symbol.NOT, false)), Symbol.BOOL);
     assertEquals(
-        Code.typeof(env, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty()))),
-        Symbol.LIST);
+        Code.typeof(Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty()))), Symbol.LIST);
     assertEquals(
         Code.typeof(
-            env,
             Array.of(Symbol.HEAD, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, Array.empty())))),
         Symbol.OBJECT);
     assertEquals(
         Code.typeof(
-            env,
             Array.of(Symbol.TAIL, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, Array.empty())))),
         Symbol.LIST);
-    assertEquals(Code.typeof(env, Array.of(Symbol.CALL, lambda(Symbol.INT, 1), 2)), Symbol.INT);
-    assertEquals(
-        Code.typeof(env, Array.of(Symbol.CALL, lambda(Symbol.INT, Array.of(Symbol.ARG, 0)), 2)),
-        Symbol.INT);
-    assertEquals(Code.typeof(env, Array.of(Symbol.IF, true, 1, 2)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.CALL, lambda(Symbol.INT, 1), 2)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.CALL, lambda(Symbol.INT, 3), 2)), Symbol.INT);
+    assertEquals(Code.typeof(Array.of(Symbol.IF, true, 1, 2)), Symbol.INT);
   }
 
   @Test
@@ -54,9 +48,9 @@ public class CodeTest {
       for (var i = 0; i < 10000; i++)
         try {
           var a = Code.rand(List.empty(), type, 4);
-          assertEquals(Code.typeof(List.empty(), a), type);
-          var b = Code.simplify(List.empty(), a);
-          assertEquals(Code.typeof(List.empty(), b), type);
+          assertEquals(Code.typeof(a), type);
+          var b = Code.simplify(HashMap.empty(), a);
+          assertEquals(Code.typeof(b), type);
           // assert !(b instanceof Seq);
         } catch (ArithmeticException
             | GaveUp
@@ -67,51 +61,50 @@ public class CodeTest {
 
   @Test
   public void simplify() {
-    var x = Array.of(Symbol.ARG, 1);
-    var y = Array.of(Symbol.ARG, 0);
-    assertEquals(Code.simplify(List.empty(), 1), 1);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.ADD, 1, 2)), 3);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.SUB, 1, (Object) 2)), -1);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.MUL, 2, (Object) 3)), 6);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.DIV, 10, (Object) 3)), 3);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.REM, 10, (Object) 3)), 1);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.EQ, 10, 10)), true);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.EQ, 10, 11)), false);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LT, 1, (Object) 1)), false);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LT, 1, (Object) 2)), true);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LT, 2, (Object) 1)), false);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LE, 1, (Object) 1)), true);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LE, 1, (Object) 2)), true);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.LE, 2, (Object) 1)), false);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.AND, false, false)), false);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.AND, false, true)), false);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.AND, true, false)), false);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.AND, true, true)), true);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.OR, false, false)), false);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.OR, false, true)), true);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.OR, true, false)), true);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.OR, true, true)), true);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.NOT, false)), true);
-    assertEquals(Code.simplify(List.empty(), Array.of(Symbol.NOT, true)), false);
+    var x = new Variable(Symbol.INT);
+    var y = new Variable(Symbol.INT);
+    assertEquals(Code.simplify(HashMap.empty(), 1), 1);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.ADD, 1, 2)), 3);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.SUB, 1, (Object) 2)), -1);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.MUL, 2, (Object) 3)), 6);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.DIV, 10, (Object) 3)), 3);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.REM, 10, (Object) 3)), 1);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.EQ, 10, 10)), true);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.EQ, 10, 11)), false);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.LT, 1, (Object) 1)), false);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.LT, 1, (Object) 2)), true);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.LT, 2, (Object) 1)), false);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.LE, 1, (Object) 1)), true);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.LE, 1, (Object) 2)), true);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.LE, 2, (Object) 1)), false);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.AND, false, false)), false);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.AND, false, true)), false);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.AND, true, false)), false);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.AND, true, true)), true);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.OR, false, false)), false);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.OR, false, true)), true);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.OR, true, false)), true);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.OR, true, true)), true);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.NOT, false)), true);
+    assertEquals(Code.simplify(HashMap.empty(), Array.of(Symbol.NOT, true)), false);
+    assertEquals(
+        Code.simplify(HashMap.empty(), Array.of(Symbol.EQ, x, y)), Array.of(Symbol.EQ, x, y));
     assertEquals(
         Code.simplify(
-            List.of(new Variable(Symbol.INT), new Variable(Symbol.INT)), Array.of(Symbol.EQ, x, y)),
-        Array.of(Symbol.EQ, x, y));
-    assertEquals(
-        Code.simplify(List.empty(), Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty()))),
+            HashMap.empty(), Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty()))),
         Code.quote(Array.of(1)));
     assertEquals(
         Code.simplify(
-            List.empty(), Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, Array.empty()))),
+            HashMap.empty(), Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, Array.empty()))),
         Code.quote(List.of(1)));
     assertEquals(
         Code.simplify(
-            List.empty(),
+            HashMap.empty(),
             Array.of(Symbol.HEAD, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty())))),
         1);
     assertEquals(
         Code.simplify(
-            List.empty(),
+            HashMap.empty(),
             Array.of(Symbol.TAIL, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty())))),
         Code.quote(List.empty()));
   }

@@ -207,8 +207,7 @@ public final class Code {
       };
   private static Random random = new Random(0);
 
-  @SuppressWarnings("unchecked")
-  public static Object rand(Seq env, Object type, int depth) {
+  public static Object rand(Seq<Variable> env, Object type, int depth) {
     // random.nextInt() % n where n is a power of 2, avoids a divide instruction
     if (depth == 0 || random.nextInt() % 4 == 0) {
       var leaves = new ArrayList<>();
@@ -223,13 +222,7 @@ public final class Code {
       if (accepts(type, Symbol.LIST)) {
         leaves.add(quote(List.empty()));
       }
-      // Despite being lists rather than atoms, argument references count as leaves
-      // because they do not contain subexpressions; the index is a constant
-      var i = 0;
-      for (var argType : env) {
-        if (accepts(type, argType)) leaves.add(Array.of(Symbol.ARG, i));
-        i++;
-      }
+      for (var x : env) if (accepts(type, x.type)) leaves.add(x);
       if (!leaves.isEmpty()) return leaves.get(random.nextInt(leaves.size()));
       if (depth == 0) throw new GaveUp(type.toString());
     }
@@ -241,7 +234,7 @@ public final class Code {
         case CALL:
           {
             var f = rand(env, Array.of(Symbol.FUNCTION, Symbol.OBJECT, type), depth);
-            var functionType = (Seq) typeof(env, f);
+            var functionType = (Seq) typeof(f);
             assert functionType.head() == Symbol.FUNCTION;
             var a = rand(env, functionType.get(1), depth);
             return Array.of(o, f, a);
@@ -251,10 +244,10 @@ public final class Code {
             if (!(type instanceof Seq)) break;
             var type1 = (Seq) type;
             if (type1.head() != Symbol.FUNCTION) break;
-            var paramType = type1.get(1);
+            var param = new Variable(type1.get(1));
             var returnType = type1.get(2);
-            var body = rand(env.prepend(paramType), returnType, depth);
-            return Array.of(o, paramType, body);
+            var body = rand(env.prepend(param), returnType, depth);
+            return Array.of(o, param, body);
           }
         case NOT:
           if (!accepts(type, Symbol.BOOL)) break;
@@ -287,14 +280,14 @@ public final class Code {
           {
             if (!accepts(type, Symbol.BOOL)) break;
             var a = rand(env, Symbol.OBJECT, depth);
-            var b = rand(env, typeof(env, a), depth);
+            var b = rand(env, typeof(a), depth);
             return Array.of(o, a, b);
           }
         case IF:
           {
             var test = rand(env, Symbol.BOOL, depth);
             var a = rand(env, type, depth);
-            var b = rand(env, typeof(env, a), depth);
+            var b = rand(env, typeof(a), depth);
             return Array.of(o, test, a, b);
           }
       }
@@ -340,81 +333,73 @@ public final class Code {
     throw new TypeError(t + " != " + u);
   }
 
-  @SuppressWarnings("unchecked")
-  public static Object typeof(Seq env, Object a) {
+  public static Object typeof(Object a) {
     if (a instanceof Seq) {
       var a1 = (Seq) a;
       switch ((Symbol) a1.head()) {
         case CALL:
           {
-            var functionType = (Seq) typeof(env, a1.get(1));
+            var functionType = (Seq) typeof(a1.get(1));
             if (functionType.head() != Symbol.FUNCTION) throw new TypeError(a.toString());
             var paramType = functionType.get(1);
-            var argType = typeof(env, a1.get(2));
+            var argType = typeof(a1.get(2));
             accept(paramType, argType);
             return functionType.get(2);
           }
         case QUOTE:
-          {
-            var x = a1.get(1);
-            if (x instanceof Seq) return Symbol.LIST;
-            if (x instanceof Boolean) return Symbol.BOOL;
-            if (x instanceof Integer) return Symbol.INT;
-            if (x instanceof Symbol) return Symbol.SYMBOL;
-            throw new IllegalArgumentException(a.toString());
-          }
+          a = a1.get(1);
+          if (a instanceof Seq) return Symbol.LIST;
+          break;
         case HEAD:
-          accept(Symbol.LIST, typeof(env, a1.get(1)));
+          accept(Symbol.LIST, typeof(a1.get(1)));
           return Symbol.OBJECT;
         case TAIL:
-          accept(Symbol.LIST, typeof(env, a1.get(1)));
+          accept(Symbol.LIST, typeof(a1.get(1)));
           return Symbol.LIST;
         case CONS:
-          accept(Symbol.OBJECT, typeof(env, a1.get(1)));
-          accept(Symbol.LIST, typeof(env, a1.get(2)));
+          accept(Symbol.OBJECT, typeof(a1.get(1)));
+          accept(Symbol.LIST, typeof(a1.get(2)));
           return Symbol.LIST;
         case LE:
         case LT:
-          accept(Symbol.INT, typeof(env, a1.get(1)));
-          accept(Symbol.INT, typeof(env, a1.get(2)));
+          accept(Symbol.INT, typeof(a1.get(1)));
+          accept(Symbol.INT, typeof(a1.get(2)));
           return Symbol.BOOL;
         case ADD:
         case SUB:
         case MUL:
         case DIV:
         case REM:
-          accept(Symbol.INT, typeof(env, a1.get(1)));
-          accept(Symbol.INT, typeof(env, a1.get(2)));
+          accept(Symbol.INT, typeof(a1.get(1)));
+          accept(Symbol.INT, typeof(a1.get(2)));
           return Symbol.INT;
         case NOT:
-          accept(Symbol.BOOL, typeof(env, a1.get(1)));
+          accept(Symbol.BOOL, typeof(a1.get(1)));
           return Symbol.BOOL;
         case AND:
         case OR:
-          accept(Symbol.BOOL, typeof(env, a1.get(1)));
-          accept(Symbol.BOOL, typeof(env, a1.get(2)));
+          accept(Symbol.BOOL, typeof(a1.get(1)));
+          accept(Symbol.BOOL, typeof(a1.get(2)));
           return Symbol.BOOL;
         case EQ:
-          typeof(env, a1.get(1));
-          typeof(env, a1.get(2));
+          typeof(a1.get(1));
+          typeof(a1.get(2));
           return Symbol.BOOL;
         case IF:
-          accept(Symbol.BOOL, typeof(env, a1.get(1)));
-          return combine(typeof(env, a1.get(2)), typeof(env, a1.get(3)));
+          accept(Symbol.BOOL, typeof(a1.get(1)));
+          return combine(typeof(a1.get(2)), typeof(a1.get(3)));
         case LAMBDA:
           {
-            var paramType = a1.get(1);
+            var param = (Variable) a1.get(1);
             var body = a1.get(2);
-            var returnType = typeof(env.prepend(paramType), body);
-            return Array.of(Symbol.FUNCTION, paramType, returnType);
+            return Array.of(Symbol.FUNCTION, param.type, typeof(body));
           }
-        case ARG:
-          return env.get((int) a1.get(1));
       }
     }
     if (a instanceof Boolean) return Symbol.BOOL;
     if (a instanceof Integer) return Symbol.INT;
     if (a instanceof Symbol) return Symbol.SYMBOL;
+    if (a instanceof Variable) return ((Variable) a).type;
     throw new IllegalArgumentException(a.toString());
   }
 
@@ -429,11 +414,6 @@ public final class Code {
       return;
     }
     var a1 = (Seq) a;
-    if (a1.head() == Symbol.ARG) {
-      print(a1.head());
-      System.out.print(a1.get(1));
-      return;
-    }
     System.out.print('(');
     for (var i = 0; i < a1.size(); i++) {
       if (i > 0) System.out.print(' ');
@@ -443,6 +423,7 @@ public final class Code {
   }
 
   private static Object unquote(Object a) {
+    if (a instanceof Variable) return null;
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
     if (a1.head() == Symbol.QUOTE) return a1.get(1);
@@ -455,25 +436,29 @@ public final class Code {
   }
 
   @SuppressWarnings("unchecked")
-  public static Object simplify(Seq<Variable> env, Object a) {
-    // Atom or compound?
+  public static Object simplify(Map<Variable, Object> env, Object a) {
+    // Variable
+    if (a instanceof Variable) {
+      var a1 = (Variable) a;
+      var r = env.getOrElse(a1, null);
+      if (r == null) return a;
+      return r;
+    }
+
+    // Constant
     if (!(a instanceof Seq)) return a;
+
+    // Compound
     var a1 = (Seq) a;
     var o = (Symbol) a1.head();
 
     // Special forms
     switch (o) {
-      case ARG:
-        {
-          var value = env.get((int) a1.get(1)).value;
-          if (value == null) return a;
-          return value;
-        }
       case LAMBDA:
         {
-          var paramType = a1.get(1);
-          var body = simplify(env.prepend(new Variable(paramType)), a1.get(2));
-          return Array.of(o, paramType, body);
+          var param = (Variable) a1.get(1);
+          var body = simplify(env.put(param, null), a1.get(2));
+          return Array.of(o, param, body);
         }
       case QUOTE:
         return quote(a1.get(1));
@@ -503,8 +488,10 @@ public final class Code {
       if (a.equals(old)) break;
     }
 
-    // Atom or compound?
+    // Constant
     if (!(a instanceof Seq)) return a;
+
+    // Compound
     a1 = (Seq) a;
     o = (Symbol) a1.head();
 

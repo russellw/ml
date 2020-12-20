@@ -20,7 +20,6 @@ public enum Symbol {
   LIST,
   OBJECT,
   LAMBDA,
-  ARG,
   IF,
   FUNCTION,
   SYMBOL,
