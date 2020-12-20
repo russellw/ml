@@ -8,6 +8,22 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public final class Code {
+  private static Variable X = new Variable(null);
+  private static Pattern[] patterns =
+      new Pattern[] {
+        new Pattern(Symbol.ADD, 0, X) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.ADD, X, 0) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+      };
   private static Random random = new Random(0);
 
   @SuppressWarnings("unchecked")
@@ -259,9 +275,34 @@ public final class Code {
 
   @SuppressWarnings("unchecked")
   public static Object simplify(Seq<Variable> env, Object a) {
+    // Atom or compound?
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
     var o = a1.head();
+
+    // Special form
+    if (o == Symbol.LAMBDA) {
+      var paramType = a1.get(1);
+      var body = simplify(env.prepend(new Variable(paramType)), a1.get(2));
+      return Array.of(o, paramType, body);
+    }
+
+    // Simplify subterms
+    a = a1.map(b -> simplify(env, b));
+
+    // Patterns
+    for (; ; ) {
+      var old = a;
+      for (var p : patterns) a = p.transform(a);
+      if (a.equals(old)) break;
+    }
+
+    // Atom or compound?
+    if (!(a instanceof Seq)) return a;
+    a1 = (Seq) a;
+    o = a1.head();
+
+    // Evaluate if possible
     switch ((Symbol) o) {
       case QUOTE:
         return quote(a1.get(1));
