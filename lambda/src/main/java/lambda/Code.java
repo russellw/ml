@@ -9,6 +9,7 @@ import java.util.Random;
 
 public final class Code {
   private static Variable X = new Variable(null);
+  private static Variable Y = new Variable(null);
   private static Pattern[] patterns =
       new Pattern[] {
         new Pattern(Symbol.ADD, 0, X) {
@@ -23,6 +24,78 @@ public final class Code {
             return X;
           }
         },
+        new Pattern(Symbol.SUB, X, X) {
+          @Override
+          Object output() {
+            return 0;
+          }
+        },
+        new Pattern(Symbol.SUB, X, 0) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.MUL, 0, X) {
+          @Override
+          Object output() {
+            return 0;
+          }
+        },
+        new Pattern(Symbol.MUL, X, 0) {
+          @Override
+          Object output() {
+            return 0;
+          }
+        },
+        new Pattern(Symbol.MUL, 1, X) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.MUL, X, 1) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.DIV, 0, X) {
+          @Override
+          Object output() {
+            return 0;
+          }
+        },
+        new Pattern(Symbol.DIV, X, 1) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.DIV, X, X) {
+          @Override
+          Object output() {
+            return 1;
+          }
+        },
+        new Pattern(Symbol.REM, 0, X) {
+          @Override
+          Object output() {
+            return 0;
+          }
+        },
+        new Pattern(Symbol.REM, X, 1) {
+          @Override
+          Object output() {
+            return 0;
+          }
+        },
+        new Pattern(Symbol.REM, X, X) {
+          @Override
+          Object output() {
+            return 0;
+          }
+        },
         new Pattern(Symbol.NOT, false) {
           @Override
           Object output() {
@@ -33,6 +106,114 @@ public final class Code {
           @Override
           Object output() {
             return false;
+          }
+        },
+        new Pattern(Symbol.AND, X, false) {
+          @Override
+          Object output() {
+            return false;
+          }
+        },
+        new Pattern(Symbol.AND, false, X) {
+          @Override
+          Object output() {
+            return false;
+          }
+        },
+        new Pattern(Symbol.AND, X, X) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.AND, true, X) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.AND, X, true) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.OR, X, false) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.OR, false, X) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.OR, X, X) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.OR, true, X) {
+          @Override
+          Object output() {
+            return true;
+          }
+        },
+        new Pattern(Symbol.OR, X, true) {
+          @Override
+          Object output() {
+            return true;
+          }
+        },
+        new Pattern(Symbol.EQ, X, X) {
+          @Override
+          Object output() {
+            return true;
+          }
+        },
+        new Pattern(Symbol.EQ, X, true) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.EQ, true, X) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.LT, X, X) {
+          @Override
+          Object output() {
+            return false;
+          }
+        },
+        new Pattern(Symbol.LE, X, X) {
+          @Override
+          Object output() {
+            return true;
+          }
+        },
+        new Pattern(Symbol.IF, X, Y, Y) {
+          @Override
+          Object output() {
+            return Y;
+          }
+        },
+        new Pattern(Symbol.IF, true, X, Y) {
+          @Override
+          Object output() {
+            return X;
+          }
+        },
+        new Pattern(Symbol.IF, false, X, Y) {
+          @Override
+          Object output() {
+            return Y;
           }
         },
       };
@@ -395,15 +576,10 @@ public final class Code {
           var y = simplify(env, a1.get(2));
           if (x instanceof Integer) {
             var x1 = (int) x;
-            if (x1 == 0) return y;
             if (y instanceof Integer) {
               var y1 = (int) y;
               return x1 + y1;
             }
-          }
-          if (y instanceof Integer) {
-            var y1 = (int) y;
-            if (y1 == 0) return x;
           }
           return Array.of(o, x, y);
         }
@@ -418,11 +594,6 @@ public final class Code {
               return x1 - y1;
             }
           }
-          if (y instanceof Integer) {
-            var y1 = (int) y;
-            if (y1 == 0) return x;
-          }
-          if (x.equals(y)) return 0;
           return Array.of(o, x, y);
         }
       case DIV:
@@ -431,17 +602,11 @@ public final class Code {
           var y = simplify(env, a1.get(2));
           if (x instanceof Integer) {
             var x1 = (int) x;
-            if (x1 == 0) return 0;
             if (y instanceof Integer) {
               var y1 = (int) y;
               return x1 / y1;
             }
           }
-          if (y instanceof Integer) {
-            var y1 = (int) y;
-            if (y1 == 1) return x;
-          }
-          if (x.equals(y)) return 1;
           return Array.of(o, x, y);
         }
       case REM:
@@ -450,17 +615,11 @@ public final class Code {
           var y = simplify(env, a1.get(2));
           if (x instanceof Integer) {
             var x1 = (int) x;
-            if (x1 == 0) return 0;
             if (y instanceof Integer) {
               var y1 = (int) y;
               return x1 % y1;
             }
           }
-          if (y instanceof Integer) {
-            var y1 = (int) y;
-            if (y1 == 1) return 0;
-          }
-          if (x.equals(y)) return 0;
           return Array.of(o, x, y);
         }
       case MUL:
@@ -469,64 +628,18 @@ public final class Code {
           var y = simplify(env, a1.get(2));
           if (x instanceof Integer) {
             var x1 = (int) x;
-            switch (x1) {
-              case 0:
-                return 0;
-              case 1:
-                return y;
-            }
             if (y instanceof Integer) {
               var y1 = (int) y;
               return x1 * y1;
             }
           }
-          if (y instanceof Integer) {
-            var y1 = (int) y;
-            switch (y1) {
-              case 0:
-                return 0;
-              case 1:
-                return x;
-            }
-          }
           return Array.of(o, x, y);
-        }
-      case AND:
-        {
-          var x = simplify(env, a1.get(1));
-          var y = simplify(env, a1.get(2));
-          if (x == Boolean.FALSE || y == Boolean.FALSE) return false;
-          if (x == Boolean.TRUE) return y;
-          if (y == Boolean.TRUE) return x;
-          return Array.of(o, x, y);
-        }
-      case OR:
-        {
-          var x = simplify(env, a1.get(1));
-          var y = simplify(env, a1.get(2));
-          if (x == Boolean.TRUE || y == Boolean.TRUE) return true;
-          if (x == Boolean.FALSE) return y;
-          if (y == Boolean.FALSE) return x;
-          return Array.of(o, x, y);
-        }
-      case IF:
-        {
-          var test = simplify(env, a1.get(1));
-          var x = simplify(env, a1.get(2));
-          var y = simplify(env, a1.get(3));
-          if (x.equals(y)) return x;
-          if (test == Boolean.TRUE) return x;
-          if (test == Boolean.FALSE) return y;
-          return Array.of(o, test, x, y);
         }
       case EQ:
         {
           var x = simplify(env, a1.get(1));
           var y = simplify(env, a1.get(2));
-          if (x.equals(y)) return true;
           if (unquote(x) != null && unquote(y) != null) return false;
-          if (x == Boolean.TRUE) return y;
-          if (y == Boolean.TRUE) return x;
           return Array.of(o, x, y);
         }
       case CALL:
