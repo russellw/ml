@@ -531,6 +531,7 @@ public final class Code {
           map = match(a1.get(i), b1.get(i), map);
           if (map == null) return null;
         }
+        return map;
       }
     }
     if (a.equals(b)) return map;
