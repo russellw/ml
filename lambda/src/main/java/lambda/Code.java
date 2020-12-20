@@ -278,13 +278,18 @@ public final class Code {
     // Atom or compound?
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
-    var o = a1.head();
+    var o = (Symbol) a1.head();
 
-    // Special form
-    if (o == Symbol.LAMBDA) {
-      var paramType = a1.get(1);
-      var body = simplify(env.prepend(new Variable(paramType)), a1.get(2));
-      return Array.of(o, paramType, body);
+    // Special forms
+    switch (o) {
+      case LAMBDA:
+        {
+          var paramType = a1.get(1);
+          var body = simplify(env.prepend(new Variable(paramType)), a1.get(2));
+          return Array.of(o, paramType, body);
+        }
+      case QUOTE:
+        return quote(a1.get(1));
     }
 
     // Simplify subterms
@@ -300,12 +305,10 @@ public final class Code {
     // Atom or compound?
     if (!(a instanceof Seq)) return a;
     a1 = (Seq) a;
-    o = a1.head();
+    o = (Symbol) a1.head();
 
     // Evaluate if possible
-    switch ((Symbol) o) {
-      case QUOTE:
-        return quote(a1.get(1));
+    switch (o) {
       case HEAD:
         {
           var x = (Seq) simplify(env, a1.get(1));
