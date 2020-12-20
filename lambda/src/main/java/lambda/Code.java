@@ -559,17 +559,23 @@ public final class Code {
       return;
     }
     var a1 = (Seq) a;
-    if (a1.head() == Symbol.LAMBDA) {
-      System.out.print('{');
-      var param = (Variable) a1.get(1);
-      print(param, map);
-      System.out.print(':');
-      print(param.type, map);
-      System.out.print(' ');
-      print(a1.get(2), map);
-      System.out.print('}');
-      return;
-    }
+    if (!a1.isEmpty())
+      switch ((Symbol) a1.head()) {
+        case LAMBDA:
+          System.out.print('{');
+          var param = (Variable) a1.get(1);
+          print(param, map);
+          System.out.print(':');
+          print(param.type, map);
+          System.out.print(' ');
+          print(a1.get(2), map);
+          System.out.print('}');
+          return;
+        case QUOTE:
+          System.out.print('\'');
+          print(a1.get(1), map);
+          return;
+      }
     System.out.print('(');
     for (var i = 0; i < a1.size(); i++) {
       if (i > 0) System.out.print(' ');
