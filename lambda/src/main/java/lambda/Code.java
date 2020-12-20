@@ -478,6 +478,20 @@ public final class Code {
         }
       case QUOTE:
         return quote(a1.get(1));
+      case CALL:
+        {
+          var x = (Seq) a1.get(1);
+          var y = a1.get(2);
+          if (x.head() == Symbol.LAMBDA) {
+            var y1 = unquote(y);
+            if (y1 != null) {
+              var paramType = x.get(1);
+              var body = x.get(2);
+              // return simplify(env.prepend(new Variable(paramType, quote(y1))), body);
+            }
+          }
+          break;
+        }
     }
 
     // Simplify subterms
@@ -496,151 +510,42 @@ public final class Code {
     o = (Symbol) a1.head();
 
     // Evaluate if possible
+    var x = unquote(a1.get(1));
+    if (x == null) return a;
+    Object y = null;
+    if (a1.size() > 2) {
+      y = unquote(a1.get(2));
+      if (y == null) return a;
+    }
     switch (o) {
       case HEAD:
-        {
-          var x = (Seq) a1.get(1);
-          if (x.head() == Symbol.QUOTE) {
-            var x1 = (Seq) x.get(1);
-            return quote(x1.head());
-          }
-          break;
-        }
+        return quote(((Seq) x).head());
       case TAIL:
-        {
-          var x = (Seq) a1.get(1);
-          if (x.head() == Symbol.QUOTE) {
-            var x1 = (Seq) x.get(1);
-            return quote(x1.tail());
-          }
-          break;
-        }
+        return quote(((Seq) x).tail());
       case CONS:
-        {
-          var x = a1.get(1);
-          var y = (Seq) a1.get(2);
-          var x1 = unquote(x);
-          if (x1 != null && y.head() == Symbol.QUOTE) {
-            var y1 = (Seq) y.get(1);
-            return quote(y1.prepend(x1));
-          }
-          break;
-        }
+        assert y != null;
+        return quote(((Seq) y).prepend(x));
       case LT:
-        {
-          var x = a1.get(1);
-          var y = a1.get(2);
-          if (x instanceof Integer) {
-            var x1 = (int) x;
-            if (y instanceof Integer) {
-              var y1 = (int) y;
-              return x1 < y1;
-            }
-          }
-          break;
-        }
+        return (int) x < (int) y;
       case LE:
-        {
-          var x = a1.get(1);
-          var y = a1.get(2);
-          if (x instanceof Integer) {
-            var x1 = (int) x;
-            if (y instanceof Integer) {
-              var y1 = (int) y;
-              return x1 <= y1;
-            }
-          }
-          break;
-        }
+        return (int) x <= (int) y;
       case ADD:
-        {
-          var x = a1.get(1);
-          var y = a1.get(2);
-          if (x instanceof Integer) {
-            var x1 = (int) x;
-            if (y instanceof Integer) {
-              var y1 = (int) y;
-              return x1 + y1;
-            }
-          }
-          break;
-        }
+        return (int) x + (int) y;
       case SUB:
-        {
-          var x = a1.get(1);
-          var y = a1.get(2);
-          if (x instanceof Integer) {
-            var x1 = (int) x;
-            if (y instanceof Integer) {
-              var y1 = (int) y;
-              return x1 - y1;
-            }
-          }
-          break;
-        }
+        return (int) x - (int) y;
       case DIV:
-        {
-          var x = a1.get(1);
-          var y = a1.get(2);
-          if (x instanceof Integer) {
-            var x1 = (int) x;
-            if (y instanceof Integer) {
-              var y1 = (int) y;
-              return x1 / y1;
-            }
-          }
-          break;
-        }
+        return (int) x / (int) y;
       case REM:
-        {
-          var x = a1.get(1);
-          var y = a1.get(2);
-          if (x instanceof Integer) {
-            var x1 = (int) x;
-            if (y instanceof Integer) {
-              var y1 = (int) y;
-              return x1 % y1;
-            }
-          }
-          break;
-        }
+        return (int) x % (int) y;
       case MUL:
-        {
-          var x = a1.get(1);
-          var y = a1.get(2);
-          if (x instanceof Integer) {
-            var x1 = (int) x;
-            if (y instanceof Integer) {
-              var y1 = (int) y;
-              return x1 * y1;
-            }
-          }
-          break;
-        }
+        return (int) x * (int) y;
       case EQ:
-        {
-          var x = a1.get(1);
-          var y = a1.get(2);
-          // X=X evaluates to true
-          // Therefore to have got this far, arguments must be syntactically unequal
-          // Therefore if they are constants, they must be actually unequal
-          if (unquote(x) != null && unquote(y) != null) return false;
-          break;
-        }
-      case CALL:
-        {
-          var f = (Seq) a1.get(1);
-          var x = a1.get(2);
-          if (f.head() == Symbol.LAMBDA) {
-            var x1 = unquote(x);
-            if (x1 != null) {
-              var paramType = f.get(1);
-              var body = f.get(2);
-              // return simplify(env.prepend(new Variable(paramType, quote(x1))), body);
-            }
-          }
-          return Array.of(o, f, x);
-        }
+        // X=X evaluates to true
+        // Therefore to have got this far:
+        // Arguments must be syntactically unequal
+        // Arguments must be constants
+        // Therefore they must be actually unequal
+        return false;
     }
     return a;
   }
