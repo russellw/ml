@@ -463,6 +463,13 @@ public final class Code {
 
     // Special forms
     switch (o) {
+      case ARG:
+      {
+        var i = (int) a1.get(1);
+        var value = env.get(i).value;
+        if (value == null) return a;
+        return value;
+      }
       case LAMBDA:
         {
           var paramType = a1.get(1);
@@ -518,19 +525,6 @@ public final class Code {
             return quote(y1.prepend(x1));
           }
           return Array.of(o, x, y);
-        }
-      case ARG:
-        {
-          var i = (int) a1.get(1);
-          var value = env.get(i).value;
-          if (value == null) return a;
-          return value;
-        }
-      case LAMBDA:
-        {
-          var paramType = a1.get(1);
-          var body = simplify(env.prepend(new Variable(paramType)), a1.get(2));
-          return Array.of(o, paramType, body);
         }
       case LT:
         {
