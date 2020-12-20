@@ -174,18 +174,6 @@ public final class Code {
             return true;
           }
         },
-        new Pattern(Symbol.EQ, X, true) {
-          @Override
-          Object output() {
-            return X;
-          }
-        },
-        new Pattern(Symbol.EQ, true, X) {
-          @Override
-          Object output() {
-            return X;
-          }
-        },
         new Pattern(Symbol.LT, X, X) {
           @Override
           Object output() {
