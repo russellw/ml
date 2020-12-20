@@ -533,7 +533,7 @@ public final class Code {
             if (x1 != null) {
               var paramType = f.get(1);
               var body = f.get(2);
-              return simplify(env.prepend(new Variable(paramType, quote(x1))), body);
+              // return simplify(env.prepend(new Variable(paramType, quote(x1))), body);
             }
           }
           return Array.of(o, f, x);

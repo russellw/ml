@@ -57,7 +57,7 @@ public class CodeTest {
           assertEquals(Code.typeof(List.empty(), a), type);
           var b = Code.simplify(List.empty(), a);
           assertEquals(Code.typeof(List.empty(), b), type);
-          assert !(b instanceof Seq);
+          // assert !(b instanceof Seq);
         } catch (ArithmeticException
             | GaveUp
             | NoSuchElementException
