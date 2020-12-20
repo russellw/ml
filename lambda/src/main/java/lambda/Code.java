@@ -465,8 +465,7 @@ public final class Code {
     switch (o) {
       case ARG:
         {
-          var i = (int) a1.get(1);
-          var value = env.get(i).value;
+          var value = env.get((int) a1.get(1)).value;
           if (value == null) return a;
           return value;
         }
@@ -547,6 +546,7 @@ public final class Code {
         // Therefore they must be actually unequal
         return false;
     }
+    // TODO: throw an exception here
     return a;
   }
 
