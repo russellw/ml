@@ -464,12 +464,12 @@ public final class Code {
     // Special forms
     switch (o) {
       case ARG:
-      {
-        var i = (int) a1.get(1);
-        var value = env.get(i).value;
-        if (value == null) return a;
-        return value;
-      }
+        {
+          var i = (int) a1.get(1);
+          var value = env.get(i).value;
+          if (value == null) return a;
+          return value;
+        }
       case LAMBDA:
         {
           var paramType = a1.get(1);
@@ -499,37 +499,37 @@ public final class Code {
     switch (o) {
       case HEAD:
         {
-          var x = (Seq) simplify(env, a1.get(1));
+          var x = (Seq) a1.get(1);
           if (x.head() == Symbol.QUOTE) {
             var x1 = (Seq) x.get(1);
             return quote(x1.head());
           }
-          return Array.of(o, x);
+          break;
         }
       case TAIL:
         {
-          var x = (Seq) simplify(env, a1.get(1));
+          var x = (Seq) a1.get(1);
           if (x.head() == Symbol.QUOTE) {
             var x1 = (Seq) x.get(1);
             return quote(x1.tail());
           }
-          return Array.of(o, x);
+          break;
         }
       case CONS:
         {
-          var x = simplify(env, a1.get(1));
-          var y = (Seq) simplify(env, a1.get(2));
+          var x = a1.get(1);
+          var y = (Seq) a1.get(2);
           var x1 = unquote(x);
           if (x1 != null && y.head() == Symbol.QUOTE) {
             var y1 = (Seq) y.get(1);
             return quote(y1.prepend(x1));
           }
-          return Array.of(o, x, y);
+          break;
         }
       case LT:
         {
-          var x = simplify(env, a1.get(1));
-          var y = simplify(env, a1.get(2));
+          var x = a1.get(1);
+          var y = a1.get(2);
           if (x instanceof Integer) {
             var x1 = (int) x;
             if (y instanceof Integer) {
@@ -537,12 +537,12 @@ public final class Code {
               return x1 < y1;
             }
           }
-          return Array.of(o, x, y);
+          break;
         }
       case LE:
         {
-          var x = simplify(env, a1.get(1));
-          var y = simplify(env, a1.get(2));
+          var x = a1.get(1);
+          var y = a1.get(2);
           if (x instanceof Integer) {
             var x1 = (int) x;
             if (y instanceof Integer) {
@@ -550,12 +550,12 @@ public final class Code {
               return x1 <= y1;
             }
           }
-          return Array.of(o, x, y);
+          break;
         }
       case ADD:
         {
-          var x = simplify(env, a1.get(1));
-          var y = simplify(env, a1.get(2));
+          var x = a1.get(1);
+          var y = a1.get(2);
           if (x instanceof Integer) {
             var x1 = (int) x;
             if (y instanceof Integer) {
@@ -563,12 +563,12 @@ public final class Code {
               return x1 + y1;
             }
           }
-          return Array.of(o, x, y);
+          break;
         }
       case SUB:
         {
-          var x = simplify(env, a1.get(1));
-          var y = simplify(env, a1.get(2));
+          var x = a1.get(1);
+          var y = a1.get(2);
           if (x instanceof Integer) {
             var x1 = (int) x;
             if (y instanceof Integer) {
@@ -576,12 +576,12 @@ public final class Code {
               return x1 - y1;
             }
           }
-          return Array.of(o, x, y);
+          break;
         }
       case DIV:
         {
-          var x = simplify(env, a1.get(1));
-          var y = simplify(env, a1.get(2));
+          var x = a1.get(1);
+          var y = a1.get(2);
           if (x instanceof Integer) {
             var x1 = (int) x;
             if (y instanceof Integer) {
@@ -589,12 +589,12 @@ public final class Code {
               return x1 / y1;
             }
           }
-          return Array.of(o, x, y);
+          break;
         }
       case REM:
         {
-          var x = simplify(env, a1.get(1));
-          var y = simplify(env, a1.get(2));
+          var x = a1.get(1);
+          var y = a1.get(2);
           if (x instanceof Integer) {
             var x1 = (int) x;
             if (y instanceof Integer) {
@@ -602,12 +602,12 @@ public final class Code {
               return x1 % y1;
             }
           }
-          return Array.of(o, x, y);
+          break;
         }
       case MUL:
         {
-          var x = simplify(env, a1.get(1));
-          var y = simplify(env, a1.get(2));
+          var x = a1.get(1);
+          var y = a1.get(2);
           if (x instanceof Integer) {
             var x1 = (int) x;
             if (y instanceof Integer) {
@@ -615,19 +615,19 @@ public final class Code {
               return x1 * y1;
             }
           }
-          return Array.of(o, x, y);
+          break;
         }
       case EQ:
         {
-          var x = simplify(env, a1.get(1));
-          var y = simplify(env, a1.get(2));
+          var x = a1.get(1);
+          var y = a1.get(2);
           if (unquote(x) != null && unquote(y) != null) return false;
-          return Array.of(o, x, y);
+          break;
         }
       case CALL:
         {
-          var f = (Seq) simplify(env, a1.get(1));
-          var x = simplify(env, a1.get(2));
+          var f = (Seq) a1.get(1);
+          var x = a1.get(2);
           if (f.head() == Symbol.LAMBDA) {
             var x1 = unquote(x);
             if (x1 != null) {
