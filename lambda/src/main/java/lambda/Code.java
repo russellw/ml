@@ -601,12 +601,6 @@ public final class Code {
 
     // Special forms
     switch (o) {
-      case LAMBDA:
-        {
-          var param = (Variable) a1.get(1);
-          var body = simplify(env, a1.get(2));
-          return Array.of(o, param, body);
-        }
       case QUOTE:
         return quote(a1.get(1));
       case CALL:
