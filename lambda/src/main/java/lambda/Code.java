@@ -389,8 +389,10 @@ public final class Code {
 
   public static Object rand(Seq<Variable> variables, Object type, int depth) {
     // random.nextInt() % n where n is a power of 2, avoids a divide instruction
-    if (depth == 0 || random.nextInt() % 4 == 0) {
+    if (depth == 0 || random.nextInt() % 16 == 0) {
       var leaves = new ArrayList<>();
+
+      // Constants are leaves
       if (accepts(type, Symbol.BOOL)) {
         leaves.add(false);
         leaves.add(true);
@@ -402,9 +404,24 @@ public final class Code {
       if (accepts(type, Symbol.LIST)) {
         leaves.add(quote(List.empty()));
       }
+
+      // Variables are leaves
       for (var x : variables) if (accepts(type, x.type)) leaves.add(x);
-      if (!leaves.isEmpty()) return leaves.get(random.nextInt(leaves.size()));
-      if (depth == 0) throw new GaveUp(type.toString());
+
+      // Functions are leaves, but only if specifically looking for a function
+      // to avoid an infinite loop
+      if (type instanceof Seq) {
+        var type1 = (Seq) type;
+        if (type1.head() == Symbol.FUNCTION) {
+          var paramType = type1.get(1);
+          var returnType = type1.get(2);
+          var param = new Variable(paramType);
+          var body = rand(variables.prepend(param), returnType, 0);
+          leaves.add(Array.of(Symbol.LAMBDA, param, body));
+        }
+      }
+      assert !leaves.isEmpty();
+      return leaves.get(random.nextInt(leaves.size()));
     }
     depth--;
     for (var i = 0; i < 1000; i++) {
@@ -416,7 +433,8 @@ public final class Code {
             var f = rand(variables, Array.of(Symbol.FUNCTION, Symbol.OBJECT, type), depth);
             var functionType = (Seq) typeof(f);
             assert functionType.head() == Symbol.FUNCTION;
-            var a = rand(variables, functionType.get(1), depth);
+            var paramType = functionType.get(1);
+            var a = rand(variables, paramType, depth);
             return Array.of(o, f, a);
           }
         case LAMBDA:
