@@ -627,7 +627,7 @@ public final class Code {
           return;
         case QUOTE:
           System.out.print('\'');
-          print(map, a1.get(1));
+          System.out.print(a1.get(1));
           return;
       }
     System.out.print('(');

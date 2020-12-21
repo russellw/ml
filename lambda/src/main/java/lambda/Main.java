@@ -14,7 +14,7 @@ public class Main {
     while (specs.size() < 20) {
       i++;
       try {
-        var a = Code.rand(List.empty(), Array.of(Symbol.FUNCTION, Symbol.INT, Symbol.BOOL), 5);
+        var a = Code.rand(List.empty(), Array.of(Symbol.FUNCTION, Symbol.OBJECT, Symbol.OBJECT), 5);
         var b = (Seq) Code.simplify(HashMap.empty(), a);
         if (!(b.get(2) instanceof Seq)) continue;
         Code.simplify(HashMap.empty(), Array.of(Symbol.CALL, b, 0));
