@@ -1,7 +1,6 @@
 package lambda;
 
 import io.vavr.collection.Array;
-import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 
 public abstract class Pattern {
@@ -13,11 +12,9 @@ public abstract class Pattern {
   }
 
   public Object transform(Object a, Map<Variable, Object> map) {
-    map = Code.match(input, a, HashMap.empty());
-    if (map == null) return a;
-    var r = Code.replace(output(map), map);
-    if (r == null) return a;
-    return r;
+    map = Code.match(input, a, map);
+    if (map == null) return null;
+    return Code.replace(output(map), map);
   }
 
   abstract Object output(Map<Variable, Object> map);

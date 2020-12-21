@@ -16,7 +16,7 @@ public final class Code {
             var body = map.get(B).get();
             var x = (Variable) map.get(X).get();
             var y = map.get(Y).get();
-            var body1 = replace(body, HashMap.of(x, y));
+            var body1 = simplify(map, replace(body, HashMap.of(x, y)));
             if (size(body1) > size(body) + 4) return null;
             return body1;
           }
@@ -599,32 +599,38 @@ public final class Code {
 
   @SuppressWarnings("unchecked")
   public static Object simplify(Map<Variable, Object> env, Object a) {
-    // Variable
-    if (a instanceof Variable) {
-      var a1 = (Variable) a;
-      var r = env.getOrElse(a1, null);
-      if (r == null) return a;
-      return r;
-    }
-
-    // Constant
-    if (!(a instanceof Seq)) return a;
-
-    // Compound
-    var a1 = (Seq) a;
-    var o = (Symbol) a1.head();
-
-    // Special syntax
-    if (o == Symbol.QUOTE) return quote(a1.get(1));
-
-    // Simplify subterms
-    a = a1.map(b -> simplify(env, b));
-
-    // Patterns
+    simplify:
     for (; ; ) {
-      var old = a;
-      for (var p : patterns) a = p.transform(a, env);
-      if (a.equals(old)) return a;
+      // Variable
+      if (a instanceof Variable) {
+        var a1 = (Variable) a;
+        var r = env.getOrElse(a1, null);
+        if (r == null) return a;
+        return r;
+      }
+
+      // Constant
+      if (!(a instanceof Seq)) return a;
+
+      // Compound
+      var a1 = (Seq) a;
+      var o = (Symbol) a1.head();
+
+      // Special syntax
+      if (o == Symbol.QUOTE) return quote(a1.get(1));
+
+      // Simplify subterms
+      a = a1.map(b -> simplify(env, b));
+
+      // Patterns
+      for (var p : patterns) {
+        var b = p.transform(a, env);
+        if (b != null) {
+          a = b;
+          continue simplify;
+        }
+      }
+      return a;
     }
   }
 
