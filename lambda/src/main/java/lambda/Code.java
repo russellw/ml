@@ -337,7 +337,7 @@ public final class Code {
       };
   private static Random random = new Random(0);
 
-  public static Object rand(Seq<Variable> env, Object type, int depth) {
+  public static Object rand(Seq<Variable> variables, Object type, int depth) {
     // random.nextInt() % n where n is a power of 2, avoids a divide instruction
     if (depth == 0 || random.nextInt() % 4 == 0) {
       var leaves = new ArrayList<>();
@@ -352,7 +352,7 @@ public final class Code {
       if (accepts(type, Symbol.LIST)) {
         leaves.add(quote(List.empty()));
       }
-      for (var x : env) if (accepts(type, x.type)) leaves.add(x);
+      for (var x : variables) if (accepts(type, x.type)) leaves.add(x);
       if (!leaves.isEmpty()) return leaves.get(random.nextInt(leaves.size()));
       if (depth == 0) throw new GaveUp(type.toString());
     }
@@ -363,10 +363,10 @@ public final class Code {
       switch (o) {
         case CALL:
           {
-            var f = rand(env, Array.of(Symbol.FUNCTION, Symbol.OBJECT, type), depth);
+            var f = rand(variables, Array.of(Symbol.FUNCTION, Symbol.OBJECT, type), depth);
             var functionType = (Seq) typeof(f);
             assert functionType.head() == Symbol.FUNCTION;
-            var a = rand(env, functionType.get(1), depth);
+            var a = rand(variables, functionType.get(1), depth);
             return Array.of(o, f, a);
           }
         case LAMBDA:
@@ -376,48 +376,52 @@ public final class Code {
             if (type1.head() != Symbol.FUNCTION) break;
             var param = new Variable(type1.get(1));
             var returnType = type1.get(2);
-            var body = rand(env.prepend(param), returnType, depth);
+            var body = rand(variables.prepend(param), returnType, depth);
             return Array.of(o, param, body);
           }
         case NOT:
           if (!accepts(type, Symbol.BOOL)) break;
-          return Array.of(o, rand(env, Symbol.BOOL, depth));
+          return Array.of(o, rand(variables, Symbol.BOOL, depth));
         case ADD:
         case SUB:
         case MUL:
         case DIV:
         case REM:
           if (!accepts(type, Symbol.INT)) break;
-          return Array.of(o, rand(env, Symbol.INT, depth), rand(env, Symbol.INT, depth));
+          return Array.of(
+              o, rand(variables, Symbol.INT, depth), rand(variables, Symbol.INT, depth));
         case LE:
         case LT:
           if (!accepts(type, Symbol.BOOL)) break;
-          return Array.of(o, rand(env, Symbol.INT, depth), rand(env, Symbol.INT, depth));
+          return Array.of(
+              o, rand(variables, Symbol.INT, depth), rand(variables, Symbol.INT, depth));
         case AND:
         case OR:
           if (!accepts(type, Symbol.BOOL)) break;
-          return Array.of(o, rand(env, Symbol.BOOL, depth), rand(env, Symbol.BOOL, depth));
+          return Array.of(
+              o, rand(variables, Symbol.BOOL, depth), rand(variables, Symbol.BOOL, depth));
         case HEAD:
           if (!accepts(type, Symbol.OBJECT)) break;
-          return Array.of(o, rand(env, Symbol.LIST, depth));
+          return Array.of(o, rand(variables, Symbol.LIST, depth));
         case TAIL:
           if (!accepts(type, Symbol.LIST)) break;
-          return Array.of(o, rand(env, Symbol.LIST, depth));
+          return Array.of(o, rand(variables, Symbol.LIST, depth));
         case CONS:
           if (!accepts(type, Symbol.LIST)) break;
-          return Array.of(o, rand(env, Symbol.OBJECT, depth), rand(env, Symbol.LIST, depth));
+          return Array.of(
+              o, rand(variables, Symbol.OBJECT, depth), rand(variables, Symbol.LIST, depth));
         case EQ:
           {
             if (!accepts(type, Symbol.BOOL)) break;
-            var a = rand(env, Symbol.OBJECT, depth);
-            var b = rand(env, typeof(a), depth);
+            var a = rand(variables, Symbol.OBJECT, depth);
+            var b = rand(variables, typeof(a), depth);
             return Array.of(o, a, b);
           }
         case IF:
           {
-            var test = rand(env, Symbol.BOOL, depth);
-            var a = rand(env, type, depth);
-            var b = rand(env, typeof(a), depth);
+            var test = rand(variables, Symbol.BOOL, depth);
+            var a = rand(variables, type, depth);
+            var b = rand(variables, typeof(a), depth);
             return Array.of(o, test, a, b);
           }
       }
@@ -598,13 +602,13 @@ public final class Code {
   }
 
   @SuppressWarnings("unchecked")
-  public static Object simplify(Map<Variable, Object> env, Object a) {
+  public static Object simplify(Map<Variable, Object> map, Object a) {
     simplify:
     for (; ; ) {
       // Variable
       if (a instanceof Variable) {
         var a1 = (Variable) a;
-        var r = env.getOrElse(a1, null);
+        var r = map.getOrElse(a1, null);
         if (r == null) return a;
         return r;
       }
@@ -620,11 +624,11 @@ public final class Code {
       if (o == Symbol.QUOTE) return quote(a1.get(1));
 
       // Simplify subterms
-      a = a1.map(b -> simplify(env, b));
+      a = a1.map(b -> simplify(map, b));
 
       // Patterns
       for (var p : patterns) {
-        var b = p.transform(a, env);
+        var b = p.transform(a, map);
         if (b != null) {
           a = b;
           continue simplify;
