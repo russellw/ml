@@ -264,6 +264,18 @@ public final class Code {
             return X;
           }
         },
+        new Pattern(Symbol.NOT, Array.of(Symbol.LE, X, Y)) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            return Array.of(Symbol.LT, Y, X);
+          }
+        },
+        new Pattern(Symbol.NOT, Array.of(Symbol.LT, X, Y)) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            return Array.of(Symbol.LE, Y, X);
+          }
+        },
         new Pattern(Symbol.NOT, false) {
           @Override
           Object output(Map<Variable, Object> map) {
