@@ -43,6 +43,38 @@ public final class Code {
             return x.equals(y);
           }
         },
+        new Pattern(Symbol.EQ, X, false) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = map.get(X).get();
+            if (typeof(x) == Symbol.BOOL) return Array.of(Symbol.NOT, x);
+            return null;
+          }
+        },
+        new Pattern(Symbol.EQ, false, X) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = map.get(X).get();
+            if (typeof(x) == Symbol.BOOL) return Array.of(Symbol.NOT, x);
+            return null;
+          }
+        },
+        new Pattern(Symbol.EQ, X, true) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = map.get(X).get();
+            if (typeof(x) == Symbol.BOOL) return x;
+            return null;
+          }
+        },
+        new Pattern(Symbol.EQ, true, X) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            var x = map.get(X).get();
+            if (typeof(x) == Symbol.BOOL) return x;
+            return null;
+          }
+        },
         new Pattern(Symbol.CONS, X, Y) {
           @Override
           @SuppressWarnings("unchecked")
@@ -224,6 +256,12 @@ public final class Code {
           @Override
           Object output(Map<Variable, Object> map) {
             return 0;
+          }
+        },
+        new Pattern(Symbol.NOT, Array.of(Symbol.NOT, X)) {
+          @Override
+          Object output(Map<Variable, Object> map) {
+            return X;
           }
         },
         new Pattern(Symbol.NOT, false) {
