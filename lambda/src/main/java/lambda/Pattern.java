@@ -11,10 +11,10 @@ public abstract class Pattern {
     this.input = Array.of(input);
   }
 
-  public Object transform(Object a, Map<Variable, Object> map) {
-    map = Code.match(input, a, map);
+  public Object transform(Map<Variable, Object> map, Object a) {
+    map = Code.match(map, input, a);
     if (map == null) return null;
-    return Code.replace(output(map), map);
+    return Code.replace(map, output(map));
   }
 
   abstract Object output(Map<Variable, Object> map);

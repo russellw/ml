@@ -125,92 +125,92 @@ public class CodeTest {
     Map<Variable, Object> map;
 
     // Succeeds. (tautology)
-    map = Code.match(a, a, HashMap.empty());
+    map = Code.match(HashMap.empty(), a, a);
     assertNotNull(map);
     assertEquals(map.size(), 0);
 
     // a and b do not match
-    map = Code.match(a, b, HashMap.empty());
+    map = Code.match(HashMap.empty(), a, b);
     assertNull(map);
 
     // Succeeds. (tautology)
-    map = Code.match(x, x, HashMap.empty());
+    map = Code.match(HashMap.empty(), x, x);
     assertNotNull(map);
     assertEquals(map.size(), 0);
 
     // x is unified with the constant a
-    map = Code.match(a, x, HashMap.empty());
+    map = Code.match(HashMap.empty(), a, x);
     assertNull(map);
 
     // x and y are aliased
-    map = Code.match(x, y, HashMap.empty());
+    map = Code.match(HashMap.empty(), x, y);
     assertNotNull(map);
     assertEquals(map.size(), 1);
-    assertEquals(Code.replace(x, map), Code.replace(y, map));
+    assertEquals(Code.replace(map, x), Code.replace(map, y));
 
     // function and constant symbols match, x is unified with the constant b
     map =
-        Code.match(Array.of(Symbol.CALL, f, a, x), Array.of(Symbol.CALL, f, a, b), HashMap.empty());
+        Code.match(HashMap.empty(), Array.of(Symbol.CALL, f, a, x), Array.of(Symbol.CALL, f, a, b));
     assertNotNull(map);
     assertEquals(map.size(), 1);
-    assertEquals(Code.replace(x, map), b);
+    assertEquals(Code.replace(map, x), b);
 
     // f and g do not match
-    map = Code.match(Array.of(Symbol.CALL, f, a), Array.of(Symbol.CALL, g, a), HashMap.empty());
+    map = Code.match(HashMap.empty(), Array.of(Symbol.CALL, f, a), Array.of(Symbol.CALL, g, a));
     assertNull(map);
 
     // x and y are aliased
-    map = Code.match(Array.of(Symbol.CALL, f, x), Array.of(Symbol.CALL, f, y), HashMap.empty());
+    map = Code.match(HashMap.empty(), Array.of(Symbol.CALL, f, x), Array.of(Symbol.CALL, f, y));
     assertNotNull(map);
     assertEquals(map.size(), 1);
-    assertEquals(Code.replace(x, map), Code.replace(y, map));
+    assertEquals(Code.replace(map, x), Code.replace(map, y));
 
     // f and g do not match
-    map = Code.match(Array.of(Symbol.CALL, f, x), Array.of(Symbol.CALL, g, y), HashMap.empty());
+    map = Code.match(HashMap.empty(), Array.of(Symbol.CALL, f, x), Array.of(Symbol.CALL, g, y));
     assertNull(map);
 
     // Fails. The f function symbols have different arity
-    map = Code.match(Array.of(Symbol.CALL, f, x), Array.of(Symbol.CALL, f, y, z), HashMap.empty());
+    map = Code.match(HashMap.empty(), Array.of(Symbol.CALL, f, x), Array.of(Symbol.CALL, f, y, z));
     assertNull(map);
 
     // Unifies y with the term g(x)
     map =
         Code.match(
+            HashMap.empty(),
             Array.of(Symbol.CALL, f, Array.of(Symbol.CALL, g, x)),
-            Array.of(Symbol.CALL, f, y),
-            HashMap.empty());
+            Array.of(Symbol.CALL, f, y));
     assertNull(map);
 
     // Unifies x with constant a, and y with the term g(a)
     map =
         Code.match(
+            HashMap.empty(),
             Array.of(Symbol.CALL, f, Array.of(Symbol.CALL, g, x), x),
-            Array.of(Symbol.CALL, f, y, a),
-            HashMap.empty());
+            Array.of(Symbol.CALL, f, y, a));
     assertNull(map);
 
     // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs
     // check).
-    map = Code.match(x, Array.of(Symbol.CALL, f, x), HashMap.empty());
+    map = Code.match(HashMap.empty(), x, Array.of(Symbol.CALL, f, x));
     assertNotNull(map);
     assertEquals(map.size(), 1);
 
     // Both x and y are unified with the constant a
-    map = Code.match(x, y, HashMap.empty());
-    map = Code.match(y, a, map);
+    map = Code.match(HashMap.empty(), x, y);
+    map = Code.match(map, y, a);
     assertNotNull(map);
     assertEquals(map.size(), 2);
-    assertEquals(Code.replace(x, map), a);
-    assertEquals(Code.replace(y, map), a);
+    assertEquals(Code.replace(map, x), a);
+    assertEquals(Code.replace(map, y), a);
 
     // As above (order of equations in set doesn't matter)
-    map = Code.match(a, y, HashMap.empty());
+    map = Code.match(HashMap.empty(), a, y);
     assertNull(map);
 
     // Fails. a and b do not match, so x can't be unified with both
-    map = Code.match(x, a, HashMap.empty());
+    map = Code.match(HashMap.empty(), x, a);
     assertNotNull(map);
-    map = Code.match(b, x, map);
+    map = Code.match(map, b, x);
     assertNull(map);
   }
 }

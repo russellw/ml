@@ -16,7 +16,7 @@ public final class Code {
             var body = map.get(B).get();
             var x = (Variable) map.get(X).get();
             var y = map.get(Y).get();
-            var body1 = simplify(map, replace(body, HashMap.of(x, y)));
+            var body1 = simplify(map, replace(HashMap.of(x, y), body));
             if (size(body1) > size(body) + 4) return null;
             return body1;
           }
@@ -538,7 +538,7 @@ public final class Code {
   }
 
   public static void println(Object a) {
-    print(a, new java.util.HashMap<>());
+    print(new java.util.HashMap<>(), a);
     System.out.println();
   }
 
@@ -547,7 +547,7 @@ public final class Code {
     return "Z" + (i - 25);
   }
 
-  private static void print(Object a, java.util.Map<Variable, String> map) {
+  private static void print(java.util.Map<Variable, String> map, Object a) {
     if (a instanceof Variable) {
       var a1 = (Variable) a;
       var name = map.get(a1);
@@ -568,22 +568,22 @@ public final class Code {
         case LAMBDA:
           System.out.print('{');
           var param = (Variable) a1.get(1);
-          print(param, map);
+          print(map, param);
           System.out.print(':');
-          print(param.type, map);
+          print(map, param.type);
           System.out.print(' ');
-          print(a1.get(2), map);
+          print(map, a1.get(2));
           System.out.print('}');
           return;
         case QUOTE:
           System.out.print('\'');
-          print(a1.get(1), map);
+          print(map, a1.get(1));
           return;
       }
     System.out.print('(');
     for (var i = 0; i < a1.size(); i++) {
       if (i > 0) System.out.print(' ');
-      print(a1.get(i), map);
+      print(map, a1.get(i));
     }
     System.out.print(')');
   }
@@ -628,7 +628,7 @@ public final class Code {
 
       // Patterns
       for (var p : patterns) {
-        var b = p.transform(a, map);
+        var b = p.transform(map, a);
         if (b != null) {
           a = b;
           continue simplify;
@@ -639,20 +639,20 @@ public final class Code {
   }
 
   @SuppressWarnings("unchecked")
-  public static Object replace(Object a, Map<Variable, Object> map) {
+  public static Object replace(Map<Variable, Object> map, Object a) {
     if (a instanceof Seq) {
       var a1 = (Seq) a;
-      return a1.map(b -> replace(b, map));
+      return a1.map(b -> replace(map, b));
     }
     if (a instanceof Variable) {
       var a1 = (Variable) a;
       var a2 = map.getOrElse(a1, null);
-      if (a2 != null) return replace(a2, map);
+      if (a2 != null) return replace(map, a2);
     }
     return a;
   }
 
-  public static Map<Variable, Object> match(Object a, Object b, Map<Variable, Object> map) {
+  public static Map<Variable, Object> match(Map<Variable, Object> map, Object a, Object b) {
     if (a == b) return map;
     if (a instanceof Variable) {
       var a1 = (Variable) a;
@@ -668,7 +668,7 @@ public final class Code {
         var n = a1.size();
         if (n != b1.size()) return null;
         for (var i = 0; i < n; i++) {
-          map = match(a1.get(i), b1.get(i), map);
+          map = match(map, a1.get(i), b1.get(i));
           if (map == null) return null;
         }
         return map;
