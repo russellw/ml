@@ -453,11 +453,21 @@ public final class Code {
         case ADD:
         case SUB:
         case MUL:
+          {
+            if (!accepts(type, Symbol.INT)) break;
+            var a = rand(variables, Symbol.INT, depth);
+            var b = rand(variables, Symbol.INT, depth);
+            return Array.of(o, a, b);
+          }
         case DIV:
         case REM:
-          if (!accepts(type, Symbol.INT)) break;
-          return Array.of(
-              o, rand(variables, Symbol.INT, depth), rand(variables, Symbol.INT, depth));
+          {
+            if (!accepts(type, Symbol.INT)) break;
+            var b = rand(variables, Symbol.INT, depth);
+            if (b.equals(0)) break;
+            var a = rand(variables, Symbol.INT, depth);
+            return Array.of(o, a, b);
+          }
         case LE:
         case LT:
           if (!accepts(type, Symbol.BOOL)) break;
