@@ -25,6 +25,16 @@ public class Main {
   public static void main(String[] args) {
     var s = Code.terms(1);
     System.out.println(s);
+    for (var a : s)
+      try {
+        Code.eval(Array.of(a, 0));
+        Code.println(a);
+      } catch (ArithmeticException
+          | ClassCastException
+          | IndexOutOfBoundsException
+          | NoSuchElementException
+          | UnsupportedOperationException ignored) {
+      }
     System.exit(0);
     var specs = new ArrayList<>();
     var tries = 0;

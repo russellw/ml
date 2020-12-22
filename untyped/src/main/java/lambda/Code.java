@@ -3,6 +3,7 @@ package lambda;
 import io.vavr.collection.*;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.function.Function;
 
 public final class Code {
   private static Random random = new Random(0);
@@ -19,51 +20,60 @@ public final class Code {
     return (int) a != 0;
   }
 
+  @SuppressWarnings("unchecked")
   private static Object eval(Map<Variable, Object> map, Object a) {
     if (a instanceof Variable) return map.get((Variable) a).get();
     if (!(a instanceof Seq)) return a;
     var a1 = (Seq) a;
     if (a1.isEmpty()) return a;
-    var o = (Symbol) a1.head();
-    switch (o) {
-      case ADD:
-        return (int) eval(map, a1.get(1)) + (int) eval(map, a1.get(2));
-      case SUB:
-        return (int) eval(map, a1.get(1)) - (int) eval(map, a1.get(2));
-      case MUL:
-        return (int) eval(map, a1.get(1)) * (int) eval(map, a1.get(2));
-      case DIV:
-        return (int) eval(map, a1.get(1)) / (int) eval(map, a1.get(2));
-      case REM:
-        return (int) eval(map, a1.get(1)) % (int) eval(map, a1.get(2));
-      case EQ:
-        return toInt(eval(map, a1.get(1)).equals(eval(map, a1.get(2))));
-      case LT:
-        return toInt((int) eval(map, a1.get(1)) < (int) eval(map, a1.get(2)));
-      case LE:
-        return toInt((int) eval(map, a1.get(1)) <= (int) eval(map, a1.get(2)));
-      case AND:
-        return toInt(toBoolean(eval(map, a1.get(1))) && toBoolean(eval(map, a1.get(2))));
-      case OR:
-        return toInt(toBoolean(eval(map, a1.get(1))) || toBoolean(eval(map, a1.get(2))));
-      case NOT:
-        return toInt(!toBoolean(eval(map, a1.get(1))));
-      case HEAD:
-        return ((Seq) eval(map, a1.get(1))).head();
-      case TAIL:
-        return ((Seq) eval(map, a1.get(1))).tail();
-      case CONS:
-        {
-          var x = eval(map, a1.get(1));
-          var s = (Seq) eval(map, a1.get(2));
-          @SuppressWarnings("unchecked")
-          var r = s.prepend(x);
-          return r;
-        }
-      case QUOTE:
-        return a1.get(1);
-    }
-    throw new IllegalArgumentException(a.toString());
+    var o = a1.head();
+    if (o instanceof Symbol)
+      switch ((Symbol) o) {
+        case ADD:
+          return (int) eval(map, a1.get(1)) + (int) eval(map, a1.get(2));
+        case SUB:
+          return (int) eval(map, a1.get(1)) - (int) eval(map, a1.get(2));
+        case MUL:
+          return (int) eval(map, a1.get(1)) * (int) eval(map, a1.get(2));
+        case DIV:
+          return (int) eval(map, a1.get(1)) / (int) eval(map, a1.get(2));
+        case REM:
+          return (int) eval(map, a1.get(1)) % (int) eval(map, a1.get(2));
+        case EQ:
+          return toInt(eval(map, a1.get(1)).equals(eval(map, a1.get(2))));
+        case LT:
+          return toInt((int) eval(map, a1.get(1)) < (int) eval(map, a1.get(2)));
+        case LE:
+          return toInt((int) eval(map, a1.get(1)) <= (int) eval(map, a1.get(2)));
+        case AND:
+          return toInt(toBoolean(eval(map, a1.get(1))) && toBoolean(eval(map, a1.get(2))));
+        case OR:
+          return toInt(toBoolean(eval(map, a1.get(1))) || toBoolean(eval(map, a1.get(2))));
+        case NOT:
+          return toInt(!toBoolean(eval(map, a1.get(1))));
+        case HEAD:
+          return ((Seq) eval(map, a1.get(1))).head();
+        case TAIL:
+          return ((Seq) eval(map, a1.get(1))).tail();
+        case LAMBDA:
+          {
+            var param = (Variable) a1.get(1);
+            var body = a1.get(2);
+            return (Function) b -> eval(map.put(param, b), body);
+          }
+        case CONS:
+          {
+            var x = eval(map, a1.get(1));
+            var s = (Seq) eval(map, a1.get(2));
+            return s.prepend(x);
+          }
+        case QUOTE:
+          return a1.get(1);
+      }
+    o = eval(map, o);
+    var f = (Function) o;
+    var b = eval(map, a1.get(1));
+    return f.apply(b);
   }
 
   public static ArrayList<Object> terms(int depth) {
@@ -80,11 +90,39 @@ public final class Code {
       return r;
     }
     for (var i = 0; i < depth; i++) r.addAll(terms(variables, i));
-    for (var o : Symbol.values()) {
-      var xs = terms(variables, depth - 1);
-      var ys = terms(variables, depth - 1);
-      for (var x : xs) for (var y : ys) r.add(Array.of(o, x, y));
-    }
+    for (var o : Symbol.values())
+      switch (o) {
+        case HEAD:
+        case TAIL:
+        case NOT:
+          {
+            var xs = terms(variables, depth - 1);
+            for (var x : xs) r.add(Array.of(o, x));
+            break;
+          }
+        case LAMBDA:
+          {
+            var param = new Variable();
+            var xs = terms(variables.prepend(param), depth - 1);
+            for (var x : xs) r.add(Array.of(o, param, x));
+            break;
+          }
+        case IF:
+          {
+            var xs = terms(variables, depth - 1);
+            var ys = terms(variables, depth - 1);
+            var zs = terms(variables, depth - 1);
+            for (var x : xs) for (var y : ys) for (var z : zs) r.add(Array.of(o, x, y, z));
+            break;
+          }
+        default:
+          {
+            var xs = terms(variables, depth - 1);
+            var ys = terms(variables, depth - 1);
+            for (var x : xs) for (var y : ys) r.add(Array.of(o, x, y));
+            break;
+          }
+      }
     return r;
   }
 
