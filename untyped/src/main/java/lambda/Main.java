@@ -23,7 +23,7 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    var s = Code.exprs(0);
+    var s = Code.terms(1);
     System.out.println(s);
     System.exit(0);
     var specs = new ArrayList<>();
@@ -31,7 +31,7 @@ public class Main {
     while (specs.size() < 20) {
       tries++;
       try {
-        var a = Code.exprs(1);
+        var a = Code.terms(1);
         var b = (Seq) Code.eval(a);
         if (!(b.get(2) instanceof Seq)) continue;
         // Code.simplify(HashMap.empty(), Array.of(Symbol.CALL, b, 0));
@@ -48,7 +48,7 @@ public class Main {
     Object best = null;
     var bestScore = -1;
     for (var i = 0; i < 1000000000; i++) {
-      var a = Code.exprs(1);
+      var a = Code.terms(1);
       var score = test(specs, a);
       if (score > bestScore) {
         Code.println(a);

@@ -66,20 +66,11 @@ public final class Code {
     throw new IllegalArgumentException(a.toString());
   }
 
-  private static ArrayList<Object> leaves(Seq<Variable> variables) {
-    var r = new ArrayList<>();
-    r.add(0);
-    r.add(1);
-    r.add(List.empty());
-    r.addAll(variables.asJava());
-    return r;
+  public static ArrayList<Object> terms(int depth) {
+    return terms(List.empty(), depth);
   }
 
-  public static ArrayList<Object> exprs(int depth) {
-    return exprs(List.empty(), depth);
-  }
-
-  private static ArrayList<Object> exprs(Seq<Variable> variables, int depth) {
+  private static ArrayList<Object> terms(Seq<Variable> variables, int depth) {
     var r = new ArrayList<>();
     if (depth == 0) {
       r.add(0);
@@ -88,9 +79,10 @@ public final class Code {
       r.addAll(variables.asJava());
       return r;
     }
+    for (var i = 0; i < depth; i++) r.addAll(terms(variables, i));
     for (var o : Symbol.values()) {
-      var xs = exprs(variables, depth - 1);
-      var ys = exprs(variables, depth - 1);
+      var xs = terms(variables, depth - 1);
+      var ys = terms(variables, depth - 1);
       for (var x : xs) for (var y : ys) r.add(Array.of(o, x, y));
     }
     return r;
