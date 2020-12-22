@@ -8,6 +8,20 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 public class Main {
+  private static boolean test(Object spec,Object a){
+    var value=Code.call( a, spec);
+    var r=Code.call(spec, value);
+    return (boolean)r;
+  }
+
+  private static int test(ArrayList<Object> specs,Object a){
+    var n=0;
+    for(var spec:specs)
+      if(test(spec,a))
+        n++;
+      return n;
+  }
+
   public static void main(String[] args) {
     var specs = new ArrayList<>();
     var i = 0;

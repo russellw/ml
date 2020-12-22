@@ -763,4 +763,8 @@ public final class Code {
     for (var b : a1) n += size(b);
     return n;
   }
+
+  public static Object call(Object  f,Object a){
+    return simplify(HashMap.empty(), Array.of(Symbol.CALL,f,quote( a)));
+  }
 }
