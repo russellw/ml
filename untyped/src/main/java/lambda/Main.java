@@ -1,35 +1,38 @@
 package lambda;
 
 import io.vavr.collection.Array;
-import io.vavr.collection.HashMap;
-import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 public class Main {
-  private static boolean test(Object spec,Object a){
-    var value=Code.call( a, spec);
-    var r=Code.call(spec, value);
-    return (boolean)r;
+  private static boolean test(Object spec, Object a) {
+    try {
+      var value = Code.eval(Array.of(a, spec));
+      var r = Code.eval(Array.of(spec, value));
+      return (boolean) r;
+    } catch (ArithmeticException | NoSuchElementException | UnsupportedOperationException ignored) {
+      return false;
+    }
   }
 
-  private static int test(ArrayList<Object> specs,Object a){
-    var n=0;
-    for(var spec:specs)
-      if(test(spec,a))
-        n++;
-      return n;
+  private static int test(ArrayList<Object> specs, Object a) {
+    var n = 0;
+    for (var spec : specs) if (test(spec, a)) n++;
+    return n;
   }
 
   public static void main(String[] args) {
+    var s = Code.exprs(0);
+    System.out.println(s);
+    System.exit(0);
     var specs = new ArrayList<>();
-    var i = 0;
+    var tries = 0;
     while (specs.size() < 20) {
-      i++;
+      tries++;
       try {
-        var a = Code.rand(List.empty(), Array.of(Symbol.FUNCTION, Symbol.INT, Symbol.BOOL), 10);
-        var b = (Seq) Code.simplify(HashMap.empty(), a);
+        var a = Code.exprs(1);
+        var b = (Seq) Code.eval(a);
         if (!(b.get(2) instanceof Seq)) continue;
         // Code.simplify(HashMap.empty(), Array.of(Symbol.CALL, b, 0));
         specs.add(b);
@@ -37,11 +40,22 @@ public class Main {
         Code.println(b);
         System.out.println();
       } catch (ArithmeticException
-          | GaveUp
           | NoSuchElementException
           | UnsupportedOperationException ignored) {
       }
     }
-    System.out.println(i);
+    System.out.println(tries);
+    Object best = null;
+    var bestScore = -1;
+    for (var i = 0; i < 1000000000; i++) {
+      var a = Code.exprs(1);
+      var score = test(specs, a);
+      if (score > bestScore) {
+        Code.println(a);
+        System.out.println(score);
+        best = a;
+        bestScore = score;
+      }
+    }
   }
 }
