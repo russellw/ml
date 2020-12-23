@@ -75,6 +75,39 @@ public final class Code {
     return f.apply(b);
   }
 
+  public static Object rand(int depth) {
+    return rand(depth, List.empty());
+  }
+
+  private static Object rand(int depth, Seq<Variable> variables) {
+    if (depth == 0) {
+      var leaves = new ArrayList<>();
+      leaves.add(0);
+      leaves.add(1);
+      leaves.add(List.empty());
+      leaves.addAll(variables.asJava());
+      return leaves.get(random.nextInt(leaves.size()));
+    }
+    depth--;
+    var symbols = Symbol.values();
+    var o = symbols[random.nextInt(symbols.length)];
+    switch (o) {
+      case HEAD:
+      case TAIL:
+      case NOT:
+        return Array.of(o, rand(depth, variables));
+      case LAMBDA:
+        {
+          var param = new Variable();
+          return Array.of(o, param, rand(depth, variables.prepend(param)));
+        }
+      case IF:
+        return Array.of(o, rand(depth, variables), rand(depth, variables), rand(depth, variables));
+      default:
+        return Array.of(o, rand(depth, variables), rand(depth, variables));
+    }
+  }
+
   public static ArrayList<Object> terms(int depth, Predicate<Object> select) {
     return terms(depth, select, List.empty());
   }

@@ -35,7 +35,11 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    var s = Code.terms(2, Main::isIntPredicate);
+    var s = new ArrayList<>();
+    for (var i = 0; i < 1000; i++) {
+      var a = Code.rand(5);
+      if (isIntPredicate(a)) s.add(a);
+    }
     for (var a : s) Code.println(a);
     System.out.println(s.size());
   }
