@@ -1,7 +1,6 @@
 package lambda;
 
 import io.vavr.collection.Array;
-import io.vavr.collection.Seq;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -22,50 +21,22 @@ public class Main {
     return n;
   }
 
+  private static boolean isIntPredicate(Object a) {
+    try {
+      Code.eval(Array.of(a, 0));
+      return true;
+    } catch (ArithmeticException
+        | ClassCastException
+        | IndexOutOfBoundsException
+        | NoSuchElementException
+        | UnsupportedOperationException ignored) {
+      return false;
+    }
+  }
+
   public static void main(String[] args) {
-    var s = Code.terms(1);
-    System.out.println(s);
-    for (var a : s)
-      try {
-        Code.eval(Array.of(a, 0));
-        Code.println(a);
-      } catch (ArithmeticException
-          | ClassCastException
-          | IndexOutOfBoundsException
-          | NoSuchElementException
-          | UnsupportedOperationException ignored) {
-      }
-    System.exit(0);
-    var specs = new ArrayList<>();
-    var tries = 0;
-    while (specs.size() < 20) {
-      tries++;
-      try {
-        var a = Code.terms(1);
-        var b = (Seq) Code.eval(a);
-        if (!(b.get(2) instanceof Seq)) continue;
-        // Code.simplify(HashMap.empty(), Array.of(Symbol.CALL, b, 0));
-        specs.add(b);
-        Code.println(a);
-        Code.println(b);
-        System.out.println();
-      } catch (ArithmeticException
-          | NoSuchElementException
-          | UnsupportedOperationException ignored) {
-      }
-    }
-    System.out.println(tries);
-    Object best = null;
-    var bestScore = -1;
-    for (var i = 0; i < 1000000000; i++) {
-      var a = Code.terms(1);
-      var score = test(specs, a);
-      if (score > bestScore) {
-        Code.println(a);
-        System.out.println(score);
-        best = a;
-        bestScore = score;
-      }
-    }
+    var s = Code.terms(2, Main::isIntPredicate);
+    for (var a : s) Code.println(a);
+    System.out.println(s.size());
   }
 }

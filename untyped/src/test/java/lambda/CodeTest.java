@@ -32,17 +32,10 @@ public class CodeTest {
     assertEquals(Code.eval(Array.of(Symbol.OR, 1, 1)), 1);
     assertEquals(Code.eval(Array.of(Symbol.NOT, 0)), 1);
     assertEquals(Code.eval(Array.of(Symbol.NOT, 1)), 0);
+    assertEquals(Code.eval(Array.of(Symbol.CONS, 1, List.empty())), Array.of(1));
+    assertEquals(Code.eval(Array.of(Symbol.CONS, 1, Array.empty())), List.of(1));
+    assertEquals(Code.eval(Array.of(Symbol.HEAD, Array.of(Symbol.CONS, 1, List.empty()))), 1);
     assertEquals(
-        Code.eval(Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty()))), Array.of(1));
-    assertEquals(
-        Code.eval(Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, Array.empty()))), List.of(1));
-    assertEquals(
-        Code.eval(
-            Array.of(Symbol.HEAD, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty())))),
-        1);
-    assertEquals(
-        Code.eval(
-            Array.of(Symbol.TAIL, Array.of(Symbol.CONS, 1, Array.of(Symbol.QUOTE, List.empty())))),
-        List.empty());
+        Code.eval(Array.of(Symbol.TAIL, Array.of(Symbol.CONS, 1, List.empty()))), List.empty());
   }
 }

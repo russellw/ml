@@ -17,5 +17,4 @@ public enum Symbol {
   CONS,
   LAMBDA,
   IF,
-  QUOTE,
 }

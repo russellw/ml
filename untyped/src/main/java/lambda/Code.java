@@ -4,6 +4,7 @@ import io.vavr.collection.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public final class Code {
   private static Random random = new Random(0);
@@ -67,8 +68,6 @@ public final class Code {
             var s = (Seq) eval(map, a1.get(2));
             return s.prepend(x);
           }
-        case QUOTE:
-          return a1.get(1);
       }
     o = eval(map, o);
     var f = (Function) o;
@@ -76,50 +75,56 @@ public final class Code {
     return f.apply(b);
   }
 
-  public static ArrayList<Object> terms(int depth) {
-    return terms(List.empty(), depth);
+  public static ArrayList<Object> terms(int depth, Predicate<Object> select) {
+    return terms(depth, select, List.empty());
   }
 
-  private static ArrayList<Object> terms(Seq<Variable> variables, int depth) {
+  private static void add(Predicate<Object> select, Object a, ArrayList<Object> r) {
+    if (select == null || select.test(a)) r.add(a);
+  }
+
+  private static ArrayList<Object> terms(
+      int depth, Predicate<Object> select, Seq<Variable> variables) {
     var r = new ArrayList<>();
     if (depth == 0) {
-      r.add(0);
-      r.add(1);
-      r.add(List.empty());
-      r.addAll(variables.asJava());
+      add(select, 0, r);
+      add(select, 1, r);
+      add(select, List.empty(), r);
+      for (var x : variables) add(select, x, r);
       return r;
     }
-    for (var i = 0; i < depth; i++) r.addAll(terms(variables, i));
+    for (var i = 0; i < depth; i++) r.addAll(terms(i, null, variables));
+    depth--;
     for (var o : Symbol.values())
       switch (o) {
         case HEAD:
         case TAIL:
         case NOT:
           {
-            var xs = terms(variables, depth - 1);
-            for (var x : xs) r.add(Array.of(o, x));
+            var xs = terms(depth, null, variables);
+            for (var x : xs) add(select, Array.of(o, x), r);
             break;
           }
         case LAMBDA:
           {
             var param = new Variable();
-            var xs = terms(variables.prepend(param), depth - 1);
-            for (var x : xs) r.add(Array.of(o, param, x));
+            var xs = terms(depth, null, variables.prepend(param));
+            for (var x : xs) add(select, Array.of(o, param, x), r);
             break;
           }
         case IF:
           {
-            var xs = terms(variables, depth - 1);
-            var ys = terms(variables, depth - 1);
-            var zs = terms(variables, depth - 1);
-            for (var x : xs) for (var y : ys) for (var z : zs) r.add(Array.of(o, x, y, z));
+            var xs = terms(depth, null, variables);
+            var ys = terms(depth, null, variables);
+            var zs = terms(depth, null, variables);
+            for (var x : xs) for (var y : ys) for (var z : zs) add(select, Array.of(o, x, y, z), r);
             break;
           }
         default:
           {
-            var xs = terms(variables, depth - 1);
-            var ys = terms(variables, depth - 1);
-            for (var x : xs) for (var y : ys) r.add(Array.of(o, x, y));
+            var xs = terms(depth, null, variables);
+            var ys = terms(depth, null, variables);
+            for (var x : xs) for (var y : ys) add(select, Array.of(o, x, y), r);
             break;
           }
       }
