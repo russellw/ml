@@ -764,7 +764,7 @@ public final class Code {
     return n;
   }
 
-  public static Object call(Object  f,Object a){
-    return simplify(HashMap.empty(), Array.of(Symbol.CALL,f,quote( a)));
+  public static Object call(Object f, Object a) {
+    return simplify(HashMap.empty(), Array.of(Symbol.CALL, f, quote(a)));
   }
 }

@@ -43,6 +43,8 @@ def do_file(filename):
     global attempted
     global solved
     filename = filename.replace("\\", "/")
+    if filename.startswith("C:/ml/"):
+        filename = filename[6:]
 
     # list file
     if os.path.splitext(filename)[1] == ".lst":
@@ -54,10 +56,10 @@ def do_file(filename):
     attempted += 1
     try:
         p = subprocess.run(
-            ["bin/eprover", "--auto", filename],
+            ["bin/eprover", "--auto", "-p", filename],
             capture_output=True,
             encoding="utf-8",
-            timeout=60,
+            timeout=3,
             check=True,
         )
         prn(p.stdout)
