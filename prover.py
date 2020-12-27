@@ -99,7 +99,7 @@ class Timeout(Exception):
         super().__init__("Timeout")
 
 
-def set_timeout(seconds=60):
+def set_timeout(seconds=3):
     global end_time
     end_time = time.time() + seconds
 
