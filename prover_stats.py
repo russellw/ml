@@ -82,10 +82,6 @@ def debug(a):
     logger.debug(str(a), stack_info=True)
 
 
-prn(sys.argv)
-prn()
-
-
 ######################################## limits
 
 
@@ -775,8 +771,6 @@ def read_dimacs(filename):
     pos = []
     for s in open(filename):
         if s[0] in ("c", "\n"):
-            if header:
-                prn(s[:-1])
             if not hasattr(problem, "expected"):
                 if "UNSAT" in s:
                     problem.expected = "Unsatisfiable"
@@ -883,10 +877,6 @@ def read_tptp(filename, select=True):
                 i = ti
                 while text[ti] != "\n":
                     ti += 1
-                if header:
-                    prn(text[i:ti])
-                    if text[ti : ti + 2] == "\n\n":
-                        prn()
                 if not hasattr(problem, "expected"):
                     m = re.match(r"%\s*Status\s*:\s*(\w+)", text[i:ti])
                     if m:
@@ -1994,6 +1984,7 @@ def superposition_pos(C, D):
         superposition_pos1(C, D, ci, c0, c1)
         superposition_pos1(C, D, ci, c1, c0)
 
+
 # for each positive equation in D (both directions)
 def superposition_pos1(C, D, ci, c0, c1):
     if c0 is True:
@@ -2039,11 +2030,15 @@ def contains_arithmetic(a):
     return typeof(a) in ("int", "rat", "real")
 
 
+givens = []
+
+
 def solve(Cs):
     global clauses
     unprocessed = [C.simplify() for C in Cs]
     heapq.heapify(unprocessed)
     processed = []
+    givens.clear()
 
     # Otter loop
     # in tests performs about as well as Discount loop
@@ -2051,6 +2046,7 @@ def solve(Cs):
     while unprocessed:
         # given clause
         g = heapq.heappop(unprocessed)
+        givens.append(g)
 
         # subsumption
         if hasattr(g, "dead"):
@@ -2122,10 +2118,13 @@ def do_file(filename):
                 r = "CounterSatisfiable"
             elif r == "Unsatisfiable":
                 r = "Theorem"
-        prn(f"% SZS status {r} for {fname}")
         if conclusion:
-            for C in conclusion.proof():
-                prformula(C)
+            p = set(conclusion.proof())
+            good = 0
+            for g in givens:
+                if g in p:
+                    good += 1
+            prn(f"{fname},{good},{len(givens)},{good/len(givens)}")
         if r in (
             "Theorem",
             "Unsatisfiable",
@@ -2143,11 +2142,9 @@ def do_file(filename):
                 else:
                     raise ValueError(f"{r} != {problem.expected}")
     except (Inappropriate, Timeout) as e:
-        prn(f"% SZS status {e} for {fname}")
+        pass
     except RecursionError:
-        prn(f"% SZS status ResourceOut for {fname}")
-    prn(f"% {time.time() - start:.3f} seconds")
-    prn()
+        pass
 
 
 if __name__ == "__main__":
@@ -2164,5 +2161,3 @@ if __name__ == "__main__":
         for root, dirs, files in os.walk(filename):
             for fname in files:
                 do_file(os.path.join(root, fname))
-    prn(f"solved {solved}/{attempted} = {solved*100/attempted}%")
-    prn(f"{time.time() - start:.3f} seconds")

@@ -1994,6 +1994,7 @@ def superposition_pos(C, D):
         superposition_pos1(C, D, ci, c0, c1)
         superposition_pos1(C, D, ci, c1, c0)
 
+
 # for each positive equation in D (both directions)
 def superposition_pos1(C, D, ci, c0, c1):
     if c0 is True:
