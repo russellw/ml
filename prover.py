@@ -1965,7 +1965,7 @@ def superposition_neg2(C, D, ci, c0, c1, di, d0, d1, path, a):
     if isinstance(a, tuple):
         for i in range(1, len(a)):
             path.append(i)
-            superposition_negc(C, D, ci, c0, c1, di, d0, d1, path, a[i])
+            superposition_neg2(C, D, ci, c0, c1, di, d0, d1, path, a[i])
             path.pop()
 
 
@@ -1994,7 +1994,6 @@ def superposition_pos(C, D):
         superposition_pos1(C, D, ci, c0, c1)
         superposition_pos1(C, D, ci, c1, c0)
 
-
 # for each positive equation in D (both directions)
 def superposition_pos1(C, D, ci, c0, c1):
     if c0 is True:
@@ -2013,7 +2012,7 @@ def superposition_pos2(C, D, ci, c0, c1, di, d0, d1, path, a):
     if isinstance(a, tuple):
         for i in range(1, len(a)):
             path.append(i)
-            superposition_posc(C, D, ci, c0, c1, di, d0, d1, path, a[i])
+            superposition_pos2(C, D, ci, c0, c1, di, d0, d1, path, a[i])
             path.pop()
 
 
