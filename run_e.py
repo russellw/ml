@@ -56,7 +56,7 @@ def do_file(filename):
     attempted += 1
     try:
         p = subprocess.run(
-            ["bin/eprover", "--auto", "-p", "--training-examples=1", filename],
+            ["bin/eprover", "--auto", "-p", "--training-examples=7", filename],
             capture_output=True,
             encoding="utf-8",
             timeout=3,
