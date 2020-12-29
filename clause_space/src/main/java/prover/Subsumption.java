@@ -6,8 +6,6 @@ import java.util.concurrent.TimeoutException;
 public final class Subsumption {
   private static int steps;
 
-  private Subsumption() {}
-
   public static void subsumeBackward(Clause c, Collection<Clause> clauses) {
     for (var d : clauses) {
       if (d.subsumed) {

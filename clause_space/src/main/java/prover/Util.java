@@ -7,8 +7,6 @@ import java.util.Arrays;
 public final class Util {
   private static int depth;
 
-  private Util() {}
-
   public static void debug(Object a) {
     System.err.print(Thread.currentThread().getStackTrace()[2] + ": ");
     System.err.println(a);
