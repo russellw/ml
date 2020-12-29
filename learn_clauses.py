@@ -219,6 +219,10 @@ def clause_size(c):
     return n
 
 
+pr(sum(map(clause_size, neg)))
+pr(sum(map(clause_size, pos)))
+pr()
+
 cs = [(c, clause_size(c), 0) for c in neg] + [(c, clause_size(c), 1) for c in pos]
 random.shuffle(cs)
 cs.sort(key=lambda a: a[1])
