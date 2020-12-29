@@ -35,6 +35,9 @@ public final class Unification {
     // Equal
     if (a == b) return true;
 
+    // Type mismatch
+    if (a.isBoolean() != b.isBoolean()) return false;
+
     // Variable
     if (a instanceof Variable) return unifyVariable((Variable) a, b, map);
     if (b instanceof Variable) return unifyVariable((Variable) b, a, map);
