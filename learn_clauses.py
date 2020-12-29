@@ -195,13 +195,48 @@ for s in open(sys.argv[1]):
         pos.append(a)
     else:
         continue
-random.shuffle(neg)
-random.shuffle(pos)
 n = min(len(neg), len(pos))
 neg = neg[:n]
 pos = pos[:n]
-db(len(neg))
-db(len(pos))
+pr(len(neg))
+pr(len(pos))
+pr()
+
+
+def term_size(a):
+    if isinstance(a, tuple):
+        n = 0
+        for b in a:
+            n += term_size(b)
+        return n
+    return 1
+
+
+def clause_size(c):
+    n = len(c) * 1000
+    for a in c:
+        n += term_size(a)
+    return n
+
+
+cs = [(c, clause_size(c), 0) for c in neg] + [(c, clause_size(c), 1) for c in pos]
+random.shuffle(cs)
+cs.sort(key=lambda a: a[1])
+
+
+def acc(i):
+    n = 0
+    for j in range(i):
+        if cs[j][2] == 0:
+            n += 1
+    for j in range(i, len(cs)):
+        if cs[j][2] == 1:
+            n += 1
+    return n
+
+
+for i in range(0, len(cs), 100):
+    pr(f"{i}\t{acc(i)}")
 pr()
 
 pr(f"{time.time() - start:.3f} seconds")
