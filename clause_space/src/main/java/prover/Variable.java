@@ -4,11 +4,6 @@ import java.util.Map;
 
 public final class Variable extends Term {
   @Override
-  public Term eval(Map<Variable, Term> map) {
-    return map.get(this);
-  }
-
-  @Override
   public Term rename(Map<Variable, Variable> map) {
     var a = map.get(this);
     if (a == null) {

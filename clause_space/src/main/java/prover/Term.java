@@ -30,10 +30,6 @@ public abstract class Term implements Iterable<Term> {
         }
       };
 
-  public Term eval(Map<Variable, Term> map) {
-    return this;
-  }
-
   public Term get(int i) {
     throw new UnsupportedOperationException(toString());
   }

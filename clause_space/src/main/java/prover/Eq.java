@@ -53,11 +53,6 @@ public final class Eq extends Term {
     return !type || (b == Term.TRUE);
   }
 
-  @Override
-  public Term eval(Map<Variable, Term> map) {
-    return of(get(0).eval(map).equals(get(1).eval(map)));
-  }
-
   public static Eq of(Term a) {
     if (!a.isBoolean()) throw new IllegalArgumentException(a.toString());
     if (a instanceof Eq) return (Eq) a;

@@ -25,7 +25,6 @@ public final class TptpParser {
   private String tokString;
   private Map<String, Variable> free = new HashMap<>();
 
-  @SuppressWarnings("fallthrough")
   private TptpParser(String file, Set<String> select) throws IOException {
     this.file = file;
     reader =
