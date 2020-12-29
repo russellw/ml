@@ -1,7 +1,6 @@
 package prover;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public abstract class Term implements Iterable<Term> {
   public static final Term FALSE =
@@ -15,11 +14,6 @@ public abstract class Term implements Iterable<Term> {
         public Tag tag() {
           return Tag.FALSE;
         }
-
-        @Override
-        public Type type() {
-          return Type.BOOLEAN;
-        }
       };
   public static final Term TRUE =
       new Term() {
@@ -31,11 +25,6 @@ public abstract class Term implements Iterable<Term> {
         @Override
         public Tag tag() {
           return Tag.TRUE;
-        }
-
-        @Override
-        public Type type() {
-          return Type.BOOLEAN;
         }
       };
 
@@ -96,11 +85,6 @@ public abstract class Term implements Iterable<Term> {
       return false;
     }
 
-    // Types
-    if (type() != b.type()) {
-      return false;
-    }
-
     // Elements
     for (var i = 0; i < size; i++) {
       if (!get(i).match(b.get(i), map)) {
@@ -110,8 +94,8 @@ public abstract class Term implements Iterable<Term> {
     return true;
   }
 
-  public double number() {
-    throw new UnsupportedOperationException(toString());
+  public boolean isBoolean() {
+    return false;
   }
 
   public static Term of(boolean value) {
@@ -131,10 +115,6 @@ public abstract class Term implements Iterable<Term> {
 
   public Term replace(Map<Variable, Term> map) {
     return transform(a -> a.replace(map));
-  }
-
-  public Term simplify() {
-    return this;
   }
 
   public int size() {
@@ -184,21 +164,6 @@ public abstract class Term implements Iterable<Term> {
     return r;
   }
 
-  public abstract Type type();
-
-  public void type(Type expected) {
-    if (type() != expected) {
-      throw new IllegalStateException(this + ": " + type() + " != " + expected);
-    }
-  }
-
-  public final boolean unequal(Term b) {
-    if (isConstant() && b.isConstant()) {
-      return !equals(b);
-    }
-    return false;
-  }
-
   public boolean unify(Term b, Map<Variable, Term> map) {
     if (equals(b)) {
       return true;
@@ -221,11 +186,6 @@ public abstract class Term implements Iterable<Term> {
       return false;
     }
 
-    // Types
-    if (type() != b.type()) {
-      return false;
-    }
-
     // Elements
     for (var i = 0; i < size; i++) {
       if (!get(i).unify(b.get(i), map)) {
@@ -233,12 +193,5 @@ public abstract class Term implements Iterable<Term> {
       }
     }
     return true;
-  }
-
-  public final void walk(Consumer<Term> f) {
-    for (var a : this) {
-      a.walk(f);
-    }
-    f.accept(this);
   }
 }

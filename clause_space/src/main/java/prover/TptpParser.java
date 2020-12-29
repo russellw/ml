@@ -129,7 +129,7 @@ public final class TptpParser {
           if (a != null) {
             return a;
           }
-          a = new Variable(Type.INDIVIDUAL, s);
+          a = new Variable();
           free.put(s, a);
           return a;
         }
@@ -323,5 +323,18 @@ public final class TptpParser {
     var s = tokString;
     lex();
     return s;
+  }
+
+  private static final class Not extends Term {
+    final Term a;
+
+    private Not(Term a) {
+      this.a = a;
+    }
+
+    @Override
+    public Tag tag() {
+      throw new UnsupportedOperationException();
+    }
   }
 }

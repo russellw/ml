@@ -12,11 +12,11 @@ public final class Eq extends Term2 {
   }
 
   public static boolean equatable(Term a, Term b) {
-    var type = a.type();
-    if (type != b.type()) {
+    var type = a.isBoolean();
+    if (type != b.isBoolean()) {
       return false;
     }
-    return (type != Type.BOOLEAN) || (b == Term.TRUE);
+    return !type || (b == Term.TRUE);
   }
 
   @Override
@@ -25,8 +25,8 @@ public final class Eq extends Term2 {
   }
 
   public static Eq of(Term a) {
-    if (a.type() != Type.BOOLEAN) {
-      throw new IllegalArgumentException(a + ": " + a.type());
+    if (!a.isBoolean()) {
+      throw new IllegalArgumentException(a.toString());
     }
     if (a instanceof Eq) {
       return (Eq) a;
@@ -36,14 +36,6 @@ public final class Eq extends Term2 {
 
   public Eq replace(Map<Variable, Term> map) {
     return new Eq(left.replace(map), right.replace(map));
-  }
-
-  @Override
-  public Term simplify() {
-    if (left.equals(right)) {
-      return TRUE;
-    }
-    return this;
   }
 
   @Override
@@ -61,10 +53,5 @@ public final class Eq extends Term2 {
   @Override
   public Term transform(Function<Term, Term> f) {
     return new Eq(f.apply(left), f.apply(right));
-  }
-
-  @Override
-  public Type type() {
-    return Type.BOOLEAN;
   }
 }

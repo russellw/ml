@@ -1,18 +1,12 @@
 package prover;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class Function extends Term {
-  public static final Map<String, Variable> COMMON_NAMES = new HashMap<>();
-  private Type type;
   private final String name;
-  public final Variable variable;
 
   public Function(String name) {
     this.name = name;
-    variable = COMMON_NAMES.get(name);
   }
 
   public Term call(List<? extends Term> args) {
@@ -39,24 +33,5 @@ public final class Function extends Term {
   @Override
   public String toString() {
     return name;
-  }
-
-  @Override
-  public Type type() {
-    if (type == null) {
-      return Type.INDIVIDUAL;
-    }
-    return type;
-  }
-
-  @Override
-  public void type(Type expected) {
-    if (type == null) {
-      type = expected;
-      return;
-    }
-    if (type() != expected) {
-      throw new IllegalStateException(this + ": " + type() + " != " + expected);
-    }
   }
 }

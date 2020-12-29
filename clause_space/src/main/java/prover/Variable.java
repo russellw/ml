@@ -3,14 +3,6 @@ package prover;
 import java.util.Map;
 
 public final class Variable extends Term {
-  private final Type type;
-  private final String name;
-
-  public Variable(Type type, String name) {
-    this.type = type;
-    this.name = name;
-  }
-
   @Override
   public boolean contains(Variable x, Map<Variable, Term> map) {
     if (this == x) {
@@ -30,15 +22,9 @@ public final class Variable extends Term {
 
   @Override
   public boolean match(Term b, Map<Variable, Term> map) {
-
     // Equal?
     if (this == b) {
       return true;
-    }
-
-    // Type match?
-    if (type() != b.type()) {
-      return false;
     }
 
     // Existing mapping
@@ -56,7 +42,7 @@ public final class Variable extends Term {
   public Term rename(Map<Variable, Variable> map) {
     var a = map.get(this);
     if (a == null) {
-      a = new Variable(type, name);
+      a = new Variable();
       map.put(this, a);
     }
     return a;
@@ -77,29 +63,10 @@ public final class Variable extends Term {
   }
 
   @Override
-  public String toString() {
-    if (name == null) {
-      return Integer.toHexString(hashCode());
-    }
-    return name;
-  }
-
-  @Override
-  public Type type() {
-    return type;
-  }
-
-  @Override
   public boolean unify(Term b, Map<Variable, Term> map) {
-
     // Equal?
     if (this == b) {
       return true;
-    }
-
-    // Type match?
-    if (type() != b.type()) {
-      return false;
     }
 
     // Existing mapping

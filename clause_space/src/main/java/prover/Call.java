@@ -53,15 +53,4 @@ public final class Call extends Terms {
     }
     return new Call(r);
   }
-
-  @Override
-  public Type type() {
-    return get(0).type();
-  }
-
-  @Override
-  public void type(Type expected) {
-    get(0).type(expected);
-    super.type(expected);
-  }
 }

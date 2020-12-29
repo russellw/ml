@@ -8,13 +8,6 @@ import org.junit.Test;
 
 public class TermTest {
   @Test
-  public void isConstant() {
-    assertTrue(((Term) new Number(0.0)).isConstant());
-    assertTrue(((Term) new Number(1.0)).isConstant());
-    assertFalse(new Function(null).isConstant());
-  }
-
-  @Test
   public void match() {
 
     // Subset of unify (see below)
@@ -25,9 +18,9 @@ public class TermTest {
     var b = new Function("b");
     var f = new Function("f");
     var g = new Function("g");
-    var x = new Variable(Type.INDIVIDUAL, "x");
-    var y = new Variable(Type.INDIVIDUAL, "y");
-    var z = new Variable(Type.INDIVIDUAL, "z");
+    var x = new Variable();
+    var y = new Variable();
+    var z = new Variable();
     Map<Variable, Term> map;
 
     // Succeeds. (tautology)
@@ -110,35 +103,6 @@ public class TermTest {
   }
 
   @Test
-  public void type() {
-    assertEquals(((Term) new Number(1.0)).type(), Type.NUMBER);
-    assertEquals(new Not(Term.TRUE).type(), Type.BOOLEAN);
-    assertEquals(new Eq(new Number(1.0), new Number(1.0)).type(), Type.BOOLEAN);
-    var x = new Variable(Type.NUMBER, "x");
-    assertEquals(x.type(), Type.NUMBER);
-  }
-
-  @Test
-  public void unequal() {
-    var f = new Function("f");
-    var g = new Function("g");
-    var x = new Variable(Type.INDIVIDUAL, "x");
-    var y = new Variable(Type.INDIVIDUAL, "y");
-
-    // Unequal
-    assertTrue(Term.FALSE.unequal(Term.TRUE));
-
-    // Equal
-    assertFalse(f.unequal(f));
-    assertFalse(x.unequal(x));
-
-    // Unknown
-    assertFalse(f.unequal(g));
-    assertFalse(f.unequal(x));
-    assertFalse(x.unequal(y));
-  }
-
-  @Test
   public void unify() {
 
     // https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
@@ -146,9 +110,9 @@ public class TermTest {
     var b = new Function("b");
     var f = new Function("f");
     var g = new Function("g");
-    var x = new Variable(Type.INDIVIDUAL, "x");
-    var y = new Variable(Type.INDIVIDUAL, "y");
-    var z = new Variable(Type.INDIVIDUAL, "z");
+    var x = new Variable();
+    var y = new Variable();
+    var z = new Variable();
     Map<Variable, Term> map;
 
     // Succeeds. (tautology)

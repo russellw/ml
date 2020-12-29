@@ -35,8 +35,6 @@ public final class Superposition {
   public static PriorityQueue<Clause> unprocessed;
   public static Clause proof;
 
-  private Superposition() {}
-
   public static Boolean satisfiable(Collection<Clause> clauses) {
     unprocessed = new PriorityQueue<>(Comparator.comparingDouble(Clause::cost));
     unprocessed.addAll(clauses);
@@ -142,7 +140,7 @@ public final class Superposition {
     }
 
     // Make new clause
-    clause(new Clause(negative, positive, c));
+    clause(new Clause(negative, positive));
   }
 
   // For each negative equation
@@ -174,7 +172,7 @@ public final class Superposition {
     }
 
     // Make new clause
-    clause(new Clause(negative, positive, c));
+    clause(new Clause(negative, positive));
   }
 
   // For each positive equation in c (both directions)
@@ -267,6 +265,6 @@ public final class Superposition {
     ((di < d.negativeSize) ? negative : positive).add(e.replace(map).term());
 
     // Make new clause
-    clause(new Clause(negative, positive, c, d));
+    clause(new Clause(negative, positive));
   }
 }
