@@ -56,8 +56,8 @@ public final class TptpParser {
               var not = eat('~');
               var a = infixUnary();
               if (a instanceof Not) {
+                a = ((Not) a).a;
                 not = !not;
-                a = a.get(0);
               }
               (not ? negative : positive).add(a);
             } while (eat('|'));
