@@ -92,10 +92,6 @@ public final class Clause {
     this.negativeSize = negativeSize;
   }
 
-  public double cost() {
-    return volume();
-  }
-
   public final boolean isFalse() {
     return literals.length == 0;
   }
@@ -130,7 +126,7 @@ public final class Clause {
     return Arrays.toString(negative()) + " => " + Arrays.toString(positive());
   }
 
-  private int volume() {
+  public int volume() {
     int n = 0;
     for (var a : literals) {
       n += volume(a);

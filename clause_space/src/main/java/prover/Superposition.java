@@ -36,7 +36,7 @@ public final class Superposition {
   public static Clause proof;
 
   public static Boolean satisfiable(Collection<Clause> clauses) {
-    unprocessed = new PriorityQueue<>(Comparator.comparingDouble(Clause::cost));
+    unprocessed = new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
     unprocessed.addAll(clauses);
     processed = new ArrayList<>();
     proof = null;
