@@ -11,6 +11,11 @@ public final class Eq extends Term2 {
     }
   }
 
+  @Override
+  public boolean isBoolean() {
+    return true;
+  }
+
   public static boolean equatable(Term a, Term b) {
     var type = a.isBoolean();
     if (type != b.isBoolean()) {
