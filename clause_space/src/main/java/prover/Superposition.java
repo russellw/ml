@@ -41,12 +41,12 @@ public final class Superposition {
     processed = new ArrayList<>();
     proof = null;
     while (!unprocessed.isEmpty()) {
-
       // Given clause
       var g = unprocessed.poll();
       if (g.subsumed) {
         continue;
       }
+
       // Solved
       if (g.isFalse()) {
         proof = g;
@@ -59,7 +59,8 @@ public final class Superposition {
       }
 
       // Subsume
-      if (Subsumption.subsumesForward(processed, g)) {
+      var g1 = g.rename();
+      if (Subsumption.subsumesForward(processed, g1)) {
         continue;
       }
 
@@ -70,16 +71,13 @@ public final class Superposition {
       // Sometimes need to match g with itself
       processed.add(g);
 
-      // match/unify assume clauses have disjoint variable names
-      g = g.rename();
-
       // Infer from two clauses
       for (var c : processed) {
         if (c.subsumed) {
           continue;
         }
-        superposition(c, g);
-        superposition(g, c);
+        superposition(c, g1);
+        superposition(g1, c);
       }
     }
     return true;

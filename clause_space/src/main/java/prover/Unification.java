@@ -7,6 +7,9 @@ public final class Unification {
     // Equal
     if (a == b) return true;
 
+    // Type mismatch
+    if (a.isBoolean() != b.isBoolean()) return false;
+
     // Variable
     if (a instanceof Variable) {
       var a1 = (Variable) a;

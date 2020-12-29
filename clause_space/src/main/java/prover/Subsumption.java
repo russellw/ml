@@ -18,6 +18,10 @@ public final class Subsumption {
   }
 
   public static boolean subsumes(Clause c, Clause d) {
+    var variables = c.variables();
+    variables.retainAll(d.variables());
+    assert variables.isEmpty();
+
     var c1 = c.negative();
     var c2 = c.positive();
     var d1 = d.negative();

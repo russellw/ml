@@ -81,6 +81,20 @@ public final class Clause {
     return a;
   }
 
+  private static void getVariables(Term a, Set<Variable> r) {
+    if (a instanceof Variable) {
+      r.add((Variable) a);
+      return;
+    }
+    for (var b : a) getVariables(b, r);
+  }
+
+  public Set<Variable> variables() {
+    var r = new HashSet<Variable>();
+    for (var a : literals) getVariables(a, r);
+    return r;
+  }
+
   private Clause(Term[] literals, int negativeSize) {
     this.literals = literals;
     this.negativeSize = negativeSize;
