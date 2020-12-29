@@ -5,10 +5,6 @@ import java.util.*;
 public abstract class Term implements Iterable<Term> {
   public static final Term FALSE =
       new Term() {
-        @Override
-        public boolean isConstant() {
-          return true;
-        }
 
         @Override
         public boolean isBoolean() {
@@ -22,10 +18,6 @@ public abstract class Term implements Iterable<Term> {
       };
   public static final Term TRUE =
       new Term() {
-        @Override
-        public boolean isConstant() {
-          return true;
-        }
 
         @Override
         public boolean isBoolean() {
@@ -53,10 +45,6 @@ public abstract class Term implements Iterable<Term> {
 
   public Term get(int i) {
     throw new UnsupportedOperationException(toString());
-  }
-
-  public boolean isConstant() {
-    return false;
   }
 
   @Override
