@@ -1,12 +1,38 @@
 package prover;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-public final class Call extends Terms {
+public final class Call extends Term {
+  private final Term[] data;
+
   public Call(Term[] data) {
-    super(data);
-    assert data.length > 0;
+    assert data.length > 1;
+    this.data = data;
+  }
+
+  @Override
+  public Term get(int i) {
+    return data[i];
+  }
+
+  @Override
+  public int size() {
+    return data.length;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Call)) return false;
+    Call terms = (Call) o;
+    return Arrays.equals(data, terms.data);
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(data);
   }
 
   @Override
