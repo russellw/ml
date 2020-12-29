@@ -1,5 +1,7 @@
 import datetime
+import inspect
 import logging
+import random
 import sys
 import time
 
@@ -17,8 +19,9 @@ def pr(a=""):
     logger.info(str(a))
 
 
-def debug(a):
-    logger.debug(str(a), stack_info=True)
+def db(a):
+    info = inspect.getframeinfo(inspect.currentframe().f_back)
+    logger.debug(f"{info.filename}:{info.function}:{info.lineno}: {repr(a)}")
 
 
 pr(sys.argv)
@@ -27,6 +30,9 @@ pr()
 
 class Var:
     pass
+
+
+variable = Var()
 
 
 def fns(a):
@@ -102,9 +108,8 @@ def parse(text):
             return True
 
     def expect(o):
-        if tok != o:
+        if not eat(o):
             raise ValueError(tok)
-        lex()
 
     # terms
     def read_name():
@@ -122,17 +127,6 @@ def parse(text):
 
         raise ValueError(o)
 
-    def args():
-        expect("(")
-        r = []
-        if tok != ")":
-            r.append(atomic_term())
-            while tok == ",":
-                lex()
-                r.append(atomic_term())
-        expect(")")
-        return tuple(r)
-
     def atomic_term():
         o = tok
 
@@ -144,13 +138,16 @@ def parse(text):
         # variable
         if o[0].isupper():
             lex()
-            return Var()
+            return variable
 
-        # function
+        # function/constant
         a = read_name()
-        if tok == "(":
-            s = args()
-            return (a,) + s
+        if eat("("):
+            r = [a, atomic_term()]
+            while eat(","):
+                r.append(atomic_term())
+            expect(")")
+            return tuple(r)
         return a
 
     def infix_unary():
@@ -171,6 +168,7 @@ def parse(text):
             return "~", unitary_formula()
         return infix_unary()
 
+    # clause
     lex()
     expect("cnf")
     expect("(")
@@ -197,7 +195,13 @@ for s in open(sys.argv[1]):
         pos.append(a)
     else:
         continue
-pr(len(neg))
-pr(len(pos))
+random.shuffle(neg)
+random.shuffle(pos)
+n = min(len(neg), len(pos))
+neg = neg[:n]
+pos = pos[:n]
+db(len(neg))
+db(len(pos))
+pr()
 
 pr(f"{time.time() - start:.3f} seconds")
