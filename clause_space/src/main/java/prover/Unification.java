@@ -16,7 +16,7 @@ public final class Unification {
 
       // Existing mapping
       var a2 = map.get(a1);
-      if (a2 != null) return match(a2, b, map);
+      if (a2 != null) return a2.equals(b);
 
       // New mapping
       map.put(a1, b);
