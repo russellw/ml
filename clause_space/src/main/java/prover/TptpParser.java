@@ -61,37 +61,27 @@ public final class TptpParser {
               }
               (not ? negative : positive).add(a);
             } while (eat('|'));
-            if (parens) {
-              expect(')');
-            }
-            if ((select != null) && !select.contains(name)) {
-              break;
-            }
+            if (parens) expect(')');
+            if ((select != null) && !select.contains(name)) break;
             clauses.add(new Clause(negative, positive));
             break;
           }
         case "include":
           {
             var tptp = System.getenv("TPTP");
-            if (tptp == null) {
-              throw new IllegalStateException("TPTP environment variable not set");
-            }
+            if (tptp == null) throw new IllegalStateException("TPTP environment variable not set");
             var select1 = select;
-            if (eat(',')) {
-              if ((tok == WORD) && "all".equals(tokString)) {
-                lex();
-              } else {
+            if (eat(','))
+              if ((tok == WORD) && "all".equals(tokString)) lex();
+              else {
                 expect('[');
                 select1 = new HashSet<>();
                 do {
                   var name1 = word();
-                  if ((select == null) || select.contains(name1)) {
-                    select1.add(name1);
-                  }
+                  if ((select == null) || select.contains(name1)) select1.add(name1);
                 } while (eat(','));
                 expect(']');
               }
-            }
             new TptpParser(tptp + '/' + name, select1);
             break;
           }
@@ -112,9 +102,8 @@ public final class TptpParser {
 
   private void args(List<Term> r) throws IOException {
     expect('(');
-    do {
-      r.add(atomicTerm());
-    } while (eat(','));
+    do r.add(atomicTerm());
+    while (eat(','));
     expect(')');
   }
 
@@ -126,9 +115,7 @@ public final class TptpParser {
       case VAR:
         {
           var a = free.get(s);
-          if (a != null) {
-            return a;
-          }
+          if (a != null) return a;
           a = new Variable();
           free.put(s, a);
           return a;
@@ -161,10 +148,8 @@ public final class TptpParser {
   }
 
   private void expect(int k) throws IOException {
-    if (eat(k)) {
-      return;
-    }
-    throw new ParseException(file, reader.getLineNumber(), ": '" + (char) k + "' expected");
+    if (!eat(k))
+      throw new ParseException(file, reader.getLineNumber(), ": '" + (char) k + "' expected");
   }
 
   private Term infixUnary() throws IOException {
@@ -259,12 +244,8 @@ public final class TptpParser {
           var sb1 = new StringBuilder();
           c = reader.read();
           while (c != quote) {
-            if (c < ' ') {
-              throw new ParseException(file, line, "unclosed quote");
-            }
-            if (c == '\\') {
-              c = reader.read();
-            }
+            if (c < ' ') throw new ParseException(file, line, "unclosed quote");
+            if (c == '\\') c = reader.read();
             sb1.append((char) c);
             c = reader.read();
           }
@@ -317,9 +298,7 @@ public final class TptpParser {
   }
 
   private String word() throws IOException {
-    if (tok != WORD) {
-      throw new ParseException(file, reader.getLineNumber(), "word expected");
-    }
+    if (tok != WORD) throw new ParseException(file, reader.getLineNumber(), "word expected");
     var s = tokString;
     lex();
     return s;

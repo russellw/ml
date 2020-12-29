@@ -18,9 +18,7 @@ public final class Function extends Term {
   public Term call(List<? extends Term> args) {
     var r = new Term[args.size() + 1];
     r[0] = this;
-    for (int i = 0; i < args.size(); i++) {
-      r[i + 1] = args.get(i);
-    }
+    for (int i = 0; i < args.size(); i++) r[i + 1] = args.get(i);
     return new Call(r);
   }
 

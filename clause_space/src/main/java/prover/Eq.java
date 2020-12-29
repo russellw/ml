@@ -8,9 +8,7 @@ public final class Eq extends Term {
   public final Term left, right;
 
   public Eq(Term left, Term right) {
-    if (!equatable(left, right)) {
-      throw new IllegalArgumentException(toString());
-    }
+    if (!equatable(left, right)) throw new IllegalArgumentException(toString());
     this.left = left;
     this.right = right;
   }
@@ -51,9 +49,7 @@ public final class Eq extends Term {
 
   public static boolean equatable(Term a, Term b) {
     var type = a.isBoolean();
-    if (type != b.isBoolean()) {
-      return false;
-    }
+    if (type != b.isBoolean()) return false;
     return !type || (b == Term.TRUE);
   }
 
@@ -63,12 +59,8 @@ public final class Eq extends Term {
   }
 
   public static Eq of(Term a) {
-    if (!a.isBoolean()) {
-      throw new IllegalArgumentException(a.toString());
-    }
-    if (a instanceof Eq) {
-      return (Eq) a;
-    }
+    if (!a.isBoolean()) throw new IllegalArgumentException(a.toString());
+    if (a instanceof Eq) return (Eq) a;
     return new Eq(a, Term.TRUE);
   }
 
@@ -82,9 +74,7 @@ public final class Eq extends Term {
   }
 
   public Term term() {
-    if (right == Term.TRUE) {
-      return left;
-    }
+    if (right == Term.TRUE) return left;
     return this;
   }
 

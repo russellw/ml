@@ -8,12 +8,8 @@ public final class Subsumption {
 
   public static void subsumeBackward(Clause c, Collection<Clause> clauses) {
     for (var d : clauses) {
-      if (d.subsumed) {
-        continue;
-      }
-      if (subsumes(c, d)) {
-        d.subsumed = true;
-      }
+      if (d.subsumed) continue;
+      if (subsumes(c, d)) d.subsumed = true;
     }
   }
 
@@ -29,7 +25,6 @@ public final class Subsumption {
 
     // Fewer literals typically fail faster
     if (c2.length < c1.length) {
-
       // Swap negative and positive
       var ct = c1;
       c1 = c2;
@@ -53,26 +48,19 @@ public final class Subsumption {
 
   public static boolean subsumesForward(Collection<Clause> clauses, Clause c) {
     for (var d : clauses) {
-      if (d.subsumed) {
-        continue;
-      }
-      if (subsumes(d, c)) {
-        return true;
-      }
+      if (d.subsumed) continue;
+      if (subsumes(d, c)) return true;
     }
     return false;
   }
 
   private static Map<Variable, Term> search(
       Term[] c, Term[] c2, Term[] d, Term[] d2, Map<Variable, Term> map) throws TimeoutException {
-    if (steps == 10_000) {
-      throw new TimeoutException();
-    }
+    if (steps == 10_000) throw new TimeoutException();
     steps++;
 
     // Matched everything in one polarity
     if (c.length == 0) {
-
       // Matched everything in the other polarity
       if (c2 == null) {
         return map;
@@ -91,36 +79,25 @@ public final class Subsumption {
         var de = Eq.of(d[di]);
 
         // Search means preserve the original map
-        // in case the search fails
-        // and need to backtrack
+        // in case the search fails and need to backtrack
         Map<Variable, Term> m;
 
         // Try orienting equation one way
         m = new HashMap<>(map);
         if (Unification.match(ce.left, de.left, m) && Unification.match(ce.right, de.right, m)) {
-          if (c1 == null) {
-            c1 = Term.remove(c, ci);
-          }
+          if (c1 == null) c1 = Term.remove(c, ci);
           d1 = Term.remove(d, di);
           m = search(c1, c2, d1, d2, m);
-          if (m != null) {
-            return m;
-          }
+          if (m != null) return m;
         }
 
         // And the other way
         m = new HashMap<>(map);
         if (Unification.match(ce.left, de.right, m) && Unification.match(ce.right, de.left, m)) {
-          if (c1 == null) {
-            c1 = Term.remove(c, ci);
-          }
-          if (d1 == null) {
-            d1 = Term.remove(d, di);
-          }
+          if (c1 == null) c1 = Term.remove(c, ci);
+          if (d1 == null) d1 = Term.remove(d, di);
           m = search(c1, c2, d1, d2, m);
-          if (m != null) {
-            return m;
-          }
+          if (m != null) return m;
         }
       }
     }

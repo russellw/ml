@@ -25,18 +25,14 @@ public final class Clause {
     for (var a : positive) setBoolean(a);
 
     // Simplify
-    for (var i = 0; i < negative.size(); i++) {
-      negative.set(i, simplify(negative.get(i)));
-    }
-    for (var i = 0; i < positive.size(); i++) {
-      positive.set(i, simplify(positive.get(i)));
-    }
+    for (var i = 0; i < negative.size(); i++) negative.set(i, simplify(negative.get(i)));
+    for (var i = 0; i < positive.size(); i++) positive.set(i, simplify(positive.get(i)));
 
     // Redundancy
     negative.removeIf(a -> a == Term.TRUE);
     positive.removeIf(a -> a == Term.FALSE);
 
-    // Tautology?
+    // Tautology
     for (var a : negative) {
       if (a == Term.FALSE) {
         literals = new Term[] {Term.TRUE};
@@ -63,12 +59,8 @@ public final class Clause {
 
     // Literals
     literals = new Term[negative.size() + positive.size()];
-    for (var i = 0; i < negative.size(); i++) {
-      literals[i] = negative.get(i);
-    }
-    for (var i = 0; i < positive.size(); i++) {
-      literals[negative.size() + i] = positive.get(i);
-    }
+    for (var i = 0; i < negative.size(); i++) literals[i] = negative.get(i);
+    for (var i = 0; i < positive.size(); i++) literals[negative.size() + i] = positive.get(i);
     negativeSize = negative.size();
   }
 

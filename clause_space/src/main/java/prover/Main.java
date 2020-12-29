@@ -24,13 +24,10 @@ public final class Main {
       var start = System.currentTimeMillis();
       Superposition.timeout = start + 60_000;
       var result = Superposition.satisfiable(clauses);
-      if (result == null) {
-        System.out.print("      ");
-      } else {
+      if (result == null) System.out.print("      ");
+      else {
         System.out.print(result ? " sat  " : " unsat");
-        if (result != status) {
-          throw new IllegalStateException();
-        }
+        if (result != status) throw new IllegalStateException();
         solved++;
       }
       System.out.printf(

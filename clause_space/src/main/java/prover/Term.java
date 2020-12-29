@@ -87,9 +87,7 @@ public abstract class Term implements Iterable<Term> {
   }
 
   public Term splice(List<Integer> position, int i, Term b) {
-    if (i == position.size()) {
-      return b;
-    }
+    if (i == position.size()) return b;
     throw new IllegalStateException(toString());
   }
 
@@ -102,9 +100,7 @@ public abstract class Term implements Iterable<Term> {
 
   public static Term[] transform(Term[] q, java.util.function.Function<Term, Term> f) {
     var r = new Term[q.length];
-    for (var i = 0; i < r.length; i++) {
-      r[i] = f.apply(q[i]);
-    }
+    for (var i = 0; i < r.length; i++) r[i] = f.apply(q[i]);
     return r;
   }
 }
