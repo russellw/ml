@@ -9,11 +9,34 @@ public final class Main {
   public static Boolean status;
 
   public static void main(String[] args) throws IOException {
-    assert args[0].endsWith(".lst");
-    var files = Files.readAllLines(Path.of(args[0]), StandardCharsets.UTF_8).toArray(new String[0]);
+    var arg = args[0];
+    String[] files;
+    if (arg.endsWith(".lst"))
+      files = Files.readAllLines(Path.of(arg), StandardCharsets.UTF_8).toArray(new String[0]);
+    else files = new String[] {arg};
+    System.out.println("file                                     clauses sat   processed   time");
+    var solved = 0;
     for (var file : files) {
+      System.out.printf("%-40s", file);
+      status = null;
       var clauses = TptpParser.read(file);
-      System.out.println(clauses.size());
+      System.out.printf(" %7d", clauses.size());
+      var start = System.currentTimeMillis();
+      Superposition.timeout = start + 60_000;
+      var result = Superposition.satisfiable(clauses);
+      if (result == null) {
+        System.out.print("      ");
+      } else {
+        System.out.print(result ? " sat  " : " unsat");
+        if (result != status) {
+          throw new IllegalStateException();
+        }
+        solved++;
+      }
+      System.out.printf(
+          " %9d %6d\n", Superposition.processed.size(), System.currentTimeMillis() - start);
     }
+    System.out.printf(
+        "solved %d/%d (%f%%)\n", solved, args.length, solved * 100 / (double) args.length);
   }
 }

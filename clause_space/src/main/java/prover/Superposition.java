@@ -47,8 +47,7 @@ public final class Superposition {
       if (g.subsumed) {
         continue;
       }
-      System.out.println(g);
-      // Solved?
+      // Solved
       if (g.isFalse()) {
         proof = g;
         return false;
