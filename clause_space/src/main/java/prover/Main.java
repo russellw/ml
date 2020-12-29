@@ -37,6 +37,6 @@ public final class Main {
           " %9d %6d\n", Superposition.processed.size(), System.currentTimeMillis() - start);
     }
     System.out.printf(
-        "solved %d/%d (%f%%)\n", solved, args.length, solved * 100 / (double) args.length);
+        "solved %d/%d (%f%%)\n", solved, files.length, solved * 100 / (double) files.length);
   }
 }
