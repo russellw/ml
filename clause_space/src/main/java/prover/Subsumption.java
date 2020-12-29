@@ -93,7 +93,7 @@ public final class Subsumption {
 
         // Try orienting equation one way
         m = new HashMap<>(map);
-        if (ce.left.match(de.left, m) && ce.right.match(de.right, m)) {
+        if (Unification.match(ce.left, de.left, m) && Unification.match(ce.right, de.right, m)) {
           if (c1 == null) {
             c1 = Term.remove(c, ci);
           }
@@ -106,7 +106,7 @@ public final class Subsumption {
 
         // And the other way
         m = new HashMap<>(map);
-        if (ce.left.match(de.right, m) && ce.right.match(de.left, m)) {
+        if (Unification.match(ce.left, de.right, m) && Unification.match(ce.right, de.left, m)) {
           if (c1 == null) {
             c1 = Term.remove(c, ci);
           }
