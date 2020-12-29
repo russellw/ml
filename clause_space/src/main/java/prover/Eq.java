@@ -1,14 +1,47 @@
 package prover;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
-public final class Eq extends Term2 {
+public final class Eq extends Term {
+  public final Term left, right;
+
   public Eq(Term left, Term right) {
-    super(left, right);
     if (!equatable(left, right)) {
       throw new IllegalArgumentException(toString());
     }
+    this.left = left;
+    this.right = right;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Eq)) return false;
+    Eq terms = (Eq) o;
+    return Objects.equals(left, terms.left) && Objects.equals(right, terms.right);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(left, right);
+  }
+
+  @Override
+  public Term get(int i) {
+    switch (i) {
+      case 0:
+        return left;
+      case 1:
+        return right;
+    }
+    throw new IllegalArgumentException(toString() + '[' + i + ']');
+  }
+
+  @Override
+  public int size() {
+    return 2;
   }
 
   @Override
