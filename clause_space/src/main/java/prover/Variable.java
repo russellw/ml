@@ -61,35 +61,4 @@ public final class Variable extends Term {
   public Tag tag() {
     return Tag.VARIABLE;
   }
-
-  @Override
-  public boolean unify(Term b, Map<Variable, Term> map) {
-    // Equal?
-    if (this == b) {
-      return true;
-    }
-
-    // Existing mapping
-    var a2 = map.get(this);
-    if (a2 != null) {
-      return a2.unify(b, map);
-    }
-
-    // Variable?
-    if (b instanceof Variable) {
-      var b2 = map.get(b);
-      if (b2 != null) {
-        return unify(b2, map);
-      }
-    }
-
-    // Occurs check
-    if (b.contains(this, map)) {
-      return false;
-    }
-
-    // New mapping
-    map.put(this, b);
-    return true;
-  }
 }

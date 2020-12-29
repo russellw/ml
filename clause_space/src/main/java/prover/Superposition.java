@@ -120,7 +120,7 @@ public final class Superposition {
       return;
     }
     var map = new HashMap<Variable, Term>();
-    if (!c0.unify(d0, map)) {
+    if (!Unification.unify(c0, d0, map)) {
       return;
     }
 
@@ -148,7 +148,7 @@ public final class Superposition {
     for (var i = 0; i < c.negativeSize; i++) {
       var e = Eq.of(c.literals[i]);
       var map = new HashMap<Variable, Term>();
-      if (e.left.unify(e.right, map)) {
+      if (Unification.unify(e.left, e.right, map)) {
         resolution(c, i, map);
       }
     }
@@ -232,7 +232,7 @@ public final class Superposition {
       List<Integer> position,
       Term a) {
     var map = new HashMap<Variable, Term>();
-    if (!c0.unify(a, map)) {
+    if (!Unification.unify(c0, a, map)) {
       return;
     }
     var e = new Eq(d0.splice(position, c1), d1);

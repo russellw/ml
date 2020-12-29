@@ -161,35 +161,4 @@ public abstract class Term implements Iterable<Term> {
     }
     return r;
   }
-
-  public boolean unify(Term b, Map<Variable, Term> map) {
-    if (equals(b)) {
-      return true;
-    }
-    if (b instanceof Variable) {
-      return b.unify(this, map);
-    }
-
-    // Atoms unequal
-    int size = size();
-    if (size == 0) {
-      return false;
-    }
-
-    // Structure
-    if (tag() != b.tag()) {
-      return false;
-    }
-    if (size != b.size()) {
-      return false;
-    }
-
-    // Elements
-    for (var i = 0; i < size; i++) {
-      if (!get(i).unify(b.get(i), map)) {
-        return false;
-      }
-    }
-    return true;
-  }
 }

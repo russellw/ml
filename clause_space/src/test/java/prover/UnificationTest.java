@@ -47,37 +47,37 @@ public class UnificationTest {
 
     // function and constant symbols match, x is unified with the constant b
     map = new HashMap<>();
-    assertTrue(f.call(a, x).unify(f.call(a, b), map));
+    assertTrue(Unification.unify(f.call(a, x), f.call(a, b), map));
     assertEquals(map.size(), 1);
     assertEquals(x.replace(map), b);
 
     // f and g do not match
     map = new HashMap<>();
-    assertFalse(f.call(a).unify(g.call(a), map));
+    assertFalse(Unification.unify(f.call(a), g.call(a), map));
 
     // x and y are aliased
     map = new HashMap<>();
-    assertTrue(f.call(x).unify(f.call(y), map));
+    assertTrue(Unification.unify(f.call(x), f.call(y), map));
     assertEquals(map.size(), 1);
     assertEquals(x.replace(map), y.replace(map));
 
     // f and g do not match
     map = new HashMap<>();
-    assertFalse(f.call(x).unify(g.call(y), map));
+    assertFalse(Unification.unify(f.call(x), g.call(y), map));
 
     // Fails. The f function symbols have different arity
     map = new HashMap<>();
-    assertFalse(f.call(x).unify(f.call(y, z), map));
+    assertFalse(Unification.unify(f.call(x), f.call(y, z), map));
 
     // Unifies y with the term g(x)
     map = new HashMap<>();
-    assertTrue(f.call(g.call(x)).unify(f.call(y), map));
+    assertTrue(Unification.unify(f.call(g.call(x)), f.call(y), map));
     assertEquals(map.size(), 1);
     assertEquals(y.replace(map), g.call(x));
 
     // Unifies x with constant a, and y with the term g(a)
     map = new HashMap<>();
-    assertTrue(f.call(g.call(x), x).unify(f.call(y, a), map));
+    assertTrue(Unification.unify(f.call(g.call(x), x), f.call(y, a), map));
     assertEquals(map.size(), 2);
     assertEquals(x.replace(map), a);
     assertEquals(y.replace(map), g.call(a));
@@ -90,7 +90,7 @@ public class UnificationTest {
     // Both x and y are unified with the constant a
     map = new HashMap<>();
     assertTrue(Unification.unify(x, y, map));
-    assertTrue(y.unify(a, map));
+    assertTrue(Unification.unify(y, a, map));
     assertEquals(map.size(), 2);
     assertEquals(x.replace(map), a);
     assertEquals(y.replace(map), a);
@@ -106,6 +106,6 @@ public class UnificationTest {
     // Fails. a and b do not match, so x can't be unified with both
     map = new HashMap<>();
     assertTrue(Unification.unify(x, a, map));
-    assertFalse(b.unify(x, map));
+    assertFalse(Unification.unify(b, x, map));
   }
 }
