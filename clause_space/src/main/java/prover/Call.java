@@ -10,6 +10,11 @@ public final class Call extends Terms {
   }
 
   @Override
+  public boolean isBoolean() {
+    return get(0).isBoolean();
+  }
+
+  @Override
   public Term splice(List<Integer> position, int i, Term b) {
     if (i == position.size()) {
       return b;

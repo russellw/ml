@@ -11,6 +11,11 @@ public abstract class Term implements Iterable<Term> {
         }
 
         @Override
+        public boolean isBoolean() {
+          return true;
+        }
+
+        @Override
         public Tag tag() {
           return Tag.FALSE;
         }
@@ -19,6 +24,11 @@ public abstract class Term implements Iterable<Term> {
       new Term() {
         @Override
         public boolean isConstant() {
+          return true;
+        }
+
+        @Override
+        public boolean isBoolean() {
           return true;
         }
 

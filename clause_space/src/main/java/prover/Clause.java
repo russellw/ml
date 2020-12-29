@@ -7,7 +7,23 @@ public final class Clause {
   public final int negativeSize;
   public boolean subsumed;
 
+  private static void setBoolean(Term a) {
+    if (a instanceof Function) {
+      ((Function) a).isBoolean = true;
+      return;
+    }
+    if (a instanceof Call) {
+      var a1 = (Call) a;
+      ((Function) a1.get(0)).isBoolean = true;
+      return;
+    }
+  }
+
   public Clause(List<Term> negative, List<Term> positive) {
+    // Types
+    for (var a : negative) setBoolean(a);
+    for (var a : positive) setBoolean(a);
+
     // Simplify
     for (var i = 0; i < negative.size(); i++) {
       negative.set(i, simplify(negative.get(i)));

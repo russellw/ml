@@ -4,9 +4,15 @@ import java.util.List;
 
 public final class Function extends Term {
   private final String name;
+  public boolean isBoolean;
 
   public Function(String name) {
     this.name = name;
+  }
+
+  @Override
+  public boolean isBoolean() {
+    return isBoolean;
   }
 
   public Term call(List<? extends Term> args) {
