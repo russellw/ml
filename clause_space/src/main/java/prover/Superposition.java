@@ -57,6 +57,7 @@ public final class Superposition {
       // Subsume
       var g1 = g.rename();
       if (Subsumption.subsumesForward(processed, g1)) continue;
+      Subsumption.subsumeBackward(g1, processed);
 
       // Infer from one clause
       resolution(g);
