@@ -23,7 +23,7 @@ public final class TptpParser {
   private int c;
   private int tok;
   private String tokString;
-  private Map<String, Variable> free = new HashMap<>();
+  private Map<String, Var> free = new HashMap<>();
 
   private void lex() throws IOException {
     for (; ; ) {
@@ -187,7 +187,7 @@ public final class TptpParser {
         {
           var a = free.get(s);
           if (a != null) return a;
-          a = new Variable();
+          a = new Var();
           free.put(s, a);
           return a;
         }
@@ -215,10 +215,10 @@ public final class TptpParser {
     switch (tok) {
       case '=':
         lex();
-        return new Equation(a, atomicTerm());
+        return new Eq(a, atomicTerm());
       case NOT_EQ:
         lex();
-        return new Not(new Equation(a, atomicTerm()));
+        return new Not(new Eq(a, atomicTerm()));
       default:
         return a;
     }

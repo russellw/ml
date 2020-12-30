@@ -14,10 +14,10 @@ public class UnificationTest {
     var b = new Func("b");
     var f = new Func("f");
     var g = new Func("g");
-    var x = new Variable();
-    var y = new Variable();
-    var z = new Variable();
-    Map<Variable, Term> map;
+    var x = new Var();
+    var y = new Var();
+    var z = new Var();
+    Map<Var, Term> map;
 
     // Succeeds. (tautology)
     map = new HashMap<>();
@@ -119,10 +119,10 @@ public class UnificationTest {
     var b = new Func("b");
     var f = new Func("f");
     var g = new Func("g");
-    var x = new Variable();
-    var y = new Variable();
-    var z = new Variable();
-    Map<Variable, Term> map;
+    var x = new Var();
+    var y = new Var();
+    var z = new Var();
+    Map<Var, Term> map;
 
     // Succeeds. (tautology)
     map = new HashMap<>();

@@ -65,7 +65,7 @@ public final class Clause {
   }
 
   private static Term simplify(Term a) {
-    if (a instanceof Equation) {
+    if (a instanceof Eq) {
       var x = a.get(0);
       var y = a.get(1);
       if (x.equals(y)) return Term.TRUE;
@@ -73,17 +73,17 @@ public final class Clause {
     return a;
   }
 
-  private static void getVariables(Term a, Set<Variable> r) {
-    if (a instanceof Variable) {
-      r.add((Variable) a);
+  private static void getVars(Term a, Set<Var> r) {
+    if (a instanceof Var) {
+      r.add((Var) a);
       return;
     }
-    for (var b : a) getVariables(b, r);
+    for (var b : a) getVars(b, r);
   }
 
-  public Set<Variable> variables() {
-    var r = new HashSet<Variable>();
-    for (var a : literals) getVariables(a, r);
+  public Set<Var> vars() {
+    var r = new HashSet<Var>();
+    for (var a : literals) getVars(a, r);
     return r;
   }
 
@@ -113,7 +113,7 @@ public final class Clause {
   }
 
   public Clause rename() {
-    var map = new HashMap<Variable, Variable>();
+    var map = new HashMap<Var, Var>();
     var literals = Term.transform(this.literals, term -> term.rename(map));
     if (map.isEmpty()) {
       return this;

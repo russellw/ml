@@ -63,11 +63,11 @@ public abstract class Term implements Iterable<Term> {
     return r;
   }
 
-  public Term rename(Map<Variable, Variable> map) {
+  public Term rename(Map<Var, Var> map) {
     return transform(a -> a.rename(map));
   }
 
-  public Term replace(Map<Variable, Term> map) {
+  public Term replace(Map<Var, Term> map) {
     return transform(a -> a.replace(map));
   }
 

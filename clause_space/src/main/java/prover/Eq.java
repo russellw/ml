@@ -4,10 +4,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-public final class Equation extends Term {
+public final class Eq extends Term {
   public final Term left, right;
 
-  public Equation(Term left, Term right) {
+  public Eq(Term left, Term right) {
     if (!equatable(left, right)) throw new IllegalArgumentException(toString());
     this.left = left;
     this.right = right;
@@ -16,8 +16,8 @@ public final class Equation extends Term {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof Equation)) return false;
-    Equation terms = (Equation) o;
+    if (!(o instanceof Eq)) return false;
+    Eq terms = (Eq) o;
     return Objects.equals(left, terms.left) && Objects.equals(right, terms.right);
   }
 
@@ -53,14 +53,14 @@ public final class Equation extends Term {
     return !type || (b == Term.TRUE);
   }
 
-  public static Equation of(Term a) {
+  public static Eq of(Term a) {
     if (!a.isBoolean()) throw new IllegalArgumentException(a.toString());
-    if (a instanceof Equation) return (Equation) a;
-    return new Equation(a, Term.TRUE);
+    if (a instanceof Eq) return (Eq) a;
+    return new Eq(a, Term.TRUE);
   }
 
-  public Equation replace(Map<Variable, Term> map) {
-    return new Equation(left.replace(map), right.replace(map));
+  public Eq replace(Map<Var, Term> map) {
+    return new Eq(left.replace(map), right.replace(map));
   }
 
   @Override
@@ -75,6 +75,6 @@ public final class Equation extends Term {
 
   @Override
   public Term transform(Function<Term, Term> f) {
-    return new Equation(f.apply(left), f.apply(right));
+    return new Eq(f.apply(left), f.apply(right));
   }
 }

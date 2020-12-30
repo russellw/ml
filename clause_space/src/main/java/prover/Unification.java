@@ -3,7 +3,7 @@ package prover;
 import java.util.Map;
 
 public final class Unification {
-  public static boolean match(Term a, Term b, Map<Variable, Term> map) {
+  public static boolean match(Term a, Term b, Map<Var, Term> map) {
     // Equal
     if (a == b) return true;
 
@@ -11,8 +11,8 @@ public final class Unification {
     if (a.isBoolean() != b.isBoolean()) return false;
 
     // Variable
-    if (a instanceof Variable) {
-      var a1 = (Variable) a;
+    if (a instanceof Var) {
+      var a1 = (Var) a;
 
       // Existing mapping
       var a2 = map.get(a1);
@@ -34,7 +34,7 @@ public final class Unification {
     return true;
   }
 
-  public static boolean unify(Term a, Term b, Map<Variable, Term> map) {
+  public static boolean unify(Term a, Term b, Map<Var, Term> map) {
     // Equal
     if (a == b) return true;
 
@@ -42,8 +42,8 @@ public final class Unification {
     if (a.isBoolean() != b.isBoolean()) return false;
 
     // Variable
-    if (a instanceof Variable) return unifyVariable((Variable) a, b, map);
-    if (b instanceof Variable) return unifyVariable((Variable) b, a, map);
+    if (a instanceof Var) return unifyVariable((Var) a, b, map);
+    if (b instanceof Var) return unifyVariable((Var) b, a, map);
 
     // Atom
     int n = a.size();
@@ -56,7 +56,7 @@ public final class Unification {
     return true;
   }
 
-  private static boolean unifyVariable(Variable a, Term b, Map<Variable, Term> map) {
+  private static boolean unifyVariable(Var a, Term b, Map<Var, Term> map) {
     // Equal
     if (a == b) return true;
 
@@ -65,7 +65,7 @@ public final class Unification {
     if (a1 != null) return unify(a1, b, map);
 
     // Variable
-    if (b instanceof Variable) {
+    if (b instanceof Var) {
       var b1 = map.get(b);
       if (b1 != null) return unify(b1, a, map);
     }
@@ -78,9 +78,9 @@ public final class Unification {
     return true;
   }
 
-  private static boolean occurs(Variable a, Term b, Map<Variable, Term> map) {
+  private static boolean occurs(Var a, Term b, Map<Var, Term> map) {
     if (a == b) return true;
-    if (b instanceof Variable) {
+    if (b instanceof Var) {
       var b1 = map.get(b);
       if (b1 != null) return occurs(a, b1, map);
       return false;
