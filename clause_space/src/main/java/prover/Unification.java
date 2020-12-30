@@ -4,6 +4,9 @@ import java.util.Map;
 
 public final class Unification {
   public static boolean match(Term a, Term b, Map<Var, Term> map) {
+    assert !(a instanceof Eq);
+    assert !(b instanceof Eq);
+
     // Equal
     if (a == b) return true;
 
@@ -28,13 +31,15 @@ public final class Unification {
     if (n == 0) return false;
 
     // Compound
-    if (a.tag() != b.tag()) return false;
     if (n != b.size()) return false;
     for (var i = 0; i < n; i++) if (!match(a.get(i), b.get(i), map)) return false;
     return true;
   }
 
   public static boolean unify(Term a, Term b, Map<Var, Term> map) {
+    assert !(a instanceof Eq);
+    assert !(b instanceof Eq);
+
     // Equal
     if (a == b) return true;
 
@@ -50,7 +55,6 @@ public final class Unification {
     if (n == 0) return false;
 
     // Compound
-    if (a.tag() != b.tag()) return false;
     if (n != b.size()) return false;
     for (var i = 0; i < n; i++) if (!unify(a.get(i), b.get(i), map)) return false;
     return true;

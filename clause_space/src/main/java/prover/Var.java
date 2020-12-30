@@ -9,9 +9,4 @@ public final class Var extends Term {
     if (a != null) return a.replace(map);
     return this;
   }
-
-  @Override
-  public Tag tag() {
-    return Tag.VARIABLE;
-  }
 }

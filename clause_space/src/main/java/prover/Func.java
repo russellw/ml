@@ -30,11 +30,6 @@ public final class Func extends Term {
   }
 
   @Override
-  public Tag tag() {
-    return Tag.FUNCTION;
-  }
-
-  @Override
   public String toString() {
     return name;
   }

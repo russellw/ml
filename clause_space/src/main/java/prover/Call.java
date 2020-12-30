@@ -56,11 +56,6 @@ public final class Call extends Term {
   }
 
   @Override
-  public Tag tag() {
-    return Tag.CALL;
-  }
-
-  @Override
   public String toString() {
     var sb = new StringBuilder();
     sb.append(get(0));

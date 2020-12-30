@@ -11,11 +11,6 @@ public abstract class Term implements Iterable<Term> {
         public boolean isBoolean() {
           return true;
         }
-
-        @Override
-        public Tag tag() {
-          return Tag.FALSE;
-        }
       };
   public static final Term TRUE =
       new Term() {
@@ -23,11 +18,6 @@ public abstract class Term implements Iterable<Term> {
         @Override
         public boolean isBoolean() {
           return true;
-        }
-
-        @Override
-        public Tag tag() {
-          return Tag.TRUE;
         }
       };
 
@@ -79,8 +69,6 @@ public abstract class Term implements Iterable<Term> {
     if (i == position.size()) return b;
     throw new IllegalStateException(toString());
   }
-
-  public abstract Tag tag();
 
   public Term transform(Function<Term, Term> f) {
     assert size() == 0;

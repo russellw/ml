@@ -311,10 +311,5 @@ public final class TptpParser {
     private Not(Term a) {
       this.a = a;
     }
-
-    @Override
-    public Tag tag() {
-      throw new UnsupportedOperationException();
-    }
   }
 }

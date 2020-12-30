@@ -63,11 +63,6 @@ public final class Eq extends Term {
     return new Eq(left.replace(map), right.replace(map));
   }
 
-  @Override
-  public Tag tag() {
-    return Tag.EQ;
-  }
-
   public Term term() {
     if (right == Term.TRUE) return left;
     return this;
