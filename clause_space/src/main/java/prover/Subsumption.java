@@ -8,7 +8,7 @@ public final class Subsumption {
 
   private static Map<Variable, Term> search(
       Term[] c, Term[] c2, Term[] d, Term[] d2, Map<Variable, Term> map) throws TimeoutException {
-    if (steps == 10_000) throw new TimeoutException();
+    if (steps == 1_000) throw new TimeoutException();
     steps++;
 
     // Matched everything in one polarity
