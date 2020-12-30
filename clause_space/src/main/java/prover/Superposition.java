@@ -34,6 +34,9 @@ public final class Superposition {
 
   private static void clause(Clause c) {
     if (c.isTrue()) return;
+    c = c.renameVars();
+    if (Subsumption.subsumesForward(out, c)) return;
+    Subsumption.subsumeBackward(c, out);
     out.add(c);
   }
 
@@ -187,6 +190,8 @@ public final class Superposition {
         superposition(g, c);
       }
     }
-    return out;
+    var out1 = new ArrayList<Clause>();
+    for (var c : out) if (!c.subsumed) out1.add(c);
+    return out1;
   }
 }
