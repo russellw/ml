@@ -9,9 +9,10 @@ public final class TptpParser {
   private static final Pattern STATUS_PATTERN = Pattern.compile("\\s*Status\\s*:\\s*(\\w+)");
 
   // Tokens
-  private static final int NOT_EQ = -2;
-  private static final int VAR = -3;
-  private static final int WORD = -4;
+  private static final int FALSE = -2;
+  private static final int NOT_EQ = -3;
+  private static final int VAR = -4;
+  private static final int WORD = -5;
 
   // Problem state
   private static List<Clause> clauses;
@@ -24,6 +25,15 @@ public final class TptpParser {
   private int tok;
   private String tokString;
   private Map<String, Var> free = new HashMap<>();
+
+  private String lexWord() throws IOException {
+    var sb = new StringBuilder();
+    do {
+      sb.append((char) c);
+      c = reader.read();
+    } while (Character.isJavaIdentifierPart(c));
+    return sb.toString();
+  }
 
   private void lex() throws IOException {
     for (; ; ) {
@@ -41,26 +51,27 @@ public final class TptpParser {
           if (c == '=') {
             c = reader.read();
             tok = NOT_EQ;
-            break;
+            return;
           }
-          break;
+          return;
         case '%':
-          var s = reader.readLine();
-          c = reader.read();
-          if (Main.status == null) {
-            var matcher = STATUS_PATTERN.matcher(s);
-            if (matcher.matches()) {
-              switch (matcher.group(1)) {
-                case "Satisfiable":
-                  Main.status = true;
-                  break;
-                case "Unsatisfiable":
-                  Main.status = false;
-                  break;
-              }
+          {
+            var s = reader.readLine();
+            c = reader.read();
+            if (Main.status == null) {
+              var matcher = STATUS_PATTERN.matcher(s);
+              if (matcher.matches())
+                switch (matcher.group(1)) {
+                  case "Satisfiable":
+                    Main.status = true;
+                    break;
+                  case "Unsatisfiable":
+                    Main.status = false;
+                    break;
+                }
             }
+            continue;
           }
-          continue;
         case 'A':
         case 'B':
         case 'C':
@@ -87,22 +98,15 @@ public final class TptpParser {
         case 'X':
         case 'Y':
         case 'Z':
-          {
-            var sb = new StringBuilder();
-            do {
-              sb.append((char) c);
-              c = reader.read();
-            } while (Character.isJavaIdentifierPart(c));
-            tok = VAR;
-            tokString = sb.toString();
-            break;
-          }
+          tok = VAR;
+          tokString = lexWord();
+          return;
         case '\'':
           {
             var line = reader.getLineNumber();
             var quote = c;
-            var sb = new StringBuilder();
             c = reader.read();
+            var sb = new StringBuilder();
             while (c != quote) {
               if (c < ' ') throw new ParseException(file, line, "unclosed quote");
               if (c == '\\') c = reader.read();
@@ -112,7 +116,7 @@ public final class TptpParser {
             c = reader.read();
             tokString = sb.toString();
             tok = WORD;
-            break;
+            return;
           }
         case 'a':
         case 'b':
@@ -140,20 +144,21 @@ public final class TptpParser {
         case 'x':
         case 'y':
         case 'z':
+          tok = WORD;
+          tokString = lexWord();
+          return;
+        case '$':
           {
-            var sb = new StringBuilder();
-            do {
-              sb.append((char) c);
-              c = reader.read();
-            } while (Character.isJavaIdentifierPart(c));
-            tok = WORD;
-            tokString = sb.toString();
-            break;
+            var s = lexWord();
+            switch (s) {
+              case "$false":
+                tok = FALSE;
+                return;
+            }
+            throw new ParseException(file, reader.getLineNumber(), s + ": unknown word");
           }
-        default:
-          c = reader.read();
-          break;
       }
+      c = reader.read();
       return;
     }
   }
@@ -183,6 +188,8 @@ public final class TptpParser {
     var s = tokString;
     lex();
     switch (k) {
+      case FALSE:
+        return Term.FALSE;
       case VAR:
         {
           var a = free.get(s);

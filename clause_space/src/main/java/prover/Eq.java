@@ -20,7 +20,7 @@ public final class Eq extends Term {
       case 1:
         return right;
     }
-    throw new IllegalArgumentException(toString() + '[' + i + ']');
+    throw new IndexOutOfBoundsException(i);
   }
 
   @Override
