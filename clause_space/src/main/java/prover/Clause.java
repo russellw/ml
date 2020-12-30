@@ -19,6 +19,41 @@ public final class Clause {
     }
   }
 
+  private static void image(Term a, StringBuilder sb) {
+    if (a instanceof Var) {
+      sb.append('?');
+      return;
+    }
+    if (a instanceof Call) {
+      sb.append(a.get(0));
+      sb.append('(');
+      for (var i = 1; i < a.size(); i++) {
+        if (i > 1) sb.append(',');
+        image(a.get(i), sb);
+      }
+      sb.append(')');
+      return;
+    }
+    if (a instanceof Eq) {
+      var a1 = (Eq) a;
+      image(a1.left, sb);
+      sb.append('=');
+      image(a1.right, sb);
+      return;
+    }
+    sb.append(a);
+  }
+
+  public String image() {
+    var sb = new StringBuilder();
+    for (var i = 0; i < literals.length; i++) {
+      if (i > 0) sb.append('|');
+      if (i < negativeSize) sb.append('~');
+      image(literals[i], sb);
+    }
+    return sb.toString();
+  }
+
   public Clause(List<Term> negative, List<Term> positive) {
     // Types
     for (var a : negative) setBoolean(a);
