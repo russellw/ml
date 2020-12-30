@@ -4,7 +4,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 
 public final class Main {
   public static Boolean status;
@@ -20,15 +19,10 @@ public final class Main {
       status = null;
       var clauses = TptpParser.read(file);
       System.out.print("\t" + clauses.size());
-      var n = 0;
-      var images = new HashSet<String>();
-      for (var g : clauses) {
-        var generated = Superposition.expand(clauses, g);
-        n += generated.size();
-        for (var c : generated) images.add(c.image());
+      for (var i = 0; i < 2; i++) {
+        clauses = Superposition.expand(clauses);
+        System.out.print("\t" + clauses.size());
       }
-      System.out.print("\t" + n);
-      System.out.print("\t" + images.size());
       System.out.println();
     }
   }

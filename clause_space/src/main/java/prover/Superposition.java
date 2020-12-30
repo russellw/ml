@@ -30,11 +30,11 @@ import java.util.*;
 // A full implementation would also implement an order on equations
 // e.g. lexicographic path ordering or Knuth-Bendix ordering
 public final class Superposition {
-  private static List<Clause> generated;
+  private static List<Clause> out;
 
   private static void clause(Clause c) {
     if (c.isTrue()) return;
-    generated.add(c);
+    out.add(c);
   }
 
   // For each negative equation
@@ -175,15 +175,18 @@ public final class Superposition {
     clause(new Clause(negative, positive));
   }
 
-  public static List<Clause> expand(Collection<Clause> clauses, Clause g) {
-    generated = new ArrayList<>();
-    g = g.renameVars();
-    resolution(g);
-    factoring(g);
-    for (var c : clauses) {
-      superposition(c, g);
-      superposition(g, c);
+  public static List<Clause> expand(Collection<Clause> in) {
+    out = new ArrayList<>();
+    out.addAll(in);
+    for (var g : in) {
+      g = g.renameVars();
+      resolution(g);
+      factoring(g);
+      for (var c : in) {
+        superposition(c, g);
+        superposition(g, c);
+      }
     }
-    return generated;
+    return out;
   }
 }
