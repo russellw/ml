@@ -1,7 +1,6 @@
 package prover;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 public final class Eq extends Term {

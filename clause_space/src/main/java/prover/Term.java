@@ -3,23 +3,9 @@ package prover;
 import java.util.*;
 import java.util.function.Function;
 
-public abstract class Term implements Iterable<Term> {
-  public static final Term FALSE =
-      new Term() {
-
-        @Override
-        public boolean isBoolean() {
-          return true;
-        }
-      };
-  public static final Term TRUE =
-      new Term() {
-
-        @Override
-        public boolean isBoolean() {
-          return true;
-        }
-      };
+public class Term implements Iterable<Term> {
+  public static final Term FALSE = new Term();
+  public static final Term TRUE = new Term();
 
   public Term get(int i) {
     throw new UnsupportedOperationException(toString());
@@ -43,7 +29,7 @@ public abstract class Term implements Iterable<Term> {
   }
 
   public boolean isBoolean() {
-    return false;
+    return true;
   }
 
   public static Term[] remove(Term[] terms, int i) {
