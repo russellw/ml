@@ -43,15 +43,6 @@ public final class Clause {
         return;
       }
     }
-    for (var a : negative) {
-      for (var b : positive) {
-        if (a.equals(b)) {
-          literals = new Term[] {Term.TRUE};
-          negativeSize = 0;
-          return;
-        }
-      }
-    }
 
     // Literals
     literals = new Term[negative.size() + positive.size()];
