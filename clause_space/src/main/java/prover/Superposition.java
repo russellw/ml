@@ -199,7 +199,7 @@ public final class Superposition {
       if (System.currentTimeMillis() > timeout) return null;
 
       // Rename variables for subsumption and subsequent inference
-      var g1 = g.rename();
+      var g1 = g.renameVars();
 
       // Discount loop performed slightly better in tests
       // Otter loop would also subsume against unprocessed clauses

@@ -112,12 +112,23 @@ public final class Clause {
     return literals.length - negativeSize;
   }
 
-  public Clause rename() {
-    var map = new HashMap<Var, Var>();
-    var literals = Term.transform(this.literals, term -> term.rename(map));
-    if (map.isEmpty()) {
-      return this;
+  private static Term renameVars(Term a, Map<Var, Var> map) {
+    if (a instanceof Var) {
+      var a1 = (Var) a;
+      var b = map.get(a1);
+      if (b == null) {
+        b = new Var();
+        map.put(a1, b);
+      }
+      return b;
     }
+    return a.transform(b -> renameVars(b, map));
+  }
+
+  public Clause renameVars() {
+    var map = new HashMap<Var, Var>();
+    var literals = Term.transform(this.literals, a -> renameVars(a, map));
+    if (map.isEmpty()) return this;
     return new Clause(literals, negativeSize);
   }
 
