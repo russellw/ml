@@ -22,7 +22,7 @@ public final class Main {
       var clauses = TptpParser.read(file);
       System.out.printf(" %7d", clauses.size());
       var start = System.currentTimeMillis();
-      Superposition.timeout = start + 60_000;
+      Superposition.timeout = start + 3_000;
       var result = Superposition.satisfiable(clauses);
       if (result == null) System.out.print("      ");
       else {

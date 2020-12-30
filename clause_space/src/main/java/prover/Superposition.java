@@ -31,8 +31,8 @@ import java.util.*;
 // e.g. lexicographic path ordering or Knuth-Bendix ordering
 public final class Superposition {
   public static long timeout;
-  public static List<Clause> processed;
   public static PriorityQueue<Clause> unprocessed;
+  public static List<Clause> processed;
   public static Clause proof;
 
   public static Boolean satisfiable(Collection<Clause> clauses) {
