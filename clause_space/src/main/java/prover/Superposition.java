@@ -30,14 +30,11 @@ import java.util.*;
 // A full implementation would also implement an order on equations
 // e.g. lexicographic path ordering or Knuth-Bendix ordering
 public final class Superposition {
-  public static long timeout;
-  public static PriorityQueue<Clause> unprocessed;
-  public static List<Clause> processed;
-  public static Clause proof;
+  private static List<Clause> generated;
 
   private static void clause(Clause c) {
     if (c.isTrue()) return;
-    unprocessed.add(c);
+    generated.add(c);
   }
 
   // For each negative equation
@@ -178,48 +175,15 @@ public final class Superposition {
     clause(new Clause(negative, positive));
   }
 
-  public static Boolean satisfiable(Collection<Clause> clauses) {
-    unprocessed = new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
-    unprocessed.addAll(clauses);
-    processed = new ArrayList<>();
-    proof = null;
-    while (!unprocessed.isEmpty()) {
-      // Given clause
-      // Discount loop, given clause cannot have already been subsumed
-      // Otter loop would check it for subsumption here
-      var g = unprocessed.poll();
-
-      // Solved
-      if (g.isFalse()) {
-        proof = g;
-        return false;
-      }
-
-      // Check resources
-      if (System.currentTimeMillis() > timeout) return null;
-
-      // Rename variables for subsumption and subsequent inference
-      var g1 = g.renameVars();
-
-      // Discount loop performed slightly better in tests
-      // Otter loop would also subsume against unprocessed clauses
-      if (Subsumption.subsumesForward(processed, g1)) continue;
-      Subsumption.subsumeBackward(g1, processed);
-
-      // Infer from one clause
-      resolution(g);
-      factoring(g);
-
-      // Sometimes need to match g with itself
-      processed.add(g);
-
-      // Infer from two clauses
-      for (var c : processed) {
-        if (c.subsumed) continue;
-        superposition(c, g1);
-        superposition(g1, c);
-      }
+  public static List<Clause> expand(Collection<Clause> clauses, Clause g) {
+    generated = new ArrayList<>();
+    g = g.renameVars();
+    resolution(g);
+    factoring(g);
+    for (var c : clauses) {
+      superposition(c, g);
+      superposition(g, c);
     }
-    return true;
+    return generated;
   }
 }
