@@ -35,95 +35,15 @@ public final class Superposition {
   public static List<Clause> processed;
   public static Clause proof;
 
-  public static Boolean satisfiable(Collection<Clause> clauses) {
-    unprocessed = new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
-    unprocessed.addAll(clauses);
-    processed = new ArrayList<>();
-    proof = null;
-    while (!unprocessed.isEmpty()) {
-      // Given clause
-      var g = unprocessed.poll();
-      if (g.subsumed) continue;
-
-      // Solved
-      if (g.isFalse()) {
-        proof = g;
-        return false;
-      }
-
-      // Check resources
-      if (System.currentTimeMillis() > timeout) return null;
-
-      // Subsume
-      var g1 = g.rename();
-      if (Subsumption.subsumesForward(processed, g1)) continue;
-      Subsumption.subsumeBackward(g1, processed);
-
-      // Infer from one clause
-      resolution(g);
-      factoring(g);
-
-      // Sometimes need to match g with itself
-      processed.add(g);
-
-      // Infer from two clauses
-      for (var c : processed) {
-        if (c.subsumed) continue;
-        superposition(c, g1);
-        superposition(g1, c);
-      }
-    }
-    return true;
-  }
-
   private static void clause(Clause c) {
     if (c.isTrue()) return;
     unprocessed.add(c);
   }
 
-  // For each positive equation (both directions)
-  private static void factoring(Clause c) {
-    for (var i = c.negativeSize; i < c.literals.length; i++) {
-      var e = Eq.of(c.literals[i]);
-      factoring(c, i, e.left, e.right);
-      factoring(c, i, e.right, e.left);
-    }
-  }
-
-  // For each positive equation (both directions) again
-  private static void factoring(Clause c, int ci, Term c0, Term c1) {
-    for (var i = c.negativeSize; i < c.literals.length; i++) {
-      if (i == ci) continue;
-      var e = Eq.of(c.literals[i]);
-      factoring(c, c0, c1, i, e.left, e.right);
-      factoring(c, c0, c1, i, e.right, e.left);
-    }
-  }
-
-  // Substitute and make new clause
-  private static void factoring(Clause c, Term c0, Term c1, int di, Term d0, Term d1) {
-    if (!Eq.equatable(c1, d1)) return;
-    var map = new HashMap<Variable, Term>();
-    if (!Unification.unify(c0, d0, map)) return;
-
-    // Negative literals
-    var negative = new ArrayList<Term>(c.negativeSize + 1);
-    for (var i = 0; i < c.negativeSize; i++) negative.add(c.literals[i].replace(map));
-    negative.add(new Eq(c1, d1).replace(map).term());
-
-    // Positive literals
-    var positive = new ArrayList<Term>(c.positiveSize() - 1);
-    for (var i = c.negativeSize; i < c.literals.length; i++)
-      if (i != di) positive.add(c.literals[i].replace(map));
-
-    // Make new clause
-    clause(new Clause(negative, positive));
-  }
-
   // For each negative equation
   private static void resolution(Clause c) {
     for (var i = 0; i < c.negativeSize; i++) {
-      var e = Eq.of(c.literals[i]);
+      var e = Equation.of(c.literals[i]);
       var map = new HashMap<Variable, Term>();
       if (Unification.unify(e.left, e.right, map)) resolution(c, i, map);
     }
@@ -144,10 +64,49 @@ public final class Superposition {
     clause(new Clause(negative, positive));
   }
 
+  // For each positive equation (both directions)
+  private static void factoring(Clause c) {
+    for (var i = c.negativeSize; i < c.literals.length; i++) {
+      var e = Equation.of(c.literals[i]);
+      factoring(c, i, e.left, e.right);
+      factoring(c, i, e.right, e.left);
+    }
+  }
+
+  // For each positive equation (both directions) again
+  private static void factoring(Clause c, int ci, Term c0, Term c1) {
+    for (var i = c.negativeSize; i < c.literals.length; i++) {
+      if (i == ci) continue;
+      var e = Equation.of(c.literals[i]);
+      factoring(c, c0, c1, i, e.left, e.right);
+      factoring(c, c0, c1, i, e.right, e.left);
+    }
+  }
+
+  // Substitute and make new clause
+  private static void factoring(Clause c, Term c0, Term c1, int di, Term d0, Term d1) {
+    if (!Equation.equatable(c1, d1)) return;
+    var map = new HashMap<Variable, Term>();
+    if (!Unification.unify(c0, d0, map)) return;
+
+    // Negative literals
+    var negative = new ArrayList<Term>(c.negativeSize + 1);
+    for (var i = 0; i < c.negativeSize; i++) negative.add(c.literals[i].replace(map));
+    negative.add(new Equation(c1, d1).replace(map).term());
+
+    // Positive literals
+    var positive = new ArrayList<Term>(c.positiveSize() - 1);
+    for (var i = c.negativeSize; i < c.literals.length; i++)
+      if (i != di) positive.add(c.literals[i].replace(map));
+
+    // Make new clause
+    clause(new Clause(negative, positive));
+  }
+
   // For each positive equation in c (both directions)
   private static void superposition(Clause c, Clause d) {
     for (var i = c.negativeSize; i < c.literals.length; i++) {
-      var e = Eq.of(c.literals[i]);
+      var e = Equation.of(c.literals[i]);
       superposition(c, d, i, e.left, e.right);
       superposition(c, d, i, e.right, e.left);
     }
@@ -157,7 +116,7 @@ public final class Superposition {
   private static void superposition(Clause c, Clause d, int ci, Term c0, Term c1) {
     if (c0 == Term.TRUE) return;
     for (var i = 0; i < d.literals.length; i++) {
-      var e = Eq.of(d.literals[i]);
+      var e = Equation.of(d.literals[i]);
       superposition(c, d, ci, c0, c1, i, e.left, e.right, new ArrayList<>(), e.left);
       superposition(c, d, ci, c0, c1, i, e.right, e.left, new ArrayList<>(), e.right);
     }
@@ -198,7 +157,7 @@ public final class Superposition {
       Term a) {
     var map = new HashMap<Variable, Term>();
     if (!Unification.unify(c0, a, map)) return;
-    var e = new Eq(d0.splice(position, c1), d1);
+    var e = new Equation(d0.splice(position, c1), d1);
 
     // Negative literals
     var negative = new ArrayList<Term>(c.negativeSize + d.negativeSize);
@@ -217,5 +176,50 @@ public final class Superposition {
 
     // Make new clause
     clause(new Clause(negative, positive));
+  }
+
+  public static Boolean satisfiable(Collection<Clause> clauses) {
+    unprocessed = new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
+    unprocessed.addAll(clauses);
+    processed = new ArrayList<>();
+    proof = null;
+    while (!unprocessed.isEmpty()) {
+      // Given clause
+      // Discount loop, given clause cannot have already been subsumed
+      // Otter loop would check it for subsumption here
+      var g = unprocessed.poll();
+
+      // Solved
+      if (g.isFalse()) {
+        proof = g;
+        return false;
+      }
+
+      // Check resources
+      if (System.currentTimeMillis() > timeout) return null;
+
+      // Rename variables for subsumption and subsequent inference
+      var g1 = g.rename();
+
+      // Discount loop performed slightly better in tests
+      // Otter loop would also subsume against unprocessed clauses
+      if (Subsumption.subsumesForward(processed, g1)) continue;
+      Subsumption.subsumeBackward(g1, processed);
+
+      // Infer from one clause
+      resolution(g);
+      factoring(g);
+
+      // Sometimes need to match g with itself
+      processed.add(g);
+
+      // Infer from two clauses
+      for (var c : processed) {
+        if (c.subsumed) continue;
+        superposition(c, g1);
+        superposition(g1, c);
+      }
+    }
+    return true;
   }
 }

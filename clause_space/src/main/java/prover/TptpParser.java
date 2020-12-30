@@ -156,10 +156,10 @@ public final class TptpParser {
     switch (tok) {
       case '=':
         lex();
-        return new Eq(a, atomicTerm());
+        return new Equation(a, atomicTerm());
       case NOT_EQ:
         lex();
-        return new Not(new Eq(a, atomicTerm()));
+        return new Not(new Equation(a, atomicTerm()));
       default:
         return a;
     }

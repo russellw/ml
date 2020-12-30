@@ -65,7 +65,7 @@ public final class Clause {
   }
 
   private static Term simplify(Term a) {
-    if (a instanceof Eq) {
+    if (a instanceof Equation) {
       var x = a.get(0);
       var y = a.get(1);
       if (x.equals(y)) return Term.TRUE;

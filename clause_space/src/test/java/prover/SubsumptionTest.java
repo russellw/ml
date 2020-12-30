@@ -229,11 +229,11 @@ public class SubsumptionTest {
     // (a = x) <= (a = b)
     negative.clear();
     positive.clear();
-    positive.add(new Eq(a, x));
+    positive.add(new Equation(a, x));
     c = new Clause(negative, positive);
     negative.clear();
     positive.clear();
-    positive.add(new Eq(a, b));
+    positive.add(new Equation(a, b));
     d = new Clause(negative, positive);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
@@ -241,11 +241,11 @@ public class SubsumptionTest {
     // (x = a) <= (a = b)
     negative.clear();
     positive.clear();
-    positive.add(new Eq(x, a));
+    positive.add(new Equation(x, a));
     c = new Clause(negative, positive);
     negative.clear();
     positive.clear();
-    positive.add(new Eq(a, b));
+    positive.add(new Equation(a, b));
     d = new Clause(negative, positive);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
