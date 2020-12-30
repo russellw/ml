@@ -14,19 +14,6 @@ public final class Eq extends Term {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof Eq)) return false;
-    Eq terms = (Eq) o;
-    return Objects.equals(left, terms.left) && Objects.equals(right, terms.right);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(left, right);
-  }
-
-  @Override
   public Term get(int i) {
     switch (i) {
       case 0:
