@@ -24,10 +24,6 @@ public final class Clause {
     for (var a : negative) setBoolean(a);
     for (var a : positive) setBoolean(a);
 
-    // Simplify
-    for (var i = 0; i < negative.size(); i++) negative.set(i, simplify(negative.get(i)));
-    for (var i = 0; i < positive.size(); i++) positive.set(i, simplify(positive.get(i)));
-
     // Redundancy
     negative.removeIf(a -> a == Term.TRUE);
     positive.removeIf(a -> a == Term.FALSE);
@@ -62,15 +58,6 @@ public final class Clause {
     for (var i = 0; i < negative.size(); i++) literals[i] = negative.get(i);
     for (var i = 0; i < positive.size(); i++) literals[negative.size() + i] = positive.get(i);
     negativeSize = negative.size();
-  }
-
-  private static Term simplify(Term a) {
-    if (a instanceof Eq) {
-      var x = a.get(0);
-      var y = a.get(1);
-      if (x.equals(y)) return Term.TRUE;
-    }
-    return a;
   }
 
   private static void getVars(Term a, Set<Var> r) {
