@@ -24,6 +24,9 @@ public final class Call extends Term {
 
   @Override
   public boolean equals(Object o) {
+    // Syntactic equality of terms is not needed by superposition calculus itself
+    // but is used by some tests for checking results
+    // and would be used by an optimized prover
     if (this == o) return true;
     if (!(o instanceof Call)) return false;
     Call terms = (Call) o;
