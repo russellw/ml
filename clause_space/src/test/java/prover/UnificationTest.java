@@ -10,10 +10,10 @@ public class UnificationTest {
   @Test
   public void unify() {
     // https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
-    var a = new Function("a");
-    var b = new Function("b");
-    var f = new Function("f");
-    var g = new Function("g");
+    var a = new Func("a");
+    var b = new Func("b");
+    var f = new Func("f");
+    var g = new Func("g");
     var x = new Variable();
     var y = new Variable();
     var z = new Variable();
@@ -115,10 +115,10 @@ public class UnificationTest {
     // Gives different results in several cases
     // In particular, has no notion of an occurs check
     // Assumes the inputs have disjoint variables
-    var a = new Function("a");
-    var b = new Function("b");
-    var f = new Function("f");
-    var g = new Function("g");
+    var a = new Func("a");
+    var b = new Func("b");
+    var f = new Func("f");
+    var g = new Func("g");
     var x = new Variable();
     var y = new Variable();
     var z = new Variable();

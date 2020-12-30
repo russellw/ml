@@ -15,7 +15,7 @@ public final class TptpParser {
 
   // Problem state
   private static List<Clause> clauses;
-  private static Map<String, Function> functions;
+  private static Map<String, Func> functions;
 
   // File state
   private final String file;
@@ -195,7 +195,7 @@ public final class TptpParser {
         {
           var a = functions.get(s);
           if (a == null) {
-            a = new Function(s);
+            a = new Func(s);
             functions.put(s, a);
           }
           if (tok == '(') {

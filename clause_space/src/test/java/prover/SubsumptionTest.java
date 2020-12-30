@@ -8,10 +8,10 @@ import org.junit.Test;
 public class SubsumptionTest {
   @Test
   public void subsumes() {
-    var a = new Function("a");
-    var b = new Function("b");
-    var p = new Function("p");
-    var q = new Function("q");
+    var a = new Func("a");
+    var b = new Func("b");
+    var p = new Func("p");
+    var q = new Func("q");
     var x = new Variable();
     var y = new Variable();
     var negative = new ArrayList<Term>();

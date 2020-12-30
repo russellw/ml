@@ -1,6 +1,7 @@
 package prover;
 
 import java.util.*;
+import java.util.function.Function;
 
 public abstract class Term implements Iterable<Term> {
   public static final Term FALSE =
@@ -55,10 +56,6 @@ public abstract class Term implements Iterable<Term> {
     return false;
   }
 
-  public static Term of(boolean value) {
-    return value ? TRUE : FALSE;
-  }
-
   public static Term[] remove(Term[] terms, int i) {
     var r = new Term[terms.length - 1];
     System.arraycopy(terms, 0, r, 0, i);
@@ -89,12 +86,12 @@ public abstract class Term implements Iterable<Term> {
 
   public abstract Tag tag();
 
-  public Term transform(java.util.function.Function<Term, Term> f) {
+  public Term transform(Function<Term, Term> f) {
     assert size() == 0;
     return this;
   }
 
-  public static Term[] transform(Term[] q, java.util.function.Function<Term, Term> f) {
+  public static Term[] transform(Term[] q, Function<Term, Term> f) {
     var r = new Term[q.length];
     for (var i = 0; i < r.length; i++) r[i] = f.apply(q[i]);
     return r;

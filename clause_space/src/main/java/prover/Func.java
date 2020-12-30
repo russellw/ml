@@ -2,11 +2,11 @@ package prover;
 
 import java.util.List;
 
-public final class Function extends Term {
+public final class Func extends Term {
   private final String name;
   public boolean isBoolean;
 
-  public Function(String name) {
+  public Func(String name) {
     this.name = name;
   }
 

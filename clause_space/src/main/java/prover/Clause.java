@@ -8,13 +8,13 @@ public final class Clause {
   public boolean subsumed;
 
   private static void setBoolean(Term a) {
-    if (a instanceof Function) {
-      ((Function) a).isBoolean = true;
+    if (a instanceof Func) {
+      ((Func) a).isBoolean = true;
       return;
     }
     if (a instanceof Call) {
       var a1 = (Call) a;
-      ((Function) a1.get(0)).isBoolean = true;
+      ((Func) a1.get(0)).isBoolean = true;
       return;
     }
   }
