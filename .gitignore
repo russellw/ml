@@ -9,6 +9,7 @@
 TPTP/
 bin/
 data/
+logs/
 satlib/
 tsplib/
 

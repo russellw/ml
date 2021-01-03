@@ -16,6 +16,7 @@ public final class Main {
     else files = new String[] {arg};
     System.out.println("file                                     clauses sat   processed   time");
     var solved = 0;
+    new File("logs").mkdir();
     for (var file : files) {
       System.out.printf("%-40s", file);
       status = null;
@@ -23,7 +24,13 @@ public final class Main {
       System.out.printf(" %7d", clauses.size());
       var start = System.currentTimeMillis();
       Superposition.timeout = start + 3_000;
+      var out = new PrintStream("logs/" + new File(file).getName().split("\\.")[0] + ".html");
+      out.println("<!DOCTYPE html>");
+      out.println("<html lang=\"en\">");
+      out.println("<meta charset=\"utf-8\"/>");
+      out.printf("<title>%s</title>\n", file);
       var result = Superposition.satisfiable(clauses);
+      out.close();
       if (result == null) System.out.print("      ");
       else {
         System.out.print(result ? " sat  " : " unsat");
