@@ -45,7 +45,7 @@ public final class Eq extends Term {
     return new Eq(a, Term.TRUE);
   }
 
-  public Eq replace(Map<Var, Term> map) {
+  public Eq replace(Map<Variable, Term> map) {
     return new Eq(left.replace(map), right.replace(map));
   }
 

@@ -25,7 +25,7 @@ public final class TptpParser {
   private int c;
   private int tok;
   private String tokString;
-  private Map<String, Var> free = new HashMap<>();
+  private Map<String, Variable> free = new HashMap<>();
 
   private String lexWord() throws IOException {
     var sb = new StringBuilder();
@@ -200,7 +200,7 @@ public final class TptpParser {
         {
           var a = free.get(s);
           if (a != null) return a;
-          a = new Var();
+          a = new Variable();
           free.put(s, a);
           return a;
         }

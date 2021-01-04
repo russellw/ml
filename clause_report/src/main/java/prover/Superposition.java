@@ -44,13 +44,13 @@ public final class Superposition {
   private static void resolution(Clause c) {
     for (var i = 0; i < c.negativeSize; i++) {
       var e = Eq.of(c.literals[i]);
-      var map = new HashMap<Var, Term>();
+      var map = new HashMap<Variable, Term>();
       if (Unification.unify(e.left, e.right, map)) resolution(c, i, map);
     }
   }
 
   // Substitute and make new clause
-  private static void resolution(Clause c, int ci, Map<Var, Term> map) {
+  private static void resolution(Clause c, int ci, Map<Variable, Term> map) {
     // Negative literals
     var negative = new ArrayList<Term>(c.negativeSize - 1);
     for (var i = 0; i < c.negativeSize; i++) if (i != ci) negative.add(c.literals[i].replace(map));
@@ -86,7 +86,7 @@ public final class Superposition {
   // Substitute and make new clause
   private static void factoring(Clause c, Term c0, Term c1, int di, Term d0, Term d1) {
     if (!Eq.equatable(c1, d1)) return;
-    var map = new HashMap<Var, Term>();
+    var map = new HashMap<Variable, Term>();
     if (!Unification.unify(c0, d0, map)) return;
 
     // Negative literals
@@ -134,7 +134,7 @@ public final class Superposition {
       Term d1,
       List<Integer> position,
       Term a) {
-    if (a instanceof Var) return;
+    if (a instanceof Variable) return;
     superposition1(c, d, ci, c0, c1, di, d0, d1, position, a);
     for (var i = 1; i < a.size(); i++) {
       position.add(i);
@@ -155,7 +155,7 @@ public final class Superposition {
       Term d1,
       List<Integer> position,
       Term a) {
-    var map = new HashMap<Var, Term>();
+    var map = new HashMap<Variable, Term>();
     if (!Unification.unify(c0, a, map)) return;
     var e = new Eq(d0.splice(position, c1), d1);
 
@@ -199,7 +199,7 @@ public final class Superposition {
       if (System.currentTimeMillis() > timeout) return null;
 
       // Rename variables for subsumption and subsequent inference
-      var g1 = g.renameVars();
+      var g1 = g.renameVariables();
 
       // Discount loop performed slightly better in tests
       // Otter loop would also subsume against unprocessed clauses

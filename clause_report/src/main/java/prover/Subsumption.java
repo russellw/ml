@@ -6,8 +6,8 @@ import java.util.concurrent.TimeoutException;
 public final class Subsumption {
   private static int steps;
 
-  private static Map<Var, Term> search(Term[] c, Term[] c2, Term[] d, Term[] d2, Map<Var, Term> map)
-      throws TimeoutException {
+  private static Map<Variable, Term> search(
+      Term[] c, Term[] c2, Term[] d, Term[] d2, Map<Variable, Term> map) throws TimeoutException {
     if (steps == 1_000) throw new TimeoutException();
     steps++;
 
@@ -32,7 +32,7 @@ public final class Subsumption {
 
         // Search means preserve the original map
         // in case the search fails and need to backtrack
-        Map<Var, Term> m;
+        Map<Variable, Term> m;
 
         // Try orienting equation one way
         m = new HashMap<>(map);
@@ -59,9 +59,9 @@ public final class Subsumption {
   }
 
   public static boolean subsumes(Clause c, Clause d) {
-    var vars = c.vars();
-    vars.retainAll(d.vars());
-    assert vars.isEmpty();
+    var variables = c.variables();
+    variables.retainAll(d.variables());
+    assert variables.isEmpty();
 
     var c1 = c.negative();
     var c2 = c.positive();

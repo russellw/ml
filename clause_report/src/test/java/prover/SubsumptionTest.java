@@ -12,8 +12,8 @@ public class SubsumptionTest {
     var b = new Func("b");
     var p = new Func("p");
     var q = new Func("q");
-    var x = new Var();
-    var y = new Var();
+    var x = new Variable();
+    var y = new Variable();
     var negative = new ArrayList<Term>();
     var positive = new ArrayList<Term>();
     Clause c, d;

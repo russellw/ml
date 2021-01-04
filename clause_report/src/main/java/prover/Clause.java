@@ -51,17 +51,17 @@ public final class Clause {
     negativeSize = negative.size();
   }
 
-  private static void getVars(Term a, Set<Var> r) {
-    if (a instanceof Var) {
-      r.add((Var) a);
+  private static void getVariables(Term a, Set<Variable> r) {
+    if (a instanceof Variable) {
+      r.add((Variable) a);
       return;
     }
-    for (var b : a) getVars(b, r);
+    for (var b : a) getVariables(b, r);
   }
 
-  public Set<Var> vars() {
-    var r = new HashSet<Var>();
-    for (var a : literals) getVars(a, r);
+  public Set<Variable> variables() {
+    var r = new HashSet<Variable>();
+    for (var a : literals) getVariables(a, r);
     return r;
   }
 
@@ -90,22 +90,22 @@ public final class Clause {
     return literals.length - negativeSize;
   }
 
-  private static Term renameVars(Term a, Map<Var, Var> map) {
-    if (a instanceof Var) {
-      var a1 = (Var) a;
+  private static Term renameVariables(Term a, Map<Variable, Variable> map) {
+    if (a instanceof Variable) {
+      var a1 = (Variable) a;
       var b = map.get(a1);
       if (b == null) {
-        b = new Var();
+        b = new Variable();
         map.put(a1, b);
       }
       return b;
     }
-    return a.transform(b -> renameVars(b, map));
+    return a.transform(b -> renameVariables(b, map));
   }
 
-  public Clause renameVars() {
-    var map = new HashMap<Var, Var>();
-    var literals = Term.transform(this.literals, a -> renameVars(a, map));
+  public Clause renameVariables() {
+    var map = new HashMap<Variable, Variable>();
+    var literals = Term.transform(this.literals, a -> renameVariables(a, map));
     if (map.isEmpty()) return this;
     return new Clause(literals, negativeSize);
   }

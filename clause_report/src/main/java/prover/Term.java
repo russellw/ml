@@ -39,7 +39,7 @@ public class Term implements Iterable<Term> {
     return r;
   }
 
-  public Term replace(Map<Var, Term> map) {
+  public Term replace(Map<Variable, Term> map) {
     return transform(a -> a.replace(map));
   }
 

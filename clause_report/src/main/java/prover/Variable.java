@@ -2,9 +2,9 @@ package prover;
 
 import java.util.Map;
 
-public final class Var extends Term {
+public final class Variable extends Term {
   @Override
-  public Term replace(Map<Var, Term> map) {
+  public Term replace(Map<Variable, Term> map) {
     var a = map.get(this);
     if (a != null) return a.replace(map);
     return this;
