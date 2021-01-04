@@ -12,7 +12,7 @@ public final class TptpParser {
   private static final int FALSE = -2;
   private static final int NOT_EQ = -3;
   private static final int TRUE = -4;
-  private static final int VAR = -5;
+  private static final int VARIABLE = -5;
   private static final int WORD = -6;
 
   // Problem state
@@ -99,7 +99,7 @@ public final class TptpParser {
         case 'X':
         case 'Y':
         case 'Z':
-          tok = VAR;
+          tok = VARIABLE;
           tokString = lexWord();
           return;
         case '\'':
@@ -196,7 +196,7 @@ public final class TptpParser {
         return Term.FALSE;
       case TRUE:
         return Term.TRUE;
-      case VAR:
+      case VARIABLE:
         {
           var a = free.get(s);
           if (a != null) return a;
