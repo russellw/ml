@@ -1,3 +1,3 @@
-call mvn test
+call mvn package
 if errorlevel 1 goto :eof
-java -XX:MaxJavaStackTraceDepth=1000000 -cp target/classes -ea prover/Main %*
+java -XX:MaxJavaStackTraceDepth=50 -Xss1m -ea -jar target/prover-1.0-SNAPSHOT-jar-with-dependencies.jar %*
