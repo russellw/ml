@@ -11,8 +11,9 @@ public final class TptpParser {
   // Tokens
   private static final int FALSE = -2;
   private static final int NOT_EQ = -3;
-  private static final int VAR = -4;
-  private static final int WORD = -5;
+  private static final int TRUE = -4;
+  private static final int VAR = -5;
+  private static final int WORD = -6;
 
   // Problem state
   private static List<Clause> clauses;
@@ -154,6 +155,9 @@ public final class TptpParser {
               case "$false":
                 tok = FALSE;
                 return;
+              case "$true":
+                tok = TRUE;
+                return;
             }
             throw new ParseException(file, reader.getLineNumber(), s + ": unknown word");
           }
@@ -190,6 +194,8 @@ public final class TptpParser {
     switch (k) {
       case FALSE:
         return Term.FALSE;
+      case TRUE:
+        return Term.TRUE;
       case VAR:
         {
           var a = free.get(s);
