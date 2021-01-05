@@ -36,7 +36,6 @@ import java.util.PriorityQueue;
 // A full implementation would also implement an order on equations
 // e.g. lexicographic path ordering or Knuth-Bendix ordering
 public final class Superposition {
-  public static long timeout;
   public static PriorityQueue<Clause> unprocessed;
   public static ArrayList<Clause> processed;
   public static Clause proof;
@@ -207,7 +206,8 @@ public final class Superposition {
     clause(new Clause(negative, positive));
   }
 
-  public static SZS satisfiable(Collection<Clause> clauses) {
+  public static SZS satisfiable(Collection<Clause> clauses, long time) {
+    var timeout = System.currentTimeMillis() + time;
     unprocessed = new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
     unprocessed.addAll(clauses);
     processed = new ArrayList<>();

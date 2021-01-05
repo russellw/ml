@@ -54,9 +54,7 @@ public enum SZS {
   }
 
   public boolean compatible(SZS b) {
-    if (b == null) {
-      return true;
-    }
+    if (b == null) return true;
     switch (this) {
       case ContradictoryAxioms:
       case Theorem:

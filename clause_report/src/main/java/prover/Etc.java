@@ -11,6 +11,12 @@ import java.util.function.Function;
 public final class Etc {
   private Etc() {}
 
+  public static String extension(String file) {
+    var i = file.lastIndexOf('.');
+    if (i < 0) return "";
+    return file.substring(i + 1);
+  }
+
   public static void debug(Object a) {
     System.out.print(Thread.currentThread().getStackTrace()[2] + ": ");
     System.out.println(a);
