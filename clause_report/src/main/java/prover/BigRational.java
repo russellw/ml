@@ -68,14 +68,15 @@ public final class BigRational extends Number implements Comparable<BigRational>
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if ((o == null) || (getClass() != o.getClass())) {
-      return false;
-    }
-    BigRational o1 = (BigRational) o;
-    return Objects.equals(num, o1.num) && Objects.equals(den, o1.den);
+    if (this == o) return true;
+    if (!(o instanceof BigRational)) return false;
+    BigRational that = (BigRational) o;
+    return Objects.equals(num, that.num) && Objects.equals(den, that.den);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(num, den);
   }
 
   @Override
@@ -85,11 +86,6 @@ public final class BigRational extends Number implements Comparable<BigRational>
 
   public BigInteger floor() {
     return Etc.divideFloor(num, den);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(num, den);
   }
 
   @Override

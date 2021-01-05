@@ -17,6 +17,10 @@ public final class Etc {
     return file.substring(i + 1);
   }
 
+  public static Seq<Object> implies(Object a, Object b) {
+    return Array.of(Symbol.OR, Array.of(Symbol.NOT, a), b);
+  }
+
   public static void debug(Object a) {
     System.out.print(Thread.currentThread().getStackTrace()[2] + ": ");
     System.out.println(a);

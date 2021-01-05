@@ -330,6 +330,88 @@ public final class TptpParser {
     var s = tokenString;
     lex();
     switch (k) {
+      case '!':
+      case '?':
+      case '[':
+        throw new InappropriateException();
+      case DEFINED_WORD:
+        switch (s) {
+          case "$ceiling":
+            return definedAtomicTerm(bound, Symbol.CEIL, 1);
+          case "$difference":
+            return definedAtomicTerm(bound, Symbol.SUBTRACT, 2);
+          case "$distinct":
+            {
+              var r = new ArrayList<>();
+              args(bound, r);
+              var inequalities = new ArrayList<>();
+              inequalities.add(Symbol.AND);
+              for (var i = 0; i < r.size(); i++)
+                for (var j = 0; j < r.size(); j++)
+                  if (i != j)
+                    inequalities.add(
+                        Array.of(Symbol.NOT, Array.of(Symbol.EQUALS, r.get(i), r.get(j))));
+              return Array.ofAll(inequalities);
+            }
+          case "$false":
+            return false;
+          case "$floor":
+            return definedAtomicTerm(bound, Symbol.FLOOR, 1);
+          case "$greater":
+            {
+              var r = new ArrayList<>();
+              args(bound, r, 2);
+              return Array.of(Symbol.LESS, r.get(1), r.get(0));
+            }
+          case "$greatereq":
+            {
+              var r = new ArrayList<>();
+              args(bound, r, 2);
+              return Array.of(Symbol.LESS_EQ, r.get(1), r.get(0));
+            }
+          case "$is_int":
+            return definedAtomicTerm(bound, Symbol.IS_INTEGER, 1);
+          case "$is_rat":
+            return definedAtomicTerm(bound, Symbol.IS_RATIONAL, 1);
+          case "$less":
+            return definedAtomicTerm(bound, Symbol.LESS, 2);
+          case "$lesseq":
+            return definedAtomicTerm(bound, Symbol.LESS_EQ, 2);
+          case "$product":
+            return definedAtomicTerm(bound, Symbol.MULTIPLY, 2);
+          case "$quotient":
+            return definedAtomicTerm(bound, Symbol.DIVIDE, 2);
+          case "$quotient_e":
+            return definedAtomicTerm(bound, Symbol.DIVIDE_EUCLIDEAN, 2);
+          case "$quotient_f":
+            return definedAtomicTerm(bound, Symbol.DIVIDE_FLOOR, 2);
+          case "$quotient_t":
+            return definedAtomicTerm(bound, Symbol.DIVIDE_TRUNCATE, 2);
+          case "$remainder_e":
+            return definedAtomicTerm(bound, Symbol.REMAINDER_EUCLIDEAN, 2);
+          case "$remainder_f":
+            return definedAtomicTerm(bound, Symbol.REMAINDER_FLOOR, 2);
+          case "$remainder_t":
+            return definedAtomicTerm(bound, Symbol.REMAINDER_TRUNCATE, 2);
+          case "$round":
+            return definedAtomicTerm(bound, Symbol.ROUND, 1);
+          case "$sum":
+            return definedAtomicTerm(bound, Symbol.ADD, 2);
+          case "$to_int":
+            return definedAtomicTerm(bound, Symbol.TO_INTEGER, 1);
+          case "$to_rat":
+            return definedAtomicTerm(bound, Symbol.TO_RATIONAL, 1);
+          case "$to_real":
+            return definedAtomicTerm(bound, Symbol.TO_REAL, 1);
+          case "$true":
+            return true;
+          case "$truncate":
+            return definedAtomicTerm(bound, Symbol.TRUNCATE, 1);
+          case "$uminus":
+            return definedAtomicTerm(bound, Symbol.NEGATE, 1);
+          default:
+            throw new ParseException(file, reader.getLineNumber(), s + ": unknown word");
+        }
       case DISTINCT_OBJECT:
         return s;
       case VARIABLE:
@@ -351,7 +433,7 @@ public final class TptpParser {
             var r = new ArrayList<>();
             r.add(a);
             args(bound, r);
-            return Array.of(r.toArray());
+            return Array.ofAll(r);
           }
           return a;
         }
@@ -381,6 +463,85 @@ public final class TptpParser {
       case NOT_EQ:
         lex();
         return Array.of(Symbol.NOT, Array.of(Symbol.EQUALS, a, atomicTerm(bound)));
+      default:
+        return a;
+    }
+  }
+
+  private Object unaryFormulaBind(Map<String, Variable> bound, Symbol op) throws IOException {
+    lex();
+    expect('[');
+    var params = new ArrayList<>();
+    do {
+      if (token != VARIABLE)
+        throw new ParseException(file, reader.getLineNumber(), "variable expected");
+      var name = tokenString;
+      lex();
+      var type = eat(':') ? null : Symbol.INDIVIDUAL;
+      var a = new Variable(type);
+      bound = bound.put(name, a);
+      params.add(a);
+    } while (eat(','));
+    expect(']');
+    expect(':');
+    return Array.of(op, Array.ofAll(params), unaryFormula(bound));
+  }
+
+  private Object unaryFormula(Map<String, Variable> bound) throws IOException {
+    switch (token) {
+      case '!':
+        return unaryFormulaBind(bound, Symbol.ALL);
+      case '(':
+        {
+          lex();
+          var a = logicFormula(bound);
+          expect(')');
+          return a;
+        }
+      case '?':
+        return unaryFormulaBind(bound, Symbol.EXISTS);
+      case '~':
+        lex();
+        return Array.of(Symbol.NOT, unaryFormula(bound));
+    }
+    return infixUnary(bound);
+  }
+
+  private Object logicFormulaRest(Map<String, Variable> bound, Symbol op, Object a)
+      throws IOException {
+    var k = token;
+    var r = new ArrayList<>();
+    r.add(op);
+    r.add(a);
+    while (eat(k)) r.add(unaryFormula(bound));
+    return Array.ofAll(r);
+  }
+
+  private Object logicFormula(Map<String, Variable> bound) throws IOException {
+    var a = unaryFormula(bound);
+    switch (token) {
+      case '&':
+        return logicFormulaRest(bound, Symbol.AND, a);
+      case '|':
+        return logicFormulaRest(bound, Symbol.OR, a);
+      case EQV:
+        lex();
+        return Array.of(Symbol.EQV, a, unaryFormula(bound));
+      case IMPLIES:
+        lex();
+        return Etc.implies(a, unaryFormula(bound));
+      case IMPLIESR:
+        lex();
+        return Etc.implies(unaryFormula(bound), a);
+      case NAND:
+        lex();
+        return Array.of(Symbol.NOT, Array.of(Symbol.AND, a, unaryFormula(bound)));
+      case NOR:
+        lex();
+        return Array.of(Symbol.NOT, Array.of(Symbol.OR, a, unaryFormula(bound)));
+      case XOR:
+        lex();
+        return Array.of(Symbol.NOT, Array.of(Symbol.EQV, a, unaryFormula(bound)));
       default:
         return a;
     }
