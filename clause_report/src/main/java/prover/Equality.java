@@ -4,6 +4,8 @@ import io.vavr.collection.Array;
 import io.vavr.collection.Seq;
 
 public final class Equality {
+  private Equality() {}
+
   public static Object of(Object a, Object b) {
     if (!equatable(a, b)) throw new IllegalArgumentException(a.toString() + '=' + b);
     if (b == Boolean.TRUE) return a;

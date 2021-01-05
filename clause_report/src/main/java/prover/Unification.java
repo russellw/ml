@@ -4,6 +4,8 @@ import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 
 public final class Unification {
+  private Unification() {}
+
   public static Map<Variable, Object> match(Object a, Object b, Map<Variable, Object> map) {
     // Equal
     if (a == b) return map;

@@ -41,6 +41,8 @@ public final class Superposition {
   public static ArrayList<Clause> processed;
   public static Clause proof;
 
+  private Superposition() {}
+
   private static void clause(Clause c) {
     if (c.isTrue()) return;
     unprocessed.add(c);

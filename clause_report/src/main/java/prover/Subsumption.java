@@ -9,6 +9,8 @@ import java.util.concurrent.TimeoutException;
 public final class Subsumption {
   private static int steps;
 
+  private Subsumption() {}
+
   private static Map<Variable, Object> search(
       Seq<Object> c, Seq<Object> c2, Seq<Object> d, Seq<Object> d2, Map<Variable, Object> map)
       throws TimeoutException {

@@ -8,6 +8,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class Etc {
+  private Etc() {}
+
   public static void debug(Object a) {
     System.out.print(Thread.currentThread().getStackTrace()[2] + ": ");
     System.out.println(a);

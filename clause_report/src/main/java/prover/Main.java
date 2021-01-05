@@ -9,6 +9,8 @@ public final class Main {
   public static Boolean status;
   public static PrintStream writer;
 
+  private Main() {}
+
   public static void main(String[] args) throws IOException {
     // Command line
     var arg = args[0];
