@@ -12,13 +12,23 @@ public final class TptpParser {
   private static final Pattern STATUS_PATTERN = Pattern.compile("\\s*Status\\s*:\\s*(\\w+)");
 
   // Tokens
-  private static final int FALSE = -2;
-  private static final int NOT_EQ = -3;
-  private static final int TRUE = -4;
-  private static final int VARIABLE = -5;
-  private static final int WORD = -6;
+  private static final int DEFINED_WORD = -2;
+  private static final int DISTINCT_OBJECT = -3;
+  private static final int EQV = -4;
+  private static final int IMPLIES = -5;
+  private static final int IMPLIESR = -6;
+  private static final int INTEGER = -7;
+  private static final int NAND = -8;
+  private static final int NOT_EQ = -9;
+  private static final int NOR = -10;
+  private static final int RATIONAL = -11;
+  private static final int REAL = -12;
+  private static final int WORD = -14;
+  private static final int XOR = -15;
+  private static final int VARIABLE = -16;
 
   // Problem state
+  private static Problem problem;
   private static ArrayList<Clause> clauses;
   private static HashMap<String, Func> functions;
 
@@ -26,9 +36,24 @@ public final class TptpParser {
   private final String file;
   private final LineNumberReader reader;
   private int c;
-  private int tok;
-  private String tokString;
+  private int token;
+  private String tokenString;
   private HashMap<String, Variable> free = new HashMap<>();
+
+  private void lexQuote() throws IOException {
+    var line = reader.getLineNumber();
+    var quote = c;
+    c = reader.read();
+    var sb = new StringBuilder();
+    while (c != quote) {
+      if (c < ' ') throw new ParseException(file, line, "unclosed quote");
+      if (c == '\\') c = reader.read();
+      sb.append((char) c);
+      c = reader.read();
+    }
+    c = reader.read();
+    tokenString = sb.toString();
+  }
 
   private String lexWord() throws IOException {
     var sb = new StringBuilder();
@@ -41,7 +66,7 @@ public final class TptpParser {
 
   private void lex() throws IOException {
     for (; ; ) {
-      tok = c;
+      token = c;
       switch (c) {
         case ' ':
         case '\f':
@@ -50,11 +75,128 @@ public final class TptpParser {
         case '\t':
           c = reader.read();
           continue;
+        case '+':
+        case '-':
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+          {
+            var sb = new StringBuilder();
+            do {
+              sb.append((char) c);
+              c = reader.read();
+            } while (Character.isDigit(c));
+            switch (c) {
+              case '.':
+                do {
+                  sb.append((char) c);
+                  c = reader.read();
+                } while (Character.isDigit(c));
+                break;
+              case '/':
+                do {
+                  sb.append((char) c);
+                  c = reader.read();
+                } while (Character.isDigit(c));
+                token = RATIONAL;
+                tokenString = sb.toString();
+                return;
+              case 'E':
+              case 'e':
+                break;
+              default:
+                token = INTEGER;
+                tokenString = sb.toString();
+                return;
+            }
+            if (c == 'e' || c == 'E') {
+              sb.append((char) c);
+              c = reader.read();
+            }
+            if (c == '+' || c == '-') {
+              sb.append((char) c);
+              c = reader.read();
+            }
+            while (Character.isDigit(c)) {
+              sb.append((char) c);
+              c = reader.read();
+            }
+            token = REAL;
+            tokenString = sb.toString();
+            return;
+          }
+        case '/':
+          var line = reader.getLineNumber();
+          c = reader.read();
+          if (c != '*') {
+            throw new ParseException(file, reader.getLineNumber(), "'*' expected");
+          }
+          do {
+            do {
+              if (c == -1) {
+                throw new ParseException(file, line, "unclosed block comment");
+              }
+              c = reader.read();
+            } while (c != '*');
+            c = reader.read();
+          } while (c != '/');
+          c = reader.read();
+          continue;
         case '!':
           c = reader.read();
           if (c == '=') {
             c = reader.read();
-            tok = NOT_EQ;
+            token = NOT_EQ;
+            return;
+          }
+          return;
+        case '<':
+          c = reader.read();
+          if (c == '=') {
+            c = reader.read();
+            if (c == '>') {
+              c = reader.read();
+              token = EQV;
+              return;
+            }
+            token = IMPLIESR;
+            return;
+          }
+          if (c == '~') {
+            c = reader.read();
+            if (c == '>') {
+              c = reader.read();
+              token = XOR;
+              return;
+            }
+            throw new ParseException(file, reader.getLineNumber(), "'>' expected");
+          }
+          return;
+        case '=':
+          c = reader.read();
+          if (c == '>') {
+            c = reader.read();
+            token = IMPLIES;
+            return;
+          }
+          return;
+        case '~':
+          c = reader.read();
+          if (c == '&') {
+            c = reader.read();
+            token = NAND;
+            return;
+          }
+          if (c == '|') {
+            c = reader.read();
+            token = NOR;
             return;
           }
           return;
@@ -64,15 +206,7 @@ public final class TptpParser {
             c = reader.read();
             if (Main.status == null) {
               var matcher = STATUS_PATTERN.matcher(s);
-              if (matcher.matches())
-                switch (matcher.group(1)) {
-                  case "Satisfiable":
-                    Main.status = true;
-                    break;
-                  case "Unsatisfiable":
-                    Main.status = false;
-                    break;
-                }
+              if (matcher.matches()) problem.expected = SZS.valueOf(matcher.group(1));
             }
             continue;
           }
@@ -102,26 +236,17 @@ public final class TptpParser {
         case 'X':
         case 'Y':
         case 'Z':
-          tok = VARIABLE;
-          tokString = lexWord();
+          token = VARIABLE;
+          tokenString = lexWord();
           return;
         case '\'':
-          {
-            var line = reader.getLineNumber();
-            var quote = c;
-            c = reader.read();
-            var sb = new StringBuilder();
-            while (c != quote) {
-              if (c < ' ') throw new ParseException(file, line, "unclosed quote");
-              if (c == '\\') c = reader.read();
-              sb.append((char) c);
-              c = reader.read();
-            }
-            c = reader.read();
-            tokString = sb.toString();
-            tok = WORD;
-            return;
-          }
+          token = WORD;
+          lexQuote();
+          return;
+        case '"':
+          token = DISTINCT_OBJECT;
+          lexQuote();
+          return;
         case 'a':
         case 'b':
         case 'c':
@@ -148,22 +273,13 @@ public final class TptpParser {
         case 'x':
         case 'y':
         case 'z':
-          tok = WORD;
-          tokString = lexWord();
+          token = WORD;
+          tokenString = lexWord();
           return;
         case '$':
-          {
-            var s = lexWord();
-            switch (s) {
-              case "$false":
-                tok = FALSE;
-                return;
-              case "$true":
-                tok = TRUE;
-                return;
-            }
-            throw new ParseException(file, reader.getLineNumber(), s + ": unknown word");
-          }
+          token = DEFINED_WORD;
+          tokenString = lexWord();
+          return;
       }
       c = reader.read();
       return;
@@ -171,7 +287,7 @@ public final class TptpParser {
   }
 
   private boolean eat(int k) throws IOException {
-    if (tok == k) {
+    if (token == k) {
       lex();
       return true;
     }
@@ -191,14 +307,10 @@ public final class TptpParser {
   }
 
   private Object atomicTerm() throws IOException {
-    var k = tok;
-    var s = tokString;
+    var k = token;
+    var s = tokenString;
     lex();
     switch (k) {
-      case FALSE:
-        return false;
-      case TRUE:
-        return true;
       case VARIABLE:
         {
           var a = free.get(s);
@@ -214,7 +326,7 @@ public final class TptpParser {
             a = new Func(s);
             functions.put(s, a);
           }
-          if (tok == '(') {
+          if (token == '(') {
             var r = new ArrayList<>();
             r.add(a);
             args(r);
@@ -229,7 +341,7 @@ public final class TptpParser {
 
   private Object infixUnary() throws IOException {
     var a = atomicTerm();
-    switch (tok) {
+    switch (token) {
       case '=':
         lex();
         return Array.of(Symbol.EQUALS, a, atomicTerm());
@@ -242,8 +354,8 @@ public final class TptpParser {
   }
 
   private String word() throws IOException {
-    if (tok != WORD) throw new ParseException(file, reader.getLineNumber(), "word expected");
-    var s = tokString;
+    if (token != WORD) throw new ParseException(file, reader.getLineNumber(), "word expected");
+    var s = tokenString;
     lex();
     return s;
   }
@@ -256,7 +368,7 @@ public final class TptpParser {
     reader.setLineNumber(1);
     c = reader.read();
     lex();
-    while (tok != -1) {
+    while (token != -1) {
       var s = word();
       expect('(');
       var name = word();
@@ -284,7 +396,7 @@ public final class TptpParser {
               (not ? negative : positive).add(a);
             } while (eat('|'));
             if (parens) expect(')');
-            if ((select != null) && !select.contains(name)) break;
+            if (select != null && !select.contains(name)) break;
             clauses.add(new Clause(negative, positive));
             break;
           }
@@ -294,13 +406,13 @@ public final class TptpParser {
             if (tptp == null) throw new IllegalStateException("TPTP environment variable not set");
             var select1 = select;
             if (eat(','))
-              if ((tok == WORD) && "all".equals(tokString)) lex();
+              if (token == WORD && "all".equals(tokenString)) lex();
               else {
                 expect('[');
                 select1 = new HashSet<>();
                 do {
                   var name1 = word();
-                  if ((select == null) || select.contains(name1)) select1.add(name1);
+                  if (select == null || select.contains(name1)) select1.add(name1);
                 } while (eat(','));
                 expect(']');
               }
