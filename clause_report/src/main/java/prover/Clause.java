@@ -25,7 +25,7 @@ public final class Clause {
 
   private static void setBoolean(Object a) {
     if (a instanceof Seq) a = ((Seq) a).head();
-    if (a instanceof Func) ((Func) a).isBoolean = true;
+    if (a instanceof Func) ((Func) a).type = Symbol.BOOLEAN;
   }
 
   public Clause(ArrayList<Object> negative, ArrayList<Object> positive) {

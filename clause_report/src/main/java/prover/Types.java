@@ -7,7 +7,7 @@ public final class Types {
 
   public static Object typeof(Object a) {
     if (a instanceof Seq) a = ((Seq) a).head();
-    if (a instanceof Func) return ((Func) a).isBoolean ? Symbol.BOOLEAN : Symbol.INDIVIDUAL;
+    if (a instanceof Func) return ((Func) a).type;
     if (a instanceof Variable) return ((Variable) a).type;
     if (a instanceof Symbol)
       switch ((Symbol) a) {

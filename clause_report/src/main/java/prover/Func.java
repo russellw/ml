@@ -5,7 +5,7 @@ import io.vavr.collection.Seq;
 
 public final class Func {
   private final String name;
-  public boolean isBoolean;
+  public Object type = Symbol.INDIVIDUAL;
 
   public Func(String name) {
     this.name = name;
