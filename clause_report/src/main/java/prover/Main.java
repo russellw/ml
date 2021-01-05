@@ -7,8 +7,12 @@ import java.nio.file.Path;
 import java.util.*;
 
 public final class Main {
+  private enum Language {
+    DIMACS,
+    TPTP,
+  }
+
   private static ArrayList<String> files = new ArrayList<>();
-  public static PrintStream writer;
   private static Language language;
   private static long timeout = 60_000;
   private static final String STDIN = "stdin";
@@ -40,14 +44,11 @@ public final class Main {
         continue;
       }
       var opt = arg;
-      while (opt.charAt(0) == '-') {
-        opt = opt.substring(1);
-      }
+      while (opt.charAt(0) == '-') opt = opt.substring(1);
       String optArg = null;
       var j = 0;
-      while ((j < opt.length()) && (Character.isLetter(opt.charAt(j)) || (opt.charAt(j) == '-'))) {
+      while ((j < opt.length()) && (Character.isLetter(opt.charAt(j)) || (opt.charAt(j) == '-')))
         j++;
-      }
       if (j < opt.length()) {
         switch (opt.charAt(j)) {
           case '0':
@@ -135,75 +136,44 @@ public final class Main {
 
   private Main() {}
 
+  private static Language language(String file) throws IOException {
+    if (language != null) return language;
+    switch (Etc.extension(file)) {
+      case "ax":
+      case "p":
+        return Language.TPTP;
+      case "cnf":
+        return Language.DIMACS;
+    }
+    throw new IOException(file + ": language not specified");
+  }
+
   public static void main(String[] args) throws IOException {
     // Command line
+    if (args.length == 0) help();
     args(args);
-    if (files.isEmpty()) help();
-
-    // Reports
-    new File("logs").mkdir();
+    if (files.isEmpty()) files.add(STDIN);
 
     // Statistics
     var solved = 0;
 
     // For each problem
-    System.out.println("file                                     clauses sat processed   time");
     for (var file : files) {
-      System.out.printf("%-40s", file);
-
       // Read
-      var problem = TptpParser.read(file);
-      System.out.printf(" %7d ", problem.clauses.size());
-
-      // Report
-      writer = new PrintStream("logs/" + new File(file).getName().split("\\.")[0] + ".html");
-      writer.println("<!DOCTYPE html>");
-      writer.println("<html lang=\"en\">");
-      writer.println("<meta charset=\"utf-8\"/>");
-      writer.printf("<title>%s</title>\n", file);
-      writer.println("<style>");
-      writer.println("h1 {");
-      writer.println("font-size: 150%;");
-      writer.println("}");
-      writer.println("h2 {");
-      writer.println("font-size: 125%;");
-      writer.println("}");
-      writer.println("caption {");
-      writer.println("text-align: left;");
-      writer.println("white-space: nowrap;");
-      writer.println("}");
-      writer.println("table.bordered, th.bordered, td.bordered {");
-      writer.println("border: 1px solid;");
-      writer.println("border-collapse: collapse;");
-      writer.println("padding: 5px;");
-      writer.println("}");
-      writer.println("table.padded, th.padded, td.padded {");
-      writer.println("padding: 3px;");
-      writer.println("}");
-      writer.println("td.fixed {");
-      writer.println("white-space: nowrap;");
-      writer.println("}");
-      writer.println("td.bar {");
-      writer.println("width: 100%");
-      writer.println("}");
-      writer.println("</style>");
-
-      // Contents
-      writer.println("<h1 id=\"Contents\">Contents</h1>");
-      writer.println("<ul>");
-      writer.println("<li><a href=\"#Contents\">Contents</a>");
-      writer.println("<li><a href=\"#Input-files\">Input files</a>");
-      writer.println("<li><a href=\"#Clauses\">Clauses</a>");
-      writer.println("<li><a href=\"#Subsumption\">Subsumption</a>");
-      writer.println("<li><a href=\"#Result\">Result</a>");
-      writer.println("<li><a href=\"#Memory\">Memory</a>");
-      writer.println("<li><a href=\"#Time\">Time</a>");
-      writer.println("</ul>");
+      Problem problem;
+      try {
+        problem = TptpParser.read(file);
+        for (var i = 0; i < problem.header.size() && i < 66; i++)
+          System.out.println(problem.header.get(i));
+      } catch (InappropriateException e) {
+        System.out.println("% SZS status Inappropriate for " + file);
+        System.out.println();
+        continue;
+      }
 
       // Solve
       var start = System.currentTimeMillis();
       Superposition.solve(problem, timeout);
-      writer.close();
 
       // Result
       System.out.print(problem.result == SZS.Timeout ? "   " : problem.result.abbreviation());

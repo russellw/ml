@@ -38,6 +38,7 @@ public final class TptpParser {
   private final String file;
   private final LineNumberReader reader;
   private int c;
+  private boolean header;
   private int token;
   private String tokenString;
   private java.util.HashMap<String, Variable> free = new java.util.HashMap<>();
@@ -206,6 +207,10 @@ public final class TptpParser {
           {
             var s = reader.readLine();
             c = reader.read();
+            if (header) {
+              problem.header.add('%' + s);
+              if (c == '\n') problem.header.add("");
+            }
             if (problem.expected == null) {
               var matcher = STATUS_PATTERN.matcher(s);
               if (matcher.matches()) problem.expected = SZS.valueOf(matcher.group(1));
@@ -577,7 +582,11 @@ public final class TptpParser {
             new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
     reader.setLineNumber(1);
     c = reader.read();
+    header = true;
     lex();
+    header = false;
+    if (!problem.header.isEmpty() && !problem.header.get(problem.header.size() - 1).isBlank())
+      problem.header.add("");
     while (token != -1) {
       var s = word();
       expect('(');
@@ -643,7 +652,7 @@ public final class TptpParser {
 
   public static Problem read(String file) throws IOException {
     functions = new java.util.HashMap<>();
-    problem = new Problem();
+    problem = new Problem(file);
 
     // Read
     new TptpParser(file, null);
