@@ -1,6 +1,8 @@
 package prover;
 
+import java.util.ArrayList;
+
 public final class Problem {
   public SZS expected;
-  public SZS result;
+  public ArrayList<Clause> clauses = new ArrayList<>();
 }

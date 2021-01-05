@@ -4,9 +4,9 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Properties;
 
 public final class Main {
-  public static Boolean status;
   public static PrintStream writer;
 
   private Main() {}
@@ -26,14 +26,13 @@ public final class Main {
     var solved = 0;
 
     // For each problem
-    System.out.println("file                                     clauses sat   processed   time");
+    System.out.println("file                                     clauses sat processed   time");
     for (var file : files) {
       System.out.printf("%-40s", file);
 
       // Read
-      status = null;
-      var clauses = TptpParser.read(file);
-      System.out.printf(" %7d", clauses.size());
+      var problem = TptpParser.read(file);
+      System.out.printf(" %7d ", problem.clauses.size());
 
       // Report
       writer = new PrintStream("logs/" + new File(file).getName().split("\\.")[0] + ".html");
@@ -83,14 +82,13 @@ public final class Main {
       // Solve
       var start = System.currentTimeMillis();
       Superposition.timeout = start + 3_000;
-      var result = Superposition.satisfiable(clauses);
+      var result = Superposition.satisfiable(problem.clauses);
       writer.close();
 
       // Result
-      if (result == null) System.out.print("      ");
-      else {
-        System.out.print(result ? " sat  " : " unsat");
-        if (result != status) throw new IllegalStateException();
+      System.out.print(result == SZS.Timeout ? "   " : result.abbreviation());
+      if (result.solved()) {
+        if (!result.compatible(problem.expected)) throw new IllegalStateException();
         solved++;
       }
 
@@ -102,5 +100,18 @@ public final class Main {
     // Statistics
     System.out.printf(
         "solved %d/%d (%f%%)\n", solved, files.length, solved * 100 / (double) files.length);
+  }
+
+  private static String version() throws IOException {
+    var properties = new Properties();
+    var stream =
+        Main.class
+            .getClassLoader()
+            .getResourceAsStream("META-INF/maven/prover/prover/pom.properties");
+    if (stream == null) {
+      return null;
+    }
+    properties.load(stream);
+    return properties.getProperty("version");
   }
 }

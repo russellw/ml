@@ -207,7 +207,7 @@ public final class Superposition {
     clause(new Clause(negative, positive));
   }
 
-  public static Boolean satisfiable(Collection<Clause> clauses) {
+  public static SZS satisfiable(Collection<Clause> clauses) {
     unprocessed = new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
     unprocessed.addAll(clauses);
     processed = new ArrayList<>();
@@ -221,11 +221,11 @@ public final class Superposition {
       // Solved
       if (g.isFalse()) {
         proof = g;
-        return false;
+        return SZS.Unsatisfiable;
       }
 
       // Check resources
-      if (System.currentTimeMillis() > timeout) return null;
+      if (System.currentTimeMillis() > timeout) return SZS.Timeout;
 
       // Rename variables for subsumption and subsequent inference
       var g1 = g.renameVariables();
@@ -249,6 +249,6 @@ public final class Superposition {
         superposition(g1, c);
       }
     }
-    return true;
+    return SZS.Satisfiable;
   }
 }

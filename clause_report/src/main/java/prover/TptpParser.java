@@ -29,7 +29,6 @@ public final class TptpParser {
 
   // Problem state
   private static Problem problem;
-  private static ArrayList<Clause> clauses;
   private static HashMap<String, Func> functions;
 
   // File state
@@ -204,7 +203,7 @@ public final class TptpParser {
           {
             var s = reader.readLine();
             c = reader.read();
-            if (Main.status == null) {
+            if (problem.expected == null) {
               var matcher = STATUS_PATTERN.matcher(s);
               if (matcher.matches()) problem.expected = SZS.valueOf(matcher.group(1));
             }
@@ -397,7 +396,7 @@ public final class TptpParser {
             } while (eat('|'));
             if (parens) expect(')');
             if (select != null && !select.contains(name)) break;
-            clauses.add(new Clause(negative, positive));
+            problem.clauses.add(new Clause(negative, positive));
             break;
           }
         case "include":
@@ -427,11 +426,18 @@ public final class TptpParser {
     }
   }
 
-  public static ArrayList<Clause> read(String file) throws IOException {
-    clauses = new ArrayList<>();
+  public static Problem read(String file) throws IOException {
     functions = new HashMap<>();
+    problem = new Problem();
+
+    // Read
     new TptpParser(file, null);
-    return clauses;
+
+    // Free memory
+    functions = null;
+
+    // Return
+    return problem;
   }
 
   private static final class Not {
