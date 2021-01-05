@@ -138,6 +138,7 @@ public final class Main {
   public static void main(String[] args) throws IOException {
     // Command line
     args(args);
+    if (files.isEmpty()) help();
 
     // Reports
     new File("logs").mkdir();
@@ -201,14 +202,14 @@ public final class Main {
 
       // Solve
       var start = System.currentTimeMillis();
-      var result = Superposition.satisfiable(problem.clauses, timeout);
+      Superposition.solve(problem, timeout);
       writer.close();
 
       // Result
-      System.out.print(result == SZS.Timeout ? "   " : result.abbreviation());
-      if (result.solved()) {
-        if (!result.compatible(problem.expected))
-          throw new IllegalStateException(result + " != " + problem.expected);
+      System.out.print(problem.result == SZS.Timeout ? "   " : problem.result.abbreviation());
+      if (problem.result.solved()) {
+        if (!problem.result.compatible(problem.expected))
+          throw new IllegalStateException(problem.result + " != " + problem.expected);
         solved++;
       }
 

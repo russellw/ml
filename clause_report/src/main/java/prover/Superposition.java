@@ -4,7 +4,6 @@ import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -38,7 +37,6 @@ import java.util.PriorityQueue;
 public final class Superposition {
   public static PriorityQueue<Clause> unprocessed;
   public static ArrayList<Clause> processed;
-  public static Clause proof;
 
   private Superposition() {}
 
@@ -206,12 +204,11 @@ public final class Superposition {
     clause(new Clause(negative, positive));
   }
 
-  public static SZS satisfiable(Collection<Clause> clauses, long time) {
+  public static void solve(Problem problem, long time) {
     var timeout = System.currentTimeMillis() + time;
     unprocessed = new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
-    unprocessed.addAll(clauses);
+    unprocessed.addAll(problem.clauses);
     processed = new ArrayList<>();
-    proof = null;
     while (!unprocessed.isEmpty()) {
       // Given clause
       // Discount loop, given clause cannot have already been subsumed
@@ -220,12 +217,16 @@ public final class Superposition {
 
       // Solved
       if (g.isFalse()) {
-        proof = g;
-        return SZS.Unsatisfiable;
+        problem.proof = g;
+        problem.result = SZS.Unsatisfiable;
+        return;
       }
 
       // Check resources
-      if (System.currentTimeMillis() > timeout) return SZS.Timeout;
+      if (System.currentTimeMillis() > timeout) {
+        problem.result = SZS.Timeout;
+        return;
+      }
 
       // Rename variables for subsumption and subsequent inference
       var g1 = g.renameVariables();
@@ -249,6 +250,6 @@ public final class Superposition {
         superposition(g1, c);
       }
     }
-    return SZS.Satisfiable;
+    problem.result = SZS.Satisfiable;
   }
 }
