@@ -1,10 +1,13 @@
 package prover;
 
 import io.vavr.collection.Array;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
+import io.vavr.collection.Seq;
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
@@ -29,7 +32,7 @@ public final class TptpParser {
 
   // Problem state
   private static Problem problem;
-  private static HashMap<String, Func> functions;
+  private static java.util.HashMap<String, Func> functions;
 
   // File state
   private final String file;
@@ -37,7 +40,7 @@ public final class TptpParser {
   private int c;
   private int token;
   private String tokenString;
-  private HashMap<String, Variable> free = new HashMap<>();
+  private java.util.HashMap<String, Variable> free = new java.util.HashMap<>();
 
   private void lexQuote() throws IOException {
     var line = reader.getLineNumber();
@@ -298,18 +301,37 @@ public final class TptpParser {
       throw new ParseException(file, reader.getLineNumber(), ": '" + (char) k + "' expected");
   }
 
-  private void args(ArrayList<Object> r) throws IOException {
+  private void args(Map<String, Variable> bound, ArrayList<Object> r) throws IOException {
     expect('(');
-    do r.add(atomicTerm());
+    do r.add(atomicTerm(bound));
     while (eat(','));
     expect(')');
   }
 
-  private Object atomicTerm() throws IOException {
+  private void args(Map<String, Variable> bound, ArrayList<Object> r, int arity)
+      throws IOException {
+    int n = r.size();
+    args(bound, r);
+    n = r.size() - n;
+    if (n != arity)
+      throw new ParseException(file, reader.getLineNumber(), "arg count: " + n + " != " + arity);
+  }
+
+  private Object definedAtomicTerm(Map<String, Variable> bound, Symbol op, int arity)
+      throws IOException {
+    var r = new ArrayList<>();
+    r.add(op);
+    args(bound, r, arity);
+    return Array.of(r);
+  }
+
+  private Object atomicTerm(Map<String, Variable> bound) throws IOException {
     var k = token;
     var s = tokenString;
     lex();
     switch (k) {
+      case DISTINCT_OBJECT:
+        return s;
       case VARIABLE:
         {
           var a = free.get(s);
@@ -328,25 +350,37 @@ public final class TptpParser {
           if (token == '(') {
             var r = new ArrayList<>();
             r.add(a);
-            args(r);
+            args(bound, r);
             return Array.of(r.toArray());
           }
           return a;
         }
-      default:
-        throw new ParseException(file, reader.getLineNumber(), ": term expected");
+      case INTEGER:
+        return new BigInteger(s);
+      case RATIONAL:
+        return BigRational.of(s);
+      case REAL:
+        // Real numbers are a problem
+        // In general, they are incomputable
+        // For computation purposes, double precision floating point is the best available
+        // approximation
+        // However, theorem proving needs exactness
+        // So represent real number literals not as the usual floating point
+        // but as 'the real number that would correspond to this rational number'
+        return Array.of(Symbol.TO_REAL, BigRational.ofDecimal(s));
     }
+    throw new ParseException(file, reader.getLineNumber(), ": term expected");
   }
 
-  private Object infixUnary() throws IOException {
-    var a = atomicTerm();
+  private Object infixUnary(Map<String, Variable> bound) throws IOException {
+    var a = atomicTerm(bound);
     switch (token) {
       case '=':
         lex();
-        return Array.of(Symbol.EQUALS, a, atomicTerm());
+        return Array.of(Symbol.EQUALS, a, atomicTerm(bound));
       case NOT_EQ:
         lex();
-        return new Not(Array.of(Symbol.EQUALS, a, atomicTerm()));
+        return Array.of(Symbol.NOT, Array.of(Symbol.EQUALS, a, atomicTerm(bound)));
       default:
         return a;
     }
@@ -357,6 +391,22 @@ public final class TptpParser {
     var s = tokenString;
     lex();
     return s;
+  }
+
+  private void ignore() throws IOException {
+    switch (token) {
+      case '(':
+        lex();
+        while (!eat(')')) {
+          ignore();
+        }
+        break;
+      case -1:
+        throw new ParseException(file, reader.getLineNumber(), "unexpected end of file");
+      default:
+        lex();
+        break;
+    }
   }
 
   private TptpParser(String file, HashSet<String> select) throws IOException {
@@ -387,10 +437,13 @@ public final class TptpParser {
             var parens = eat('(');
             do {
               var not = eat('~');
-              var a = infixUnary();
-              if (a instanceof Not) {
-                a = ((Not) a).a;
-                not = !not;
+              var a = infixUnary(HashMap.empty());
+              if (a instanceof Seq) {
+                var a1 = (Seq) a;
+                if (a1.head() == Symbol.NOT) {
+                  a = a1.get(1);
+                  not = !not;
+                }
               }
               (not ? negative : positive).add(a);
             } while (eat('|'));
@@ -421,13 +474,14 @@ public final class TptpParser {
         default:
           throw new ParseException(file, reader.getLineNumber(), "unknown language");
       }
+      if (token == ',') do ignore(); while (token != ')');
       expect(')');
       expect('.');
     }
   }
 
   public static Problem read(String file) throws IOException {
-    functions = new HashMap<>();
+    functions = new java.util.HashMap<>();
     problem = new Problem();
 
     // Read
@@ -438,13 +492,5 @@ public final class TptpParser {
 
     // Return
     return problem;
-  }
-
-  private static final class Not {
-    final Object a;
-
-    private Not(Object a) {
-      this.a = a;
-    }
   }
 }
