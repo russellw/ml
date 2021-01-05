@@ -3,6 +3,7 @@ package prover;
 import io.vavr.collection.Array;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -55,5 +56,29 @@ public final class Etc {
       r[j] = x;
     }
     return Array.of(r);
+  }
+
+  public static BigInteger divideEuclidean(BigInteger a, BigInteger b) {
+    return a.subtract(remainderEuclidean(a, b)).divide(b);
+  }
+
+  public static BigInteger divideFloor(BigInteger a, BigInteger b) {
+    var r = a.divideAndRemainder(b);
+    if ((a.signum() < 0 != b.signum() < 0) && (r[1].signum() != 0)) {
+      r[0] = r[0].subtract(BigInteger.ONE);
+    }
+    return r[0];
+  }
+
+  public static BigInteger remainderEuclidean(BigInteger a, BigInteger b) {
+    var r = a.remainder(b);
+    if (r.signum() < 0) {
+      r = r.add(b.abs());
+    }
+    return r;
+  }
+
+  public static BigInteger remainderFloor(BigInteger a, BigInteger b) {
+    return a.subtract(divideFloor(a, b).multiply(b));
   }
 }
