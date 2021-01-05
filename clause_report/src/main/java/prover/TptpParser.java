@@ -218,7 +218,7 @@ public final class TptpParser {
             var r = new ArrayList<>();
             r.add(a);
             args(r);
-            return Array.of(r);
+            return Array.of(r.toArray());
           }
           return a;
         }

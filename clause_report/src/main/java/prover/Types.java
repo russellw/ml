@@ -13,6 +13,6 @@ public final class Types {
           return Symbol.BOOLEAN;
       }
     if (a instanceof Boolean) return Symbol.BOOLEAN;
-    throw new IllegalArgumentException(a.toString());
+    throw new IllegalArgumentException(a + ": " + a.getClass());
   }
 }
