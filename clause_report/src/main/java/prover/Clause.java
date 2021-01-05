@@ -1,6 +1,7 @@
 package prover;
 
-import io.vavr.collection.List;
+import io.vavr.collection.Array;
+import io.vavr.collection.Seq;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,12 +19,12 @@ public final class Clause {
     return literals[i];
   }
 
-  public List<Object> literals() {
-    return List.of(literals);
+  public Seq<Object> literals() {
+    return Array.of(literals);
   }
 
   private static void setBoolean(Object a) {
-    if (a instanceof List) a = ((List) a).head();
+    if (a instanceof Seq) a = ((Seq) a).head();
     if (a instanceof Func) ((Func) a).isBoolean = true;
   }
 
@@ -82,11 +83,11 @@ public final class Clause {
     return (literals.length == 1) && (negativeSize == 0) && (literals[0] == Boolean.TRUE);
   }
 
-  public final List<Object> negative() {
+  public final Seq<Object> negative() {
     return literals().slice(0, negativeSize);
   }
 
-  public final List<Object> positive() {
+  public final Seq<Object> positive() {
     return literals().slice(negativeSize, literals.length);
   }
 
@@ -112,7 +113,7 @@ public final class Clause {
               return a;
             });
     if (map.isEmpty()) return this;
-    return new Clause(((List) r).toJavaArray(), negativeSize);
+    return new Clause(((Seq) r).toJavaArray(), negativeSize);
   }
 
   @Override
