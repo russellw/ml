@@ -12,10 +12,10 @@ public class SubsumptionTest {
     var b = new Func("b");
     var p = new Func("p");
     var q = new Func("q");
-    var x = new Variable();
-    var y = new Variable();
-    var negative = new ArrayList<Term>();
-    var positive = new ArrayList<Term>();
+    var x = new Variable(Symbol.INDIVIDUAL);
+    var y = new Variable(Symbol.INDIVIDUAL);
+    var negative = new ArrayList<>();
+    var positive = new ArrayList<>();
     Clause c, d;
 
     // false <= false
@@ -229,11 +229,11 @@ public class SubsumptionTest {
     // (a = x) <= (a = b)
     negative.clear();
     positive.clear();
-    positive.add(new Eq(a, x));
+    positive.add(Equality.of(a, x));
     c = new Clause(negative, positive);
     negative.clear();
     positive.clear();
-    positive.add(new Eq(a, b));
+    positive.add(Equality.of(a, b));
     d = new Clause(negative, positive);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
@@ -241,11 +241,11 @@ public class SubsumptionTest {
     // (x = a) <= (a = b)
     negative.clear();
     positive.clear();
-    positive.add(new Eq(x, a));
+    positive.add(Equality.of(x, a));
     c = new Clause(negative, positive);
     negative.clear();
     positive.clear();
-    positive.add(new Eq(a, b));
+    positive.add(Equality.of(a, b));
     d = new Clause(negative, positive);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));

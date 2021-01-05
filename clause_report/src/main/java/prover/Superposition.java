@@ -1,6 +1,12 @@
 package prover;
 
-import java.util.*;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
+import io.vavr.collection.Seq;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 // The superposition calculus generates new clauses by three rules:
 //
@@ -32,7 +38,7 @@ import java.util.*;
 public final class Superposition {
   public static long timeout;
   public static PriorityQueue<Clause> unprocessed;
-  public static List<Clause> processed;
+  public static ArrayList<Clause> processed;
   public static Clause proof;
 
   private static void clause(Clause c) {
@@ -43,22 +49,21 @@ public final class Superposition {
   // For each negative equation
   private static void resolution(Clause c) {
     for (var i = 0; i < c.negativeSize; i++) {
-      var e = Eq.of(c.literals[i]);
-      var map = new HashMap<Variable, Term>();
-      if (Unification.unify(e.left, e.right, map)) resolution(c, i, map);
+      var e = c.get(i);
+      var map = Unification.unify(Equality.left(e), Equality.right(e), HashMap.empty());
+      if (map != null) resolution(c, i, map);
     }
   }
 
   // Substitute and make new clause
-  private static void resolution(Clause c, int ci, Map<Variable, Term> map) {
+  private static void resolution(Clause c, int ci, Map<Variable, Object> map) {
     // Negative literals
-    var negative = new ArrayList<Term>(c.negativeSize - 1);
-    for (var i = 0; i < c.negativeSize; i++) if (i != ci) negative.add(c.literals[i].replace(map));
+    var negative = new ArrayList<>(c.negativeSize - 1);
+    for (var i = 0; i < c.negativeSize; i++) if (i != ci) negative.add(Etc.replace(c.get(i), map));
 
     // Positive literals
-    var positive = new ArrayList<Term>(c.positiveSize());
-    for (var i = c.negativeSize; i < c.literals.length; i++)
-      positive.add(c.literals[i].replace(map));
+    var positive = new ArrayList<>(c.positiveSize());
+    for (var i = c.negativeSize; i < c.size(); i++) positive.add(Etc.replace(c.get(i), map));
 
     // Make new clause
     clause(new Clause(negative, positive));
@@ -66,38 +71,38 @@ public final class Superposition {
 
   // For each positive equation (both directions)
   private static void factoring(Clause c) {
-    for (var i = c.negativeSize; i < c.literals.length; i++) {
-      var e = Eq.of(c.literals[i]);
-      factoring(c, i, e.left, e.right);
-      factoring(c, i, e.right, e.left);
+    for (var i = c.negativeSize; i < c.size(); i++) {
+      var e = c.get(i);
+      factoring(c, i, Equality.left(e), Equality.right(e));
+      factoring(c, i, Equality.right(e), Equality.left(e));
     }
   }
 
   // For each positive equation (both directions) again
-  private static void factoring(Clause c, int ci, Term c0, Term c1) {
-    for (var i = c.negativeSize; i < c.literals.length; i++) {
+  private static void factoring(Clause c, int ci, Object c0, Object c1) {
+    for (var i = c.negativeSize; i < c.size(); i++) {
       if (i == ci) continue;
-      var e = Eq.of(c.literals[i]);
-      factoring(c, c0, c1, i, e.left, e.right);
-      factoring(c, c0, c1, i, e.right, e.left);
+      var e = c.get(i);
+      factoring(c, c0, c1, i, Equality.left(e), Equality.right(e));
+      factoring(c, c0, c1, i, Equality.right(e), Equality.left(e));
     }
   }
 
   // Substitute and make new clause
-  private static void factoring(Clause c, Term c0, Term c1, int di, Term d0, Term d1) {
-    if (!Eq.equatable(c1, d1)) return;
-    var map = new HashMap<Variable, Term>();
-    if (!Unification.unify(c0, d0, map)) return;
+  private static void factoring(Clause c, Object c0, Object c1, int di, Object d0, Object d1) {
+    if (!Equality.equatable(c1, d1)) return;
+    var map = Unification.unify(c0, d0, HashMap.empty());
+    if (map == null) return;
 
     // Negative literals
-    var negative = new ArrayList<Term>(c.negativeSize + 1);
-    for (var i = 0; i < c.negativeSize; i++) negative.add(c.literals[i].replace(map));
-    negative.add(new Eq(c1, d1).replace(map).term());
+    var negative = new ArrayList<>(c.negativeSize + 1);
+    for (var i = 0; i < c.negativeSize; i++) negative.add(Etc.replace(c.get(i), map));
+    negative.add(Etc.replace(Equality.of(c1, d1), map));
 
     // Positive literals
-    var positive = new ArrayList<Term>(c.positiveSize() - 1);
-    for (var i = c.negativeSize; i < c.literals.length; i++)
-      if (i != di) positive.add(c.literals[i].replace(map));
+    var positive = new ArrayList<>(c.positiveSize() - 1);
+    for (var i = c.negativeSize; i < c.size(); i++)
+      if (i != di) positive.add(Etc.replace(c.get(i), map));
 
     // Make new clause
     clause(new Clause(negative, positive));
@@ -105,20 +110,40 @@ public final class Superposition {
 
   // For each positive equation in c (both directions)
   private static void superposition(Clause c, Clause d) {
-    for (var i = c.negativeSize; i < c.literals.length; i++) {
-      var e = Eq.of(c.literals[i]);
-      superposition(c, d, i, e.left, e.right);
-      superposition(c, d, i, e.right, e.left);
+    for (var i = c.negativeSize; i < c.size(); i++) {
+      var e = c.get(i);
+      superposition(c, d, i, Equality.left(e), Equality.right(e));
+      superposition(c, d, i, Equality.right(e), Equality.left(e));
     }
   }
 
   // For each equation in d (both directions)
-  private static void superposition(Clause c, Clause d, int ci, Term c0, Term c1) {
-    if (c0 == Term.TRUE) return;
-    for (var i = 0; i < d.literals.length; i++) {
-      var e = Eq.of(d.literals[i]);
-      superposition(c, d, ci, c0, c1, i, e.left, e.right, new ArrayList<>(), e.left);
-      superposition(c, d, ci, c0, c1, i, e.right, e.left, new ArrayList<>(), e.right);
+  private static void superposition(Clause c, Clause d, int ci, Object c0, Object c1) {
+    if (c0 == Boolean.TRUE) return;
+    for (var i = 0; i < d.size(); i++) {
+      var e = d.get(i);
+      superposition(
+          c,
+          d,
+          ci,
+          c0,
+          c1,
+          i,
+          Equality.left(e),
+          Equality.right(e),
+          new ArrayList<>(),
+          Equality.left(e));
+      superposition(
+          c,
+          d,
+          ci,
+          c0,
+          c1,
+          i,
+          Equality.right(e),
+          Equality.left(e),
+          new ArrayList<>(),
+          Equality.right(e));
     }
   }
 
@@ -127,18 +152,20 @@ public final class Superposition {
       Clause c,
       Clause d,
       int ci,
-      Term c0,
-      Term c1,
+      Object c0,
+      Object c1,
       int di,
-      Term d0,
-      Term d1,
-      List<Integer> position,
-      Term a) {
+      Object d0,
+      Object d1,
+      ArrayList<Integer> position,
+      Object a) {
     if (a instanceof Variable) return;
     superposition1(c, d, ci, c0, c1, di, d0, d1, position, a);
-    for (var i = 1; i < a.size(); i++) {
+    if (!(a instanceof Seq)) return;
+    var a1 = (Seq) a;
+    for (var i = 1; i < a1.size(); i++) {
       position.add(i);
-      superposition(c, d, ci, c0, c1, di, d0, d1, position, a.get(i));
+      superposition(c, d, ci, c0, c1, di, d0, d1, position, a1.get(i));
       position.remove(position.size() - 1);
     }
   }
@@ -148,31 +175,31 @@ public final class Superposition {
       Clause c,
       Clause d,
       int ci,
-      Term c0,
-      Term c1,
+      Object c0,
+      Object c1,
       int di,
-      Term d0,
-      Term d1,
-      List<Integer> position,
-      Term a) {
-    var map = new HashMap<Variable, Term>();
-    if (!Unification.unify(c0, a, map)) return;
-    var e = new Eq(d0.splice(position, c1), d1);
+      Object d0,
+      Object d1,
+      ArrayList<Integer> position,
+      Object a) {
+    var map = Unification.unify(c0, a, HashMap.empty());
+    if (map == null) return;
+    var e = Equality.of(Etc.splice(d0, position, 0, c1), d1);
 
     // Negative literals
-    var negative = new ArrayList<Term>(c.negativeSize + d.negativeSize);
-    for (var i = 0; i < c.negativeSize; i++) negative.add(c.literals[i].replace(map));
-    for (var i = 0; i < d.negativeSize; i++) if (i != di) negative.add(d.literals[i].replace(map));
+    var negative = new ArrayList<>(c.negativeSize + d.negativeSize);
+    for (var i = 0; i < c.negativeSize; i++) negative.add(Etc.replace(c.get(i), map));
+    for (var i = 0; i < d.negativeSize; i++) if (i != di) negative.add(Etc.replace(d.get(i), map));
 
     // Positive literals
-    var positive = new ArrayList<Term>(c.positiveSize() + d.positiveSize() - 1);
-    for (var i = c.negativeSize; i < c.literals.length; i++)
-      if (i != ci) positive.add(c.literals[i].replace(map));
-    for (var i = d.negativeSize; i < d.literals.length; i++)
-      if (i != di) positive.add(d.literals[i].replace(map));
+    var positive = new ArrayList<>(c.positiveSize() + d.positiveSize() - 1);
+    for (var i = c.negativeSize; i < c.size(); i++)
+      if (i != ci) positive.add(Etc.replace(c.get(i), map));
+    for (var i = d.negativeSize; i < d.size(); i++)
+      if (i != di) positive.add(Etc.replace(d.get(i), map));
 
     // Negative and positive superposition
-    ((di < d.negativeSize) ? negative : positive).add(e.replace(map).term());
+    ((di < d.negativeSize) ? negative : positive).add(Etc.replace(e, map));
 
     // Make new clause
     clause(new Clause(negative, positive));

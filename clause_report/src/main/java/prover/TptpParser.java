@@ -1,8 +1,11 @@
 package prover;
 
+import io.vavr.collection.Array;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 
 public final class TptpParser {
@@ -16,8 +19,8 @@ public final class TptpParser {
   private static final int WORD = -6;
 
   // Problem state
-  private static List<Clause> clauses;
-  private static Map<String, Func> functions;
+  private static ArrayList<Clause> clauses;
+  private static HashMap<String, Func> functions;
 
   // File state
   private final String file;
@@ -25,7 +28,7 @@ public final class TptpParser {
   private int c;
   private int tok;
   private String tokString;
-  private Map<String, Variable> free = new HashMap<>();
+  private HashMap<String, Variable> free = new HashMap<>();
 
   private String lexWord() throws IOException {
     var sb = new StringBuilder();
@@ -180,27 +183,27 @@ public final class TptpParser {
       throw new ParseException(file, reader.getLineNumber(), ": '" + (char) k + "' expected");
   }
 
-  private void args(List<Term> r) throws IOException {
+  private void args(ArrayList<Object> r) throws IOException {
     expect('(');
     do r.add(atomicTerm());
     while (eat(','));
     expect(')');
   }
 
-  private Term atomicTerm() throws IOException {
+  private Object atomicTerm() throws IOException {
     var k = tok;
     var s = tokString;
     lex();
     switch (k) {
       case FALSE:
-        return Term.FALSE;
+        return false;
       case TRUE:
-        return Term.TRUE;
+        return true;
       case VARIABLE:
         {
           var a = free.get(s);
           if (a != null) return a;
-          a = new Variable();
+          a = new Variable(Symbol.INDIVIDUAL);
           free.put(s, a);
           return a;
         }
@@ -212,9 +215,10 @@ public final class TptpParser {
             functions.put(s, a);
           }
           if (tok == '(') {
-            var r = new ArrayList<Term>();
+            var r = new ArrayList<>();
+            r.add(a);
             args(r);
-            return a.call(r);
+            return Array.of(r);
           }
           return a;
         }
@@ -223,15 +227,15 @@ public final class TptpParser {
     }
   }
 
-  private Term infixUnary() throws IOException {
+  private Object infixUnary() throws IOException {
     var a = atomicTerm();
     switch (tok) {
       case '=':
         lex();
-        return new Eq(a, atomicTerm());
+        return Array.of(Symbol.EQUALS, a, atomicTerm());
       case NOT_EQ:
         lex();
-        return new Not(new Eq(a, atomicTerm()));
+        return new Not(Array.of(Symbol.EQUALS, a, atomicTerm()));
       default:
         return a;
     }
@@ -244,7 +248,7 @@ public final class TptpParser {
     return s;
   }
 
-  private TptpParser(String file, Set<String> select) throws IOException {
+  private TptpParser(String file, HashSet<String> select) throws IOException {
     this.file = file;
     reader =
         new LineNumberReader(
@@ -267,8 +271,8 @@ public final class TptpParser {
 
             // Formula
             free.clear();
-            var negative = new ArrayList<Term>();
-            var positive = new ArrayList<Term>();
+            var negative = new ArrayList<>();
+            var positive = new ArrayList<>();
             var parens = eat('(');
             do {
               var not = eat('~');
@@ -311,17 +315,17 @@ public final class TptpParser {
     }
   }
 
-  public static List<Clause> read(String file) throws IOException {
+  public static ArrayList<Clause> read(String file) throws IOException {
     clauses = new ArrayList<>();
     functions = new HashMap<>();
     new TptpParser(file, null);
     return clauses;
   }
 
-  private static final class Not extends Term {
-    final Term a;
+  private static final class Not {
+    final Object a;
 
-    private Not(Term a) {
+    private Not(Object a) {
       this.a = a;
     }
   }
