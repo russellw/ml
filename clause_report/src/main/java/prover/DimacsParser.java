@@ -25,7 +25,7 @@ public final class DimacsParser {
   private int token;
   private String tokenString;
 
-    //Tokenizer
+  // Tokenizer
   private void lex() throws IOException {
     for (; ; ) {
       token = c;
@@ -100,7 +100,7 @@ public final class DimacsParser {
     return a;
   }
 
-    //Top level
+  // Top level
   private DimacsParser(String file, InputStream stream) throws IOException {
     problem = new Problem(file);
     reader = new LineNumberReader(new InputStreamReader(stream, StandardCharsets.UTF_8));

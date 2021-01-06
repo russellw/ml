@@ -31,6 +31,7 @@ public final class TptpParser {
   private static final int VARIABLE = -16;
 
   // Problem state
+  private static java.util.HashMap<String, Func> types = new java.util.HashMap<>();
   private static java.util.HashMap<String, Func> funcs;
   private static Problem problem;
 
@@ -43,7 +44,7 @@ public final class TptpParser {
   private String tokenString;
   private java.util.HashMap<String, Variable> free = new java.util.HashMap<>();
 
-  //Tokenizer
+  // Tokenizer
   private void lexQuote() throws IOException {
     var line = reader.getLineNumber();
     var quote = c;
@@ -307,12 +308,26 @@ public final class TptpParser {
       throw new ParseException(file, reader.getLineNumber(), ": '" + (char) k + "' expected");
   }
 
-  //Types
-  private Object typeAtom() throws IOException {
+  // Types
+  private static Func namedType(String name) {
+    var type = types.get(name);
+    if (type != null) return type;
+    type = new Func(null, name);
+    types.put(name, type);
+    return type;
+  }
+
+  private Object atomicType() throws IOException {
     var k = token;
     var s = tokenString;
     lex();
     switch (k) {
+      case '(':
+        {
+          var t = atomicType();
+          expect(')');
+          return t;
+        }
       case '!':
       case '[':
         throw new InappropriateException();
@@ -330,17 +345,44 @@ public final class TptpParser {
             return Symbol.REAL;
           case "$tType":
             throw new InappropriateException();
-          default:
-            throw new ParseException(file, reader.getLineNumber(), s + ": unknown type");
         }
+        throw new ParseException(file, reader.getLineNumber(), s + ": unknown type");
       case WORD:
-        return typeAtom(s);
+        return namedType(s);
       default:
         throw new ParseException(file, reader.getLineNumber(), "type expected");
     }
   }
 
-  //Terms
+  private Object type() throws IOException {
+    if (eat('(')) {
+      var r = new ArrayList<>();
+      r.add(null);
+      do r.add(atomicType());
+      while (eat('*'));
+      expect(')');
+      expect('>');
+      var returnType = atomicType();
+      r.set(0, returnType);
+      return Array.ofAll(r);
+    }
+    var t = atomicType();
+    if (eat('>')) {
+      var returnType = atomicType();
+      return Array.of(returnType, t);
+    }
+    return t;
+  }
+
+  // Terms
+  private static Func namedFunc(String name) {
+    var a = funcs.get(name);
+    if (a != null) return a;
+    a = new Func(null, name);
+    funcs.put(name, a);
+    return a;
+  }
+
   private void args(Map<String, Variable> bound, ArrayList<Object> r) throws IOException {
     expect('(');
     do r.add(atomicTerm(bound));
@@ -464,11 +506,7 @@ public final class TptpParser {
         }
       case WORD:
         {
-          var a = funcs.get(s);
-          if (a == null) {
-            a = new Func(new Variable(null), s);
-            funcs.put(s, a);
-          }
+          var a = namedFunc(s);
           if (token == '(') {
             var r = new ArrayList<>();
             r.add(a);
@@ -587,7 +625,7 @@ public final class TptpParser {
     }
   }
 
-  //Top level
+  // Top level
   private String word() throws IOException {
     if (token != WORD) throw new ParseException(file, reader.getLineNumber(), "word expected");
     var s = tokenString;
@@ -658,71 +696,71 @@ public final class TptpParser {
           }
         case "fof":
         case "tff":
-        {
-          expect(',');
+          {
+            expect(',');
 
-          // Role
-          var role = word();
-          expect(',');
+            // Role
+            var role = word();
+            expect(',');
 
-          // Formula
-          switch (role) {
-            case "assumption":
-            case "plain":
-            case "unknown":
-            case "axiom":
-            case "corollary":
-            case "definition":
-            case "hypothesis":
-            case "lemma":
-            case "negated_conjecture":
-            case "theorem":
-            {
-              var a = logicFormula(HashMap.empty());
-              if (select != null && !select.contains(name)) break;
-              var formula=new Formula(a);
-              formula.name = name;
-              problem.formulas.add(formula);
-              break;
+            // Formula
+            switch (role) {
+              case "assumption":
+              case "plain":
+              case "unknown":
+              case "axiom":
+              case "corollary":
+              case "definition":
+              case "hypothesis":
+              case "lemma":
+              case "negated_conjecture":
+              case "theorem":
+                {
+                  var a = logicFormula(HashMap.empty());
+                  if (select != null && !select.contains(name)) break;
+                  var formula = new Formula(a);
+                  formula.name = name;
+                  problem.formulas.add(formula);
+                  break;
+                }
+              case "conjecture":
+                {
+                  var a = logicFormula(HashMap.empty());
+                  if (select != null && !select.contains(name)) break;
+                  if (problem.conjecture != null)
+                    throw new ParseException(
+                        file, reader.getLineNumber(), "multiple conjectures not supported");
+                  var formula = new Formula(a);
+                  formula.name = name;
+                  problem.conjecture = formula;
+                  break;
+                }
+              case "type":
+                {
+                  var parens = 0;
+                  while (eat('(')) parens++;
+                  var funcName = word();
+                  expect(':');
+                  if (token == DEFINED_WORD && tokenString.equals("$tType")) {
+                    lex();
+                    if (token == '>') throw new InappropriateException();
+                  } else {
+                    var type = type();
+                    var a = funcs.get(funcName);
+                    if (a == null) {
+                      a = new Func(type, funcName);
+                      funcs.put(funcName, a);
+                    } else if (!Types.typeof(a).equals(type))
+                      throw new ParseException(file, reader.getLineNumber(), "type mismatch");
+                  }
+                  while (parens-- > 0) expect(')');
+                  break;
+                }
+              default:
+                throw new ParseException(file, reader.getLineNumber(), role + ": unknown role");
             }
-            case "conjecture":
-            {
-              var a = logicFormula(HashMap.empty());
-              if (select != null && !select.contains(name)) break;
-              if (problem.conjecture != null) throw new ParseException(
-                      file, reader.getLineNumber(), "multiple conjectures not supported");
-              var formula=new Formula(a);
-              formula.name = name;
-              problem.conjecture = formula;
-              break;
-            }
-            case "type":
-            {
-              var parens = 0;
-              while (eat('(')) parens++;
-              var funcName = word();
-              expect(':');
-              if (token == DEFINED_WORD &&tokenString.equals( "$tType")) {
-                lex();
-                if (token == '>') throw new InappropriateException();
-                typeAtom(funcName);
-              } else {
-                var type = type();
-                var a = funcs.get(funcName);
-                if (a == null) {
-                  a = new Func(type, funcName);
-                  funcs.put(funcName, a);
-                } else if (!a.type().equals(type))
-                  throw new ParseException(file, reader.getLineNumber(), "type mismatch");
-              }
-              while (parens-- > 0) expect(')');
-              break;
-            }
-            default:
-              throw new ParseException(file, reader.getLineNumber(), role + ": unknown role");
+            break;
           }
-          break;
-        }
         case "include":
           {
             // TPTP directory
