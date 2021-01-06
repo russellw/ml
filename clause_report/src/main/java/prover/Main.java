@@ -158,6 +158,8 @@ public final class Main {
 
     // For each problem
     for (var file : files) {
+      var start = System.currentTimeMillis();
+
       // Read
       Problem problem;
       try {
@@ -182,8 +184,7 @@ public final class Main {
       }
 
       // Solve
-      var start = System.currentTimeMillis();
-      Superposition.solve(problem, timeout);
+      Superposition.solve(problem, start + timeout);
 
       // Result
       System.out.print(problem.result == SZS.Timeout ? "   " : problem.result.abbreviation());

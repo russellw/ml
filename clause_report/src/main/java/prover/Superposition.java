@@ -206,8 +206,7 @@ public final class Superposition {
     clause(new Clause(negative, positive));
   }
 
-  public static void solve(Problem problem, long time) {
-    var timeout = System.currentTimeMillis() + time;
+  public static void solve(Problem problem, long deadline) {
     unprocessed = new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
     unprocessed.addAll(problem.clauses);
     processed = new ArrayList<>();
@@ -225,7 +224,7 @@ public final class Superposition {
       }
 
       // Check resources
-      if (System.currentTimeMillis() > timeout) {
+      if (System.currentTimeMillis() > deadline) {
         problem.result = SZS.Timeout;
         return;
       }
