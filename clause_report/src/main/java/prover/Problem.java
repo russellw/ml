@@ -9,6 +9,8 @@ public final class Problem {
   public final String file;
   public ArrayList<String> header = new ArrayList<>();
   public SZS expected;
+  public ArrayList<Formula> formulas = new ArrayList<>();
+  public Formula conjecture;
   public ArrayList<Clause> clauses = new ArrayList<>();
   public Clause proof;
   public SZS result;

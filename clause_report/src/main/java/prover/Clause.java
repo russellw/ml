@@ -8,11 +8,15 @@ import java.util.HashSet;
 
 public final class Clause {
   private final Object[] literals;
-  public final int negativeSize;
+  private final int negativeSize;
   public boolean subsumed;
 
   public int size() {
     return literals.length;
+  }
+
+  public int negativeSize() {
+    return negativeSize;
   }
 
   public Object get(int i) {
