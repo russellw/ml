@@ -3,10 +3,11 @@ package prover;
 import io.vavr.collection.Array;
 import io.vavr.collection.Seq;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public final class Clause {
+public final class Clause extends AbstractFormula {
   private final Object[] literals;
   private final int negativeSize;
   public boolean subsumed;
@@ -32,7 +33,9 @@ public final class Clause {
     if (a instanceof Func) ((Func) a).type = Symbol.BOOLEAN;
   }
 
-  public Clause(ArrayList<Object> negative, ArrayList<Object> positive) {
+  public Clause(ArrayList<Object> negative, ArrayList<Object> positive, AbstractFormula... from) {
+    super(from);
+
     // Types
     for (var a : negative) setBoolean(a);
     for (var a : positive) setBoolean(a);
@@ -74,7 +77,8 @@ public final class Clause {
     return r;
   }
 
-  private Clause(Object[] literals, int negativeSize) {
+  private Clause(Object[] literals, int negativeSize, AbstractFormula[] from) {
+    super(from);
     this.literals = literals;
     this.negativeSize = negativeSize;
   }
@@ -117,7 +121,7 @@ public final class Clause {
               return a;
             });
     if (map.isEmpty()) return this;
-    return new Clause(((Seq) r).toJavaArray(), negativeSize);
+    return new Clause(((Seq) r).toJavaArray(), negativeSize, from);
   }
 
   @Override
@@ -129,5 +133,20 @@ public final class Clause {
     int[] n = new int[1];
     Etc.treeForEach(literals(), a -> n[0]++);
     return n[0];
+  }
+
+  @Override
+  public Object term() {
+    var r = new ArrayList<>();
+    r.add(Symbol.OR);
+    for (var i = 0; i < negativeSize; i++) r.add(Array.of(Symbol.NOT, literals[i]));
+    r.addAll(Arrays.asList(literals).subList(negativeSize, literals.length));
+    switch (r.size()) {
+      case 1:
+        return false;
+      case 2:
+        return r.get(1);
+    }
+    return Array.ofAll(r);
   }
 }
