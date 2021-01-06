@@ -575,11 +575,9 @@ public final class TptpParser {
     }
   }
 
-  private TptpParser(String file, HashSet<String> select) throws IOException {
+  private TptpParser(String file, InputStream stream, HashSet<String> select) throws IOException {
     this.file = file;
-    reader =
-        new LineNumberReader(
-            new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+    reader = new LineNumberReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     reader.setLineNumber(1);
     c = reader.read();
     header = true;
@@ -624,8 +622,15 @@ public final class TptpParser {
           }
         case "include":
           {
+            // TPTP directory
             var tptp = System.getenv("TPTP");
             if (tptp == null) throw new IllegalStateException("TPTP environment variable not set");
+
+            // File
+            var file1 = tptp + '/' + name;
+            var stream1 = new FileInputStream(file1);
+
+            // Select
             var select1 = select;
             if (eat(','))
               if (token == WORD && "all".equals(tokenString)) lex();
@@ -638,7 +643,9 @@ public final class TptpParser {
                 } while (eat(','));
                 expect(']');
               }
-            new TptpParser(tptp + '/' + name, select1);
+
+            // Read
+            new TptpParser(file1, stream1, select1);
             break;
           }
         default:
@@ -650,12 +657,12 @@ public final class TptpParser {
     }
   }
 
-  public static Problem read(String file) throws IOException {
+  public static Problem read(String file, InputStream stream) throws IOException {
     functions = new java.util.HashMap<>();
     problem = new Problem(file);
 
     // Read
-    new TptpParser(file, null);
+    new TptpParser(file, stream, null);
 
     // Free memory
     functions = null;

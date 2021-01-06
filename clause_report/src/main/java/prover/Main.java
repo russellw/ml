@@ -150,9 +150,8 @@ public final class Main {
 
   public static void main(String[] args) throws IOException {
     // Command line
-    if (args.length == 0) help();
     args(args);
-    if (files.isEmpty()) files.add(STDIN);
+    if (files.isEmpty()) help();
 
     // Statistics
     var solved = 0;
@@ -162,7 +161,9 @@ public final class Main {
       // Read
       Problem problem;
       try {
-        problem = TptpParser.read(file);
+        var stream = System.in;
+        if (!file.equals(STDIN)) stream = new FileInputStream(file);
+        problem = TptpParser.read(file, stream);
         for (var i = 0; i < problem.header.size() && i < 66; i++)
           System.out.println(problem.header.get(i));
       } catch (InappropriateException e) {
