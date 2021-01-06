@@ -4,10 +4,11 @@ import io.vavr.collection.Array;
 import io.vavr.collection.Seq;
 
 public final class Func {
-  private final String name;
-  public Object type = Symbol.INDIVIDUAL;
+  public Object type;
+  public String name;
 
-  public Func(String name) {
+  public Func(Object type, String name) {
+    this.type = type;
     this.name = name;
   }
 

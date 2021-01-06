@@ -163,7 +163,16 @@ public final class Main {
       try {
         var stream = System.in;
         if (!file.equals(STDIN)) stream = new FileInputStream(file);
-        problem = TptpParser.read(file, stream);
+        switch (language(file)) {
+          case TPTP:
+            problem = TptpParser.read(file, stream);
+            break;
+          case DIMACS:
+            problem = DimacsParser.read(file, stream);
+            break;
+          default:
+            throw new IllegalStateException();
+        }
         for (var i = 0; i < problem.header.size() && i < 66; i++)
           System.out.println(problem.header.get(i));
       } catch (InappropriateException e) {

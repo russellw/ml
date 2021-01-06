@@ -31,8 +31,8 @@ public final class TptpParser {
   private static final int VARIABLE = -16;
 
   // Problem state
+  private static java.util.HashMap<String, Func> funcs;
   private static Problem problem;
-  private static java.util.HashMap<String, Func> functions;
 
   // File state
   private final String file;
@@ -429,10 +429,10 @@ public final class TptpParser {
         }
       case WORD:
         {
-          var a = functions.get(s);
+          var a = funcs.get(s);
           if (a == null) {
-            a = new Func(s);
-            functions.put(s, a);
+            a = new Func(new Variable(null), s);
+            funcs.put(s, a);
           }
           if (token == '(') {
             var r = new ArrayList<>();
@@ -658,14 +658,14 @@ public final class TptpParser {
   }
 
   public static Problem read(String file, InputStream stream) throws IOException {
-    functions = new java.util.HashMap<>();
+    funcs = new java.util.HashMap<>();
     problem = new Problem(file);
 
     // Read
     new TptpParser(file, stream, null);
 
     // Free memory
-    functions = null;
+    funcs = null;
 
     // Return
     return problem;
