@@ -43,6 +43,7 @@ public final class TptpParser {
   private String tokenString;
   private java.util.HashMap<String, Variable> free = new java.util.HashMap<>();
 
+  //Tokenizer
   private void lexQuote() throws IOException {
     var line = reader.getLineNumber();
     var quote = c;
@@ -306,6 +307,40 @@ public final class TptpParser {
       throw new ParseException(file, reader.getLineNumber(), ": '" + (char) k + "' expected");
   }
 
+  //Types
+  private Object typeAtom() throws IOException {
+    var k = token;
+    var s = tokenString;
+    lex();
+    switch (k) {
+      case '!':
+      case '[':
+        throw new InappropriateException();
+      case DEFINED_WORD:
+        switch (s) {
+          case "$i":
+            return Symbol.INDIVIDUAL;
+          case "$int":
+            return Symbol.INTEGER;
+          case "$o":
+            return Symbol.BOOLEAN;
+          case "$rat":
+            return Symbol.RATIONAL;
+          case "$real":
+            return Symbol.REAL;
+          case "$tType":
+            throw new InappropriateException();
+          default:
+            throw new ParseException(file, reader.getLineNumber(), s + ": unknown type");
+        }
+      case WORD:
+        return typeAtom(s);
+      default:
+        throw new ParseException(file, reader.getLineNumber(), "type expected");
+    }
+  }
+
+  //Terms
   private void args(Map<String, Variable> bound, ArrayList<Object> r) throws IOException {
     expect('(');
     do r.add(atomicTerm(bound));
@@ -552,6 +587,7 @@ public final class TptpParser {
     }
   }
 
+  //Top level
   private String word() throws IOException {
     if (token != WORD) throw new ParseException(file, reader.getLineNumber(), "word expected");
     var s = tokenString;
@@ -620,6 +656,73 @@ public final class TptpParser {
             problem.clauses.add(new Clause(negative, positive));
             break;
           }
+        case "fof":
+        case "tff":
+        {
+          expect(',');
+
+          // Role
+          var role = word();
+          expect(',');
+
+          // Formula
+          switch (role) {
+            case "assumption":
+            case "plain":
+            case "unknown":
+            case "axiom":
+            case "corollary":
+            case "definition":
+            case "hypothesis":
+            case "lemma":
+            case "negated_conjecture":
+            case "theorem":
+            {
+              var a = logicFormula(HashMap.empty());
+              if (select != null && !select.contains(name)) break;
+              var formula=new Formula(a);
+              formula.name = name;
+              problem.formulas.add(formula);
+              break;
+            }
+            case "conjecture":
+            {
+              var a = logicFormula(HashMap.empty());
+              if (select != null && !select.contains(name)) break;
+              if (problem.conjecture != null) throw new ParseException(
+                      file, reader.getLineNumber(), "multiple conjectures not supported");
+              var formula=new Formula(a);
+              formula.name = name;
+              problem.conjecture = formula;
+              break;
+            }
+            case "type":
+            {
+              var parens = 0;
+              while (eat('(')) parens++;
+              var funcName = word();
+              expect(':');
+              if (token == DEFINED_WORD &&tokenString.equals( "$tType")) {
+                lex();
+                if (token == '>') throw new InappropriateException();
+                typeAtom(funcName);
+              } else {
+                var type = type();
+                var a = funcs.get(funcName);
+                if (a == null) {
+                  a = new Func(type, funcName);
+                  funcs.put(funcName, a);
+                } else if (!a.type().equals(type))
+                  throw new ParseException(file, reader.getLineNumber(), "type mismatch");
+              }
+              while (parens-- > 0) expect(')');
+              break;
+            }
+            default:
+              throw new ParseException(file, reader.getLineNumber(), role + ": unknown role");
+          }
+          break;
+        }
         case "include":
           {
             // TPTP directory
@@ -648,6 +751,8 @@ public final class TptpParser {
             new TptpParser(file1, stream1, select1);
             break;
           }
+        case "thf":
+          throw new InappropriateException();
         default:
           throw new ParseException(file, reader.getLineNumber(), "unknown language");
       }
