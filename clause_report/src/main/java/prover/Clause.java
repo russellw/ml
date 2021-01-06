@@ -28,17 +28,8 @@ public final class Clause extends AbstractFormula {
     return Array.of(literals);
   }
 
-  private static void setBoolean(Object a) {
-    if (a instanceof Seq) a = ((Seq) a).head();
-    if (a instanceof Func) ((Func) a).type = Symbol.BOOLEAN;
-  }
-
   public Clause(ArrayList<Object> negative, ArrayList<Object> positive, AbstractFormula... from) {
     super(from);
-
-    // Types
-    for (var a : negative) setBoolean(a);
-    for (var a : positive) setBoolean(a);
 
     // Redundancy
     negative.removeIf(a -> a == Boolean.TRUE);
