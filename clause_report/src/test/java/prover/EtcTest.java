@@ -3,12 +3,13 @@ package prover;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.junit.Test;
 
 public class EtcTest {
   @Test
   public void divideEuclidean() {
-    // int
     assertEquals(
         Etc.divideEuclidean(BigInteger.valueOf(7), BigInteger.valueOf(3)), BigInteger.valueOf(2));
     assertEquals(
@@ -60,6 +61,53 @@ public class EtcTest {
     assertEquals(
         Etc.divideFloor(BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(Math.floorDiv(-5, -3)));
+  }
+
+  @Test
+  public void cartesianProduct() {
+    ArrayList<ArrayList<String>> qs = new ArrayList<>();
+    ArrayList<String> q;
+    q = new ArrayList<>();
+    q.add("a0");
+    q.add("a1");
+    qs.add(q);
+    q = new ArrayList<>();
+    q.add("b0");
+    q.add("b1");
+    q.add("b2");
+    qs.add(q);
+    q = new ArrayList<>();
+    q.add("c0");
+    q.add("c1");
+    q.add("c2");
+    q.add("c3");
+    qs.add(q);
+    var rs = Etc.cartesianProduct(qs);
+    var i = 0;
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b0", "c0"));
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b0", "c1"));
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b0", "c2"));
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b0", "c3"));
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b1", "c0"));
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b1", "c1"));
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b1", "c2"));
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b1", "c3"));
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b2", "c0"));
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b2", "c1"));
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b2", "c2"));
+    assertEquals(rs.get(i++), Arrays.asList("a0", "b2", "c3"));
+    assertEquals(rs.get(i++), Arrays.asList("a1", "b0", "c0"));
+    assertEquals(rs.get(i++), Arrays.asList("a1", "b0", "c1"));
+    assertEquals(rs.get(i++), Arrays.asList("a1", "b0", "c2"));
+    assertEquals(rs.get(i++), Arrays.asList("a1", "b0", "c3"));
+    assertEquals(rs.get(i++), Arrays.asList("a1", "b1", "c0"));
+    assertEquals(rs.get(i++), Arrays.asList("a1", "b1", "c1"));
+    assertEquals(rs.get(i++), Arrays.asList("a1", "b1", "c2"));
+    assertEquals(rs.get(i++), Arrays.asList("a1", "b1", "c3"));
+    assertEquals(rs.get(i++), Arrays.asList("a1", "b2", "c0"));
+    assertEquals(rs.get(i++), Arrays.asList("a1", "b2", "c1"));
+    assertEquals(rs.get(i++), Arrays.asList("a1", "b2", "c2"));
+    assertEquals(rs.get(i), Arrays.asList("a1", "b2", "c3"));
   }
 
   @Test

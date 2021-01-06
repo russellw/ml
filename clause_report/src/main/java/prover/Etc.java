@@ -17,6 +17,24 @@ public final class Etc {
     return file.substring(i + 1);
   }
 
+  public static <T> ArrayList<ArrayList<T>> cartesianProduct(ArrayList<ArrayList<T>> qs) {
+    var js = new int[qs.size()];
+    var rs = new ArrayList<ArrayList<T>>();
+    cartesianProduct(qs, 0, js, rs);
+    return rs;
+  }
+
+  private static <T> void cartesianProduct(
+      ArrayList<ArrayList<T>> qs, int i, int[] js, ArrayList<ArrayList<T>> rs) {
+    if (i == js.length) {
+      var ys = new ArrayList<T>();
+      for (i = 0; i < js.length; i++) ys.add(qs.get(i).get(js[i]));
+      rs.add(ys);
+      return;
+    }
+    for (js[i] = 0; js[i] < qs.get(i).size(); js[i]++) cartesianProduct(qs, i + 1, js, rs);
+  }
+
   public static Seq<Object> implies(Object a, Object b) {
     return Array.of(Symbol.OR, Array.of(Symbol.NOT, a), b);
   }
