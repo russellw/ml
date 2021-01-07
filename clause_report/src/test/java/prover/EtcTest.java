@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import org.junit.Test;
 
 public class EtcTest {
@@ -133,7 +134,7 @@ public class EtcTest {
 
   @Test
   public void cartesianProduct() {
-    ArrayList<ArrayList<String>> qs = new ArrayList<>();
+    ArrayList<List<String>> qs = new ArrayList<>();
     ArrayList<String> q;
     q = new ArrayList<>();
     q.add("a0");

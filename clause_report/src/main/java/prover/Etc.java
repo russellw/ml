@@ -1,11 +1,10 @@
 package prover;
 
-import io.vavr.collection.Array;
-import io.vavr.collection.Map;
-import io.vavr.collection.Seq;
+import io.vavr.collection.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -18,15 +17,15 @@ public final class Etc {
     return file.substring(i + 1);
   }
 
-  public static <T> ArrayList<ArrayList<T>> cartesianProduct(ArrayList<ArrayList<T>> qs) {
+  public static <T> ArrayList<List<T>> cartesianProduct(ArrayList<List<T>> qs) {
     var js = new int[qs.size()];
-    var rs = new ArrayList<ArrayList<T>>();
+    var rs = new ArrayList<List<T>>();
     cartesianProduct(qs, 0, js, rs);
     return rs;
   }
 
   private static <T> void cartesianProduct(
-      ArrayList<ArrayList<T>> qs, int i, int[] js, ArrayList<ArrayList<T>> rs) {
+      ArrayList<List<T>> qs, int i, int[] js, ArrayList<List<T>> rs) {
     if (i == js.length) {
       var ys = new ArrayList<T>();
       for (i = 0; i < js.length; i++) ys.add(qs.get(i).get(js[i]));
@@ -138,21 +137,55 @@ public final class Etc {
 
   public static BigInteger divideFloor(BigInteger a, BigInteger b) {
     var r = a.divideAndRemainder(b);
-    if ((a.signum() < 0 != b.signum() < 0) && (r[1].signum() != 0)) {
+    if (a.signum() < 0 != b.signum() < 0 && r[1].signum() != 0)
       r[0] = r[0].subtract(BigInteger.ONE);
-    }
     return r[0];
   }
 
   public static BigInteger remainderEuclidean(BigInteger a, BigInteger b) {
     var r = a.remainder(b);
-    if (r.signum() < 0) {
-      r = r.add(b.abs());
-    }
+    if (r.signum() < 0) r = r.add(b.abs());
     return r;
   }
 
   public static BigInteger remainderFloor(BigInteger a, BigInteger b) {
     return a.subtract(divideFloor(a, b).multiply(b));
+  }
+
+  public static Object unquantify(Object a) {
+    while (a instanceof Seq) {
+      var a1 = (Seq) a;
+      if (a1.head() != Symbol.ALL) break;
+      a = a1.get(2);
+    }
+    return a;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static void getFreeVariables(
+      Set<Variable> bound, Object a, java.util.HashSet<Variable> r) {
+    if (a instanceof Seq) {
+      var a1 = (Seq) a;
+      var op = a1.head();
+      if (op instanceof Symbol)
+        switch ((Symbol) op) {
+          case ALL:
+          case EXISTS:
+            {
+              var binding = (Seq) a1.get(1);
+              getFreeVariables(bound.addAll(binding), a1.get(2), r);
+              return;
+            }
+        }
+      for (var b : a1) getFreeVariables(bound, b, r);
+      return;
+    }
+    if (a instanceof Variable) r.add((Variable) a);
+  }
+
+  public static java.util.HashSet<Variable> freeVariables(Object a) {
+    var r = new java.util.HashSet<Variable>();
+    getFreeVariables(HashSet.empty(), a, r);
+    return r;
   }
 }
