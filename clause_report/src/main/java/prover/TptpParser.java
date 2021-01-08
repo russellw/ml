@@ -633,6 +633,22 @@ public final class TptpParser {
     return s;
   }
 
+  private Object name() throws IOException {
+    Object a;
+    switch (token) {
+      case WORD:
+        a = tokenString;
+        break;
+      case INTEGER:
+        a = new BigInteger(tokenString);
+        break;
+      default:
+        throw new ParseException(file, reader.getLineNumber(), "name expected");
+    }
+    lex();
+    return a;
+  }
+
   private void ignore() throws IOException {
     switch (token) {
       case '(':
@@ -649,7 +665,7 @@ public final class TptpParser {
     }
   }
 
-  private TptpParser(String file, InputStream stream, HashSet<String> select) throws IOException {
+  private TptpParser(String file, InputStream stream, HashSet<Object> select) throws IOException {
     this.file = file;
     reader = new LineNumberReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     reader.setLineNumber(1);
@@ -662,7 +678,7 @@ public final class TptpParser {
     while (token != -1) {
       var s = word();
       expect('(');
-      var name = word();
+      var name = name();
       switch (s) {
         case "cnf":
           {
