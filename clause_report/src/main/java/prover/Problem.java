@@ -16,6 +16,7 @@ public final class Problem {
   public SZS result;
 
   public void solve(long deadline) {
+    new CNF(formulas, clauses);
     Superposition.solve(this, deadline);
     if (conjecture != null)
       switch (result) {

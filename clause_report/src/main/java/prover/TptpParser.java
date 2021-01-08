@@ -640,7 +640,7 @@ public final class TptpParser {
         a = tokenString;
         break;
       case INTEGER:
-        a = new BigInteger(tokenString);
+        a = Long.valueOf(tokenString);
         break;
       default:
         throw new ParseException(file, reader.getLineNumber(), "name expected");

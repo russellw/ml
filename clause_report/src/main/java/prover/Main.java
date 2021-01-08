@@ -149,14 +149,10 @@ public final class Main {
   }
 
   public static void main(String[] args) throws IOException {
-    // Command line
     args(args);
     if (files.isEmpty()) help();
-
-    // Statistics
+    var attempted = 0;
     var solved = 0;
-
-    // For each problem
     for (var file : files) {
       var start = System.currentTimeMillis();
 
@@ -188,8 +184,21 @@ public final class Main {
 
       // Result
       System.out.printf("%% SZS status %s for %s\n", problem.result, file);
+      if (problem.refutation != null) {
+        System.out.println("% SZS output start CNFRefutation for " + file);
+        var proof = problem.refutation.proof();
+        var i = -1L;
+        for (var formula : proof)
+          if (formula.name instanceof Long) i = Math.max(i, (long) formula.name);
+        for (var formula : proof) {
+          if (formula.name == null) formula.name = ++i;
+          TptpPrinter.println(formula);
+        }
+        System.out.println("% SZS output end CNFRefutation for " + file);
+      }
 
       // Statistics
+      attempted++;
       switch (problem.result) {
         case Unsatisfiable:
         case ContradictoryAxioms:
@@ -201,10 +210,8 @@ public final class Main {
       }
       System.out.printf("%% %f seconds\n", (System.currentTimeMillis() - start) * 0.001);
     }
-
-    // Statistics
     System.out.printf(
-        "solved %d/%d (%f%%)\n", solved, files.size(), solved * 100 / (double) files.size());
+        "solved %d/%d (%f%%)\n", solved, attempted, solved * 100 / (double) attempted);
   }
 
   private static void help() {
