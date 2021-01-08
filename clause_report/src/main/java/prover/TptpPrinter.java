@@ -149,7 +149,7 @@ public final class TptpPrinter {
     return false;
   }
 
-  private static void infix(Seq a, String op) {
+  private static void infix(String op, Seq a) {
     for (var i = 1; i < a.size(); i++) {
       if (i > 1) System.out.print(op);
       print(a.get(i), a);
@@ -180,6 +180,12 @@ public final class TptpPrinter {
   public static void println(AbstractFormula formula) {
     System.out.print(formula instanceof Clause ? "cnf(" : "fof(");
     System.out.print(formula.name);
+    System.out.print(", ");
+
+    // Role
+    System.out.print(", ");
+
+    // End
     System.out.println(").");
   }
 
@@ -217,24 +223,24 @@ public final class TptpPrinter {
             quant(a1);
             break;
           case AND:
-            infix(a1, " & ");
+            infix(" & ", a1);
             break;
           case OR:
-            infix(a1, " | ");
+            infix(" | ", a1);
             break;
           case NOT:
             if (Etc.head(a1.get(1)) == Symbol.EQUALS) {
-              infix((Seq) a1.get(1), "!=");
+              infix("!=", (Seq) a1.get(1));
               break;
             }
             System.out.print('~');
             print(a1.get(1), a1);
             break;
           case EQUALS:
-            infix(a1, "=");
+            infix("=", a1);
             break;
           case EQV:
-            infix(a1, " <=> ");
+            infix(" <=> ", a1);
             break;
           default:
             print(op);

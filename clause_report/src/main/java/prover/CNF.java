@@ -78,7 +78,7 @@ public final class CNF {
 
   private Object rename(Object a) {
     var b = skolem(Symbol.BOOLEAN, Array.ofAll(Etc.freeVariables(a)));
-    var formula = new Formula(Etc.implies(b, a));
+    var formula = new Formula(Etc.implies(b, a), Inference.DEFINE);
     convert(formula);
     return b;
   }
@@ -184,19 +184,18 @@ public final class CNF {
     var b = nnf(LinkedHashMap.empty(), HashMap.empty(), true, a);
     a = Etc.unquantify(a);
     if (!Etc.isomorphic(a, b, new java.util.HashMap<>())) {
-      formula = new Formula(b, formula);
+      formula = new Formula(b, Inference.NNF, formula);
       a = b;
     }
 
     // Distribute OR down into AND
     b = distribute(a);
     if (!a.equals(b)) {
-      formula = new Formula(b, formula);
+      formula = new Formula(b, Inference.DISTRIBUTE, formula);
       a = b;
     }
 
     // Split AND into clauses
-    var from = formula;
     if (a instanceof Seq) {
       var a1 = (Seq) a;
       if (a1.head() == Symbol.AND) {
@@ -204,7 +203,7 @@ public final class CNF {
           negative.clear();
           positive.clear();
           split(a1.get(i));
-          var c = new Clause(negative, positive, from);
+          var c = new Clause(negative, positive, Inference.SPLIT, formula);
           if (!c.isTrue()) clauses.add(c);
         }
         return;
@@ -213,7 +212,7 @@ public final class CNF {
     negative.clear();
     positive.clear();
     split(a);
-    var c = new Clause(negative, positive, from);
+    var c = new Clause(negative, positive, Inference.SPLIT, formula);
     if (!c.isTrue()) clauses.add(c);
   }
 

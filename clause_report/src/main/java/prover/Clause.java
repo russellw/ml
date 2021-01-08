@@ -28,8 +28,12 @@ public final class Clause extends AbstractFormula {
     return Array.of(literals);
   }
 
-  public Clause(ArrayList<Object> negative, ArrayList<Object> positive, AbstractFormula... from) {
-    super(from);
+  public Clause(
+      ArrayList<Object> negative,
+      ArrayList<Object> positive,
+      Inference inference,
+      AbstractFormula... from) {
+    super(inference, from);
 
     // Redundancy
     negative.removeIf(a -> a == Boolean.TRUE);
@@ -68,8 +72,8 @@ public final class Clause extends AbstractFormula {
     return r;
   }
 
-  private Clause(Object[] literals, int negativeSize, AbstractFormula[] from) {
-    super(from);
+  private Clause(Object[] literals, int negativeSize, Inference inference, AbstractFormula[] from) {
+    super(inference, from);
     this.literals = literals;
     this.negativeSize = negativeSize;
   }
@@ -112,7 +116,7 @@ public final class Clause extends AbstractFormula {
               return a;
             });
     if (map.isEmpty()) return this;
-    return new Clause(((Seq) r).toJavaArray(), negativeSize, from);
+    return new Clause(((Seq) r).toJavaArray(), negativeSize, inference, from);
   }
 
   @Override

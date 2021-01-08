@@ -22,20 +22,20 @@ public class SubsumptionTest {
     Clause c, d;
 
     // false <= false
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
 
     // false <= p
     negative.clear();
     positive.clear();
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p1);
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
 
@@ -43,34 +43,34 @@ public class SubsumptionTest {
     negative.clear();
     positive.clear();
     positive.add(p1);
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p1);
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
 
     // !p <= !p
     negative.clear();
     negative.add(p1);
     positive.clear();
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     negative.add(p1);
     positive.clear();
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
 
     // p <= p | p
     negative.clear();
     positive.clear();
     positive.add(p1);
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p1);
     positive.add(p1);
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
 
@@ -78,11 +78,11 @@ public class SubsumptionTest {
     negative.clear();
     positive.clear();
     positive.add(p1);
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     negative.add(p1);
     positive.clear();
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertFalse(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
 
@@ -91,12 +91,12 @@ public class SubsumptionTest {
     positive.clear();
     positive.add(p1);
     positive.add(q1);
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(q1);
     positive.add(p1);
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertTrue(Subsumption.subsumes(d, c));
 
@@ -105,13 +105,13 @@ public class SubsumptionTest {
     positive.clear();
     positive.add(p1);
     positive.add(q1);
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p1);
     positive.add(q1);
     positive.add(p1);
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
 
@@ -122,14 +122,14 @@ public class SubsumptionTest {
     positive.add(p1.call(b));
     positive.add(q1.call(a));
     positive.add(q1.call(b));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p1.call(a));
     positive.add(q1.call(a));
     positive.add(p1.call(b));
     positive.add(q1.call(b));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertTrue(Subsumption.subsumes(d, c));
 
@@ -137,11 +137,11 @@ public class SubsumptionTest {
     negative.clear();
     positive.clear();
     positive.add(p2.call(x, y));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p2.call(a, b));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
 
@@ -149,11 +149,11 @@ public class SubsumptionTest {
     negative.clear();
     positive.clear();
     positive.add(p2.call(x, x));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p2.call(a, b));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertFalse(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
 
@@ -161,11 +161,11 @@ public class SubsumptionTest {
     negative.clear();
     positive.clear();
     positive.add(p1.call(x));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p1.call(y));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertTrue(Subsumption.subsumes(d, c));
 
@@ -175,13 +175,13 @@ public class SubsumptionTest {
     positive.add(p1.call(x));
     positive.add(p1.call(a1.call(x)));
     positive.add(p1.call(a1.call(a1.call(x))));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p1.call(y));
     positive.add(p1.call(a1.call(y)));
     positive.add(p1.call(a1.call(a1.call(y))));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertTrue(Subsumption.subsumes(d, c));
 
@@ -190,12 +190,12 @@ public class SubsumptionTest {
     positive.clear();
     positive.add(p1.call(x));
     positive.add(p1.call(a));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p1.call(a));
     positive.add(p1.call(b));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
 
@@ -204,12 +204,12 @@ public class SubsumptionTest {
     positive.clear();
     positive.add(p1.call(x));
     positive.add(p1.call(a1.call(x)));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p1.call(a1.call(y)));
     positive.add(p1.call(y));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertTrue(Subsumption.subsumes(d, c));
 
@@ -219,13 +219,13 @@ public class SubsumptionTest {
     positive.add(p1.call(x));
     positive.add(p1.call(a1.call(x)));
     positive.add(p1.call(a1.call(a1.call(x))));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p1.call(a1.call(a1.call(y))));
     positive.add(p1.call(a1.call(y)));
     positive.add(p1.call(y));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertTrue(Subsumption.subsumes(d, c));
 
@@ -233,11 +233,11 @@ public class SubsumptionTest {
     negative.clear();
     positive.clear();
     positive.add(Equality.of(a, x));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(Equality.of(a, b));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
 
@@ -245,11 +245,11 @@ public class SubsumptionTest {
     negative.clear();
     positive.clear();
     positive.add(Equality.of(x, a));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(Equality.of(a, b));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
 
@@ -259,13 +259,13 @@ public class SubsumptionTest {
     negative.add(p1.call(x));
     positive.clear();
     positive.add(q1.call(x));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     negative.add(p1.call(a));
     negative.add(p1.call(b));
     positive.clear();
     positive.add(q1.call(b));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
 
@@ -275,13 +275,13 @@ public class SubsumptionTest {
     negative.add(p1.call(y));
     positive.clear();
     positive.add(q1.call(x));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     negative.add(p1.call(a));
     negative.add(p1.call(b));
     positive.clear();
     positive.add(q1.call(b));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertTrue(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
 
@@ -289,11 +289,11 @@ public class SubsumptionTest {
     negative.clear();
     positive.clear();
     positive.add(p2.call(x, a1.call(x)));
-    c = new Clause(negative, positive);
+    c = new Clause(negative, positive, Inference.AXIOM);
     negative.clear();
     positive.clear();
     positive.add(p2.call(a1.call(y), a1.call(y)));
-    d = new Clause(negative, positive);
+    d = new Clause(negative, positive, Inference.AXIOM);
     assertFalse(Subsumption.subsumes(c, d));
     assertFalse(Subsumption.subsumes(d, c));
   }

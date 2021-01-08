@@ -143,14 +143,14 @@ public final class DimacsParser {
           break;
         case -1:
           if (negative.size() + positive.size() > 0)
-            problem.clauses.add(new Clause(negative, positive));
+            problem.clauses.add(new Clause(negative, positive, Inference.AXIOM));
           return;
         case INTEGER:
           positive.add(func());
           break;
         case ZERO:
           lex();
-          problem.clauses.add(new Clause(negative, positive));
+          problem.clauses.add(new Clause(negative, positive, Inference.AXIOM));
           negative.clear();
           positive.clear();
           break;

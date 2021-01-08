@@ -46,16 +46,16 @@ public final class Superposition {
   }
 
   // For each negative equation
-  private static void resolution(Clause c) {
+  private static void resolve(Clause c) {
     for (var i = 0; i < c.negativeSize(); i++) {
       var e = c.get(i);
       var map = Unification.unify(Equality.left(e), Equality.right(e), HashMap.empty());
-      if (map != null) resolution(c, i, map);
+      if (map != null) resolve(c, i, map);
     }
   }
 
   // Substitute and make new clause
-  private static void resolution(Clause c, int ci, Map<Variable, Object> map) {
+  private static void resolve(Clause c, int ci, Map<Variable, Object> map) {
     // Negative literals
     var negative = new ArrayList<>(c.negativeSize() - 1);
     for (var i = 0; i < c.negativeSize(); i++)
@@ -66,30 +66,30 @@ public final class Superposition {
     for (var i = c.negativeSize(); i < c.size(); i++) positive.add(Etc.replace(c.get(i), map));
 
     // Make new clause
-    clause(new Clause(negative, positive));
+    clause(new Clause(negative, positive, Inference.RESOLVE, c));
   }
 
   // For each positive equation (both directions)
-  private static void factoring(Clause c) {
+  private static void factor(Clause c) {
     for (var i = c.negativeSize(); i < c.size(); i++) {
       var e = c.get(i);
-      factoring(c, i, Equality.left(e), Equality.right(e));
-      factoring(c, i, Equality.right(e), Equality.left(e));
+      factor(c, i, Equality.left(e), Equality.right(e));
+      factor(c, i, Equality.right(e), Equality.left(e));
     }
   }
 
   // For each positive equation (both directions) again
-  private static void factoring(Clause c, int ci, Object c0, Object c1) {
+  private static void factor(Clause c, int ci, Object c0, Object c1) {
     for (var i = c.negativeSize(); i < c.size(); i++) {
       if (i == ci) continue;
       var e = c.get(i);
-      factoring(c, c0, c1, i, Equality.left(e), Equality.right(e));
-      factoring(c, c0, c1, i, Equality.right(e), Equality.left(e));
+      factor(c, c0, c1, i, Equality.left(e), Equality.right(e));
+      factor(c, c0, c1, i, Equality.right(e), Equality.left(e));
     }
   }
 
   // Substitute and make new clause
-  private static void factoring(Clause c, Object c0, Object c1, int di, Object d0, Object d1) {
+  private static void factor(Clause c, Object c0, Object c1, int di, Object d0, Object d1) {
     if (!Equality.equatable(c1, d1)) return;
     var map = Unification.unify(c0, d0, HashMap.empty());
     if (map == null) return;
@@ -105,7 +105,7 @@ public final class Superposition {
       if (i != di) positive.add(Etc.replace(c.get(i), map));
 
     // Make new clause
-    clause(new Clause(negative, positive));
+    clause(new Clause(negative, positive, Inference.FACTOR, c));
   }
 
   // For each positive equation in c (both directions)
@@ -203,7 +203,7 @@ public final class Superposition {
     ((di < d.negativeSize()) ? negative : positive).add(Etc.replace(e, map));
 
     // Make new clause
-    clause(new Clause(negative, positive));
+    clause(new Clause(negative, positive, Inference.SUPERPOSITION, c, d));
   }
 
   public static void solve(Problem problem, long deadline) {
@@ -238,8 +238,8 @@ public final class Superposition {
       Subsumption.subsumeBackward(g1, processed);
 
       // Infer from one clause
-      resolution(g);
-      factoring(g);
+      resolve(g);
+      factor(g);
 
       // Sometimes need to match g with itself
       processed.add(g);
