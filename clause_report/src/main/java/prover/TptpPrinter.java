@@ -177,6 +177,12 @@ public final class TptpPrinter {
     print(a, null);
   }
 
+  public static void println(AbstractFormula formula) {
+    System.out.print(formula instanceof Clause ? "cnf(" : "fof(");
+    System.out.print(formula.name);
+    System.out.println(").");
+  }
+
   private static boolean isWeird(String s) {
     if (Character.isDigit(s.charAt(0))) return true;
     for (var i = 0; i < s.length(); i++) {
@@ -184,6 +190,15 @@ public final class TptpPrinter {
       if (!(Character.isLetterOrDigit(c) || c == '_')) return true;
     }
     return false;
+  }
+
+  private static void args(Seq a) {
+    System.out.print('(');
+    for (var i = 1; i < a.size(); i++) {
+      if (i > 1) System.out.print(',');
+      print(a.get(i));
+    }
+    System.out.print(')');
   }
 
   private static void print(Object a, Seq parent) {
@@ -222,11 +237,16 @@ public final class TptpPrinter {
             infix(a1, " <=> ");
             break;
           default:
-            throw new IllegalArgumentException(a.toString());
+            print(op);
+            args(a1);
+            return;
         }
         if (needParens(a1, parent)) System.out.print(')');
         return;
       }
+      print(op);
+      args(a1);
+      return;
     }
     if (a instanceof Func) {
       var name = a.toString();

@@ -47,11 +47,10 @@ public final class CNF {
             {
               var x = a1.get(1);
               var y = a1.get(2);
-              var z1 =
-                  Array.of(Symbol.OR, nnf(all, exists, false, x), nnf(all, exists, polarity, y));
-              var z2 =
-                  Array.of(Symbol.OR, nnf(all, exists, true, x), nnf(all, exists, !polarity, y));
-              return Array.of(Symbol.AND, z1, z2);
+              return Array.of(
+                  Symbol.AND,
+                  Array.of(Symbol.OR, nnf(all, exists, false, x), nnf(all, exists, polarity, y)),
+                  Array.of(Symbol.OR, nnf(all, exists, true, x), nnf(all, exists, !polarity, y)));
             }
           case EXISTS:
             return polarity ? nnfExists(all, exists, true, a1) : nnfAll(all, exists, false, a1);
