@@ -2,6 +2,7 @@ package prover;
 
 import io.vavr.collection.Seq;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 
 public final class TptpPrinter {
@@ -211,9 +212,26 @@ public final class TptpPrinter {
       case AXIOM:
         System.out.printf("file(%s,%s)", Etc.quote('\'', formula.file), formula.name);
         break;
+      case NEGATE:
+        System.out.printf("inference(negate,[status(ceq)],[%s])", formula.from[0].name);
+        break;
       default:
         System.out.printf(
             "inference(%s,[status(", formula.inference.toString().toLowerCase(Locale.ROOT));
+
+        // If a formula introduces new symbols, then it is only equisatisfiable
+        // This happens during subformula renaming in CNF conversion
+        var fromFuncs = new HashSet<>();
+        for (var from : formula.from) Etc.collect(from.term(), a -> a instanceof Func, fromFuncs);
+        var funcs = Etc.collect(formula.term(), a -> a instanceof Func);
+        System.out.print(fromFuncs.containsAll(funcs) ? "thm" : "esa");
+
+        System.out.print(")],[");
+        for (var i = 0; i < formula.from.length; i++) {
+          if (i > 0) System.out.print(',');
+          System.out.print(formula.from[i].name);
+        }
+        System.out.print("])");
         break;
     }
     System.out.println(").");

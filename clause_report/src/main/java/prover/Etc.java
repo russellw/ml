@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public final class Etc {
   private Etc() {}
@@ -159,6 +160,21 @@ public final class Etc {
       a = a1.get(2);
     }
     return a;
+  }
+
+  public static java.util.HashSet<Object> collect(Object a, Predicate<Object> f) {
+    var r = new java.util.HashSet<>();
+    collect(a, f, r);
+    return r;
+  }
+
+  public static void collect(Object a, Predicate<Object> f, java.util.HashSet<Object> r) {
+    if (a instanceof Seq) {
+      var a1 = (Seq) a;
+      for (var b : a1) collect(b, f, r);
+      return;
+    }
+    if (f.test(a)) r.add(a);
   }
 
   @SuppressWarnings("unchecked")
