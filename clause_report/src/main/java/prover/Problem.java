@@ -1,5 +1,6 @@
 package prover;
 
+import io.vavr.collection.Array;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -16,6 +17,9 @@ public final class Problem {
   public SZS result;
 
   public void solve(long deadline) {
+    if (conjecture != null)
+      formulas.add(
+          new Formula(Array.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
     new CNF(formulas, clauses);
     Superposition.solve(this, deadline);
     if (conjecture != null)
