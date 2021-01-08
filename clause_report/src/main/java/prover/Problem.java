@@ -12,8 +12,35 @@ public final class Problem {
   public ArrayList<Formula> formulas = new ArrayList<>();
   public Formula conjecture;
   public ArrayList<Clause> clauses = new ArrayList<>();
-  public Clause proof;
+  public Clause refutation;
   public SZS result;
+
+  public void solve(long deadline) {
+    Superposition.solve(this, deadline);
+    if (conjecture != null)
+      switch (result) {
+        case Satisfiable:
+          result = SZS.CounterSatisfiable;
+          break;
+        case Unsatisfiable:
+          result = SZS.Theorem;
+          break;
+      }
+    if (expected != null
+        && result != expected
+        && !(isUnsatisfiable(result) && expected == SZS.ContradictoryAxioms))
+      throw new IllegalStateException(result + " != " + expected);
+  }
+
+  private static boolean isUnsatisfiable(SZS szs) {
+    switch (szs) {
+      case Unsatisfiable:
+      case ContradictoryAxioms:
+      case Theorem:
+        return true;
+    }
+    return false;
+  }
 
   public Problem(String file) {
     this.file = file;

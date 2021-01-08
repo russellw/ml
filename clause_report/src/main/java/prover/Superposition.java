@@ -218,7 +218,7 @@ public final class Superposition {
 
       // Solved
       if (g.isFalse()) {
-        problem.proof = g;
+        problem.refutation = g;
         problem.result = SZS.Unsatisfiable;
         return;
       }

@@ -184,19 +184,22 @@ public final class Main {
       }
 
       // Solve
-      Superposition.solve(problem, start + timeout);
+      problem.solve(start + timeout);
 
       // Result
-      System.out.print(problem.result == SZS.Timeout ? "   " : problem.result.abbreviation());
-      if (problem.result.solved()) {
-        if (!problem.result.compatible(problem.expected))
-          throw new IllegalStateException(problem.result + " != " + problem.expected);
-        solved++;
-      }
+      System.out.printf("%% SZS status %s for %s\n", problem.result, file);
 
       // Statistics
-      System.out.printf(
-          " %9d %6d\n", Superposition.processed.size(), System.currentTimeMillis() - start);
+      switch (problem.result) {
+        case Unsatisfiable:
+        case ContradictoryAxioms:
+        case Theorem:
+        case CounterSatisfiable:
+        case Satisfiable:
+          solved++;
+          break;
+      }
+      System.out.printf("%% %f seconds\n", (System.currentTimeMillis() - start) * 0.001);
     }
 
     // Statistics
