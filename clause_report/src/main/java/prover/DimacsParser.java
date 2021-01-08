@@ -24,6 +24,8 @@ public final class DimacsParser {
   private int c;
   private int token;
   private String tokenString;
+  private ArrayList<Object> negative = new ArrayList<>();
+  private ArrayList<Object> positive = new ArrayList<>();
 
   // Tokenizer
   private void lex() throws IOException {
@@ -101,6 +103,12 @@ public final class DimacsParser {
   }
 
   // Top level
+  private void clause() {
+    var c = new Clause(negative, positive, Inference.AXIOM);
+    c.file = problem.file;
+    problem.clauses.add(c);
+  }
+
   private DimacsParser(String file, InputStream stream) throws IOException {
     problem = new Problem(file);
     reader = new LineNumberReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
@@ -133,8 +141,6 @@ public final class DimacsParser {
     }
 
     // Clauses
-    var negative = new ArrayList<>();
-    var positive = new ArrayList<>();
     for (; ; )
       switch (token) {
         case '-':
@@ -142,15 +148,14 @@ public final class DimacsParser {
           negative.add(func());
           break;
         case -1:
-          if (negative.size() + positive.size() > 0)
-            problem.clauses.add(new Clause(negative, positive, Inference.AXIOM));
+          if (negative.size() + positive.size() > 0) clause();
           return;
         case INTEGER:
           positive.add(func());
           break;
         case ZERO:
           lex();
-          problem.clauses.add(new Clause(negative, positive, Inference.AXIOM));
+          clause();
           negative.clear();
           positive.clear();
           break;

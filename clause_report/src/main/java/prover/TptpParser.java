@@ -672,7 +672,7 @@ public final class TptpParser {
             word();
             expect(',');
 
-            // Formula
+            // Literals
             free.clear();
             var negative = new ArrayList<>();
             var positive = new ArrayList<>();
@@ -691,7 +691,10 @@ public final class TptpParser {
             } while (eat('|'));
             if (parens) expect(')');
             if (select != null && !select.contains(name)) break;
-            problem.clauses.add(new Clause(negative, positive, Inference.AXIOM));
+            var c = new Clause(negative, positive, Inference.AXIOM);
+            c.file = file;
+            c.name = name;
+            problem.clauses.add(c);
             break;
           }
         case "fof":
@@ -703,7 +706,7 @@ public final class TptpParser {
             var role = word();
             expect(',');
 
-            // Formula
+            // Term
             switch (role) {
               case "assumption":
               case "plain":
@@ -719,6 +722,7 @@ public final class TptpParser {
                   var a = logicFormula(HashMap.empty());
                   if (select != null && !select.contains(name)) break;
                   var formula = new Formula(a, Inference.AXIOM);
+                  formula.file = file;
                   formula.name = name;
                   problem.formulas.add(formula);
                   break;
@@ -731,6 +735,7 @@ public final class TptpParser {
                     throw new ParseException(
                         file, reader.getLineNumber(), "multiple conjectures not supported");
                   var formula = new Formula(a, Inference.CONJECTURE);
+                  formula.file = file;
                   formula.name = name;
                   problem.conjecture = formula;
                   break;

@@ -2,6 +2,7 @@ package prover;
 
 import io.vavr.collection.Seq;
 import java.util.HashMap;
+import java.util.Locale;
 
 public final class TptpPrinter {
   private static final HashMap<Variable, String> variableNames = new HashMap<>();
@@ -183,9 +184,38 @@ public final class TptpPrinter {
     System.out.print(", ");
 
     // Role
+    switch (formula.inference) {
+      case CONJECTURE:
+        System.out.print("conjecture");
+        break;
+      case NEGATE:
+        System.out.print("negated_conjecture");
+        break;
+      default:
+        System.out.print("plain");
+        break;
+    }
     System.out.print(", ");
 
-    // End
+    // Term
+    variableNames.clear();
+    print(formula.term());
+    System.out.print(", ");
+
+    // Source
+    switch (formula.inference) {
+      case DEFINE:
+        System.out.print("introduced(definition)");
+        break;
+      case CONJECTURE:
+      case AXIOM:
+        System.out.printf("file(%s,%s)", Etc.quote('\'', formula.file), formula.name);
+        break;
+      default:
+        System.out.printf(
+            "inference(%s,[status(", formula.inference.toString().toLowerCase(Locale.ROOT));
+        break;
+    }
     System.out.println(").");
   }
 

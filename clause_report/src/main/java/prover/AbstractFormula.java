@@ -2,6 +2,7 @@ package prover;
 
 public abstract class AbstractFormula {
   public Object name;
+  public String file;
   public final Inference inference;
   public final AbstractFormula[] from;
 
