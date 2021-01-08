@@ -24,6 +24,12 @@ public class EtcTest {
   }
 
   @Test
+  public void quote() {
+    assertEquals(Etc.quote('\'', "a"), "'a'");
+    assertEquals(Etc.quote('\'', "a'"), "'a\\''");
+  }
+
+  @Test
   public void remainderEuclidean() {
     assertEquals(
         Etc.remainderEuclidean(BigInteger.valueOf(7), BigInteger.valueOf(3)),

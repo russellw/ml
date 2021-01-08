@@ -200,8 +200,7 @@ public final class CNF {
     var from = formula;
     if (a instanceof Seq) {
       var a1 = (Seq) a;
-      var op = a1.head();
-      if (op == Symbol.AND) {
+      if (a1.head() == Symbol.AND) {
         for (var i = 1; i <= a1.size(); i++) {
           negative.clear();
           positive.clear();

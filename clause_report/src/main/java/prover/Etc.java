@@ -183,6 +183,23 @@ public final class Etc {
     if (a instanceof Variable) r.add((Variable) a);
   }
 
+  public static Object head(Object a) {
+    if (a instanceof Seq) return ((Seq) a).head();
+    return null;
+  }
+
+  public static String quote(char q, String s) {
+    var sb = new StringBuilder();
+    sb.append(q);
+    for (var i = 0; i < s.length(); i++) {
+      var c = s.charAt(i);
+      if (c == q || c == '\\') sb.append('\\');
+      sb.append(c);
+    }
+    sb.append(q);
+    return sb.toString();
+  }
+
   public static java.util.HashSet<Variable> freeVariables(Object a) {
     var r = new java.util.HashSet<Variable>();
     getFreeVariables(HashSet.empty(), a, r);
