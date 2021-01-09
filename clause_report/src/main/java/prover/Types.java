@@ -149,7 +149,7 @@ public final class Types {
     if (opType instanceof Seq) {
       var opType1 = (Seq) opType;
       if (opType1.size() == a1.size()) {
-        for (var i = 0; i < opType1.size(); i++) unifyTypes(opType1.get(i), a1.get(i), map);
+        for (var i = 1; i < opType1.size(); i++) unifyTypes(opType1.get(i), a1.get(i), map);
         return;
       }
     }
@@ -243,7 +243,7 @@ public final class Types {
       if (opType instanceof Seq) {
         var opType1 = (Seq) opType;
         if (opType1.size() == a1.size()) {
-          for (var i = 0; i < opType1.size(); i++) checkTypes(opType1.get(i), a1.get(i));
+          for (var i = 1; i < opType1.size(); i++) checkTypes(opType1.get(i), a1.get(i));
           return;
         }
       }

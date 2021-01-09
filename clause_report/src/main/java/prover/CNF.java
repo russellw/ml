@@ -199,7 +199,7 @@ public final class CNF {
     if (a instanceof Seq) {
       var a1 = (Seq) a;
       if (a1.head() == Symbol.AND) {
-        for (var i = 1; i <= a1.size(); i++) {
+        for (var i = 1; i < a1.size(); i++) {
           negative.clear();
           positive.clear();
           split(a1.get(i));
