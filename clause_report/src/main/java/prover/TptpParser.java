@@ -653,9 +653,7 @@ public final class TptpParser {
     switch (token) {
       case '(':
         lex();
-        while (!eat(')')) {
-          ignore();
-        }
+        while (!eat(')')) ignore();
         break;
       case -1:
         throw new ParseException(file, reader.getLineNumber(), "unexpected end of file");
@@ -771,7 +769,8 @@ public final class TptpParser {
                     if (a == null) {
                       a = new Func(type, funcName);
                       funcs.put(funcName, a);
-                    } else if (!Types.typeof(a).equals(type))
+                    } else if (a.type instanceof Variable) a.type = type;
+                    else if (!Types.typeof(a).equals(type))
                       throw new ParseException(file, reader.getLineNumber(), "type mismatch");
                   }
                   while (parens-- > 0) expect(')');
