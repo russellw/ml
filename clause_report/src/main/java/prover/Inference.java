@@ -11,4 +11,5 @@ public enum Inference {
   NNF,
   DISTRIBUTE,
   SPLIT,
+  RENAME_VARIABLES,
 }

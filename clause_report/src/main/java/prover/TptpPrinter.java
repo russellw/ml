@@ -192,6 +192,8 @@ public final class TptpPrinter {
 
     // Source
     switch (formula.inference) {
+      case RENAME_VARIABLES:
+        throw new IllegalArgumentException(formula.toString());
       case DEFINE:
         System.out.print("introduced(definition)");
         break;

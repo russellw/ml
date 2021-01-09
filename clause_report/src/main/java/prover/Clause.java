@@ -116,7 +116,13 @@ public final class Clause extends AbstractFormula {
               return a;
             });
     if (map.isEmpty()) return this;
-    return new Clause(((Seq) r).toJavaArray(), negativeSize, inference, from);
+    return new Clause(
+        ((Seq) r).toJavaArray(), negativeSize, Inference.RENAME_VARIABLES, new Clause[] {this});
+  }
+
+  public Clause original() {
+    if (inference == Inference.RENAME_VARIABLES) return (Clause) from[0];
+    return this;
   }
 
   @Override

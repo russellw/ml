@@ -204,7 +204,7 @@ public final class Superposition {
     ((di < d.negativeSize()) ? negative : positive).add(Unification.replace(e, map));
 
     // Make new clause
-    clause(new Clause(negative, positive, Inference.SUPERPOSITION, c, d));
+    clause(new Clause(negative, positive, Inference.SUPERPOSITION, c.original(), d.original()));
   }
 
   public static void solve(Problem problem, long deadline) {

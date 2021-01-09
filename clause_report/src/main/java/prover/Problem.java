@@ -31,20 +31,15 @@ public final class Problem {
           result = SZS.Theorem;
           break;
       }
-    if (expected != null
-        && result != expected
-        && !(isUnsatisfiable(result) && expected == SZS.ContradictoryAxioms))
-      throw new IllegalStateException(result + " != " + expected);
-  }
-
-  private static boolean isUnsatisfiable(SZS szs) {
-    switch (szs) {
-      case Unsatisfiable:
-      case ContradictoryAxioms:
-      case Theorem:
-        return true;
-    }
-    return false;
+    if (expected != null && result != expected)
+      switch (result) {
+        case Unsatisfiable:
+        case Theorem:
+          if (expected == SZS.ContradictoryAxioms) break;
+        case Satisfiable:
+        case CounterSatisfiable:
+          throw new IllegalStateException(result + " != " + expected);
+      }
   }
 
   public Problem(String file) {
