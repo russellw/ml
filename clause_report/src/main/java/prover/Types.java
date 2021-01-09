@@ -105,6 +105,18 @@ public final class Types {
     return false;
   }
 
+  private static Object replace(Object a, HashMap<Variable, Object> map) {
+    return Etc.treeMap(
+        a,
+        b -> {
+          if (b instanceof Variable) {
+            var b1 = map.get(b);
+            if (b1 != null) return replace(b1, map);
+          }
+          return b;
+        });
+  }
+
   // First step of type inference:
   // Unify to figure out how all the unspecified types can be made consistent
   private static void unifyTypes(Object wanted, Object a, HashMap<Variable, Object> map) {
@@ -136,10 +148,7 @@ public final class Types {
     if (opType instanceof Seq) {
       var opType1 = (Seq) opType;
       if (opType1.size() == a1.size()) {
-        for (var i = 1; i < opType1.size(); i++)
-          if (!opType1.get(i).equals(typeof(a1.get(i))))
-            throw new IllegalArgumentException(
-                String.format("%s: %s %s: %s", wanted, typeof(a), a, opType));
+        for (var i = 0; i < opType1.size(); i++) unifyTypes(opType1.get(i), a1.get(i), map);
         return;
       }
     }
@@ -155,6 +164,77 @@ public final class Types {
         b -> {
           if (b instanceof Func) {}
         });
+  }
+
+  // Third step of type inference:
+  // Check the types are correct
+  private static void checkTypes(Object wanted, Object a) {
+    if (wanted instanceof Variable)
+      throw new IllegalArgumentException(String.format("%s: %s", wanted, a));
+    if (!wanted.equals(typeof(a)))
+      throw new IllegalArgumentException(String.format("%s != %s %s", wanted, typeof(a), a));
+    if (!(a instanceof Seq)) return;
+    var a1 = (Seq) a;
+    var op = a1.head();
+    if (op instanceof Symbol)
+      switch ((Symbol) op) {
+        case ALL:
+        case EXISTS:
+          {
+            var binding = (Seq) a1.get(1);
+            for (var x : binding)
+              if (typeof(x) == Symbol.BOOLEAN)
+                throw new IllegalArgumentException(String.format("%s: %s", wanted, a));
+            checkTypes(Symbol.BOOLEAN, a1.get(2));
+            return;
+          }
+        case DIVIDE_FLOOR:
+        case DIVIDE_TRUNCATE:
+        case DIVIDE_EUCLIDEAN:
+        case REMAINDER_FLOOR:
+        case REMAINDER_TRUNCATE:
+        case REMAINDER_EUCLIDEAN:
+          for (var i = 1; i < a1.size(); i++) checkTypes(Symbol.INTEGER, a1.get(i));
+          return;
+        case AND:
+        case OR:
+        case EQV:
+        case NOT:
+          for (var i = 1; i < a1.size(); i++) checkTypes(Symbol.BOOLEAN, a1.get(i));
+          return;
+        case EQUALS:
+          {
+            var type = typeof(a1.get(1));
+            for (var i = 1; i < a1.size(); i++) checkTypes(type, a1.get(i));
+            return;
+          }
+        case DIVIDE:
+          {
+            var type = typeof(a1.get(1));
+            if (type == Symbol.INTEGER)
+              throw new IllegalArgumentException(String.format("%s: %s", wanted, a));
+            for (var i = 1; i < a1.size(); i++) checkTypes(type, a1.get(i));
+            return;
+          }
+        default:
+          {
+            var type = typeof(a1.get(1));
+            if (!isNumeric(type))
+              throw new IllegalArgumentException(String.format("%s: %s", wanted, a));
+            for (var i = 1; i < a1.size(); i++) checkTypes(type, a1.get(i));
+            return;
+          }
+      }
+    var opType = typeof(op);
+    if (opType instanceof Seq) {
+      var opType1 = (Seq) opType;
+      if (opType1.size() == a1.size()) {
+        for (var i = 0; i < opType1.size(); i++) checkTypes(opType1.get(i), a1.get(i));
+        return;
+      }
+    }
+    throw new IllegalArgumentException(
+        String.format("%s: %s %s: %s", wanted, typeof(a), a, opType));
   }
 
   public static boolean isNumeric(Object a) {
