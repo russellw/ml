@@ -71,6 +71,7 @@ public final class Etc {
         var b1 = (Seq) b;
         int n = a1.size();
         if (n != b1.size()) return false;
+        if (a1.head() != b1.head()) return false;
         for (var i = 0; i < n; i++) if (!isomorphic(a1.get(i), b1.get(i), map)) return false;
         return true;
       }
