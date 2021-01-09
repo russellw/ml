@@ -78,7 +78,7 @@ public final class CNF {
 
   private Object rename(Object a) {
     var b = skolem(Symbol.BOOLEAN, Array.ofAll(Variable.freeVariables(a)));
-    var formula = new Formula(Etc.implies(b, a), Inference.DEFINE);
+    var formula = new Formula(Variable.quantify(Etc.implies(b, a)), Inference.DEFINE);
     convert(formula);
     return b;
   }

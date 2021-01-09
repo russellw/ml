@@ -1,5 +1,6 @@
 package prover;
 
+import io.vavr.collection.Array;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Seq;
 import io.vavr.collection.Set;
@@ -39,9 +40,15 @@ public final class Variable {
   }
 
   public static java.util.HashSet<Variable> freeVariables(Object a) {
-    var r = new java.util.HashSet<Variable>();
+    var r = new java.util.LinkedHashSet<Variable>();
     getFreeVariables(HashSet.empty(), a, r);
     return r;
+  }
+
+  public static Object quantify(Object a) {
+    var variables = freeVariables(a);
+    if (variables.isEmpty()) return a;
+    return Array.of(Symbol.ALL, Array.ofAll(variables), a);
   }
 
   public static Object unquantify(Object a) {
