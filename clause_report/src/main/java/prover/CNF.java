@@ -77,7 +77,7 @@ public final class CNF {
   }
 
   private Object rename(Object a) {
-    var b = skolem(Symbol.BOOLEAN, Array.ofAll(Etc.freeVariables(a)));
+    var b = skolem(Symbol.BOOLEAN, Array.ofAll(Variable.freeVariables(a)));
     var formula = new Formula(Etc.implies(b, a), Inference.DEFINE);
     convert(formula);
     return b;
@@ -178,7 +178,7 @@ public final class CNF {
   private void convert(Formula formula) {
     // Variables must be bound only for the first step
     var a = formula.term();
-    assert Etc.freeVariables(a).isEmpty();
+    assert Variable.freeVariables(a).isEmpty();
 
     // Negation normal form includes several transformations that need to be done together
     var b = nnf(LinkedHashMap.empty(), HashMap.empty(), true, a);
