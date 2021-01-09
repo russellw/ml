@@ -769,8 +769,7 @@ public final class TptpParser {
                     if (a == null) {
                       a = new Func(type, funcName);
                       funcs.put(funcName, a);
-                    } else if (a.type instanceof Variable) a.type = type;
-                    else if (!Types.typeof(a).equals(type))
+                    } else if (!Types.typeof(a).equals(type))
                       throw new ParseException(file, reader.getLineNumber(), "type mismatch");
                   }
                   while (parens-- > 0) expect(')');
