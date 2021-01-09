@@ -193,7 +193,10 @@ public final class Etc {
       for (var b : a1) getFreeVariables(bound, b, r);
       return;
     }
-    if (a instanceof Variable) r.add((Variable) a);
+    if (a instanceof Variable) {
+      var a1 = (Variable) a;
+      if (!bound.contains(a1)) r.add(a1);
+    }
   }
 
   public static Object head(Object a) {

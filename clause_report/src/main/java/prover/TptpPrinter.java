@@ -1,23 +1,10 @@
 package prover;
 
 import io.vavr.collection.Seq;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 
 public final class TptpPrinter {
-  private static final HashMap<Variable, String> variableNames = new HashMap<>();
-
-  private static void print(Variable a) {
-    var name = variableNames.get(a);
-    if (name == null) {
-      var i = variableNames.size();
-      name = i < 26 ? Character.toString('A' + i) : "Z" + (i - 25);
-      variableNames.put(a, name);
-    }
-    System.out.print(name);
-  }
-
   private static void print(Symbol a) {
     switch (a) {
       case BOOLEAN:
@@ -199,7 +186,7 @@ public final class TptpPrinter {
     System.out.print(", ");
 
     // Term
-    variableNames.clear();
+    Variable.names.clear();
     print(formula.term());
     System.out.print(", ");
 
@@ -308,10 +295,6 @@ public final class TptpPrinter {
         System.out.print(Etc.quote('\'', name));
         return;
       }
-    }
-    if (a instanceof Variable) {
-      print((Variable) a);
-      return;
     }
     if (a instanceof Symbol) {
       print((Symbol) a);
