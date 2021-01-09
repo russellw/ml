@@ -150,13 +150,11 @@ public final class Types {
   // Second step of type inference:
   // Fill in actual types for all the type variables
   private static void setTypes(Object a, HashMap<Variable, Object> map) {
-    if (a instanceof Seq) {
-      for (var b : (Seq) a) setTypes(b, map);
-      return;
-    }
-    if (a instanceof Func) {
-      return;
-    }
+    Etc.treeWalk(
+        a,
+        b -> {
+          if (b instanceof Func) {}
+        });
   }
 
   public static boolean isNumeric(Object a) {

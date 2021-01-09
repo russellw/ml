@@ -99,10 +99,10 @@ public final class Etc {
     return f.apply(a);
   }
 
-  public static void treeForEach(Object a, Consumer<Object> f) {
+  public static void treeWalk(Object a, Consumer<Object> f) {
     if (a instanceof Seq) {
       var a1 = (Seq) a;
-      for (var b : a1) treeForEach(b, f);
+      for (var b : a1) treeWalk(b, f);
       return;
     }
     f.accept(a);
