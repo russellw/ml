@@ -53,6 +53,52 @@ public final class Variable {
     return a;
   }
 
+  public static boolean isomorphic(Object a, Object b, HashMap<Variable, Variable> map) {
+    // Equal
+    if (a == b) return true;
+
+    // Type mismatch
+    if (!Types.typeof(a).equals(Types.typeof(b))) return false;
+
+    // Variable
+    if (a instanceof Variable) {
+      var a1 = (Variable) a;
+      if (b instanceof Variable) {
+        var b1 = (Variable) b;
+        var a2 = map.get(a1);
+        var b2 = map.get(b1);
+
+        // Compatible mapping
+        if (a1 == b2 && b1 == a2) return true;
+
+        // New mapping
+        if (a2 == null && b2 == null) {
+          map.put(a1, b1);
+          map.put(b1, a1);
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Compounds
+    if (a instanceof Seq) {
+      var a1 = (Seq) a;
+      if (b instanceof Seq) {
+        var b1 = (Seq) b;
+        int n = a1.size();
+        if (n != b1.size()) return false;
+        if (a1.head() != b1.head()) return false;
+        for (var i = 0; i < n; i++) if (!isomorphic(a1.get(i), b1.get(i), map)) return false;
+        return true;
+      }
+      return false;
+    }
+
+    // Atoms
+    return a.equals(b);
+  }
+
   @Override
   public String toString() {
     var name = names.get(this);
