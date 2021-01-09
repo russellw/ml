@@ -142,19 +142,10 @@ public final class Etc {
     return a.subtract(divideFloor(a, b).multiply(b));
   }
 
-  public static Object unquantify(Object a) {
-    while (a instanceof Seq) {
-      var a1 = (Seq) a;
-      if (a1.head() != Symbol.ALL) break;
-      a = a1.get(2);
-    }
-    return a;
-  }
-
-  public static boolean exists(Object a, Predicate<Object> f) {
+  public static boolean treeExists(Object a, Predicate<Object> f) {
     if (a instanceof Seq) {
       var a1 = (Seq) a;
-      for (var b : a1) if (exists(b, f)) return true;
+      for (var b : a1) if (treeExists(b, f)) return true;
       return false;
     }
     return (f.test(a));

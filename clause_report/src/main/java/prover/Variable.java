@@ -44,6 +44,15 @@ public final class Variable {
     return r;
   }
 
+  public static Object unquantify(Object a) {
+    while (a instanceof Seq) {
+      var a1 = (Seq) a;
+      if (a1.head() != Symbol.ALL) break;
+      a = a1.get(2);
+    }
+    return a;
+  }
+
   @Override
   public String toString() {
     var name = names.get(this);

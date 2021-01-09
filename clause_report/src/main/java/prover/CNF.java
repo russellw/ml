@@ -182,7 +182,7 @@ public final class CNF {
 
     // Negation normal form includes several transformations that need to be done together
     var b = nnf(LinkedHashMap.empty(), HashMap.empty(), true, a);
-    a = Etc.unquantify(a);
+    a = Variable.unquantify(a);
     if (!Etc.isomorphic(a, b, new java.util.HashMap<>())) {
       formula = new Formula(b, Inference.NNF, formula);
       a = b;
