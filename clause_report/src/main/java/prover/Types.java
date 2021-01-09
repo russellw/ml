@@ -158,11 +158,24 @@ public final class Types {
 
   // Second step of type inference:
   // Fill in actual types for all the type variables
+  @SuppressWarnings("unchecked")
   private static void setTypes(Object a, HashMap<Variable, Object> map) {
     Etc.treeWalk(
         a,
         b -> {
-          if (b instanceof Func) {}
+          if (b instanceof Func) {
+            var b1 = (Func) b;
+            b1.type = replace(b1.type, map);
+            if (b1.type instanceof Seq) {
+              var type = (Seq) b1.type;
+              b1.type = type.map(t -> t instanceof Variable ? Symbol.INDIVIDUAL : t);
+              return;
+            }
+            if (b1.type instanceof Variable) {
+              b1.type = Symbol.INDIVIDUAL;
+              return;
+            }
+          }
         });
   }
 
