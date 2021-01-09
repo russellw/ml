@@ -489,6 +489,8 @@ public final class TptpParser {
         {
           var a = free.get(s);
           if (a != null) return a;
+          a = bound.getOrElse(s, null);
+          if (a != null) return a;
           a = new Variable(Symbol.INDIVIDUAL);
           free.put(s, a);
           return a;
@@ -554,7 +556,7 @@ public final class TptpParser {
         throw new ParseException(file, reader.getLineNumber(), "variable expected");
       var name = tokenString;
       lex();
-      var type = eat(':') ? null : Symbol.INDIVIDUAL;
+      var type = eat(':') ? atomicType() : Symbol.INDIVIDUAL;
       var a = new Variable(type);
       bound = bound.put(name, a);
       params.add(a);
