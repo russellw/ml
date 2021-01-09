@@ -45,15 +45,6 @@ public final class Superposition {
     unprocessed.add(c);
   }
 
-  // For each negative equation
-  private static void resolve(Clause c) {
-    for (var i = 0; i < c.negativeSize(); i++) {
-      var e = c.get(i);
-      var map = Unification.unify(Equality.left(e), Equality.right(e), HashMap.empty());
-      if (map != null) resolve(c, i, map);
-    }
-  }
-
   // Substitute and make new clause
   private static void resolve(Clause c, int ci, Map<Variable, Object> map) {
     // Negative literals
@@ -70,22 +61,12 @@ public final class Superposition {
     clause(new Clause(negative, positive, Inference.RESOLVE, c));
   }
 
-  // For each positive equation (both directions)
-  private static void factor(Clause c) {
-    for (var i = c.negativeSize(); i < c.size(); i++) {
+  // For each negative equation
+  private static void resolve(Clause c) {
+    for (var i = 0; i < c.negativeSize(); i++) {
       var e = c.get(i);
-      factor(c, i, Equality.left(e), Equality.right(e));
-      factor(c, i, Equality.right(e), Equality.left(e));
-    }
-  }
-
-  // For each positive equation (both directions) again
-  private static void factor(Clause c, int ci, Object c0, Object c1) {
-    for (var i = c.negativeSize(); i < c.size(); i++) {
-      if (i == ci) continue;
-      var e = c.get(i);
-      factor(c, c0, c1, i, Equality.left(e), Equality.right(e));
-      factor(c, c0, c1, i, Equality.right(e), Equality.left(e));
+      var map = Unification.unify(Equality.left(e), Equality.right(e), HashMap.empty());
+      if (map != null) resolve(c, i, map);
     }
   }
 
@@ -109,65 +90,22 @@ public final class Superposition {
     clause(new Clause(negative, positive, Inference.FACTOR, c));
   }
 
-  // For each positive equation in c (both directions)
-  private static void superposition(Clause c, Clause d) {
+  // For each positive equation (both directions) again
+  private static void factor(Clause c, int ci, Object c0, Object c1) {
+    for (var i = c.negativeSize(); i < c.size(); i++) {
+      if (i == ci) continue;
+      var e = c.get(i);
+      factor(c, c0, c1, i, Equality.left(e), Equality.right(e));
+      factor(c, c0, c1, i, Equality.right(e), Equality.left(e));
+    }
+  }
+
+  // For each positive equation (both directions)
+  private static void factor(Clause c) {
     for (var i = c.negativeSize(); i < c.size(); i++) {
       var e = c.get(i);
-      superposition(c, d, i, Equality.left(e), Equality.right(e));
-      superposition(c, d, i, Equality.right(e), Equality.left(e));
-    }
-  }
-
-  // For each equation in d (both directions)
-  private static void superposition(Clause c, Clause d, int ci, Object c0, Object c1) {
-    if (c0 == Boolean.TRUE) return;
-    for (var i = 0; i < d.size(); i++) {
-      var e = d.get(i);
-      superposition(
-          c,
-          d,
-          ci,
-          c0,
-          c1,
-          i,
-          Equality.left(e),
-          Equality.right(e),
-          new ArrayList<>(),
-          Equality.left(e));
-      superposition(
-          c,
-          d,
-          ci,
-          c0,
-          c1,
-          i,
-          Equality.right(e),
-          Equality.left(e),
-          new ArrayList<>(),
-          Equality.right(e));
-    }
-  }
-
-  // Descend into subterms
-  private static void superposition(
-      Clause c,
-      Clause d,
-      int ci,
-      Object c0,
-      Object c1,
-      int di,
-      Object d0,
-      Object d1,
-      ArrayList<Integer> position,
-      Object a) {
-    if (a instanceof Variable) return;
-    superposition1(c, d, ci, c0, c1, di, d0, d1, position, a);
-    if (!(a instanceof Seq)) return;
-    var a1 = (Seq) a;
-    for (var i = 1; i < a1.size(); i++) {
-      position.add(i);
-      superposition(c, d, ci, c0, c1, di, d0, d1, position, a1.get(i));
-      position.remove(position.size() - 1);
+      factor(c, i, Equality.left(e), Equality.right(e));
+      factor(c, i, Equality.right(e), Equality.left(e));
     }
   }
 
@@ -205,6 +143,68 @@ public final class Superposition {
 
     // Make new clause
     clause(new Clause(negative, positive, Inference.SUPERPOSITION, c.original(), d.original()));
+  }
+
+  // Descend into subterms
+  private static void superposition(
+      Clause c,
+      Clause d,
+      int ci,
+      Object c0,
+      Object c1,
+      int di,
+      Object d0,
+      Object d1,
+      ArrayList<Integer> position,
+      Object a) {
+    if (a instanceof Variable) return;
+    superposition1(c, d, ci, c0, c1, di, d0, d1, position, a);
+    if (!(a instanceof Seq)) return;
+    var a1 = (Seq) a;
+    for (var i = 1; i < a1.size(); i++) {
+      position.add(i);
+      superposition(c, d, ci, c0, c1, di, d0, d1, position, a1.get(i));
+      position.remove(position.size() - 1);
+    }
+  }
+
+  // For each equation in d (both directions)
+  private static void superposition(Clause c, Clause d, int ci, Object c0, Object c1) {
+    if (c0 == Boolean.TRUE) return;
+    for (var i = 0; i < d.size(); i++) {
+      var e = d.get(i);
+      superposition(
+          c,
+          d,
+          ci,
+          c0,
+          c1,
+          i,
+          Equality.left(e),
+          Equality.right(e),
+          new ArrayList<>(),
+          Equality.left(e));
+      superposition(
+          c,
+          d,
+          ci,
+          c0,
+          c1,
+          i,
+          Equality.right(e),
+          Equality.left(e),
+          new ArrayList<>(),
+          Equality.right(e));
+    }
+  }
+
+  // For each positive equation in c (both directions)
+  private static void superposition(Clause c, Clause d) {
+    for (var i = c.negativeSize(); i < c.size(); i++) {
+      var e = c.get(i);
+      superposition(c, d, i, Equality.left(e), Equality.right(e));
+      superposition(c, d, i, Equality.right(e), Equality.left(e));
+    }
   }
 
   public static void solve(Problem problem, long deadline) {
