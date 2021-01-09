@@ -309,14 +309,6 @@ public final class TptpParser {
   }
 
   // Types
-  private static Func namedType(String name) {
-    var type = types.get(name);
-    if (type != null) return type;
-    type = new Func(null, name);
-    types.put(name, type);
-    return type;
-  }
-
   private Object atomicType() throws IOException {
     var k = token;
     var s = tokenString;
@@ -348,7 +340,13 @@ public final class TptpParser {
         }
         throw new ParseException(file, reader.getLineNumber(), s + ": unknown type");
       case WORD:
-        return namedType(s);
+        {
+          var type = types.get(s);
+          if (type != null) return type;
+          type = new Func(null, s);
+          types.put(s, type);
+          return type;
+        }
       default:
         throw new ParseException(file, reader.getLineNumber(), "type expected");
     }
