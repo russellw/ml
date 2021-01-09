@@ -324,9 +324,9 @@ public final class TptpParser {
     switch (k) {
       case '(':
         {
-          var t = atomicType();
+          var type = atomicType();
           expect(')');
-          return t;
+          return type;
         }
       case '!':
       case '[':
@@ -366,12 +366,12 @@ public final class TptpParser {
       r.set(0, returnType);
       return Array.ofAll(r);
     }
-    var t = atomicType();
+    var type = atomicType();
     if (eat('>')) {
       var returnType = atomicType();
-      return Array.of(returnType, t);
+      return Array.of(returnType, type);
     }
-    return t;
+    return type;
   }
 
   // Terms
