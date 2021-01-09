@@ -6,6 +6,18 @@ import java.math.BigInteger;
 public final class Types {
   private Types() {}
 
+  public static boolean isNumeric(Object a) {
+    var t = typeof(a);
+    if (t instanceof Symbol)
+      switch ((Symbol) t) {
+        case INTEGER:
+        case RATIONAL:
+        case REAL:
+          return true;
+      }
+    return false;
+  }
+
   public static Object typeof(Object a) {
     if (a instanceof Seq) {
       var a1 = (Seq) a;

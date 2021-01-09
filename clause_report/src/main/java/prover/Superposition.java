@@ -251,6 +251,18 @@ public final class Superposition {
         superposition(g1, c);
       }
     }
+
+    // Superposition is not complete on arithmetic
+    for (var c : processed) {
+      if (c.subsumed) continue;
+      if (Etc.exists(c.term(), Types::isNumeric)) {
+        problem.result = SZS.GaveUp;
+        return;
+      }
+    }
+
+    // Proof of satisfiability by running out of inferences
+    // is rare, but can happen for very simple problems
     problem.result = SZS.Satisfiable;
   }
 }

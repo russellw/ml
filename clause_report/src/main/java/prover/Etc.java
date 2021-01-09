@@ -162,6 +162,15 @@ public final class Etc {
     return a;
   }
 
+  public static boolean exists(Object a, Predicate<Object> f) {
+    if (a instanceof Seq) {
+      var a1 = (Seq) a;
+      for (var b : a1) if (exists(b, f)) return true;
+      return false;
+    }
+    return (f.test(a));
+  }
+
   public static java.util.HashSet<Object> collect(Object a, Predicate<Object> f) {
     var r = new java.util.HashSet<>();
     collect(a, f, r);
