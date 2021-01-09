@@ -1,6 +1,8 @@
 import os
 import sys
 
+out = open("a.p", "w")
+
 
 def read_file(filename):
     lines = open(filename).readlines()
@@ -11,7 +13,7 @@ def read_file(filename):
                 raise ValueError("TPTP environment variable not set")
             read_file(tptp + "/" + s.split("'")[1])
             continue
-        print(s[:-1])
+        out.write(s)
 
 
 read_file(sys.argv[1])
