@@ -47,6 +47,40 @@ public final class Unification {
     return a.equals(b) ? map : null;
   }
 
+  private static boolean occurs(Variable a, Object b, Map<Variable, Object> map) {
+    if (b instanceof Variable) {
+      if (a == b) return true;
+      var b1 = map.getOrElse((Variable) b, null);
+      if (b1 != null) return occurs(a, b1, map);
+      return false;
+    }
+    if (b instanceof Seq) {
+      var b1 = (Seq) b;
+      assert b1.head() != Symbol.EQUALS;
+      for (var x : b1) if (occurs(a, x, map)) return true;
+    }
+    return false;
+  }
+
+  private static Map<Variable, Object> unifyVariable(
+      Variable a, Object b, Map<Variable, Object> map) {
+    // Existing mapping
+    var a1 = map.getOrElse(a, null);
+    if (a1 != null) return unify(a1, b, map);
+
+    // Variable
+    if (b instanceof Variable) {
+      var b1 = map.getOrElse((Variable) b, null);
+      if (b1 != null) return unify(b1, a, map);
+    }
+
+    // Occurs check
+    if (occurs(a, b, map)) return null;
+
+    // New mapping
+    return map.put(a, b);
+  }
+
   public static Map<Variable, Object> unify(Object a, Object b, Map<Variable, Object> map) {
     // Equal
     if (a == b) return map;
@@ -80,37 +114,15 @@ public final class Unification {
     return a.equals(b) ? map : null;
   }
 
-  private static Map<Variable, Object> unifyVariable(
-      Variable a, Object b, Map<Variable, Object> map) {
-    // Existing mapping
-    var a1 = map.getOrElse(a, null);
-    if (a1 != null) return unify(a1, b, map);
-
-    // Variable
-    if (b instanceof Variable) {
-      var b1 = map.getOrElse((Variable) b, null);
-      if (b1 != null) return unify(b1, a, map);
-    }
-
-    // Occurs check
-    if (occurs(a, b, map)) return null;
-
-    // New mapping
-    return map.put(a, b);
-  }
-
-  private static boolean occurs(Variable a, Object b, Map<Variable, Object> map) {
-    if (b instanceof Variable) {
-      if (a == b) return true;
-      var b1 = map.getOrElse((Variable) b, null);
-      if (b1 != null) return occurs(a, b1, map);
-      return false;
-    }
-    if (b instanceof Seq) {
-      var b1 = (Seq) b;
-      assert b1.head() != Symbol.EQUALS;
-      for (var x : b1) if (occurs(a, x, map)) return true;
-    }
-    return false;
+  public static Object replace(Object a, Map<Variable, Object> map) {
+    return Etc.treeMap(
+        a,
+        b -> {
+          if (b instanceof Variable) {
+            var b1 = map.getOrElse((Variable) b, null);
+            if (b1 != null) return replace(b1, map);
+          }
+          return b;
+        });
   }
 }

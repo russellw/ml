@@ -108,18 +108,6 @@ public final class Etc {
     f.accept(a);
   }
 
-  public static Object replace(Object a, Map<Variable, Object> map) {
-    return treeMap(
-        a,
-        b -> {
-          if (b instanceof Variable) {
-            var b1 = map.getOrElse((Variable) b, null);
-            if (b1 != null) return replace(b1, map);
-          }
-          return b;
-        });
-  }
-
   public static Object splice(Object a, ArrayList<Integer> position, int i, Object b) {
     if (i == position.size()) return b;
     var a1 = (Seq) a;
