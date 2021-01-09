@@ -32,18 +32,9 @@ public final class Types {
           case TO_RATIONAL:
             return Symbol.RATIONAL;
           default:
-            throw new IllegalArgumentException(a.getClass().toString() + ' ' + a);
+            return typeof(a1.get(1));
         }
-      var opType = typeof(op);
-      if (!(opType instanceof Seq))
-        throw new IllegalArgumentException(a.getClass().toString() + ' ' + a + ", " + opType);
-      var opType1 = (Seq) opType;
-      if (opType1.size() != a1.size())
-        throw new IllegalArgumentException(a.getClass().toString() + ' ' + a);
-      for (var i = 1; i < opType1.size(); i++)
-        if (!opType1.get(i).equals(typeof(a1.get(i))))
-          throw new IllegalArgumentException(a.getClass().toString() + ' ' + a);
-      return opType1.head();
+      return ((Seq) typeof(op)).head();
     }
     if (a instanceof Func) return ((Func) a).type;
     if (a instanceof Variable) return ((Variable) a).type;
@@ -51,7 +42,7 @@ public final class Types {
     if (a instanceof BigInteger) return Symbol.INTEGER;
     if (a instanceof BigRational) return Symbol.RATIONAL;
     if (a instanceof String) return Symbol.INDIVIDUAL;
-    throw new IllegalArgumentException(a.getClass().toString() + ' ' + a);
+    throw new IllegalArgumentException(a.toString());
   }
 
   private static boolean occurs(Variable a, Object b, HashMap<Variable, Object> map) {
@@ -119,28 +110,52 @@ public final class Types {
   private static void unifyTypes(Object wanted, Object a, HashMap<Variable, Object> map) {
     if (!unify(wanted, typeof(a), map))
       throw new IllegalArgumentException(String.format("%s != %s %s", wanted, typeof(a), a));
+    if (!(a instanceof Seq)) return;
+    var a1 = (Seq) a;
+    var op = a1.head();
+    if (op instanceof Symbol)
+      switch ((Symbol) op) {
+        case ALL:
+        case EXISTS:
+          unifyTypes(Symbol.BOOLEAN, a1.get(2), map);
+          return;
+        case AND:
+        case OR:
+        case EQV:
+        case NOT:
+          for (var i = 1; i < a1.size(); i++) unifyTypes(Symbol.BOOLEAN, a1.get(i), map);
+          return;
+        default:
+          {
+            var type = typeof(a1.get(1));
+            for (var i = 1; i < a1.size(); i++) unifyTypes(type, a1.get(i), map);
+            return;
+          }
+      }
+    var opType = typeof(op);
+    if (opType instanceof Seq) {
+      var opType1 = (Seq) opType;
+      if (opType1.size() == a1.size()) {
+        for (var i = 1; i < opType1.size(); i++)
+          if (!opType1.get(i).equals(typeof(a1.get(i))))
+            throw new IllegalArgumentException(
+                String.format("%s: %s %s: %s", wanted, typeof(a), a, opType));
+        return;
+      }
+    }
+    throw new IllegalArgumentException(
+        String.format("%s: %s %s: %s", wanted, typeof(a), a, opType));
+  }
+
+  // Second step of type inference:
+  // Fill in actual types for all the type variables
+  private static void setTypes(Object a, HashMap<Variable, Object> map) {
     if (a instanceof Seq) {
-      var a1 = (Seq) a;
-      var op = a1.head();
-      if (op instanceof Symbol)
-        switch ((Symbol) op) {
-          case ALL:
-          case EXISTS:
-            unifyTypes(Symbol.BOOLEAN, a1.get(2), map);
-            return;
-          case AND:
-          case OR:
-          case EQV:
-          case NOT:
-            for (var i = 1; i < a1.size(); i++) unifyTypes(Symbol.BOOLEAN, a1.get(i), map);
-            return;
-          default:
-            {
-              var type = typeof(a1.get(1));
-              for (var i = 1; i < a1.size(); i++) unifyTypes(type, a1.get(i), map);
-              return;
-            }
-        }
+      for (var b : (Seq) a) setTypes(b, map);
+      return;
+    }
+    if (a instanceof Func) {
+      return;
     }
   }
 
