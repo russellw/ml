@@ -45,10 +45,6 @@ public class VariableTest {
     assertTrue(Variable.isomorphic(x, y, map));
     assertEquals(map.size(), 2);
 
-    // Variables, different types
-    map = new HashMap<>();
-    assertFalse(Variable.isomorphic(x, r, map));
-
     // Compound, equal
     map = new HashMap<>();
     assertTrue(

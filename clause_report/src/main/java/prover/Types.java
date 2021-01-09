@@ -35,7 +35,9 @@ public final class Types {
           default:
             return typeof(a1.get(1));
         }
-      return ((Seq) typeof(op)).head();
+      var opType = typeof(op);
+      if (!(opType instanceof Seq)) throw new IllegalArgumentException(a.toString());
+      return ((Seq) opType).head();
     }
     if (a instanceof Func) return ((Func) a).type;
     if (a instanceof Variable) return ((Variable) a).type;

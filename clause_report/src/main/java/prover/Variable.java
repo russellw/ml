@@ -64,9 +64,6 @@ public final class Variable {
     // Equal
     if (a == b) return true;
 
-    // Type mismatch
-    if (!Types.typeof(a).equals(Types.typeof(b))) return false;
-
     // Variable
     if (a instanceof Variable) {
       var a1 = (Variable) a;
@@ -95,8 +92,7 @@ public final class Variable {
         var b1 = (Seq) b;
         int n = a1.size();
         if (n != b1.size()) return false;
-        if (a1.head() != b1.head()) return false;
-        for (var i = 1; i < n; i++) if (!isomorphic(a1.get(i), b1.get(i), map)) return false;
+        for (var i = 0; i < n; i++) if (!isomorphic(a1.get(i), b1.get(i), map)) return false;
         return true;
       }
       return false;
