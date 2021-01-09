@@ -2,6 +2,7 @@ package prover;
 
 import io.vavr.collection.Seq;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public final class Types {
@@ -265,6 +266,16 @@ public final class Types {
         throw new IllegalArgumentException(String.format("%s: %s", wanted, a));
       return;
     }
+  }
+
+  public static void inferTypes(ArrayList<Formula> formulas, ArrayList<Clause> clauses) {
+    var terms = new ArrayList<>();
+    for (var formula : formulas) terms.add(formula.term());
+    for (var c : clauses) terms.add(c.term());
+    var map = new HashMap<Variable, Object>();
+    for (var a : terms) unifyTypes(Symbol.BOOLEAN, a, map);
+    for (var a : terms) setTypes(a, map);
+    for (var a : terms) checkTypes(Symbol.BOOLEAN, a);
   }
 
   public static boolean isNumeric(Object a) {

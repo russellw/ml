@@ -372,15 +372,6 @@ public final class TptpParser {
     return type;
   }
 
-  // Terms
-  private static Func namedFunc(String name) {
-    var a = funcs.get(name);
-    if (a != null) return a;
-    a = new Func(null, name);
-    funcs.put(name, a);
-    return a;
-  }
-
   private void args(Map<String, Variable> bound, ArrayList<Object> r) throws IOException {
     expect('(');
     do r.add(atomicTerm(bound));
@@ -504,13 +495,23 @@ public final class TptpParser {
         }
       case WORD:
         {
-          var a = namedFunc(s);
+          var a = funcs.get(s);
+          if (a == null) {
+            a = new Func(null, s);
+            funcs.put(s, a);
+          }
           if (token == '(') {
             var r = new ArrayList<>();
             r.add(a);
             args(bound, r);
+            if (a.type == null) {
+              var type = new Object[r.size()];
+              for (var i = 0; i < type.length; i++) type[i] = new Variable(null);
+              a.type = Array.of(type);
+            }
             return Array.ofAll(r);
           }
+          if (a.type == null) a.type = new Variable(null);
           return a;
         }
       case INTEGER:
@@ -823,6 +824,7 @@ public final class TptpParser {
 
     // Read
     new TptpParser(file, stream, null);
+    Types.inferTypes(problem.formulas, problem.clauses);
 
     // Free memory
     funcs = null;
