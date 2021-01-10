@@ -12,23 +12,23 @@ import java.util.PriorityQueue;
 // Equality resolution
 // c | c0 != c1
 // ->
-// c/s
+// c/map
 // where
-// s = unify(c0, c1)
+// map = unify(c0, c1)
 //
 // Equality factoring
-// c | c0 = c1 | d0 = d1
+// c | c0 = c1 | c2 = c3
 // ->
-// (c | c0 = c1 | c1 != d1)/s
+// (c | c0 = c1 | c1 != c3)/map
 // where
-// s = unify(c0, d0)
+// map = unify(c0, c2)
 //
 // Superposition
 // c | c0 = c1, d | d0(a) ?= d1
 // ->
-// (c | d | d0(c1) ?= d1)/s
+// (c | d | d0(c1) ?= d1)/map
 // where
-// s = unify(c0, a)
+// map = unify(c0, a)
 // a not variable
 //
 // This is a partial implementation of the superposition calculus
@@ -46,16 +46,16 @@ public final class Superposition {
   }
 
   // Substitute and make new clause
-  private static void resolve(Clause c, int ci, Map<Variable, Object> map) {
+  private static void resolve(Clause c, int i, Map<Variable, Object> map) {
     // Negative literals
     var negative = new ArrayList<>(c.negativeSize() - 1);
-    for (var i = 0; i < c.negativeSize(); i++)
-      if (i != ci) negative.add(Unification.replace(c.get(i), map));
+    for (var j = 0; j < c.negativeSize(); j++)
+      if (j != i) negative.add(Unification.replace(c.get(j), map));
 
     // Positive literals
     var positive = new ArrayList<>(c.positiveSize());
-    for (var i = c.negativeSize(); i < c.size(); i++)
-      positive.add(Unification.replace(c.get(i), map));
+    for (var j = c.negativeSize(); j < c.size(); j++)
+      positive.add(Unification.replace(c.get(j), map));
 
     // Make new clause
     clause(new Clause(negative, positive, Inference.RESOLVE, c));
@@ -71,32 +71,34 @@ public final class Superposition {
   }
 
   // Substitute and make new clause
-  private static void factor(Clause c, Object c0, Object c1, int di, Object d0, Object d1) {
-    if (!Equality.equatable(c1, d1)) return;
-    var map = Unification.unify(c0, d0, HashMap.empty());
+  private static void factor(Clause c, Object c0, Object c1, int i, Object c2, Object c3) {
+    if (!Equality.equatable(c1, c3)) return;
+    var map = Unification.unify(c0, c2, HashMap.empty());
     if (map == null) return;
 
     // Negative literals
     var negative = new ArrayList<>(c.negativeSize() + 1);
-    for (var i = 0; i < c.negativeSize(); i++) negative.add(Unification.replace(c.get(i), map));
-    negative.add(Unification.replace(Equality.of(c1, d1), map));
+    for (var j = 0; j < c.negativeSize(); j++) negative.add(Unification.replace(c.get(j), map));
+    negative.add(Unification.replace(Equality.of(c1, c3), map));
 
     // Positive literals
     var positive = new ArrayList<>(c.positiveSize() - 1);
-    for (var i = c.negativeSize(); i < c.size(); i++)
-      if (i != di) positive.add(Unification.replace(c.get(i), map));
+    for (var j = c.negativeSize(); j < c.size(); j++)
+      if (j != i) positive.add(Unification.replace(c.get(j), map));
 
     // Make new clause
     clause(new Clause(negative, positive, Inference.FACTOR, c));
   }
 
   // For each positive equation (both directions) again
-  private static void factor(Clause c, int ci, Object c0, Object c1) {
-    for (var i = c.negativeSize(); i < c.size(); i++) {
-      if (i == ci) continue;
-      var e = c.get(i);
-      factor(c, c0, c1, i, Equality.left(e), Equality.right(e));
-      factor(c, c0, c1, i, Equality.right(e), Equality.left(e));
+  private static void factor(Clause c, int i, Object c0, Object c1) {
+    for (var j = c.negativeSize(); j < c.size(); j++) {
+      if (j == i) continue;
+      var e = c.get(j);
+      var c2 = Equality.left(e);
+      var c3 = Equality.right(e);
+      factor(c, c0, c1, j, c2, c3);
+      factor(c, c0, c1, j, c3, c2);
     }
   }
 
@@ -104,8 +106,10 @@ public final class Superposition {
   private static void factor(Clause c) {
     for (var i = c.negativeSize(); i < c.size(); i++) {
       var e = c.get(i);
-      factor(c, i, Equality.left(e), Equality.right(e));
-      factor(c, i, Equality.right(e), Equality.left(e));
+      var c0 = Equality.left(e);
+      var c1 = Equality.right(e);
+      factor(c, i, c0, c1);
+      factor(c, i, c1, c0);
     }
   }
 
