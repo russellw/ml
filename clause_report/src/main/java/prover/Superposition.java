@@ -143,7 +143,7 @@ public final class Superposition {
       if (i != di) positive.add(Unification.replace(d.get(i), map));
 
     // Negative and positive superposition
-    ((di < d.negativeSize()) ? negative : positive).add(Unification.replace(e, map));
+    (di < d.negativeSize() ? negative : positive).add(Unification.replace(e, map));
 
     // Make new clause
     clause(new Clause(negative, positive, Inference.SUPERPOSITION, c.original(), d.original()));
