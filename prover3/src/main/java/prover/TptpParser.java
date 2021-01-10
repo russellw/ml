@@ -822,7 +822,6 @@ public final class TptpParser {
 
     // Read
     new TptpParser(file, stream, null);
-    Types.inferTypes(problem.formulas, problem.clauses);
 
     // Free memory
     funcs = null;

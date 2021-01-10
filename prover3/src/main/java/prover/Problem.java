@@ -20,6 +20,7 @@ public final class Problem {
     if (conjecture != null)
       formulas.add(
           new Formula(List.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
+    Types.inferTypes(formulas, clauses);
     new CNF(formulas, clauses);
     Superposition.solve(this, deadline);
     if (conjecture != null)
