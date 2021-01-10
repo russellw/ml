@@ -9,6 +9,15 @@ public final class CNF {
   private final ArrayList<Object> positive = new ArrayList<>();
   private final ArrayList<Clause> clauses;
 
+  private static Object skolem(Object returnType, Collection<Variable> args) {
+    if (args.isEmpty()) return new Func(returnType, null);
+    var type = new Object[1 + args.size()];
+    type[0] = returnType;
+    var i = 1;
+    for (var a : args) type[i++] = a;
+    return new Func(List.of(type), null).call(args);
+  }
+
   private Object nnfAll(
       Map<Variable, Variable> all, Map<Variable, Object> exists, boolean polarity, List a) {
     var binding = (List) a.get(1);
@@ -145,15 +154,6 @@ public final class CNF {
         }
     }
     return a1;
-  }
-
-  private static Object skolem(Object returnType, Collection<Variable> args) {
-    if (args.isEmpty()) return new Func(returnType, null);
-    var type = new Object[1 + args.size()];
-    type[0] = returnType;
-    var i = 1;
-    for (var a : args) type[i++] = a;
-    return new Func(List.of(type), null).call(args);
   }
 
   private void split(Object a) {
