@@ -239,7 +239,13 @@ public final class Superposition {
     // Superposition is not complete on arithmetic
     for (var c : processed) {
       if (c.subsumed) continue;
-      if (Etc.treeExists(c.term(), Types::isNumeric)) {
+      if (Etc.treeExists(
+          c.term(),
+          a -> {
+            if (a instanceof List) return false;
+            if (a instanceof Symbol) return false;
+            return Types.isNumeric(a);
+          })) {
         problem.result = SZS.GaveUp;
         return;
       }
