@@ -184,8 +184,10 @@ public final class Superposition {
   private static void superposition(Clause c, Clause d) {
     for (var i = c.negativeSize(); i < c.size(); i++) {
       var e = c.get(i);
-      superposition(c, d, i, Equality.left(e), Equality.right(e));
-      superposition(c, d, i, Equality.right(e), Equality.left(e));
+      var c0 = Equality.left(e);
+      var c1 = Equality.right(e);
+      superposition(c, d, i, c0, c1);
+      superposition(c, d, i, c1, c0);
     }
   }
 
