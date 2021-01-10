@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class Types {
   private Types() {}
@@ -48,10 +49,82 @@ public final class Types {
     throw new IllegalArgumentException(a.toString());
   }
 
+  private static boolean occurs(Variable a, Object b, Map<Variable, Object> map) {
+    if (b instanceof Variable) {
+      if (a == b) return true;
+      var b1 = map.get(b);
+      if (b1 != null) return occurs(a, b1, map);
+      return false;
+    }
+    if (b instanceof List) {
+      var b1 = (List) b;
+      for (var x : b1) if (occurs(a, x, map)) return true;
+    }
+    return false;
+  }
+
+  private static boolean unifyVariable(Variable a, Object b, Map<Variable, Object> map) {
+    // Existing mapping
+    var a1 = map.get(a);
+    if (a1 != null) return unify(a1, b, map);
+
+    // Variable
+    if (b instanceof Variable) {
+      var b1 = map.get(b);
+      if (b1 != null) return unify(b1, a, map);
+    }
+
+    // Occurs check
+    if (occurs(a, b, map)) return false;
+
+    // New mapping
+    map.put(a, b);
+    return true;
+  }
+
+  // This version of unify skips the type check
+  // because it makes no sense to ask the type of a type
+  private static boolean unify(Object a, Object b, Map<Variable, Object> map) {
+    // Equal
+    if (a == b) return true;
+
+    // Variable
+    if (a instanceof Variable) return unifyVariable((Variable) a, b, map);
+    if (b instanceof Variable) return unifyVariable((Variable) b, a, map);
+
+    // Compounds
+    if (a instanceof List) {
+      var a1 = (List) a;
+      if (b instanceof List) {
+        var b1 = (List) b;
+        int n = a1.size();
+        if (n != b1.size()) return false;
+        for (var i = 0; i < n; i++) if (!unify(a1.get(i), b1.get(i), map)) return false;
+        return true;
+      }
+      return false;
+    }
+
+    // Atoms
+    return false;
+  }
+
+  private static Object replace(Object a, Map<Variable, Object> map) {
+    return Etc.treeMap(
+        a,
+        b -> {
+          if (b instanceof Variable) {
+            var b1 = map.get(b);
+            if (b1 != null) return replace(b1, map);
+          }
+          return b;
+        });
+  }
+
   // First step of type inference:
   // Unify to figure out how all the unspecified types can be made consistent
   private static void unifyTypes(Object wanted, Object a, HashMap<Variable, Object> map) {
-    if (!Unification.unify(wanted, typeof(a), map))
+    if (!unify(wanted, typeof(a), map))
       throw new IllegalArgumentException(String.format("%s != %s %s", wanted, typeof(a), a));
     if (!(a instanceof List)) return;
     var a1 = (List) a;
@@ -96,7 +169,7 @@ public final class Types {
         b -> {
           if (b instanceof Func) {
             var b1 = (Func) b;
-            b1.type = Unification.replace(b1.type, map);
+            b1.type = replace(b1.type, map);
             if (b1.type instanceof List) {
               var type = (List) b1.type;
               b1.type = Etc.map(type, t -> t instanceof Variable ? Symbol.INDIVIDUAL : t);
