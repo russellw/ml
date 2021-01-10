@@ -1,7 +1,6 @@
 package prover;
 
-import io.vavr.collection.Array;
-import io.vavr.collection.Seq;
+import java.util.List;
 
 public final class Func {
   public Object type;
@@ -12,11 +11,11 @@ public final class Func {
     this.name = name;
   }
 
-  public Seq<Object> call(Object... args) {
+  public List<Object> call(Object... args) {
     var r = new Object[args.length + 1];
     r[0] = this;
     System.arraycopy(args, 0, r, 1, args.length);
-    return Array.of(r);
+    return List.of(r);
   }
 
   @Override

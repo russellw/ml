@@ -1,7 +1,6 @@
 package prover;
 
-import io.vavr.collection.Array;
-import io.vavr.collection.Seq;
+import java.util.List;
 
 public final class Equality {
   private Equality() {}
@@ -9,7 +8,7 @@ public final class Equality {
   public static Object of(Object a, Object b) {
     if (!equatable(a, b)) throw new IllegalArgumentException(a.toString() + '=' + b);
     if (b == Boolean.TRUE) return a;
-    return Array.of(Symbol.EQUALS, a, b);
+    return List.of(Symbol.EQUALS, a, b);
   }
 
   public static boolean equatable(Object a, Object b) {
@@ -19,17 +18,17 @@ public final class Equality {
   }
 
   public static Object left(Object a) {
-    if (a instanceof Seq) {
-      var a1 = (Seq) a;
-      if (a1.head() == Symbol.EQUALS) return a1.get(1);
+    if (a instanceof List) {
+      var a1 = (List) a;
+      if (a1.get(0) == Symbol.EQUALS) return a1.get(1);
     }
     return a;
   }
 
   public static Object right(Object a) {
-    if (a instanceof Seq) {
-      var a1 = (Seq) a;
-      if (a1.head() == Symbol.EQUALS) return a1.get(2);
+    if (a instanceof List) {
+      var a1 = (List) a;
+      if (a1.get(0) == Symbol.EQUALS) return a1.get(2);
     }
     return true;
   }

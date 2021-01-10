@@ -1,6 +1,5 @@
 package prover;
 
-import io.vavr.collection.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +9,10 @@ import java.util.function.Predicate;
 
 public final class Etc {
   private Etc() {}
+
+  public static Object same(Object a) {
+    return a;
+  }
 
   public static String extension(String file) {
     var i = file.lastIndexOf('.');
@@ -35,8 +38,8 @@ public final class Etc {
     for (js[i] = 0; js[i] < qs.get(i).size(); js[i]++) cartesianProduct(qs, i + 1, js, rs);
   }
 
-  public static Seq<Object> implies(Object a, Object b) {
-    return Array.of(Symbol.OR, Array.of(Symbol.NOT, a), b);
+  public static List<Object> implies(Object a, Object b) {
+    return List.of(Symbol.OR, List.of(Symbol.NOT, a), b);
   }
 
   public static void debug(Object a) {
@@ -44,18 +47,31 @@ public final class Etc {
     System.out.println(a);
   }
 
+  public static List<Object> map(List<Object> a, Function<Object, Object> f) {
+    var r = new ArrayList<>();
+    for (var b : a) r.add(f.apply(b));
+    return r;
+  }
+
+  public static Object[] removeAt(Object[] a, int i) {
+    var r = new Object[a.length - 1];
+    System.arraycopy(a, 0, r, 0, i);
+    System.arraycopy(a, i + 1, r, i, r.length - i);
+    return r;
+  }
+
   @SuppressWarnings("unchecked")
   public static Object treeMap(Object a, Function<Object, Object> f) {
-    if (a instanceof Seq) {
-      var a1 = (Seq) a;
-      return a1.map(b -> treeMap(b, f));
+    if (a instanceof List) {
+      var a1 = (List) a;
+      return map(a1, b -> treeMap(b, f));
     }
     return f.apply(a);
   }
 
   public static void treeWalk(Object a, Consumer<Object> f) {
-    if (a instanceof Seq) {
-      var a1 = (Seq) a;
+    if (a instanceof List) {
+      var a1 = (List) a;
       for (var b : a1) treeWalk(b, f);
       return;
     }
@@ -64,14 +80,14 @@ public final class Etc {
 
   public static Object splice(Object a, ArrayList<Integer> position, int i, Object b) {
     if (i == position.size()) return b;
-    var a1 = (Seq) a;
+    var a1 = (List) a;
     var r = new Object[a1.size()];
     for (var j = 0; j < r.length; j++) {
       var x = a1.get(j);
       if (j == position.get(i)) x = splice(x, position, i + 1, b);
       r[j] = x;
     }
-    return Array.of(r);
+    return List.of(r);
   }
 
   public static BigInteger divideEuclidean(BigInteger a, BigInteger b) {
@@ -96,8 +112,8 @@ public final class Etc {
   }
 
   public static boolean treeExists(Object a, Predicate<Object> f) {
-    if (a instanceof Seq) {
-      var a1 = (Seq) a;
+    if (a instanceof List) {
+      var a1 = (List) a;
       for (var b : a1) if (treeExists(b, f)) return true;
       return false;
     }
@@ -111,8 +127,8 @@ public final class Etc {
   }
 
   public static void collect(Object a, Predicate<Object> f, java.util.HashSet<Object> r) {
-    if (a instanceof Seq) {
-      var a1 = (Seq) a;
+    if (a instanceof List) {
+      var a1 = (List) a;
       for (var b : a1) collect(b, f, r);
       return;
     }
@@ -120,7 +136,7 @@ public final class Etc {
   }
 
   public static Object head(Object a) {
-    if (a instanceof Seq) return ((Seq) a).head();
+    if (a instanceof List) return ((List) a).get(0);
     return null;
   }
 

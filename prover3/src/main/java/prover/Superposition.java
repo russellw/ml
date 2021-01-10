@@ -1,11 +1,6 @@
 package prover;
 
-import io.vavr.collection.HashMap;
-import io.vavr.collection.Map;
-import io.vavr.collection.Seq;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.PriorityQueue;
+import java.util.*;
 
 // The superposition calculus generates new clauses by three rules:
 //
@@ -65,16 +60,16 @@ public final class Superposition {
   private static void resolve(Clause c) {
     for (var i = 0; i < c.negativeSize(); i++) {
       var e = c.get(i);
-      var map = Unification.unify(Equality.left(e), Equality.right(e), HashMap.empty());
-      if (map != null) resolve(c, i, map);
+      var map = new HashMap<Variable, Object>();
+      if (Unification.unify(Equality.left(e), Equality.right(e), map)) resolve(c, i, map);
     }
   }
 
   // Substitute and make new clause
   private static void factor(Clause c, Object c0, Object c1, int i, Object c2, Object c3) {
     if (!Equality.equatable(c1, c3)) return;
-    var map = Unification.unify(c0, c2, HashMap.empty());
-    if (map == null) return;
+    var map = new HashMap<Variable, Object>();
+    if (!Unification.unify(c0, c2, map)) return;
 
     // Negative literals
     var negative = new ArrayList<>(c.negativeSize() + 1);
@@ -125,8 +120,8 @@ public final class Superposition {
       Object d1,
       ArrayList<Integer> position,
       Object a) {
-    var map = Unification.unify(c0, a, HashMap.empty());
-    if (map == null) return;
+    var map = new HashMap<Variable, Object>();
+    if (!Unification.unify(c0, a, map)) return;
     var e = Equality.of(Etc.splice(d0, position, 0, c1), d1);
 
     // Negative literals
@@ -163,8 +158,8 @@ public final class Superposition {
       Object a) {
     if (a instanceof Variable) return;
     superposition1(c, d, ci, c0, c1, di, d0, d1, position, a);
-    if (!(a instanceof Seq)) return;
-    var a1 = (Seq) a;
+    if (!(a instanceof List)) return;
+    var a1 = (List) a;
     for (var i = 1; i < a1.size(); i++) {
       position.add(i);
       superposition(c, d, ci, c0, c1, di, d0, d1, position, a1.get(i));

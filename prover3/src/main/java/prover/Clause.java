@@ -1,15 +1,10 @@
 package prover;
 
-import io.vavr.collection.Array;
-import io.vavr.collection.Seq;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public final class Clause extends AbstractFormula {
-  private final Object[] literals;
-  private final int negativeSize;
+  public final Object[] literals;
+  public final int negativeSize;
   public boolean subsumed;
 
   public int size() {
@@ -22,10 +17,6 @@ public final class Clause extends AbstractFormula {
 
   public Object get(int i) {
     return literals[i];
-  }
-
-  public Seq<Object> literals() {
-    return Array.of(literals);
   }
 
   public Clause(
@@ -65,7 +56,7 @@ public final class Clause extends AbstractFormula {
   public HashSet<Variable> variables() {
     var r = new HashSet<Variable>();
     Etc.treeWalk(
-        literals(),
+        Arrays.asList(literals),
         a -> {
           if (a instanceof Variable) r.add((Variable) a);
         });
@@ -86,14 +77,6 @@ public final class Clause extends AbstractFormula {
     return (literals.length == 1) && (negativeSize == 0) && (literals[0] == Boolean.TRUE);
   }
 
-  public final Seq<Object> negative() {
-    return literals().slice(0, negativeSize);
-  }
-
-  public final Seq<Object> positive() {
-    return literals().slice(negativeSize, literals.length);
-  }
-
   public final int positiveSize() {
     return literals.length - negativeSize;
   }
@@ -101,23 +84,23 @@ public final class Clause extends AbstractFormula {
   public Clause renameVariables() {
     var map = new HashMap<Variable, Variable>();
     var r =
-        Etc.treeMap(
-            literals(),
-            a -> {
-              if (a instanceof Variable) {
-                var a1 = (Variable) a;
-                var b = map.get(a1);
-                if (b == null) {
-                  b = new Variable(a1.type);
-                  map.put(a1, b);
-                }
-                return b;
-              }
-              return a;
-            });
+        (List)
+            Etc.treeMap(
+                Arrays.asList(literals),
+                a -> {
+                  if (a instanceof Variable) {
+                    var a1 = (Variable) a;
+                    var b = map.get(a1);
+                    if (b == null) {
+                      b = new Variable(a1.type);
+                      map.put(a1, b);
+                    }
+                    return b;
+                  }
+                  return a;
+                });
     if (map.isEmpty()) return this;
-    return new Clause(
-        ((Seq) r).toJavaArray(), negativeSize, Inference.RENAME_VARIABLES, new Clause[] {this});
+    return new Clause(r.toArray(), negativeSize, Inference.RENAME_VARIABLES, new Clause[] {this});
   }
 
   public Clause original() {
@@ -125,29 +108,32 @@ public final class Clause extends AbstractFormula {
     return this;
   }
 
-  @Override
-  public String toString() {
-    return negative() + " => " + positive();
-  }
-
   public int volume() {
     int[] n = new int[1];
-    Etc.treeWalk(literals(), a -> n[0]++);
+    Etc.treeWalk(Arrays.asList(literals), a -> n[0]++);
     return n[0];
+  }
+
+  public final Object[] negative() {
+    return Arrays.copyOf(literals, negativeSize);
+  }
+
+  public final Object[] positive() {
+    return Arrays.copyOfRange(literals, negativeSize, literals.length);
   }
 
   @Override
   public Object term() {
     var r = new ArrayList<>();
     r.add(Symbol.OR);
-    for (var i = 0; i < negativeSize; i++) r.add(Array.of(Symbol.NOT, literals[i]));
-    r.addAll(Arrays.asList(literals).subList(negativeSize, literals.length));
+    for (var i = 0; i < negativeSize; i++) r.add(List.of(Symbol.NOT, literals[i]));
+    r.addAll(List.of(literals).subList(negativeSize, literals.length));
     switch (r.size()) {
       case 1:
         return false;
       case 2:
         return r.get(1);
     }
-    return Array.ofAll(r);
+    return Etc.same(r);
   }
 }

@@ -1,7 +1,7 @@
 package prover;
 
-import io.vavr.collection.Seq;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 
 public final class TptpPrinter {
@@ -112,16 +112,16 @@ public final class TptpPrinter {
     }
   }
 
-  private static boolean needParens(Seq a, Seq parent) {
+  private static boolean needParens(List<Object> a, List<Object> parent) {
     if (parent == null) return false;
-    var op = a.head();
+    var op = a.get(0);
     if (op instanceof Symbol)
       switch ((Symbol) op) {
         case AND:
         case EQV:
         case OR:
           {
-            var parentOp = parent.head();
+            var parentOp = parent.get(0);
             if (parentOp instanceof Symbol)
               switch ((Symbol) parentOp) {
                 case ALL:
@@ -138,16 +138,16 @@ public final class TptpPrinter {
     return false;
   }
 
-  private static void infix(String op, Seq a) {
+  private static void infix(String op, List<Object> a) {
     for (var i = 1; i < a.size(); i++) {
       if (i > 1) System.out.print(op);
       print(a.get(i), a);
     }
   }
 
-  private static void quant(Seq a) {
+  private static void quant(List<Object> a) {
     System.out.print('[');
-    var binding = (Seq) a.get(1);
+    var binding = (List) a.get(1);
     for (var i = 0; i < binding.size(); i++) {
       var x = binding.get(i);
       if (i > 0) System.out.print(',');
@@ -235,7 +235,7 @@ public final class TptpPrinter {
     return false;
   }
 
-  private static void args(Seq a) {
+  private static void args(List<Object> a) {
     System.out.print('(');
     for (var i = 1; i < a.size(); i++) {
       if (i > 1) System.out.print(',');
@@ -244,10 +244,11 @@ public final class TptpPrinter {
     System.out.print(')');
   }
 
-  private static void print(Object a, Seq parent) {
-    if (a instanceof Seq) {
-      var a1 = (Seq) a;
-      var op = a1.head();
+  @SuppressWarnings("unchecked")
+  private static void print(Object a, List<Object> parent) {
+    if (a instanceof List) {
+      var a1 = (List) a;
+      var op = a1.get(0);
       if (op instanceof Symbol) {
         if (needParens(a1, parent)) System.out.print('(');
         switch ((Symbol) op) {
@@ -267,7 +268,7 @@ public final class TptpPrinter {
             break;
           case NOT:
             if (Etc.head(a1.get(1)) == Symbol.EQUALS) {
-              infix("!=", (Seq) a1.get(1));
+              infix("!=", (List) a1.get(1));
               break;
             }
             System.out.print('~');

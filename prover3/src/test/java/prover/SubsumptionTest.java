@@ -2,19 +2,19 @@ package prover;
 
 import static org.junit.Assert.*;
 
-import io.vavr.collection.Array;
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
 
 public class SubsumptionTest {
   @Test
   public void subsumes() {
     var a = new Func(Symbol.INDIVIDUAL, "a");
-    var a1 = new Func(Array.of(Symbol.INDIVIDUAL, Symbol.INDIVIDUAL), "a1");
+    var a1 = new Func(List.of(Symbol.INDIVIDUAL, Symbol.INDIVIDUAL), "a1");
     var b = new Func(Symbol.INDIVIDUAL, "b");
-    var p1 = new Func(Array.of(Symbol.BOOLEAN, Symbol.INDIVIDUAL), "p1");
-    var p2 = new Func(Array.of(Symbol.BOOLEAN, Symbol.INDIVIDUAL, Symbol.INDIVIDUAL), "p2");
-    var q1 = new Func(Array.of(Symbol.BOOLEAN, Symbol.INDIVIDUAL), "q1");
+    var p1 = new Func(List.of(Symbol.BOOLEAN, Symbol.INDIVIDUAL), "p1");
+    var p2 = new Func(List.of(Symbol.BOOLEAN, Symbol.INDIVIDUAL, Symbol.INDIVIDUAL), "p2");
+    var q1 = new Func(List.of(Symbol.BOOLEAN, Symbol.INDIVIDUAL), "q1");
     var x = new Variable(Symbol.INDIVIDUAL);
     var y = new Variable(Symbol.INDIVIDUAL);
     var negative = new ArrayList<>();

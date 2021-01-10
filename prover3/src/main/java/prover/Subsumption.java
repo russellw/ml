@@ -1,9 +1,6 @@
 package prover;
 
-import io.vavr.collection.HashMap;
-import io.vavr.collection.Map;
-import io.vavr.collection.Seq;
-import java.util.Collection;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
 
 public final class Subsumption {
@@ -12,13 +9,13 @@ public final class Subsumption {
   private Subsumption() {}
 
   private static Map<Variable, Object> search(
-      Seq<Object> c, Seq<Object> c2, Seq<Object> d, Seq<Object> d2, Map<Variable, Object> map)
+      Object[] c, Object[] c2, Object[] d, Object[] d2, Map<Variable, Object> map)
       throws TimeoutException {
     if (steps == 1_000) throw new TimeoutException();
     steps++;
 
     // Matched everything in one polarity
-    if (c.isEmpty()) {
+    if (c.length == 0) {
       // Matched everything in the other polarity
       if (c2 == null) {
         return map;
@@ -29,35 +26,36 @@ public final class Subsumption {
     }
 
     // Try matching literals
-    for (var ci = 0; ci < c.size(); ci++) {
-      Seq<Object> c1 = null;
-      var ce = c.get(ci);
-      for (var di = 0; di < d.size(); di++) {
-        Seq<Object> d1 = null;
-        var de = d.get(di);
+    for (var ci = 0; ci < c.length; ci++) {
+      Object[] c1 = null;
+      var ce = c[ci];
+      for (var di = 0; di < d.length; di++) {
+        Object[] d1 = null;
+        var de = d[di];
+
+        // Search means preserve the original map
+        // in case the search fails
+        // and need to backtrack
+        Map<Variable, Object> m;
 
         // Try orienting equation one way
-        var m = Unification.match(Equality.left(ce), Equality.left(de), map);
-        if (m != null) {
-          m = Unification.match(Equality.right(ce), Equality.right(de), m);
-          if (m != null) {
-            if (c1 == null) c1 = c.removeAt(ci);
-            d1 = d.removeAt(di);
-            m = search(c1, c2, d1, d2, m);
-            if (m != null) return m;
-          }
+        m = new HashMap<>(map);
+        if (Unification.match(Equality.left(ce), Equality.left(de), m)
+            && Unification.match(Equality.right(ce), Equality.right(de), m)) {
+          if (c1 == null) c1 = Etc.removeAt(c, ci);
+          d1 = Etc.removeAt(d, di);
+          m = search(c1, c2, d1, d2, m);
+          if (m != null) return m;
         }
 
         // And the other way
-        m = Unification.match(Equality.left(ce), Equality.right(de), map);
-        if (m != null) {
-          m = Unification.match(Equality.right(ce), Equality.left(de), m);
-          if (m != null) {
-            if (c1 == null) c1 = c.removeAt(ci);
-            if (d1 == null) d1 = d.removeAt(di);
-            m = search(c1, c2, d1, d2, m);
-            if (m != null) return m;
-          }
+        m = new HashMap<>(map);
+        if (Unification.match(Equality.left(ce), Equality.right(de), m)
+            && Unification.match(Equality.right(ce), Equality.left(de), m)) {
+          if (c1 == null) c1 = Etc.removeAt(c, ci);
+          if (d1 == null) d1 = Etc.removeAt(d, di);
+          m = search(c1, c2, d1, d2, m);
+          if (m != null) return m;
         }
       }
     }
@@ -77,7 +75,7 @@ public final class Subsumption {
     var d2 = d.positive();
 
     // Fewer literals typically fail faster
-    if (c2.size() < c1.size()) {
+    if (c2.length < c1.length) {
       // Swap negative and positive
       var ct = c1;
       c1 = c2;
@@ -93,7 +91,7 @@ public final class Subsumption {
     // so give up if taking too long
     steps = 0;
     try {
-      return search(c1, c2, d1, d2, HashMap.empty()) != null;
+      return search(c1, c2, d1, d2, new HashMap<>()) != null;
     } catch (TimeoutException e) {
       return false;
     }

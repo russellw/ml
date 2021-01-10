@@ -1,14 +1,9 @@
 package prover;
 
-import io.vavr.collection.Array;
-import io.vavr.collection.HashMap;
-import io.vavr.collection.Map;
-import io.vavr.collection.Seq;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public final class TptpParser {
@@ -362,12 +357,12 @@ public final class TptpParser {
       expect('>');
       var returnType = atomicType();
       r.set(0, returnType);
-      return Array.ofAll(r);
+      return Etc.same(r);
     }
     var type = atomicType();
     if (eat('>')) {
       var returnType = atomicType();
-      return Array.of(returnType, type);
+      return List.of(returnType, type);
     }
     return type;
   }
@@ -393,7 +388,7 @@ public final class TptpParser {
     var r = new ArrayList<>();
     r.add(op);
     args(bound, r, arity);
-    return Array.of(r);
+    return List.of(r);
   }
 
   private Object atomicTerm(Map<String, Variable> bound) throws IOException {
@@ -421,8 +416,8 @@ public final class TptpParser {
                 for (var j = 0; j < r.size(); j++)
                   if (i != j)
                     inequalities.add(
-                        Array.of(Symbol.NOT, Array.of(Symbol.EQUALS, r.get(i), r.get(j))));
-              return Array.ofAll(inequalities);
+                        List.of(Symbol.NOT, List.of(Symbol.EQUALS, r.get(i), r.get(j))));
+              return Etc.same(inequalities);
             }
           case "$false":
             return false;
@@ -432,13 +427,13 @@ public final class TptpParser {
             {
               var r = new ArrayList<>();
               args(bound, r, 2);
-              return Array.of(Symbol.LESS, r.get(1), r.get(0));
+              return List.of(Symbol.LESS, r.get(1), r.get(0));
             }
           case "$greatereq":
             {
               var r = new ArrayList<>();
               args(bound, r, 2);
-              return Array.of(Symbol.LESS_EQ, r.get(1), r.get(0));
+              return List.of(Symbol.LESS_EQ, r.get(1), r.get(0));
             }
           case "$is_int":
             return definedAtomicTerm(bound, Symbol.IS_INTEGER, 1);
@@ -489,7 +484,7 @@ public final class TptpParser {
         {
           var a = free.get(s);
           if (a != null) return a;
-          a = bound.getOrElse(s, null);
+          a = bound.get(s);
           if (a != null) return a;
           a = new Variable(Symbol.INDIVIDUAL);
           free.put(s, a);
@@ -509,9 +504,9 @@ public final class TptpParser {
             if (a.type == null) {
               var type = new Object[r.size()];
               for (var i = 0; i < type.length; i++) type[i] = new Variable(null);
-              a.type = Array.of(type);
+              a.type = List.of(type);
             }
-            return Array.ofAll(r);
+            return Etc.same(r);
           }
           if (a.type == null) a.type = new Variable(null);
           return a;
@@ -528,7 +523,7 @@ public final class TptpParser {
         // However, theorem proving needs exactness
         // So represent real number literals not as the usual floating point
         // but as 'the real number that would correspond to this rational number'
-        return Array.of(Symbol.TO_REAL, BigRational.ofDecimal(s));
+        return List.of(Symbol.TO_REAL, BigRational.ofDecimal(s));
     }
     throw new ParseException(file, reader.getLineNumber(), ": term expected");
   }
@@ -538,10 +533,10 @@ public final class TptpParser {
     switch (token) {
       case '=':
         lex();
-        return Array.of(Symbol.EQUALS, a, atomicTerm(bound));
+        return List.of(Symbol.EQUALS, a, atomicTerm(bound));
       case NOT_EQ:
         lex();
-        return Array.of(Symbol.NOT, Array.of(Symbol.EQUALS, a, atomicTerm(bound)));
+        return List.of(Symbol.NOT, List.of(Symbol.EQUALS, a, atomicTerm(bound)));
       default:
         return a;
     }
@@ -551,6 +546,7 @@ public final class TptpParser {
     lex();
     expect('[');
     var params = new ArrayList<>();
+    bound = new HashMap<>(bound);
     do {
       if (token != VARIABLE)
         throw new ParseException(file, reader.getLineNumber(), "variable expected");
@@ -558,12 +554,12 @@ public final class TptpParser {
       lex();
       var type = eat(':') ? atomicType() : Symbol.INDIVIDUAL;
       var a = new Variable(type);
-      bound = bound.put(name, a);
       params.add(a);
+      bound.put(name, a);
     } while (eat(','));
     expect(']');
     expect(':');
-    return Array.of(op, Array.ofAll(params), unaryFormula(bound));
+    return List.of(op, Etc.same(params), unaryFormula(bound));
   }
 
   private Object unaryFormula(Map<String, Variable> bound) throws IOException {
@@ -581,7 +577,7 @@ public final class TptpParser {
         return unaryFormulaBind(bound, Symbol.EXISTS);
       case '~':
         lex();
-        return Array.of(Symbol.NOT, unaryFormula(bound));
+        return List.of(Symbol.NOT, unaryFormula(bound));
     }
     return infixUnary(bound);
   }
@@ -593,7 +589,7 @@ public final class TptpParser {
     r.add(op);
     r.add(a);
     while (eat(k)) r.add(unaryFormula(bound));
-    return Array.ofAll(r);
+    return Etc.same(r);
   }
 
   private Object logicFormula(Map<String, Variable> bound) throws IOException {
@@ -605,7 +601,7 @@ public final class TptpParser {
         return logicFormulaRest(bound, Symbol.OR, a);
       case EQV:
         lex();
-        return Array.of(Symbol.EQV, a, unaryFormula(bound));
+        return List.of(Symbol.EQV, a, unaryFormula(bound));
       case IMPLIES:
         lex();
         return Etc.implies(a, unaryFormula(bound));
@@ -614,13 +610,13 @@ public final class TptpParser {
         return Etc.implies(unaryFormula(bound), a);
       case NAND:
         lex();
-        return Array.of(Symbol.NOT, Array.of(Symbol.AND, a, unaryFormula(bound)));
+        return List.of(Symbol.NOT, List.of(Symbol.AND, a, unaryFormula(bound)));
       case NOR:
         lex();
-        return Array.of(Symbol.NOT, Array.of(Symbol.OR, a, unaryFormula(bound)));
+        return List.of(Symbol.NOT, List.of(Symbol.OR, a, unaryFormula(bound)));
       case XOR:
         lex();
-        return Array.of(Symbol.NOT, Array.of(Symbol.EQV, a, unaryFormula(bound)));
+        return List.of(Symbol.NOT, List.of(Symbol.EQV, a, unaryFormula(bound)));
       default:
         return a;
     }
@@ -694,10 +690,10 @@ public final class TptpParser {
             var parens = eat('(');
             do {
               var not = eat('~');
-              var a = infixUnary(HashMap.empty());
-              if (a instanceof Seq) {
-                var a1 = (Seq) a;
-                if (a1.head() == Symbol.NOT) {
+              var a = infixUnary(new HashMap<>());
+              if (a instanceof List) {
+                var a1 = (List) a;
+                if (a1.get(0) == Symbol.NOT) {
                   a = a1.get(1);
                   not = !not;
                 }
@@ -734,7 +730,7 @@ public final class TptpParser {
               case "negated_conjecture":
               case "theorem":
                 {
-                  var a = logicFormula(HashMap.empty());
+                  var a = logicFormula(new HashMap<>());
                   if (select != null && !select.contains(name)) break;
                   var formula = new Formula(a, Inference.AXIOM);
                   formula.file = file;
@@ -744,7 +740,7 @@ public final class TptpParser {
                 }
               case "conjecture":
                 {
-                  var a = logicFormula(HashMap.empty());
+                  var a = logicFormula(new HashMap<>());
                   if (select != null && !select.contains(name)) break;
                   if (problem.conjecture != null)
                     throw new ParseException(

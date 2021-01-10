@@ -1,10 +1,9 @@
 package prover;
 
-import io.vavr.collection.Array;
-import io.vavr.collection.HashSet;
-import io.vavr.collection.Seq;
-import io.vavr.collection.Set;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public final class Variable {
   public final Object type;
@@ -17,16 +16,18 @@ public final class Variable {
   @SuppressWarnings("unchecked")
   private static void getFreeVariables(
       Set<Variable> bound, Object a, java.util.HashSet<Variable> r) {
-    if (a instanceof Seq) {
-      var a1 = (Seq) a;
-      var op = a1.head();
+    if (a instanceof List) {
+      var a1 = (List) a;
+      var op = a1.get(0);
       if (op instanceof Symbol)
         switch ((Symbol) op) {
           case ALL:
           case EXISTS:
             {
-              var binding = (Seq) a1.get(1);
-              getFreeVariables(bound.addAll(binding), a1.get(2), r);
+              var binding = (List) a1.get(1);
+              var bound1 = new HashSet<>(bound);
+              bound1.addAll(binding);
+              getFreeVariables(bound1, a1.get(2), r);
               return;
             }
         }
@@ -41,20 +42,20 @@ public final class Variable {
 
   public static java.util.HashSet<Variable> freeVariables(Object a) {
     var r = new java.util.LinkedHashSet<Variable>();
-    getFreeVariables(HashSet.empty(), a, r);
+    getFreeVariables(new HashSet<>(), a, r);
     return r;
   }
 
   public static Object quantify(Object a) {
     var variables = freeVariables(a);
     if (variables.isEmpty()) return a;
-    return Array.of(Symbol.ALL, Array.ofAll(variables), a);
+    return List.of(Symbol.ALL, Etc.same(variables), a);
   }
 
   public static Object unquantify(Object a) {
-    while (a instanceof Seq) {
-      var a1 = (Seq) a;
-      if (a1.head() != Symbol.ALL) break;
+    while (a instanceof List) {
+      var a1 = (List) a;
+      if (a1.get(0) != Symbol.ALL) break;
       a = a1.get(2);
     }
     return a;
@@ -86,10 +87,10 @@ public final class Variable {
     }
 
     // Compounds
-    if (a instanceof Seq) {
-      var a1 = (Seq) a;
-      if (b instanceof Seq) {
-        var b1 = (Seq) b;
+    if (a instanceof List) {
+      var a1 = (List) a;
+      if (b instanceof List) {
+        var b1 = (List) b;
         int n = a1.size();
         if (n != b1.size()) return false;
         for (var i = 0; i < n; i++) if (!isomorphic(a1.get(i), b1.get(i), map)) return false;
