@@ -173,28 +173,10 @@ public final class Superposition {
     if (c0 == Boolean.TRUE) return;
     for (var i = 0; i < d.size(); i++) {
       var e = d.get(i);
-      superposition(
-          c,
-          d,
-          ci,
-          c0,
-          c1,
-          i,
-          Equality.left(e),
-          Equality.right(e),
-          new ArrayList<>(),
-          Equality.left(e));
-      superposition(
-          c,
-          d,
-          ci,
-          c0,
-          c1,
-          i,
-          Equality.right(e),
-          Equality.left(e),
-          new ArrayList<>(),
-          Equality.right(e));
+      var d0 = Equality.left(e);
+      var d1 = Equality.right(e);
+      superposition(c, d, ci, c0, c1, i, d0, d1, new ArrayList<>(), d0);
+      superposition(c, d, ci, c0, c1, i, d1, d0, new ArrayList<>(), d1);
     }
   }
 

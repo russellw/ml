@@ -209,6 +209,7 @@ public final class Main {
           break;
       }
       System.out.printf("%% %f seconds\n", (System.currentTimeMillis() - start) * 0.001);
+      System.out.println();
     }
     System.out.printf(
         "solved %d/%d (%f%%)\n", solved, attempted, solved * 100 / (double) attempted);
