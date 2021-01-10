@@ -271,10 +271,10 @@ public final class Types {
     }
   }
 
-  public static void inferTypes(ArrayList<Formula> formulas, ArrayList<Clause> clauses) {
+  public static void inferTypes(List<Formula> formulas, List<Clause> clauses) {
     var terms = new ArrayList<>();
     for (var formula : formulas) terms.add(formula.term());
-    for (var c : clauses) terms.add(c.term());
+    for (var clause : clauses) terms.add(clause.term());
     var map = new HashMap<Variable, Object>();
     for (var a : terms) unifyTypes(Symbol.BOOLEAN, a, map);
     for (var a : terms) setTypes(a, map);
