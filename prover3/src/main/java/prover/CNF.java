@@ -10,12 +10,19 @@ public final class CNF {
   private final ArrayList<Clause> clauses;
 
   private static Object skolem(Object returnType, Collection<Variable> args) {
+    // Atom
     if (args.isEmpty()) return new Func(returnType, null);
-    var type = new Object[1 + args.size()];
-    type[0] = returnType;
-    var i = 1;
-    for (var a : args) type[i++] = a;
-    return new Func(List.of(type), null).call(args);
+
+    // Type
+    var type = new ArrayList<>();
+    type.add(returnType);
+    for (var a : args) type.add(Types.typeof(a));
+
+    // Term
+    var r = new ArrayList<>();
+    r.add(new Func(type, null));
+    r.addAll(args);
+    return r;
   }
 
   private Object nnfAll(
