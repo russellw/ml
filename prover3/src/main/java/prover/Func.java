@@ -11,11 +11,12 @@ public final class Func {
     this.name = name;
   }
 
-  public List<Object> call(Object... args) {
-    var r = new Object[args.length + 1];
-    r[0] = this;
-    System.arraycopy(args, 0, r, 1, args.length);
-    return List.of(r);
+  public List<Object> call(Object a) {
+    return List.of(this, a);
+  }
+
+  public List<Object> call(Object a, Object b) {
+    return List.of(this, a, b);
   }
 
   @Override
