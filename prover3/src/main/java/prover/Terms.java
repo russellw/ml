@@ -3,8 +3,8 @@ package prover;
 import java.util.List;
 import java.util.Map;
 
-public final class Unification {
-  private Unification() {}
+public final class Terms {
+  private Terms() {}
 
   public static boolean match(Object a, Object b, Map<Variable, Object> map) {
     // Equal

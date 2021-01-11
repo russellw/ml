@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 
-public class UnificationTest {
+public class TermsTest {
   @Test
   public void match() {
     // Subset of unify
@@ -26,81 +26,81 @@ public class UnificationTest {
 
     // Succeeds. (tautology)
     map = new HashMap<>();
-    assertTrue(Unification.match(a, a, map));
+    assertTrue(Terms.match(a, a, map));
     assertEquals(map.size(), 0);
 
     // a and b do not match
     map = new HashMap<>();
-    assertFalse(Unification.match(a, b, map));
+    assertFalse(Terms.match(a, b, map));
 
     // Succeeds. (tautology)
     map = new HashMap<>();
-    assertTrue(Unification.match(x, x, map));
+    assertTrue(Terms.match(x, x, map));
     assertEquals(map.size(), 0);
 
     // x is unified with the constant a
     map = new HashMap<>();
-    assertFalse(Unification.match(a, x, map));
+    assertFalse(Terms.match(a, x, map));
 
     // x and y are aliased
     map = new HashMap<>();
-    assertTrue(Unification.match(x, y, map));
+    assertTrue(Terms.match(x, y, map));
     assertEquals(map.size(), 1);
-    assertEquals(Unification.replace(x, map), Unification.replace(y, map));
+    assertEquals(Terms.replace(x, map), Terms.replace(y, map));
 
     // Function and constant symbols match, x is unified with the constant b
     map = new HashMap<>();
-    assertTrue(Unification.match(f2.call(a, x), f2.call(a, b), map));
+    assertTrue(Terms.match(f2.call(a, x), f2.call(a, b), map));
     assertEquals(map.size(), 1);
-    assertEquals(Unification.replace(x, map), b);
+    assertEquals(Terms.replace(x, map), b);
 
     // f and g do not match
     map = new HashMap<>();
-    assertFalse(Unification.match(f1.call(a), g1.call(a), map));
+    assertFalse(Terms.match(f1.call(a), g1.call(a), map));
 
     // x and y are aliased
     map = new HashMap<>();
-    assertTrue(Unification.match(f1.call(x), f1.call(y), map));
+    assertTrue(Terms.match(f1.call(x), f1.call(y), map));
     assertEquals(map.size(), 1);
-    assertEquals(Unification.replace(x, map), Unification.replace(y, map));
+    assertEquals(Terms.replace(x, map), Terms.replace(y, map));
 
     // f and g do not match
     map = new HashMap<>();
-    assertFalse(Unification.match(f1.call(x), g1.call(y), map));
+    assertFalse(Terms.match(f1.call(x), g1.call(y), map));
 
     // Fails. The f function symbols have different arity
     map = new HashMap<>();
-    assertFalse(Unification.match(f1.call(x), f2.call(y, z), map));
+    assertFalse(Terms.match(f1.call(x), f2.call(y, z), map));
 
     // Unifies y with the term g(x)
     map = new HashMap<>();
-    assertFalse(Unification.match(f1.call(g1.call(x)), f1.call(y), map));
+    assertFalse(Terms.match(f1.call(g1.call(x)), f1.call(y), map));
 
     // Unifies x with constant a, and y with the term g(a)
     map = new HashMap<>();
-    assertFalse(Unification.match(f2.call(g1.call(x), x), f2.call(y, a), map));
+    assertFalse(Terms.match(f2.call(g1.call(x), x), f2.call(y, a), map));
 
     // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs
     // check).
     map = new HashMap<>();
-    assertTrue(Unification.match(x, f1.call(x), map));
+    assertTrue(Terms.match(x, f1.call(x), map));
 
     // Both x and y are unified with the constant a
     map = new HashMap<>();
-    assertTrue(Unification.match(x, y, map));
-    assertTrue(Unification.match(y, a, map));
+    assertTrue(Terms.match(x, y, map));
+    assertTrue(Terms.match(y, a, map));
     assertEquals(map.size(), 2);
-    assertEquals(Unification.replace(x, map), a);
-    assertEquals(Unification.replace(y, map), a);
+    assertEquals(Terms.replace(x, map), a);
+    assertEquals(Terms.replace(y, map), a);
 
     // As above (order of equations in set doesn't matter)
     map = new HashMap<>();
-    assertFalse(Unification.match(a, y, map));
+    assertFalse(Terms.match(a, y, map));
 
     // Fails. a and b do not match, so x can't be unified with both
     map = new HashMap<>();
-    assertTrue(Unification.match(x, a, map));
-    assertFalse(Unification.match(b, x, map));
+    assertTrue(Terms.match(x, a, map));
+    assertFalse(Terms.match(b, x, map));
   }
 
   @Test
@@ -118,91 +118,91 @@ public class UnificationTest {
 
     // Succeeds. (tautology)
     map = new HashMap<>();
-    assertTrue(Unification.unify(a, a, map));
+    assertTrue(Terms.unify(a, a, map));
     assertEquals(map.size(), 0);
 
     // a and b do not match
     map = new HashMap<>();
-    assertFalse(Unification.unify(a, b, map));
+    assertFalse(Terms.unify(a, b, map));
 
     // Succeeds. (tautology)
     map = new HashMap<>();
-    assertTrue(Unification.unify(x, x, map));
+    assertTrue(Terms.unify(x, x, map));
     assertEquals(map.size(), 0);
 
     // x is unified with the constant a
     map = new HashMap<>();
-    assertTrue(Unification.unify(a, x, map));
+    assertTrue(Terms.unify(a, x, map));
     assertEquals(map.size(), 1);
-    assertEquals(Unification.replace(x, map), a);
+    assertEquals(Terms.replace(x, map), a);
 
     // x and y are aliased
     map = new HashMap<>();
-    assertTrue(Unification.unify(x, y, map));
+    assertTrue(Terms.unify(x, y, map));
     assertEquals(map.size(), 1);
-    assertEquals(Unification.replace(x, map), Unification.replace(y, map));
+    assertEquals(Terms.replace(x, map), Terms.replace(y, map));
 
     // Function and constant symbols match, x is unified with the constant b
     map = new HashMap<>();
-    assertTrue(Unification.unify(f2.call(a, x), f2.call(a, b), map));
+    assertTrue(Terms.unify(f2.call(a, x), f2.call(a, b), map));
     assertEquals(map.size(), 1);
-    assertEquals(Unification.replace(x, map), b);
+    assertEquals(Terms.replace(x, map), b);
 
     // f and g1 do not match
     map = new HashMap<>();
-    assertFalse(Unification.unify(f1.call(a), g1.call(a), map));
+    assertFalse(Terms.unify(f1.call(a), g1.call(a), map));
 
     // x and y are aliased
     map = new HashMap<>();
-    assertTrue(Unification.unify(f1.call(x), f1.call(y), map));
+    assertTrue(Terms.unify(f1.call(x), f1.call(y), map));
     assertEquals(map.size(), 1);
-    assertEquals(Unification.replace(x, map), Unification.replace(y, map));
+    assertEquals(Terms.replace(x, map), Terms.replace(y, map));
 
     // f and g1 do not match
     map = new HashMap<>();
-    assertFalse(Unification.unify(f1.call(x), g1.call(y), map));
+    assertFalse(Terms.unify(f1.call(x), g1.call(y), map));
 
     // Fails. The f function symbols have different arity
     map = new HashMap<>();
-    assertFalse(Unification.unify(f1.call(x), f2.call(y, z), map));
+    assertFalse(Terms.unify(f1.call(x), f2.call(y, z), map));
 
     // Unifies y with the term g1(x)
     map = new HashMap<>();
-    assertTrue(Unification.unify(f1.call(g1.call(x)), f1.call(y), map));
+    assertTrue(Terms.unify(f1.call(g1.call(x)), f1.call(y), map));
     assertEquals(map.size(), 1);
-    assertEquals(Unification.replace(y, map), g1.call(x));
+    assertEquals(Terms.replace(y, map), g1.call(x));
 
     // Unifies x with constant a, and y with the term g1(a)
     map = new HashMap<>();
-    assertTrue(Unification.unify(f2.call(g1.call(x), x), f2.call(y, a), map));
+    assertTrue(Terms.unify(f2.call(g1.call(x), x), f2.call(y, a), map));
     assertEquals(map.size(), 2);
-    assertEquals(Unification.replace(x, map), a);
-    assertEquals(Unification.replace(y, map), g1.call(a));
+    assertEquals(Terms.replace(x, map), a);
+    assertEquals(Terms.replace(y, map), g1.call(a));
 
     // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs
     // check).
     map = new HashMap<>();
-    assertFalse(Unification.unify(x, f1.call(x), map));
+    assertFalse(Terms.unify(x, f1.call(x), map));
 
     // Both x and y are unified with the constant a
     map = new HashMap<>();
-    assertTrue(Unification.unify(x, y, map));
-    assertTrue(Unification.unify(y, a, map));
+    assertTrue(Terms.unify(x, y, map));
+    assertTrue(Terms.unify(y, a, map));
     assertEquals(map.size(), 2);
-    assertEquals(Unification.replace(x, map), a);
-    assertEquals(Unification.replace(y, map), a);
+    assertEquals(Terms.replace(x, map), a);
+    assertEquals(Terms.replace(y, map), a);
 
     // As above (order of equations in set doesn't matter)
     map = new HashMap<>();
-    assertTrue(Unification.unify(a, y, map));
-    assertTrue(Unification.unify(x, y, map));
+    assertTrue(Terms.unify(a, y, map));
+    assertTrue(Terms.unify(x, y, map));
     assertEquals(map.size(), 2);
-    assertEquals(Unification.replace(x, map), a);
-    assertEquals(Unification.replace(y, map), a);
+    assertEquals(Terms.replace(x, map), a);
+    assertEquals(Terms.replace(y, map), a);
 
     // Fails. a and b do not match, so x can't be unified with both
     map = new HashMap<>();
-    assertTrue(Unification.unify(x, a, map));
-    assertFalse(Unification.unify(b, x, map));
+    assertTrue(Terms.unify(x, a, map));
+    assertFalse(Terms.unify(b, x, map));
   }
 }

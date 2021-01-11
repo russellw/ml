@@ -40,8 +40,8 @@ public final class Subsumption {
 
         // Try orienting equation one way
         m = new HashMap<>(map);
-        if (Unification.match(Equality.left(ce), Equality.left(de), m)
-            && Unification.match(Equality.right(ce), Equality.right(de), m)) {
+        if (Terms.match(Equality.left(ce), Equality.left(de), m)
+            && Terms.match(Equality.right(ce), Equality.right(de), m)) {
           if (c1 == null) c1 = Etc.removeAt(c, ci);
           d1 = Etc.removeAt(d, di);
           m = search(c1, c2, d1, d2, m);
@@ -50,8 +50,8 @@ public final class Subsumption {
 
         // And the other way
         m = new HashMap<>(map);
-        if (Unification.match(Equality.left(ce), Equality.right(de), m)
-            && Unification.match(Equality.right(ce), Equality.left(de), m)) {
+        if (Terms.match(Equality.left(ce), Equality.right(de), m)
+            && Terms.match(Equality.right(ce), Equality.left(de), m)) {
           if (c1 == null) c1 = Etc.removeAt(c, ci);
           if (d1 == null) d1 = Etc.removeAt(d, di);
           m = search(c1, c2, d1, d2, m);

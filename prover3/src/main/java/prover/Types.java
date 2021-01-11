@@ -72,7 +72,7 @@ public final class Types {
     }
 
     // Occurs check
-    if (Unification.occurs(a, b, map)) return false;
+    if (Terms.occurs(a, b, map)) return false;
 
     // New mapping
     map.put(a, b);
@@ -154,7 +154,7 @@ public final class Types {
         b -> {
           if (b instanceof Func) {
             var b1 = (Func) b;
-            b1.type = Unification.replace(b1.type, map);
+            b1.type = Terms.replace(b1.type, map);
             if (b1.type instanceof List) {
               var type = (List) b1.type;
               b1.type = Etc.map(type, t -> t instanceof Variable ? Symbol.INDIVIDUAL : t);

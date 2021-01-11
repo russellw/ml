@@ -45,12 +45,11 @@ public final class Superposition {
     // Negative literals
     var negative = new ArrayList<>(c.negativeSize() - 1);
     for (var j = 0; j < c.negativeSize(); j++)
-      if (j != i) negative.add(Unification.replace(c.get(j), map));
+      if (j != i) negative.add(Terms.replace(c.get(j), map));
 
     // Positive literals
     var positive = new ArrayList<>(c.positiveSize());
-    for (var j = c.negativeSize(); j < c.size(); j++)
-      positive.add(Unification.replace(c.get(j), map));
+    for (var j = c.negativeSize(); j < c.size(); j++) positive.add(Terms.replace(c.get(j), map));
 
     // Make new clause
     clause(new Clause(negative, positive, Inference.RESOLVE, c));
@@ -61,7 +60,7 @@ public final class Superposition {
     for (var i = 0; i < c.negativeSize(); i++) {
       var e = c.get(i);
       var map = new HashMap<Variable, Object>();
-      if (Unification.unify(Equality.left(e), Equality.right(e), map)) resolve(c, i, map);
+      if (Terms.unify(Equality.left(e), Equality.right(e), map)) resolve(c, i, map);
     }
   }
 
@@ -69,17 +68,17 @@ public final class Superposition {
   private static void factor(Clause c, Object c0, Object c1, int i, Object c2, Object c3) {
     if (!Equality.equatable(c1, c3)) return;
     var map = new HashMap<Variable, Object>();
-    if (!Unification.unify(c0, c2, map)) return;
+    if (!Terms.unify(c0, c2, map)) return;
 
     // Negative literals
     var negative = new ArrayList<>(c.negativeSize() + 1);
-    for (var j = 0; j < c.negativeSize(); j++) negative.add(Unification.replace(c.get(j), map));
-    negative.add(Unification.replace(Equality.of(c1, c3), map));
+    for (var j = 0; j < c.negativeSize(); j++) negative.add(Terms.replace(c.get(j), map));
+    negative.add(Terms.replace(Equality.of(c1, c3), map));
 
     // Positive literals
     var positive = new ArrayList<>(c.positiveSize() - 1);
     for (var j = c.negativeSize(); j < c.size(); j++)
-      if (j != i) positive.add(Unification.replace(c.get(j), map));
+      if (j != i) positive.add(Terms.replace(c.get(j), map));
 
     // Make new clause
     clause(new Clause(negative, positive, Inference.FACTOR, c));
@@ -121,24 +120,24 @@ public final class Superposition {
       List<Integer> position,
       Object a) {
     var map = new HashMap<Variable, Object>();
-    if (!Unification.unify(c0, a, map)) return;
+    if (!Terms.unify(c0, a, map)) return;
     var e = Equality.of(Etc.splice(d0, position, 0, c1), d1);
 
     // Negative literals
     var negative = new ArrayList<>(c.negativeSize() + d.negativeSize());
-    for (var i = 0; i < c.negativeSize(); i++) negative.add(Unification.replace(c.get(i), map));
+    for (var i = 0; i < c.negativeSize(); i++) negative.add(Terms.replace(c.get(i), map));
     for (var i = 0; i < d.negativeSize(); i++)
-      if (i != di) negative.add(Unification.replace(d.get(i), map));
+      if (i != di) negative.add(Terms.replace(d.get(i), map));
 
     // Positive literals
     var positive = new ArrayList<>(c.positiveSize() + d.positiveSize() - 1);
     for (var i = c.negativeSize(); i < c.size(); i++)
-      if (i != ci) positive.add(Unification.replace(c.get(i), map));
+      if (i != ci) positive.add(Terms.replace(c.get(i), map));
     for (var i = d.negativeSize(); i < d.size(); i++)
-      if (i != di) positive.add(Unification.replace(d.get(i), map));
+      if (i != di) positive.add(Terms.replace(d.get(i), map));
 
     // Negative and positive superposition
-    (di < d.negativeSize() ? negative : positive).add(Unification.replace(e, map));
+    (di < d.negativeSize() ? negative : positive).add(Terms.replace(e, map));
 
     // Make new clause
     clause(new Clause(negative, positive, Inference.SUPERPOSITION, c.original(), d.original()));
