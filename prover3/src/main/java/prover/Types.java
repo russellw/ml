@@ -61,14 +61,27 @@ public final class Types {
   }
 
   private static boolean unifyVariable(Variable a, Object b, Map<Variable, Object> map) {
-    // Existing mapping
+    // Existing mappings
     var a1 = map.get(a);
-    if (a1 != null) return unify(a1, b, map);
-
-    // Variable
+    if (a1 != null) {
+      if (!unify(a1, b, map)) return false;
+      // https://stackoverflow.com/questions/48352156/implementing-unification-and-skipping-variables
+      if (a1 instanceof Variable) {
+        var a2 = map.get(a1);
+        if (a2 != null) map.put(a, a2);
+      }
+      return true;
+    }
     if (b instanceof Variable) {
       var b1 = map.get(b);
-      if (b1 != null) return unify(b1, a, map);
+      if (b1 != null) {
+        if (!unify(a, b1, map)) return false;
+        if (b1 instanceof Variable) {
+          var b2 = map.get(b1);
+          if (b2 != null) map.put((Variable) b, b2);
+        }
+        return true;
+      }
     }
 
     // Occurs check

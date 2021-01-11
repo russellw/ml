@@ -60,14 +60,12 @@ public final class Terms {
   }
 
   private static boolean unifyVariable(Variable a, Object b, Map<Variable, Object> map) {
-    // Existing mapping
+    // Existing mappings
     var a1 = map.get(a);
     if (a1 != null) return unify(a1, b, map);
-
-    // Variable
     if (b instanceof Variable) {
       var b1 = map.get(b);
-      if (b1 != null) return unify(b1, a, map);
+      if (b1 != null) return unify(a, b1, map);
     }
 
     // Occurs check
