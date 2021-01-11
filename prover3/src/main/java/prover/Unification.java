@@ -36,9 +36,7 @@ public final class Unification {
         int n = a1.size();
         if (n != b1.size()) return false;
         if (a1.get(0) != b1.get(0)) return false;
-        for (var i = 1; i < n; i++) {
-          if (!match(a1.get(i), b1.get(i), map)) return false;
-        }
+        for (var i = 1; i < n; i++) if (!match(a1.get(i), b1.get(i), map)) return false;
         return true;
       }
       return false;
