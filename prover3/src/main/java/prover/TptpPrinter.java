@@ -1,8 +1,10 @@
 package prover;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 public final class TptpPrinter {
   private static void print(Symbol a) {
@@ -169,13 +171,37 @@ public final class TptpPrinter {
   public static void proof(String file, Clause refutation) {
     System.out.println("% SZS output start CNFRefutation for " + file);
     var proof = refutation.proof();
+
+    // Names for anonymous formulas
     var i = -1L;
     for (var formula : proof)
       if (formula.name instanceof Long) i = Math.max(i, (long) formula.name);
-    for (var formula : proof) {
-      if (formula.name == null) formula.name = ++i;
-      TptpPrinter.println(formula);
-    }
+    for (var formula : proof) if (formula.name == null) formula.name = ++i;
+
+    // Names for anonymous Skolem functions
+    var pattern = Pattern.compile("sK\\d+");
+    var skolems = new LinkedHashSet<Func>();
+    var j = new long[] {-1L};
+    for (var formula : proof)
+      Etc.walk(
+          formula.term(),
+          a -> {
+            if (a instanceof Func) {
+              var a1 = (Func) a;
+              var name = a1.name;
+              if (name == null) {
+                skolems.add(a1);
+                return;
+              }
+              var matcher = pattern.matcher(name);
+              if (matcher.matches()) j[0] = Math.max(j[0], Long.parseLong(matcher.group(1)));
+            }
+          });
+    i = j[0];
+    for (var a : skolems) a.name = "sK" + ++i;
+
+    // Print
+    for (var formula : proof) TptpPrinter.println(formula);
     System.out.println("% SZS output end CNFRefutation for " + file);
   }
 
