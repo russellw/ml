@@ -43,13 +43,12 @@ public final class Superposition {
   // Substitute and make new clause
   private static void resolve(Clause c, int i, Map<Variable, Object> map) {
     // Negative literals
-    var negative = new ArrayList<>(c.negativeSize() - 1);
-    for (var j = 0; j < c.negativeSize(); j++)
-      if (j != i) negative.add(Terms.replace(c.get(j), map));
+    var negative = new ArrayList<>(c.negativeSize - 1);
+    for (var j = 0; j < c.negativeSize; j++) if (j != i) negative.add(Terms.replace(c.get(j), map));
 
     // Positive literals
     var positive = new ArrayList<>(c.positiveSize());
-    for (var j = c.negativeSize(); j < c.size(); j++) positive.add(Terms.replace(c.get(j), map));
+    for (var j = c.negativeSize; j < c.size(); j++) positive.add(Terms.replace(c.get(j), map));
 
     // Make new clause
     clause(new Clause(negative, positive, Inference.RESOLVE, c));
@@ -57,7 +56,7 @@ public final class Superposition {
 
   // For each negative equation
   private static void resolve(Clause c) {
-    for (var i = 0; i < c.negativeSize(); i++) {
+    for (var i = 0; i < c.negativeSize; i++) {
       var e = c.get(i);
       var map = new HashMap<Variable, Object>();
       if (Terms.unify(Equality.left(e), Equality.right(e), map)) resolve(c, i, map);
@@ -71,13 +70,13 @@ public final class Superposition {
     if (!Terms.unify(c0, c2, map)) return;
 
     // Negative literals
-    var negative = new ArrayList<>(c.negativeSize() + 1);
-    for (var j = 0; j < c.negativeSize(); j++) negative.add(Terms.replace(c.get(j), map));
+    var negative = new ArrayList<>(c.negativeSize + 1);
+    for (var j = 0; j < c.negativeSize; j++) negative.add(Terms.replace(c.get(j), map));
     negative.add(Terms.replace(Equality.of(c1, c3), map));
 
     // Positive literals
     var positive = new ArrayList<>(c.positiveSize() - 1);
-    for (var j = c.negativeSize(); j < c.size(); j++)
+    for (var j = c.negativeSize; j < c.size(); j++)
       if (j != i) positive.add(Terms.replace(c.get(j), map));
 
     // Make new clause
@@ -86,7 +85,7 @@ public final class Superposition {
 
   // For each positive equation (both directions) again
   private static void factor(Clause c, int i, Object c0, Object c1) {
-    for (var j = c.negativeSize(); j < c.size(); j++) {
+    for (var j = c.negativeSize; j < c.size(); j++) {
       if (j == i) continue;
       var e = c.get(j);
       var c2 = Equality.left(e);
@@ -98,7 +97,7 @@ public final class Superposition {
 
   // For each positive equation (both directions)
   private static void factor(Clause c) {
-    for (var i = c.negativeSize(); i < c.size(); i++) {
+    for (var i = c.negativeSize; i < c.size(); i++) {
       var e = c.get(i);
       var c0 = Equality.left(e);
       var c1 = Equality.right(e);
@@ -124,20 +123,20 @@ public final class Superposition {
     var e = Equality.of(Etc.splice(d0, position, 0, c1), d1);
 
     // Negative literals
-    var negative = new ArrayList<>(c.negativeSize() + d.negativeSize());
-    for (var i = 0; i < c.negativeSize(); i++) negative.add(Terms.replace(c.get(i), map));
-    for (var i = 0; i < d.negativeSize(); i++)
+    var negative = new ArrayList<>(c.negativeSize + d.negativeSize);
+    for (var i = 0; i < c.negativeSize; i++) negative.add(Terms.replace(c.get(i), map));
+    for (var i = 0; i < d.negativeSize; i++)
       if (i != di) negative.add(Terms.replace(d.get(i), map));
 
     // Positive literals
     var positive = new ArrayList<>(c.positiveSize() + d.positiveSize() - 1);
-    for (var i = c.negativeSize(); i < c.size(); i++)
+    for (var i = c.negativeSize; i < c.size(); i++)
       if (i != ci) positive.add(Terms.replace(c.get(i), map));
-    for (var i = d.negativeSize(); i < d.size(); i++)
+    for (var i = d.negativeSize; i < d.size(); i++)
       if (i != di) positive.add(Terms.replace(d.get(i), map));
 
     // Negative and positive superposition
-    (di < d.negativeSize() ? negative : positive).add(Terms.replace(e, map));
+    (di < d.negativeSize ? negative : positive).add(Terms.replace(e, map));
 
     // Make new clause
     clause(new Clause(negative, positive, Inference.SUPERPOSITION, c.original(), d.original()));
@@ -180,7 +179,7 @@ public final class Superposition {
 
   // For each positive equation in c (both directions)
   private static void superposition(Clause c, Clause d) {
-    for (var i = c.negativeSize(); i < c.size(); i++) {
+    for (var i = c.negativeSize; i < c.size(); i++) {
       var e = c.get(i);
       var c0 = Equality.left(e);
       var c1 = Equality.right(e);

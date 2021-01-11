@@ -11,10 +11,6 @@ public final class Clause extends AbstractFormula {
     return literals.length;
   }
 
-  public int negativeSize() {
-    return negativeSize;
-  }
-
   public Object get(int i) {
     return literals[i];
   }
@@ -28,20 +24,25 @@ public final class Clause extends AbstractFormula {
     positive.removeIf(a -> a == Boolean.FALSE);
 
     // Tautology
-    for (var a : negative) {
+    for (var a : negative)
       if (a == Boolean.FALSE) {
         literals = new Object[] {true};
         negativeSize = 0;
         return;
       }
-    }
-    for (var a : positive) {
+    for (var a : positive)
       if (a == Boolean.TRUE) {
         literals = new Object[] {true};
         negativeSize = 0;
         return;
       }
-    }
+    for (var a : negative)
+      for (var b : positive)
+        if (a.equals(b)) {
+          literals = new Object[] {true};
+          negativeSize = 0;
+          return;
+        }
 
     // Literals
     literals = new Object[negative.size() + positive.size()];
@@ -116,11 +117,11 @@ public final class Clause extends AbstractFormula {
     return Arrays.toString(negative()) + " => " + Arrays.toString(positive());
   }
 
-  public final Object[] negative() {
+  public Object[] negative() {
     return Arrays.copyOf(literals, negativeSize);
   }
 
-  public final Object[] positive() {
+  public Object[] positive() {
     return Arrays.copyOfRange(literals, negativeSize, literals.length);
   }
 
