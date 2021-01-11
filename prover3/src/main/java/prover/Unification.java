@@ -35,7 +35,8 @@ public final class Unification {
         assert b1.get(0) != Symbol.EQUALS;
         int n = a1.size();
         if (n != b1.size()) return false;
-        for (var i = 0; i < n; i++) {
+        if (a1.get(0) != b1.get(0)) return false;
+        for (var i = 1; i < n; i++) {
           if (!match(a1.get(i), b1.get(i), map)) return false;
         }
         return true;
@@ -98,7 +99,8 @@ public final class Unification {
         var b1 = (List) b;
         int n = a1.size();
         if (n != b1.size()) return false;
-        for (var i = 0; i < n; i++) if (!unify(a1.get(i), b1.get(i), map)) return false;
+        if (a1.get(0) != b1.get(0)) return false;
+        for (var i = 1; i < n; i++) if (!unify(a1.get(i), b1.get(i), map)) return false;
         return true;
       }
       return false;
