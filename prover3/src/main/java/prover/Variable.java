@@ -49,7 +49,7 @@ public final class Variable {
   public static Object quantify(Object a) {
     var variables = freeVariables(a);
     if (variables.isEmpty()) return a;
-    return List.of(Symbol.ALL, Etc.same(variables), a);
+    return List.of(Symbol.ALL, List.copyOf(variables), a);
   }
 
   public static Object unquantify(Object a) {
