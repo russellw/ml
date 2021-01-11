@@ -111,6 +111,11 @@ public final class Clause extends AbstractFormula {
     return n[0];
   }
 
+  @Override
+  public String toString() {
+    return Arrays.toString(negative()) + " => " + Arrays.toString(positive());
+  }
+
   public final Object[] negative() {
     return Arrays.copyOf(literals, negativeSize);
   }

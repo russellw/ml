@@ -87,7 +87,7 @@ public final class CNF {
       b = exists.get(a1);
       assert b != null;
       return b;
-    } else if (a instanceof Boolean) return polarity ^ (boolean) a;
+    } else if (a instanceof Boolean) return polarity == (boolean) a;
     return polarity ? a : List.of(Symbol.NOT, a);
   }
 
