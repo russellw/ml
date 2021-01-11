@@ -7,10 +7,6 @@ public final class Clause extends AbstractFormula {
   public final int negativeSize;
   public boolean subsumed;
 
-  public int size() {
-    return literals.length;
-  }
-
   public Clause(
       List<Object> negative, List<Object> positive, Inference inference, AbstractFormula... from) {
     super(inference, from);

@@ -49,7 +49,8 @@ public final class Superposition {
 
     // Positive literals
     var positive = new ArrayList<>(c.positiveSize());
-    for (var j = c.negativeSize; j < c.size(); j++) positive.add(Terms.replace(c.literals[j], map));
+    for (var j = c.negativeSize; j < c.literals.length; j++)
+      positive.add(Terms.replace(c.literals[j], map));
 
     // Make new clause
     clause(new Clause(negative, positive, Inference.RESOLVE, c));
@@ -77,7 +78,7 @@ public final class Superposition {
 
     // Positive literals
     var positive = new ArrayList<>(c.positiveSize() - 1);
-    for (var j = c.negativeSize; j < c.size(); j++)
+    for (var j = c.negativeSize; j < c.literals.length; j++)
       if (j != i) positive.add(Terms.replace(c.literals[j], map));
 
     // Make new clause
@@ -86,7 +87,7 @@ public final class Superposition {
 
   // For each positive equation (both directions) again
   private static void factor(Clause c, int i, Object c0, Object c1) {
-    for (var j = c.negativeSize; j < c.size(); j++) {
+    for (var j = c.negativeSize; j < c.literals.length; j++) {
       if (j == i) continue;
       var e = c.literals[j];
       var c2 = Equality.left(e);
@@ -98,7 +99,7 @@ public final class Superposition {
 
   // For each positive equation (both directions)
   private static void factor(Clause c) {
-    for (var i = c.negativeSize; i < c.size(); i++) {
+    for (var i = c.negativeSize; i < c.literals.length; i++) {
       var e = c.literals[i];
       var c0 = Equality.left(e);
       var c1 = Equality.right(e);
@@ -131,9 +132,9 @@ public final class Superposition {
 
     // Positive literals
     var positive = new ArrayList<>(c.positiveSize() + d.positiveSize() - 1);
-    for (var i = c.negativeSize; i < c.size(); i++)
+    for (var i = c.negativeSize; i < c.literals.length; i++)
       if (i != ci) positive.add(Terms.replace(c.literals[i], map));
-    for (var i = d.negativeSize; i < d.size(); i++)
+    for (var i = d.negativeSize; i < d.literals.length; i++)
       if (i != di) positive.add(Terms.replace(d.literals[i], map));
 
     // Negative and positive superposition
@@ -169,7 +170,7 @@ public final class Superposition {
   // For each equation in d (both directions)
   private static void superposition(Clause c, Clause d, int ci, Object c0, Object c1) {
     if (c0 == Boolean.TRUE) return;
-    for (var i = 0; i < d.size(); i++) {
+    for (var i = 0; i < d.literals.length; i++) {
       var e = d.literals[i];
       var d0 = Equality.left(e);
       var d1 = Equality.right(e);
@@ -180,7 +181,7 @@ public final class Superposition {
 
   // For each positive equation in c (both directions)
   private static void superposition(Clause c, Clause d) {
-    for (var i = c.negativeSize; i < c.size(); i++) {
+    for (var i = c.negativeSize; i < c.literals.length; i++) {
       var e = c.literals[i];
       var c0 = Equality.left(e);
       var c1 = Equality.right(e);
