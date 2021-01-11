@@ -11,10 +11,6 @@ public final class Clause extends AbstractFormula {
     return literals.length;
   }
 
-  public Object get(int i) {
-    return literals[i];
-  }
-
   public Clause(
       List<Object> negative, List<Object> positive, Inference inference, AbstractFormula... from) {
     super(inference, from);
