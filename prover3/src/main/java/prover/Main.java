@@ -170,7 +170,7 @@ public final class Main {
           default:
             throw new IllegalStateException();
         }
-        for (var i = 0; i < problem.header.size() && i < 66; i++)
+        for (var i = 0; i < problem.header.size() && i < 50; i++)
           System.out.println(problem.header.get(i));
       } catch (InappropriateException e) {
         System.out.println("% SZS status Inappropriate for " + file);
