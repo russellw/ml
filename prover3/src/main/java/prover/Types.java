@@ -281,8 +281,7 @@ public final class Types {
     for (var a : terms) checkTypes(Symbol.BOOLEAN, a);
   }
 
-  public static boolean isNumeric(Object a) {
-    var type = typeof(a);
+  public static boolean isNumeric(Object type) {
     if (type instanceof Symbol)
       switch ((Symbol) type) {
         case INTEGER:

@@ -244,7 +244,7 @@ public final class Superposition {
           a -> {
             if (a instanceof List) return false;
             if (a instanceof Symbol) return false;
-            return Types.isNumeric(a);
+            return Types.isNumeric(Types.typeof(a));
           })) {
         problem.result = SZS.GaveUp;
         return;
