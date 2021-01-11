@@ -388,7 +388,7 @@ public final class TptpParser {
     var r = new ArrayList<>();
     r.add(op);
     args(bound, r, arity);
-    return List.of(r);
+    return r;
   }
 
   private Object atomicTerm(Map<String, Variable> bound) throws IOException {
