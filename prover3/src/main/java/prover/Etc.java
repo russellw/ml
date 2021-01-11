@@ -2,7 +2,9 @@ package prover;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -115,13 +117,13 @@ public final class Etc {
     return (f.test(a));
   }
 
-  public static java.util.Set<Object> collect(Object a, Predicate<Object> f) {
-    var r = new java.util.HashSet<>();
+  public static Set<Object> collect(Object a, Predicate<Object> f) {
+    var r = new HashSet<>();
     collect(a, f, r);
     return r;
   }
 
-  public static void collect(Object a, Predicate<Object> f, java.util.Set<Object> r) {
+  public static void collect(Object a, Predicate<Object> f, Set<Object> r) {
     if (a instanceof List) {
       var a1 = (List) a;
       for (var b : a1) collect(b, f, r);

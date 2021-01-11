@@ -11,7 +11,7 @@ public final class Variable {
   }
 
   @SuppressWarnings("unchecked")
-  private static void getFreeVariables(Set<Variable> bound, Object a, java.util.Set<Variable> r) {
+  private static void getFreeVariables(Set<Variable> bound, Object a, Set<Variable> r) {
     if (a instanceof List) {
       var a1 = (List) a;
       var op = a1.get(0);
@@ -36,8 +36,8 @@ public final class Variable {
     }
   }
 
-  public static java.util.Set<Variable> freeVariables(Object a) {
-    var r = new java.util.LinkedHashSet<Variable>();
+  public static Set<Variable> freeVariables(Object a) {
+    var r = new LinkedHashSet<Variable>();
     getFreeVariables(new HashSet<>(), a, r);
     return r;
   }

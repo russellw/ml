@@ -26,8 +26,8 @@ public final class TptpParser {
   private static final int VARIABLE = -16;
 
   // Problem state
-  private static java.util.Map<String, Func> types = new java.util.HashMap<>();
-  private static java.util.Map<String, Func> funcs;
+  private static Map<String, Func> types = new HashMap<>();
+  private static Map<String, Func> funcs;
   private static Problem problem;
 
   // File state
@@ -37,7 +37,7 @@ public final class TptpParser {
   private boolean header;
   private int token;
   private String tokenString;
-  private java.util.Map<String, Variable> free = new java.util.HashMap<>();
+  private Map<String, Variable> free = new HashMap<>();
 
   // Tokenizer
   private void lexQuote() throws IOException {
@@ -816,7 +816,7 @@ public final class TptpParser {
   }
 
   public static Problem read(String file, InputStream stream) throws IOException {
-    funcs = new java.util.HashMap<>();
+    funcs = new HashMap<>();
     problem = new Problem(file);
 
     // Read

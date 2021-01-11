@@ -18,7 +18,6 @@ public class VariableTest {
     var a = new Func(Symbol.INDIVIDUAL, "a");
     var b = new Func(Symbol.INDIVIDUAL, "b");
     var f = new Func(List.of(Symbol.BOOLEAN, Symbol.INDIVIDUAL), "f");
-    var r = new Variable(Symbol.REAL);
     var x = new Variable(Symbol.INDIVIDUAL);
     var y = new Variable(Symbol.INDIVIDUAL);
     Map<Variable, Variable> map;
