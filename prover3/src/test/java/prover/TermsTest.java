@@ -49,40 +49,40 @@ public class TermsTest {
 
     // Function and constant symbols match, x is unified with the constant b
     map = new HashMap<>();
-    assertTrue(Terms.match(f2.call(a, x), f2.call(a, b), map));
+    assertTrue(Terms.match(List.of(f2, a, x), List.of(f2, a, b), map));
     assertEquals(map.size(), 1);
     assertEquals(Terms.replace(x, map), b);
 
     // f and g do not match
     map = new HashMap<>();
-    assertFalse(Terms.match(f1.call(a), g1.call(a), map));
+    assertFalse(Terms.match(List.of(f1, a), List.of(g1, a), map));
 
     // x and y are aliased
     map = new HashMap<>();
-    assertTrue(Terms.match(f1.call(x), f1.call(y), map));
+    assertTrue(Terms.match(List.of(f1, x), List.of(f1, y), map));
     assertEquals(map.size(), 1);
     assertEquals(Terms.replace(x, map), Terms.replace(y, map));
 
     // f and g do not match
     map = new HashMap<>();
-    assertFalse(Terms.match(f1.call(x), g1.call(y), map));
+    assertFalse(Terms.match(List.of(f1, x), List.of(g1, y), map));
 
     // Fails. The f function symbols have different arity
     map = new HashMap<>();
-    assertFalse(Terms.match(f1.call(x), f2.call(y, z), map));
+    assertFalse(Terms.match(List.of(f1, x), List.of(f2, y, z), map));
 
     // Unifies y with the term g(x)
     map = new HashMap<>();
-    assertFalse(Terms.match(f1.call(g1.call(x)), f1.call(y), map));
+    assertFalse(Terms.match(List.of(f1, List.of(g1, x)), List.of(f1, y), map));
 
     // Unifies x with constant a, and y with the term g(a)
     map = new HashMap<>();
-    assertFalse(Terms.match(f2.call(g1.call(x), x), f2.call(y, a), map));
+    assertFalse(Terms.match(List.of(f2, List.of(g1, x), x), List.of(f2, y, a), map));
 
     // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs
     // check).
     map = new HashMap<>();
-    assertTrue(Terms.match(x, f1.call(x), map));
+    assertTrue(Terms.match(x, List.of(f1, x), map));
 
     // Both x and y are unified with the constant a
     map = new HashMap<>();
@@ -143,45 +143,45 @@ public class TermsTest {
 
     // Function and constant symbols match, x is unified with the constant b
     map = new HashMap<>();
-    assertTrue(Terms.unify(f2.call(a, x), f2.call(a, b), map));
+    assertTrue(Terms.unify(List.of(f2, a, x), List.of(f2, a, b), map));
     assertEquals(map.size(), 1);
     assertEquals(Terms.replace(x, map), b);
 
     // f and g1 do not match
     map = new HashMap<>();
-    assertFalse(Terms.unify(f1.call(a), g1.call(a), map));
+    assertFalse(Terms.unify(List.of(f1, a), List.of(g1, a), map));
 
     // x and y are aliased
     map = new HashMap<>();
-    assertTrue(Terms.unify(f1.call(x), f1.call(y), map));
+    assertTrue(Terms.unify(List.of(f1, x), List.of(f1, y), map));
     assertEquals(map.size(), 1);
     assertEquals(Terms.replace(x, map), Terms.replace(y, map));
 
     // f and g1 do not match
     map = new HashMap<>();
-    assertFalse(Terms.unify(f1.call(x), g1.call(y), map));
+    assertFalse(Terms.unify(List.of(f1, x), List.of(g1, y), map));
 
     // Fails. The f function symbols have different arity
     map = new HashMap<>();
-    assertFalse(Terms.unify(f1.call(x), f2.call(y, z), map));
+    assertFalse(Terms.unify(List.of(f1, x), List.of(f2, y, z), map));
 
     // Unifies y with the term g1(x)
     map = new HashMap<>();
-    assertTrue(Terms.unify(f1.call(g1.call(x)), f1.call(y), map));
+    assertTrue(Terms.unify(List.of(f1, List.of(g1, x)), List.of(f1, y), map));
     assertEquals(map.size(), 1);
-    assertEquals(Terms.replace(y, map), g1.call(x));
+    assertEquals(Terms.replace(y, map), List.of(g1, x));
 
     // Unifies x with constant a, and y with the term g1(a)
     map = new HashMap<>();
-    assertTrue(Terms.unify(f2.call(g1.call(x), x), f2.call(y, a), map));
+    assertTrue(Terms.unify(List.of(f2, List.of(g1, x), x), List.of(f2, y, a), map));
     assertEquals(map.size(), 2);
     assertEquals(Terms.replace(x, map), a);
-    assertEquals(Terms.replace(y, map), g1.call(a));
+    assertEquals(Terms.replace(y, map), List.of(g1, a));
 
     // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs
     // check).
     map = new HashMap<>();
-    assertFalse(Terms.unify(x, f1.call(x), map));
+    assertFalse(Terms.unify(x, List.of(f1, x), map));
 
     // Both x and y are unified with the constant a
     map = new HashMap<>();
@@ -247,7 +247,9 @@ public class TermsTest {
     map = new HashMap<>();
     assertTrue(
         Terms.isomorphic(
-            List.of(Symbol.EQUALS, a, f.call(x)), List.of(Symbol.EQUALS, a, f.call(x)), map));
+            List.of(Symbol.EQUALS, a, List.of(f, x)),
+            List.of(Symbol.EQUALS, a, List.of(f, x)),
+            map));
     assertEquals(map.size(), 0);
 
     // Compound, unequal
@@ -262,7 +264,9 @@ public class TermsTest {
     map = new HashMap<>();
     assertTrue(
         Terms.isomorphic(
-            List.of(Symbol.EQUALS, a, f.call(x)), List.of(Symbol.EQUALS, a, f.call(y)), map));
+            List.of(Symbol.EQUALS, a, List.of(f, x)),
+            List.of(Symbol.EQUALS, a, List.of(f, y)),
+            map));
     assertEquals(map.size(), 2);
   }
 
