@@ -5,9 +5,9 @@ import java.util.*;
 // Open problem:
 // https://stackoverflow.com/questions/53718986/converting-first-order-logic-to-cnf-without-exponential-blowup
 public final class CNF {
-  private final ArrayList<Object> negative = new ArrayList<>();
-  private final ArrayList<Object> positive = new ArrayList<>();
-  private final ArrayList<Clause> clauses;
+  private final List<Object> negative = new ArrayList<>();
+  private final List<Object> positive = new ArrayList<>();
+  private final List<Clause> clauses;
 
   private static Object skolem(Object returnType, Collection<Variable> args) {
     // Atom
@@ -223,8 +223,12 @@ public final class CNF {
     if (!c.isTrue()) clauses.add(c);
   }
 
-  public CNF(ArrayList<Formula> formulas, ArrayList<Clause> clauses) {
+  private CNF(List<Formula> formulas, List<Clause> clauses) {
     this.clauses = clauses;
     for (var formula : formulas) convert(formula);
+  }
+
+  public static void convert(List<Formula> formulas, List<Clause> clauses) {
+    new CNF(formulas, clauses);
   }
 }

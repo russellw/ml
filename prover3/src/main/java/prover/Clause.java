@@ -20,10 +20,7 @@ public final class Clause extends AbstractFormula {
   }
 
   public Clause(
-      ArrayList<Object> negative,
-      ArrayList<Object> positive,
-      Inference inference,
-      AbstractFormula... from) {
+      List<Object> negative, List<Object> positive, Inference inference, AbstractFormula... from) {
     super(inference, from);
 
     // Redundancy

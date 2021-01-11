@@ -21,7 +21,7 @@ public final class Problem {
       formulas.add(
           new Formula(List.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
     Types.inferTypes(formulas, clauses);
-    new CNF(formulas, clauses);
+    CNF.convert(formulas, clauses);
     Superposition.solve(this, deadline);
     if (conjecture != null)
       switch (result) {
