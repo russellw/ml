@@ -1,5 +1,6 @@
 package prover;
 
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -238,7 +239,9 @@ public final class TptpPrinter {
         break;
       case CONJECTURE:
       case AXIOM:
-        System.out.printf("file(%s,%s)", Etc.quote('\'', formula.file), formula.name);
+        System.out.printf(
+            "file(%s,%s)",
+            Etc.quote('\'', Path.of(formula.file).getFileName().toString()), formula.name);
         break;
       case NEGATE:
         System.out.printf("inference(negate,[status(ceq)],[%s])", formula.from[0].name);
