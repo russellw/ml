@@ -603,10 +603,10 @@ public final class TptpParser {
         return List.of(Symbol.EQV, a, unaryFormula(bound));
       case IMPLIES:
         lex();
-        return Etc.implies(a, unaryFormula(bound));
+        return Terms.implies(a, unaryFormula(bound));
       case IMPLIESR:
         lex();
-        return Etc.implies(unaryFormula(bound), a);
+        return Terms.implies(unaryFormula(bound), a);
       case NAND:
         lex();
         return List.of(Symbol.NOT, List.of(Symbol.AND, a, unaryFormula(bound)));

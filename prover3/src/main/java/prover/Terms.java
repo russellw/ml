@@ -207,4 +207,8 @@ public final class Terms {
     // Atoms
     return a.equals(b);
   }
+
+  public static List<Object> implies(Object a, Object b) {
+    return List.of(Symbol.OR, List.of(Symbol.NOT, a), b);
+  }
 }
