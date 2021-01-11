@@ -46,7 +46,7 @@ public final class Unification {
     return a.equals(b);
   }
 
-  private static boolean occurs(Variable a, Object b, Map<Variable, Object> map) {
+  public static boolean occurs(Variable a, Object b, Map<Variable, Object> map) {
     if (b instanceof Variable) {
       if (a == b) return true;
       var b1 = map.get(b);

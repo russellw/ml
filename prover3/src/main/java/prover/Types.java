@@ -49,20 +49,6 @@ public final class Types {
     throw new IllegalArgumentException(a.toString());
   }
 
-  private static boolean occurs(Variable a, Object b, Map<Variable, Object> map) {
-    if (b instanceof Variable) {
-      if (a == b) return true;
-      var b1 = map.get(b);
-      if (b1 != null) return occurs(a, b1, map);
-      return false;
-    }
-    if (b instanceof List) {
-      var b1 = (List) b;
-      for (var x : b1) if (occurs(a, x, map)) return true;
-    }
-    return false;
-  }
-
   private static boolean unifyVariable(Variable a, Object b, Map<Variable, Object> map) {
     // Existing mapping
     var a1 = map.get(a);
@@ -75,7 +61,7 @@ public final class Types {
     }
 
     // Occurs check
-    if (occurs(a, b, map)) return false;
+    if (Unification.occurs(a, b, map)) return false;
 
     // New mapping
     map.put(a, b);
@@ -107,18 +93,6 @@ public final class Types {
 
     // Atoms
     return false;
-  }
-
-  private static Object replace(Object a, Map<Variable, Object> map) {
-    return Etc.treeMap(
-        a,
-        b -> {
-          if (b instanceof Variable) {
-            var b1 = map.get(b);
-            if (b1 != null) return replace(b1, map);
-          }
-          return b;
-        });
   }
 
   // First step of type inference:
@@ -169,7 +143,7 @@ public final class Types {
         b -> {
           if (b instanceof Func) {
             var b1 = (Func) b;
-            b1.type = replace(b1.type, map);
+            b1.type = Unification.replace(b1.type, map);
             if (b1.type instanceof List) {
               var type = (List) b1.type;
               b1.type = Etc.map(type, t -> t instanceof Variable ? Symbol.INDIVIDUAL : t);
