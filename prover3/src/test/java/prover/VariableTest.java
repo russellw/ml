@@ -3,14 +3,11 @@ package prover;
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import org.junit.Test;
 
 public class VariableTest {
-  private static HashSet<Object> setOf(Object... q) {
+  private static Set<Object> setOf(Object... q) {
     var r = new HashSet<>();
     Collections.addAll(r, q);
     return r;
@@ -24,7 +21,7 @@ public class VariableTest {
     var r = new Variable(Symbol.REAL);
     var x = new Variable(Symbol.INDIVIDUAL);
     var y = new Variable(Symbol.INDIVIDUAL);
-    HashMap<Variable, Variable> map;
+    Map<Variable, Variable> map;
 
     // Atoms, equal
     map = new HashMap<>();

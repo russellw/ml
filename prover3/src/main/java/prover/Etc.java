@@ -16,15 +16,14 @@ public final class Etc {
     return file.substring(i + 1);
   }
 
-  public static <T> ArrayList<List<T>> cartesianProduct(ArrayList<List<T>> qs) {
+  public static <T> List<List<T>> cartesianProduct(List<List<T>> qs) {
     var js = new int[qs.size()];
     var rs = new ArrayList<List<T>>();
     cartesianProduct(qs, 0, js, rs);
     return rs;
   }
 
-  private static <T> void cartesianProduct(
-      ArrayList<List<T>> qs, int i, int[] js, ArrayList<List<T>> rs) {
+  private static <T> void cartesianProduct(List<List<T>> qs, int i, int[] js, List<List<T>> rs) {
     if (i == js.length) {
       var ys = new ArrayList<T>();
       for (i = 0; i < js.length; i++) ys.add(qs.get(i).get(js[i]));
@@ -74,7 +73,7 @@ public final class Etc {
     f.accept(a);
   }
 
-  public static Object splice(Object a, ArrayList<Integer> position, int i, Object b) {
+  public static Object splice(Object a, List<Integer> position, int i, Object b) {
     if (i == position.size()) return b;
     var a1 = (List) a;
     var r = new Object[a1.size()];
@@ -116,13 +115,13 @@ public final class Etc {
     return (f.test(a));
   }
 
-  public static java.util.HashSet<Object> collect(Object a, Predicate<Object> f) {
+  public static java.util.Set<Object> collect(Object a, Predicate<Object> f) {
     var r = new java.util.HashSet<>();
     collect(a, f, r);
     return r;
   }
 
-  public static void collect(Object a, Predicate<Object> f, java.util.HashSet<Object> r) {
+  public static void collect(Object a, Predicate<Object> f, java.util.Set<Object> r) {
     if (a instanceof List) {
       var a1 = (List) a;
       for (var b : a1) collect(b, f, r);

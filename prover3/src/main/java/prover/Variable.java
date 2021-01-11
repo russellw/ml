@@ -1,21 +1,17 @@
 package prover;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public final class Variable {
   public final Object type;
-  public static final HashMap<Variable, String> names = new HashMap<>();
+  public static final Map<Variable, String> names = new HashMap<>();
 
   public Variable(Object type) {
     this.type = type;
   }
 
   @SuppressWarnings("unchecked")
-  private static void getFreeVariables(
-      Set<Variable> bound, Object a, java.util.HashSet<Variable> r) {
+  private static void getFreeVariables(Set<Variable> bound, Object a, java.util.Set<Variable> r) {
     if (a instanceof List) {
       var a1 = (List) a;
       var op = a1.get(0);
@@ -25,9 +21,9 @@ public final class Variable {
           case EXISTS:
             {
               var binding = (List) a1.get(1);
-              var bound1 = new HashSet<>(bound);
-              bound1.addAll(binding);
-              getFreeVariables(bound1, a1.get(2), r);
+              bound = new HashSet<>(bound);
+              bound.addAll(binding);
+              getFreeVariables(bound, a1.get(2), r);
               return;
             }
         }
@@ -40,7 +36,7 @@ public final class Variable {
     }
   }
 
-  public static java.util.HashSet<Variable> freeVariables(Object a) {
+  public static java.util.Set<Variable> freeVariables(Object a) {
     var r = new java.util.LinkedHashSet<Variable>();
     getFreeVariables(new HashSet<>(), a, r);
     return r;
@@ -61,7 +57,7 @@ public final class Variable {
     return a;
   }
 
-  public static boolean isomorphic(Object a, Object b, HashMap<Variable, Variable> map) {
+  public static boolean isomorphic(Object a, Object b, Map<Variable, Variable> map) {
     // Equal
     if (a == b) return true;
 

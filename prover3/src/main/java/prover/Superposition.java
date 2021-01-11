@@ -31,7 +31,7 @@ import java.util.*;
 // e.g. lexicographic path ordering or Knuth-Bendix ordering
 public final class Superposition {
   public static PriorityQueue<Clause> unprocessed;
-  public static ArrayList<Clause> processed;
+  public static List<Clause> processed;
 
   private Superposition() {}
 
@@ -118,7 +118,7 @@ public final class Superposition {
       int di,
       Object d0,
       Object d1,
-      ArrayList<Integer> position,
+      List<Integer> position,
       Object a) {
     var map = new HashMap<Variable, Object>();
     if (!Unification.unify(c0, a, map)) return;
@@ -154,7 +154,7 @@ public final class Superposition {
       int di,
       Object d0,
       Object d1,
-      ArrayList<Integer> position,
+      List<Integer> position,
       Object a) {
     if (a instanceof Variable) return;
     superposition1(c, d, ci, c0, c1, di, d0, d1, position, a);

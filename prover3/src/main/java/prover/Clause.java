@@ -50,7 +50,7 @@ public final class Clause extends AbstractFormula {
     negativeSize = negative.size();
   }
 
-  public HashSet<Variable> variables() {
+  public Set<Variable> variables() {
     var r = new HashSet<Variable>();
     Etc.treeWalk(
         Arrays.asList(literals),

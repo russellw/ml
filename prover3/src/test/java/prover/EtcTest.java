@@ -71,8 +71,8 @@ public class EtcTest {
 
   @Test
   public void cartesianProduct() {
-    ArrayList<List<String>> qs = new ArrayList<>();
-    ArrayList<String> q;
+    List<List<String>> qs = new ArrayList<>();
+    List<String> q;
     q = new ArrayList<>();
     q.add("a0");
     q.add("a1");

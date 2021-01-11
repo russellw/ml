@@ -24,8 +24,8 @@ public final class DimacsParser {
   private int c;
   private int token;
   private String tokenString;
-  private ArrayList<Object> negative = new ArrayList<>();
-  private ArrayList<Object> positive = new ArrayList<>();
+  private List<Object> negative = new ArrayList<>();
+  private List<Object> positive = new ArrayList<>();
 
   // Tokenizer
   private void lex() throws IOException {

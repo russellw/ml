@@ -12,7 +12,7 @@ public final class Main {
     TPTP,
   }
 
-  private static ArrayList<String> files = new ArrayList<>();
+  private static List<String> files = new ArrayList<>();
   private static Language language;
   private static long timeout = 60_000;
   private static final String STDIN = "stdin";

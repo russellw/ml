@@ -26,8 +26,8 @@ public final class TptpParser {
   private static final int VARIABLE = -16;
 
   // Problem state
-  private static java.util.HashMap<String, Func> types = new java.util.HashMap<>();
-  private static java.util.HashMap<String, Func> funcs;
+  private static java.util.Map<String, Func> types = new java.util.HashMap<>();
+  private static java.util.Map<String, Func> funcs;
   private static Problem problem;
 
   // File state
@@ -37,7 +37,7 @@ public final class TptpParser {
   private boolean header;
   private int token;
   private String tokenString;
-  private java.util.HashMap<String, Variable> free = new java.util.HashMap<>();
+  private java.util.Map<String, Variable> free = new java.util.HashMap<>();
 
   // Tokenizer
   private void lexQuote() throws IOException {
@@ -367,15 +367,14 @@ public final class TptpParser {
     return type;
   }
 
-  private void args(Map<String, Variable> bound, ArrayList<Object> r) throws IOException {
+  private void args(Map<String, Variable> bound, List<Object> r) throws IOException {
     expect('(');
     do r.add(atomicTerm(bound));
     while (eat(','));
     expect(')');
   }
 
-  private void args(Map<String, Variable> bound, ArrayList<Object> r, int arity)
-      throws IOException {
+  private void args(Map<String, Variable> bound, List<Object> r, int arity) throws IOException {
     int n = r.size();
     args(bound, r);
     n = r.size() - n;
@@ -660,7 +659,7 @@ public final class TptpParser {
     }
   }
 
-  private TptpParser(String file, InputStream stream, HashSet<Object> select) throws IOException {
+  private TptpParser(String file, InputStream stream, Set<Object> select) throws IOException {
     this.file = file;
     reader = new LineNumberReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     reader.setLineNumber(1);

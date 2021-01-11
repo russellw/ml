@@ -9,6 +9,17 @@ import java.util.Map;
 public final class Types {
   private Types() {}
 
+  public static boolean isNumeric(Object type) {
+    if (type instanceof Symbol)
+      switch ((Symbol) type) {
+        case INTEGER:
+        case RATIONAL:
+        case REAL:
+          return true;
+      }
+    return false;
+  }
+
   public static Object typeof(Object a) {
     if (a instanceof List) {
       var a1 = (List) a;
@@ -97,7 +108,7 @@ public final class Types {
 
   // First step of type inference:
   // Unify to figure out how all the unspecified types can be made consistent
-  private static void unifyTypes(Object wanted, Object a, HashMap<Variable, Object> map) {
+  private static void unifyTypes(Object wanted, Object a, Map<Variable, Object> map) {
     if (!unify(wanted, typeof(a), map))
       throw new IllegalArgumentException(String.format("%s != %s %s", wanted, typeof(a), a));
     if (!(a instanceof List)) return;
@@ -137,7 +148,7 @@ public final class Types {
   // Second step of type inference:
   // Fill in actual types for all the type variables
   @SuppressWarnings("unchecked")
-  private static void setTypes(Object a, HashMap<Variable, Object> map) {
+  private static void setTypes(Object a, Map<Variable, Object> map) {
     Etc.treeWalk(
         a,
         b -> {
@@ -253,16 +264,5 @@ public final class Types {
     for (var a : terms) unifyTypes(Symbol.BOOLEAN, a, map);
     for (var a : terms) setTypes(a, map);
     for (var a : terms) checkTypes(Symbol.BOOLEAN, a);
-  }
-
-  public static boolean isNumeric(Object type) {
-    if (type instanceof Symbol)
-      switch ((Symbol) type) {
-        case INTEGER:
-        case RATIONAL:
-        case REAL:
-          return true;
-      }
-    return false;
   }
 }
