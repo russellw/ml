@@ -47,8 +47,7 @@ public final class Main {
       while (opt.charAt(0) == '-') opt = opt.substring(1);
       String optArg = null;
       var j = 0;
-      while ((j < opt.length()) && (Character.isLetter(opt.charAt(j)) || (opt.charAt(j) == '-')))
-        j++;
+      while (j < opt.length() && (Character.isLetter(opt.charAt(j)) || (opt.charAt(j) == '-'))) j++;
       if (j < opt.length()) {
         switch (opt.charAt(j)) {
           case '0':
@@ -184,18 +183,7 @@ public final class Main {
 
       // Result
       System.out.printf("%% SZS status %s for %s\n", problem.result, file);
-      if (problem.refutation != null) {
-        System.out.println("% SZS output start CNFRefutation for " + file);
-        var proof = problem.refutation.proof();
-        var i = -1L;
-        for (var formula : proof)
-          if (formula.name instanceof Long) i = Math.max(i, (long) formula.name);
-        for (var formula : proof) {
-          if (formula.name == null) formula.name = ++i;
-          TptpPrinter.println(formula);
-        }
-        System.out.println("% SZS output end CNFRefutation for " + file);
-      }
+      if (problem.refutation != null) TptpPrinter.proof(file, problem.refutation);
 
       // Statistics
       attempted++;
@@ -240,9 +228,7 @@ public final class Main {
         Main.class
             .getClassLoader()
             .getResourceAsStream("META-INF/maven/prover/prover/pom.properties");
-    if (stream == null) {
-      return null;
-    }
+    if (stream == null) return null;
     properties.load(stream);
     return properties.getProperty("version");
   }

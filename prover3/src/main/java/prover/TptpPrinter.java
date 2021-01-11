@@ -166,6 +166,19 @@ public final class TptpPrinter {
     print(a, null);
   }
 
+  public static void proof(String file, Clause refutation) {
+    System.out.println("% SZS output start CNFRefutation for " + file);
+    var proof = refutation.proof();
+    var i = -1L;
+    for (var formula : proof)
+      if (formula.name instanceof Long) i = Math.max(i, (long) formula.name);
+    for (var formula : proof) {
+      if (formula.name == null) formula.name = ++i;
+      TptpPrinter.println(formula);
+    }
+    System.out.println("% SZS output end CNFRefutation for " + file);
+  }
+
   public static void println(AbstractFormula formula) {
     System.out.print(formula instanceof Clause ? "cnf(" : "fof(");
     System.out.print(formula.name);
