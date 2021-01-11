@@ -10,10 +10,6 @@ import java.util.function.Predicate;
 public final class Etc {
   private Etc() {}
 
-  public static Object same(Object a) {
-    return a;
-  }
-
   public static String extension(String file) {
     var i = file.lastIndexOf('.');
     if (i < 0) return "";

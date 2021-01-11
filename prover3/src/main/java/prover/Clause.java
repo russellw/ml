@@ -136,6 +136,6 @@ public final class Clause extends AbstractFormula {
       case 2:
         return r.get(1);
     }
-    return Etc.same(r);
+    return r;
   }
 }

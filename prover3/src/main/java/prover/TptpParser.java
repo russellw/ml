@@ -357,7 +357,7 @@ public final class TptpParser {
       expect('>');
       var returnType = atomicType();
       r.set(0, returnType);
-      return Etc.same(r);
+      return r;
     }
     var type = atomicType();
     if (eat('>')) {
@@ -417,7 +417,7 @@ public final class TptpParser {
                   if (i != j)
                     inequalities.add(
                         List.of(Symbol.NOT, List.of(Symbol.EQUALS, r.get(i), r.get(j))));
-              return Etc.same(inequalities);
+              return inequalities;
             }
           case "$false":
             return false;
@@ -506,7 +506,7 @@ public final class TptpParser {
               for (var i = 0; i < type.length; i++) type[i] = new Variable(null);
               a.type = List.of(type);
             }
-            return Etc.same(r);
+            return r;
           }
           if (a.type == null) a.type = new Variable(null);
           return a;
@@ -559,7 +559,7 @@ public final class TptpParser {
     } while (eat(','));
     expect(']');
     expect(':');
-    return List.of(op, Etc.same(params), unaryFormula(bound));
+    return List.of(op, params, unaryFormula(bound));
   }
 
   private Object unaryFormula(Map<String, Variable> bound) throws IOException {
@@ -589,7 +589,7 @@ public final class TptpParser {
     r.add(op);
     r.add(a);
     while (eat(k)) r.add(unaryFormula(bound));
-    return Etc.same(r);
+    return r;
   }
 
   private Object logicFormula(Map<String, Variable> bound) throws IOException {

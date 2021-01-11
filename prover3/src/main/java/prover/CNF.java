@@ -120,7 +120,7 @@ public final class CNF {
             }
             r.add(b);
           }
-          return Etc.same(r);
+          return r;
         }
       case OR:
         {
@@ -155,9 +155,9 @@ public final class CNF {
           and.add(Symbol.AND);
           for (var or : ors) {
             or.add(0, Symbol.OR);
-            and.add(Etc.same(or));
+            and.add(or);
           }
-          return Etc.same(and);
+          return and;
         }
     }
     return a1;
