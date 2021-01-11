@@ -62,10 +62,10 @@ public final class Etc {
     return f.apply(a);
   }
 
-  public static void treeWalk(Object a, Consumer<Object> f) {
+  public static void walk(Object a, Consumer<Object> f) {
     if (a instanceof List) {
       var a1 = (List) a;
-      for (var b : a1) treeWalk(b, f);
+      for (var b : a1) walk(b, f);
       return;
     }
     f.accept(a);
@@ -104,10 +104,10 @@ public final class Etc {
     return a.subtract(divideFloor(a, b).multiply(b));
   }
 
-  public static boolean treeExists(Object a, Predicate<Object> f) {
+  public static boolean exists(Object a, Predicate<Object> f) {
     if (a instanceof List) {
       var a1 = (List) a;
-      for (var b : a1) if (treeExists(b, f)) return true;
+      for (var b : a1) if (exists(b, f)) return true;
       return false;
     }
     return (f.test(a));

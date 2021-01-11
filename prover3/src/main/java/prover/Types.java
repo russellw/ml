@@ -149,7 +149,7 @@ public final class Types {
   // Fill in actual types for all the type variables
   @SuppressWarnings("unchecked")
   private static void setTypes(Object a, Map<Variable, Object> map) {
-    Etc.treeWalk(
+    Etc.walk(
         a,
         b -> {
           if (b instanceof Func) {

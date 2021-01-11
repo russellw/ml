@@ -238,7 +238,7 @@ public final class Superposition {
     // Superposition is not complete on arithmetic
     for (var c : processed) {
       if (c.subsumed) continue;
-      if (Etc.treeExists(
+      if (Etc.exists(
           c.term(),
           a -> {
             if (a instanceof List) return false;
