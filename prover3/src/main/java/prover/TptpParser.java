@@ -401,6 +401,8 @@ public final class TptpParser {
         throw new InappropriateException();
       case DEFINED_WORD:
         switch (s) {
+          case "$ite":
+            throw new InappropriateException();
           case "$ceiling":
             return definedAtomicTerm(bound, Symbol.CEIL, 1);
           case "$difference":
