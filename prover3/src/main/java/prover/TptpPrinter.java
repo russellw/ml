@@ -1,6 +1,6 @@
 package prover;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -9,10 +9,14 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 public final class TptpPrinter {
-  private final PrintStream out;
+  private final PrintWriter out;
 
-  public TptpPrinter(PrintStream out) {
+  public TptpPrinter(PrintWriter out) {
     this.out = out;
+  }
+
+  public void flush() {
+    out.flush();
   }
 
   private void print(Symbol a) {
@@ -101,7 +105,7 @@ public final class TptpPrinter {
     }
   }
 
-  private boolean needParens(List<Object> a, List<Object> parent) {
+  private static boolean needParens(List<Object> a, List<Object> parent) {
     if (parent == null) return false;
     var op = a.get(0);
     if (op instanceof Symbol)
@@ -253,7 +257,7 @@ public final class TptpPrinter {
     out.println(").");
   }
 
-  private boolean isWeird(String s) {
+  private static boolean isWeird(String s) {
     if (Character.isDigit(s.charAt(0))) return true;
     for (var i = 0; i < s.length(); i++) {
       var c = s.charAt(i);
