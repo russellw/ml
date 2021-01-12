@@ -185,7 +185,7 @@ public final class Main {
       // Result
       file = Path.of(file).getFileName().toString();
       System.out.printf("%% SZS status %s for %s\n", problem.result, file);
-      if (problem.refutation != null) new TptpPrinter().proof(file, problem.refutation);
+      if (problem.refutation != null) new TptpPrinter(System.out).proof(file, problem.refutation);
 
       // Statistics
       attempted++;

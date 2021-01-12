@@ -9,7 +9,11 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 public final class TptpPrinter {
-  private final PrintStream out = System.out;
+  private final PrintStream out;
+
+  public TptpPrinter(PrintStream out) {
+    this.out = out;
+  }
 
   private void print(Symbol a) {
     switch (a) {
