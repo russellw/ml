@@ -9,111 +9,90 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 public final class TptpPrinter {
-  private final PrintStream stream = System.out;
+  private final PrintStream out = System.out;
 
   private void print(Symbol a) {
     switch (a) {
       case BOOLEAN:
-        stream.print("$o");
+        out.print("$o");
         return;
       case INDIVIDUAL:
-        stream.print("$i");
+        out.print("$i");
         return;
       case ADD:
-        stream.print("$sum");
-        return;
-      case ALL:
-        stream.print("!");
-        return;
-      case AND:
-        stream.print("&");
+        out.print("$sum");
         return;
       case CEIL:
-        stream.print("$ceiling");
+        out.print("$ceiling");
         return;
       case DIVIDE:
-        stream.print("$quotient");
+        out.print("$quotient");
         return;
       case DIVIDE_EUCLIDEAN:
-        stream.print("$quotient_e");
+        out.print("$quotient_e");
         return;
       case DIVIDE_FLOOR:
-        stream.print("$quotient_f");
+        out.print("$quotient_f");
         return;
       case DIVIDE_TRUNCATE:
-        stream.print("$quotient_t");
-        return;
-      case EQUALS:
-        stream.print("=");
-        return;
-      case EQV:
-        stream.print("<=>");
-        return;
-      case EXISTS:
-        stream.print("?");
+        out.print("$quotient_t");
         return;
       case FLOOR:
-        stream.print("$floor");
+        out.print("$floor");
         return;
       case IS_INTEGER:
-        stream.print("$is_int");
+        out.print("$is_int");
         return;
       case INTEGER:
-        stream.print("$int");
+        out.print("$int");
         return;
       case IS_RATIONAL:
-        stream.print("$is_rat");
+        out.print("$is_rat");
         return;
       case RATIONAL:
-        stream.print("rat");
+        out.print("$rat");
         return;
       case LESS:
-        stream.print("$lesseq");
+        out.print("$lesseq");
         return;
       case LESS_EQ:
-        stream.print("$less");
+        out.print("$less");
         return;
       case MULTIPLY:
-        stream.print("$product");
+        out.print("$product");
         return;
       case NEGATE:
-        stream.print("$negate");
-        return;
-      case NOT:
-        stream.print("~");
-        return;
-      case OR:
-        stream.print("|");
+        out.print("$negate");
         return;
       case REMAINDER_EUCLIDEAN:
-        stream.print("$remainder_e");
+        out.print("$remainder_e");
         return;
       case REMAINDER_FLOOR:
-        stream.print("$remainder_f");
+        out.print("$remainder_f");
         return;
       case REMAINDER_TRUNCATE:
-        stream.print("$remainder_t");
+        out.print("$remainder_t");
         return;
       case ROUND:
-        stream.print("$round");
+        out.print("$round");
         return;
       case SUBTRACT:
-        stream.print("$difference");
+        out.print("$difference");
         return;
       case TO_INTEGER:
-        stream.print("$to_int");
+        out.print("$to_int");
         return;
       case TO_RATIONAL:
-        stream.print("$to_rat");
+        out.print("$to_rat");
         return;
       case TO_REAL:
-        stream.print("$to_real");
+        out.print("$to_real");
         return;
       case REAL:
-        stream.print("$real");
+        out.print("$real");
         return;
       case TRUNCATE:
-        stream.print("$truncate");
+        out.print("$truncate");
         return;
     }
   }
@@ -146,25 +125,25 @@ public final class TptpPrinter {
 
   private void infix(String op, List<Object> a) {
     for (var i = 1; i < a.size(); i++) {
-      if (i > 1) stream.print(op);
+      if (i > 1) out.print(op);
       print(a.get(i), a);
     }
   }
 
   private void quant(List<Object> a) {
-    stream.print('[');
+    out.print('[');
     var binding = (List) a.get(1);
     for (var i = 0; i < binding.size(); i++) {
       var x = binding.get(i);
-      if (i > 0) stream.print(',');
+      if (i > 0) out.print(',');
       print(x);
       var type = Types.typeof(x);
       if (type != Symbol.INDIVIDUAL) {
-        stream.print(':');
+        out.print(':');
         print(type);
       }
     }
-    stream.print("]:");
+    out.print("]:");
     print(a.get(2), a);
   }
 
@@ -173,7 +152,7 @@ public final class TptpPrinter {
   }
 
   public void proof(String file, Clause refutation) {
-    stream.println("% SZS output start CNFRefutation for " + file);
+    out.println("% SZS output start CNFRefutation for " + file);
     var proof = refutation.proof();
 
     // Names for anonymous formulas
@@ -206,69 +185,68 @@ public final class TptpPrinter {
 
     // Print
     for (var formula : proof) println(formula);
-    stream.println("% SZS output end CNFRefutation for " + file);
+    out.println("% SZS output end CNFRefutation for " + file);
   }
 
   public void println(AbstractFormula formula) {
-    stream.print(formula instanceof Clause ? "cnf(" : "fof(");
-    stream.print(formula.name);
-    stream.print(", ");
+    out.print(formula instanceof Clause ? "cnf(" : "fof(");
+    out.print(formula.name);
+    out.print(", ");
 
     // Role
     switch (formula.inference) {
       case CONJECTURE:
-        stream.print("conjecture");
+        out.print("conjecture");
         break;
       case NEGATE:
-        stream.print("negated_conjecture");
+        out.print("negated_conjecture");
         break;
       default:
-        stream.print("plain");
+        out.print("plain");
         break;
     }
-    stream.print(", ");
+    out.print(", ");
 
     // Term
     Variable.names.clear();
     print(formula.term());
-    stream.print(", ");
+    out.print(", ");
 
     // Source
     switch (formula.inference) {
       case RENAME_VARIABLES:
         throw new IllegalArgumentException(formula.toString());
       case DEFINE:
-        stream.print("introduced(definition)");
+        out.print("introduced(definition)");
         break;
       case CONJECTURE:
       case AXIOM:
-        stream.printf(
+        out.printf(
             "file(%s,%s)",
             Etc.quote('\'', Path.of(formula.file).getFileName().toString()), formula.name);
         break;
       case NEGATE:
-        stream.printf("inference(negate,[status(ceq)],[%s])", formula.from[0].name);
+        out.printf("inference(negate,[status(ceq)],[%s])", formula.from[0].name);
         break;
       default:
-        stream.printf(
-            "inference(%s,[status(", formula.inference.toString().toLowerCase(Locale.ROOT));
+        out.printf("inference(%s,[status(", formula.inference.toString().toLowerCase(Locale.ROOT));
 
         // If a formula introduces new symbols, then it is only equisatisfiable
         // This happens during subformula renaming in CNF conversion
         var fromFuncs = new HashSet<>();
         for (var from : formula.from) Etc.collect(from.term(), a -> a instanceof Func, fromFuncs);
         var funcs = Etc.collect(formula.term(), a -> a instanceof Func);
-        stream.print(fromFuncs.containsAll(funcs) ? "thm" : "esa");
+        out.print(fromFuncs.containsAll(funcs) ? "thm" : "esa");
 
-        stream.print(")],[");
+        out.print(")],[");
         for (var i = 0; i < formula.from.length; i++) {
-          if (i > 0) stream.print(',');
-          stream.print(formula.from[i].name);
+          if (i > 0) out.print(',');
+          out.print(formula.from[i].name);
         }
-        stream.print("])");
+        out.print("])");
         break;
     }
-    stream.println(").");
+    out.println(").");
   }
 
   private boolean isWeird(String s) {
@@ -281,12 +259,12 @@ public final class TptpPrinter {
   }
 
   private void args(List<Object> a) {
-    stream.print('(');
+    out.print('(');
     for (var i = 1; i < a.size(); i++) {
-      if (i > 1) stream.print(',');
+      if (i > 1) out.print(',');
       print(a.get(i));
     }
-    stream.print(')');
+    out.print(')');
   }
 
   @SuppressWarnings("unchecked")
@@ -295,14 +273,14 @@ public final class TptpPrinter {
       var a1 = (List) a;
       var op = a1.get(0);
       if (op instanceof Symbol) {
-        if (needParens(a1, parent)) stream.print('(');
+        if (needParens(a1, parent)) out.print('(');
         switch ((Symbol) op) {
           case ALL:
-            stream.print('!');
+            out.print('!');
             quant(a1);
             break;
           case EXISTS:
-            stream.print('?');
+            out.print('?');
             quant(a1);
             break;
           case AND:
@@ -316,7 +294,7 @@ public final class TptpPrinter {
               infix("!=", (List) a1.get(1));
               break;
             }
-            stream.print('~');
+            out.print('~');
             print(a1.get(1), a1);
             break;
           case EQUALS:
@@ -330,7 +308,7 @@ public final class TptpPrinter {
             args(a1);
             return;
         }
-        if (needParens(a1, parent)) stream.print(')');
+        if (needParens(a1, parent)) out.print(')');
         return;
       }
       print(op);
@@ -340,7 +318,7 @@ public final class TptpPrinter {
     if (a instanceof Func) {
       var name = a.toString();
       if (isWeird(name)) {
-        stream.print(Etc.quote('\'', name));
+        out.print(Etc.quote('\'', name));
         return;
       }
     }
@@ -348,11 +326,11 @@ public final class TptpPrinter {
       print((Symbol) a);
       return;
     }
-    if (a instanceof Boolean) stream.print('$');
+    if (a instanceof Boolean) out.print('$');
     if (a instanceof String) {
-      stream.print(Etc.quote('"', (String) a));
+      out.print(Etc.quote('"', (String) a));
       return;
     }
-    stream.print(a);
+    out.print(a);
   }
 }
