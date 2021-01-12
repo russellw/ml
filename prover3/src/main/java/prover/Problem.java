@@ -1,6 +1,5 @@
 package prover;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
@@ -59,9 +58,8 @@ public final class Problem {
 
   public void write() throws IOException {
     // Report
-    new File("logs").mkdir();
     var writer =
-        new PrintWriter("logs/" + Etc.withoutExtension(Etc.withoutDir(files.get(0))) + ".html");
+        new PrintWriter("/t/" + Etc.withoutExtension(Etc.withoutDir(files.get(0))) + ".html");
     var numberFormat = NumberFormat.getInstance();
 
     // Header
@@ -121,6 +119,19 @@ public final class Problem {
       }
       writer.println("</pre>");
     }
+
+    // Input files
+    writer.println("<h1 id=\"Input-files\">Input files</h1>");
+    var includeDepth = 0;
+    for (var file : files) {
+      var i = 0;
+      while (file.charAt(i) == '\t') i++;
+      if (i > includeDepth) writer.println("<ul>");
+      if (i < includeDepth) writer.println("</ul>");
+      includeDepth = i;
+      writer.println(file);
+    }
+    for (var i = 0; i < includeDepth; i++) writer.println("</ul>");
 
     // Result
     writer.println("<h1 id=\"Result\">Result</h1>");

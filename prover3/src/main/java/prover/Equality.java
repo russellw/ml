@@ -2,6 +2,9 @@ package prover;
 
 import java.util.List;
 
+// Normally, first-order logic does not allow equality of predicates (Boolean terms)
+// However, superposition calculus takes the view that a predicate is an equation
+// p=true
 public final class Equality {
   private Equality() {}
 
