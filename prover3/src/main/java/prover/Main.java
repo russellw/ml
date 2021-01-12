@@ -173,7 +173,7 @@ public final class Main {
         for (var i = 0; i < problem.header.size() && i < 50; i++)
           System.out.println(problem.header.get(i));
       } catch (InappropriateException e) {
-        file = Path.of(file).getFileName().toString();
+        file = Etc.removeDir(file);
         System.out.println("% SZS status Inappropriate for " + file);
         System.out.println();
         continue;
@@ -183,7 +183,7 @@ public final class Main {
       problem.solve(start + timeout);
 
       // Result
-      file = Path.of(file).getFileName().toString();
+      file = Etc.removeDir(file);
       System.out.printf("%% SZS status %s for %s\n", problem.result, file);
       if (problem.refutation != null) new TptpPrinter(System.out).proof(file, problem.refutation);
 

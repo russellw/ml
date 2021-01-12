@@ -50,7 +50,7 @@ public final class Problem {
   public void write() throws FileNotFoundException {
     // Report
     new File("logs").mkdir();
-    var writer = new PrintStream("logs/" + new File(file).getName().split("\\.")[0] + ".html");
+    var writer = new PrintStream("logs/" + Etc.removeExtension(Etc.removeDir(file)) + ".html");
     writer.println("<!DOCTYPE html>");
     writer.println("<html lang=\"en\">");
     writer.println("<meta charset=\"utf-8\"/>");

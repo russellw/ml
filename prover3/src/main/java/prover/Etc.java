@@ -1,6 +1,7 @@
 package prover;
 
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,14 @@ public final class Etc {
   public static void debug(Object a) {
     System.out.print(Thread.currentThread().getStackTrace()[2] + ": ");
     System.out.println(a);
+  }
+
+  public static String removeExtension(String file) {
+    return file.split("\\.")[0];
+  }
+
+  public static String removeDir(String file) {
+    return Path.of(file).getFileName().toString();
   }
 
   public static List<Object> map(List<Object> a, Function<Object, Object> f) {

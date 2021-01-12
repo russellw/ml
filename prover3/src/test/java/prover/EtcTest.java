@@ -142,4 +142,19 @@ public class EtcTest {
         Etc.remainderFloor(BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(Math.floorMod(-5, -3)));
   }
+
+  @Test
+  public void removeExtension() {
+    assertEquals(Etc.removeExtension("abc.txt"), "abc");
+    assertEquals(Etc.removeExtension("abc"), "abc");
+  }
+
+  @Test
+  public void removeDir() {
+    assertEquals(Etc.removeDir("abc.txt"), "abc.txt");
+    assertEquals(Etc.removeDir("abc"), "abc");
+    assertEquals(Etc.removeDir("/dir/abc"), "abc");
+    assertEquals(Etc.removeDir("\\dir\\abc"), "abc");
+    assertEquals(Etc.removeDir("C:\\dir\\abc"), "abc");
+  }
 }
