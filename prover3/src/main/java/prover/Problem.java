@@ -20,15 +20,31 @@ public final class Problem {
   public SZS result;
 
   // Statistics
-  public long timeRead;
+  private long start = System.currentTimeMillis();
+  public long timeParser;
+  private long timeTypeInference;
+  private long timeCnfConversion;
+  private long timeSuperposition;
 
   public void solve(long deadline) {
     if (conjecture != null)
       formulas.add(
           new Formula(List.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
-    Types.inferTypes(formulas, clauses);
-    CNF.convert(formulas, clauses);
-    Superposition.solve(this, deadline);
+    timeTypeInference =
+        Etc.time(
+            () -> {
+              Types.inferTypes(formulas, clauses);
+            });
+    timeCnfConversion =
+        Etc.time(
+            () -> {
+              CNF.convert(formulas, clauses);
+            });
+    timeSuperposition =
+        Etc.time(
+            () -> {
+              Superposition.solve(this, deadline);
+            });
     if (conjecture != null)
       switch (result) {
         case Satisfiable:
@@ -167,8 +183,30 @@ public final class Problem {
     writer.println("<h1 id=\"Time\">Time</h1>");
     writer.println("<table class=\"bordered\">");
     writer.println("<tr>");
-    writer.println("<td class=\"bordered\">Read input");
-    writer.printf("<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeRead / 1000.0);
+    writer.println("<td class=\"bordered\">Parser");
+    writer.printf("<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeParser * 0.001);
+    writer.println("</tr>");
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">Type inference");
+    writer.printf(
+        "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeTypeInference * 0.001);
+    writer.println("</tr>");
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">CNF conversion");
+    writer.printf(
+        "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeCnfConversion * 0.001);
+    writer.println("</tr>");
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">Superposition");
+    writer.printf(
+        "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeSuperposition * 0.001);
+    writer.println("</tr>");
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">Total");
+    writer.printf(
+        "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n",
+        (System.currentTimeMillis() - start) * 0.001);
+    writer.println("</tr>");
     writer.println("</table>");
     writer.println(
         "<p>"

@@ -49,6 +49,12 @@ public final class Etc {
     return Path.of(file).getFileName().toString();
   }
 
+  public static long time(Runnable f) {
+    var start = System.currentTimeMillis();
+    f.run();
+    return System.currentTimeMillis() - start;
+  }
+
   public static List<Object> map(List<Object> a, Function<Object, Object> f) {
     var r = new ArrayList<>();
     for (var b : a) r.add(f.apply(b));
