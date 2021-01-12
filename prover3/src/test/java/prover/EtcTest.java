@@ -144,17 +144,17 @@ public class EtcTest {
   }
 
   @Test
-  public void removeExtension() {
-    assertEquals(Etc.removeExtension("abc.txt"), "abc");
-    assertEquals(Etc.removeExtension("abc"), "abc");
+  public void withoutExtension() {
+    assertEquals(Etc.withoutExtension("abc.txt"), "abc");
+    assertEquals(Etc.withoutExtension("abc"), "abc");
   }
 
   @Test
-  public void removeDir() {
-    assertEquals(Etc.removeDir("abc.txt"), "abc.txt");
-    assertEquals(Etc.removeDir("abc"), "abc");
-    assertEquals(Etc.removeDir("/dir/abc"), "abc");
-    assertEquals(Etc.removeDir("\\dir\\abc"), "abc");
-    assertEquals(Etc.removeDir("C:\\dir\\abc"), "abc");
+  public void withoutDir() {
+    assertEquals(Etc.withoutDir("abc.txt"), "abc.txt");
+    assertEquals(Etc.withoutDir("abc"), "abc");
+    assertEquals(Etc.withoutDir("/dir/abc"), "abc");
+    assertEquals(Etc.withoutDir("\\dir\\abc"), "abc");
+    assertEquals(Etc.withoutDir("C:\\dir\\abc"), "abc");
   }
 }

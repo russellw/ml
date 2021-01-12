@@ -19,6 +19,9 @@ public final class Problem {
   public Clause refutation;
   public SZS result;
 
+  // Statistics
+  public long timeRead;
+
   public void solve(long deadline) {
     if (conjecture != null)
       formulas.add(
@@ -53,7 +56,7 @@ public final class Problem {
   public void write() throws IOException {
     // Report
     new File("logs").mkdir();
-    var writer = new PrintWriter("logs/" + Etc.removeExtension(Etc.removeDir(file)) + ".html");
+    var writer = new PrintWriter("logs/" + Etc.withoutExtension(Etc.withoutDir(file)) + ".html");
     var numberFormat = NumberFormat.getInstance();
 
     // Header
@@ -162,6 +165,11 @@ public final class Problem {
 
     // Time
     writer.println("<h1 id=\"Time\">Time</h1>");
+    writer.println("<table class=\"bordered\">");
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">Read input");
+    writer.printf("<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeRead / 1000.0);
+    writer.println("</table>");
     writer.println(
         "<p>"
             + LocalDateTime.now()

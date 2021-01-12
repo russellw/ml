@@ -169,10 +169,11 @@ public final class Main {
           default:
             throw new IllegalStateException();
         }
+        problem.timeRead = System.currentTimeMillis() - start;
         for (var i = 0; i < problem.header.size() && i < 50; i++)
           System.out.println(problem.header.get(i));
       } catch (InappropriateException e) {
-        file = Etc.removeDir(file);
+        file = Etc.withoutDir(file);
         System.out.println("% SZS status Inappropriate for " + file);
         System.out.println();
         continue;
@@ -182,7 +183,7 @@ public final class Main {
       problem.solve(start + timeout);
 
       // Result
-      file = Etc.removeDir(file);
+      file = Etc.withoutDir(file);
       System.out.printf("%% SZS status %s for %s\n", problem.result, file);
       if (problem.refutation != null) TptpPrinter.proof(file, problem.refutation);
       problem.write();

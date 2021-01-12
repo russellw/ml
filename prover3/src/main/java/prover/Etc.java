@@ -41,11 +41,11 @@ public final class Etc {
     System.out.println(a);
   }
 
-  public static String removeExtension(String file) {
+  public static String withoutExtension(String file) {
     return file.split("\\.")[0];
   }
 
-  public static String removeDir(String file) {
+  public static String withoutDir(String file) {
     return Path.of(file).getFileName().toString();
   }
 
