@@ -105,12 +105,13 @@ public final class DimacsParser {
   // Top level
   private void clause() {
     var c = new Clause(negative, positive, Inference.AXIOM);
-    c.file = problem.file;
+    c.file = problem.files.get(0);
     problem.clauses.add(c);
   }
 
   private DimacsParser(String file, InputStream stream) throws IOException {
-    problem = new Problem(file);
+    problem = new Problem();
+    problem.add(file, 0);
     reader = new LineNumberReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     reader.setLineNumber(1);
     c = reader.read();

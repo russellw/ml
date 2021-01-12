@@ -10,41 +10,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class Problem {
-  public final String file;
-  public List<String> header = new ArrayList<>();
+  public final List<String> files = new ArrayList<>();
+  public final List<String> header = new ArrayList<>();
   public SZS expected;
-  public List<Formula> formulas = new ArrayList<>();
+  public final List<Formula> formulas = new ArrayList<>();
   public Formula conjecture;
-  public List<Clause> clauses = new ArrayList<>();
+  public final List<Clause> clauses = new ArrayList<>();
   public Clause refutation;
   public SZS result;
 
   // Statistics
-  private long start = System.currentTimeMillis();
+  public final long start = System.currentTimeMillis();
   public long timeParser;
   private long timeTypeInference;
   private long timeCnfConversion;
   private long timeSuperposition;
 
+  public void add(String file, int includeDepth) {
+    files.add("\t".repeat(includeDepth) + file);
+  }
+
   public void solve(long deadline) {
     if (conjecture != null)
       formulas.add(
           new Formula(List.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
-    timeTypeInference =
-        Etc.time(
-            () -> {
-              Types.inferTypes(formulas, clauses);
-            });
-    timeCnfConversion =
-        Etc.time(
-            () -> {
-              CNF.convert(formulas, clauses);
-            });
-    timeSuperposition =
-        Etc.time(
-            () -> {
-              Superposition.solve(this, deadline);
-            });
+    timeTypeInference = Etc.time(() -> Types.inferTypes(formulas, clauses));
+    timeCnfConversion = Etc.time(() -> CNF.convert(formulas, clauses));
+    timeSuperposition = Etc.time(() -> Superposition.solve(this, deadline));
     if (conjecture != null)
       switch (result) {
         case Satisfiable:
@@ -65,21 +57,18 @@ public final class Problem {
       }
   }
 
-  public Problem(String file) {
-    this.file = file;
-  }
-
   public void write() throws IOException {
     // Report
     new File("logs").mkdir();
-    var writer = new PrintWriter("logs/" + Etc.withoutExtension(Etc.withoutDir(file)) + ".html");
+    var writer =
+        new PrintWriter("logs/" + Etc.withoutExtension(Etc.withoutDir(files.get(0))) + ".html");
     var numberFormat = NumberFormat.getInstance();
 
     // Header
     writer.println("<!DOCTYPE html>");
     writer.println("<html lang=\"en\">");
     writer.println("<meta charset=\"utf-8\"/>");
-    writer.printf("<title>%s</title>\n", file);
+    writer.printf("<title>%s</title>\n", files.get(0));
     writer.println("<style>");
     writer.println("h1 {");
     writer.println("font-size: 150%;");

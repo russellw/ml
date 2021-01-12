@@ -661,8 +661,10 @@ public final class TptpParser {
     }
   }
 
-  private TptpParser(String file, InputStream stream, Set<Object> select) throws IOException {
+  private TptpParser(String file, InputStream stream, Set<Object> select, int includeDepth)
+      throws IOException {
     this.file = file;
+    problem.add(file, includeDepth);
     reader = new LineNumberReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     reader.setLineNumber(1);
     c = reader.read();
@@ -803,7 +805,7 @@ public final class TptpParser {
               }
 
             // Read
-            new TptpParser(file1, stream1, select1);
+            new TptpParser(file1, stream1, select1, includeDepth + 1);
             break;
           }
         case "thf":
@@ -819,10 +821,10 @@ public final class TptpParser {
 
   public static Problem read(String file, InputStream stream) throws IOException {
     funcs = new HashMap<>();
-    problem = new Problem(file);
+    problem = new Problem();
 
     // Read
-    new TptpParser(file, stream, null);
+    new TptpParser(file, stream, null, 0);
 
     // Free memory
     funcs = null;
