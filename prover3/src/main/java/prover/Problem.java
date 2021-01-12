@@ -3,6 +3,9 @@ package prover;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,89 +53,125 @@ public final class Problem {
   public void write() throws IOException {
     // Report
     new File("logs").mkdir();
-    var out = new PrintWriter("logs/" + Etc.removeExtension(Etc.removeDir(file)) + ".html");
-    out.println("<!DOCTYPE html>");
-    out.println("<html lang=\"en\">");
-    out.println("<meta charset=\"utf-8\"/>");
-    out.printf("<title>%s</title>\n", file);
-    out.println("<style>");
-    out.println("h1 {");
-    out.println("font-size: 150%;");
-    out.println("}");
-    out.println("h2 {");
-    out.println("font-size: 125%;");
-    out.println("}");
-    out.println("caption {");
-    out.println("text-align: left;");
-    out.println("white-space: nowrap;");
-    out.println("}");
-    out.println("table.bordered, th.bordered, td.bordered {");
-    out.println("border: 1px solid;");
-    out.println("border-collapse: collapse;");
-    out.println("padding: 5px;");
-    out.println("}");
-    out.println("table.padded, th.padded, td.padded {");
-    out.println("padding: 3px;");
-    out.println("}");
-    out.println("td.fixed {");
-    out.println("white-space: nowrap;");
-    out.println("}");
-    out.println("td.bar {");
-    out.println("width: 100%");
-    out.println("}");
-    out.println("</style>");
+    var writer = new PrintWriter("logs/" + Etc.removeExtension(Etc.removeDir(file)) + ".html");
+    var numberFormat = NumberFormat.getInstance();
+
+    // Header
+    writer.println("<!DOCTYPE html>");
+    writer.println("<html lang=\"en\">");
+    writer.println("<meta charset=\"utf-8\"/>");
+    writer.printf("<title>%s</title>\n", file);
+    writer.println("<style>");
+    writer.println("h1 {");
+    writer.println("font-size: 150%;");
+    writer.println("}");
+    writer.println("h2 {");
+    writer.println("font-size: 125%;");
+    writer.println("}");
+    writer.println("caption {");
+    writer.println("text-align: left;");
+    writer.println("white-space: nowrap;");
+    writer.println("}");
+    writer.println("table.bordered, th.bordered, td.bordered {");
+    writer.println("border: 1px solid;");
+    writer.println("border-collapse: collapse;");
+    writer.println("padding: 5px;");
+    writer.println("}");
+    writer.println("table.padded, th.padded, td.padded {");
+    writer.println("padding: 3px;");
+    writer.println("}");
+    writer.println("td.fixed {");
+    writer.println("white-space: nowrap;");
+    writer.println("}");
+    writer.println("td.bar {");
+    writer.println("width: 100%");
+    writer.println("}");
+    writer.println("</style>");
 
     // Contents
-    out.println("<h1 id=\"Contents\">Contents</h1>");
-    out.println("<ul>");
-    out.println("<li><a href=\"#Contents\">Contents</a>");
-    out.println("<li><a href=\"#Input-files\">Input files</a>");
-    out.println("<li><a href=\"#Clauses\">Clauses</a>");
-    out.println("<li><a href=\"#Subsumption\">Subsumption</a>");
-    out.println("<li><a href=\"#Result\">Result</a>");
-    if (refutation != null) out.println("<li><a href=\"#Proof\">Proof</a>");
-    out.println("<li><a href=\"#Memory\">Memory</a>");
-    out.println("<li><a href=\"#Time\">Time</a>");
-    out.println("</ul>");
+    writer.println("<h1 id=\"Contents\">Contents</h1>");
+    writer.println("<ul>");
+    writer.println("<li><a href=\"#Contents\">Contents</a>");
+    writer.println("<li><a href=\"#Input-files\">Input files</a>");
+    writer.println("<li><a href=\"#Clauses\">Clauses</a>");
+    writer.println("<li><a href=\"#Subsumption\">Subsumption</a>");
+    writer.println("<li><a href=\"#Result\">Result</a>");
+    if (refutation != null) writer.println("<li><a href=\"#Proof\">Proof</a>");
+    writer.println("<li><a href=\"#Memory\">Memory</a>");
+    writer.println("<li><a href=\"#Time\">Time</a>");
+    writer.println("</ul>");
 
     // Problem header
     if (!header.isEmpty()) {
       if (header.get(header.size() - 1).isEmpty()) {
         header.remove(header.size() - 1);
       }
-      out.println("<h1 id=\"Problem-header\">Problem header</h1>");
-      out.println("<pre>");
+      writer.println("<h1 id=\"Problem-header\">Problem header</h1>");
+      writer.println("<pre>");
       for (var s : header) {
-        wrap(s, out);
+        wrap(s, writer);
       }
-      out.println("</pre>");
+      writer.println("</pre>");
     }
 
     // Result
-    out.println("<h1 id=\"Result\">Result</h1>");
-    out.println("<table class=\"bordered\">");
+    writer.println("<h1 id=\"Result\">Result</h1>");
+    writer.println("<table class=\"bordered\">");
     if (expected != null) {
-      out.println("<tr>");
-      out.println("<td class=\"bordered\">Expected");
-      out.println("<td class=\"bordered\">" + expected);
+      writer.println("<tr>");
+      writer.println("<td class=\"bordered\">Expected");
+      writer.println("<td class=\"bordered\">" + expected);
     }
-    out.println("<tr>");
-    out.println("<td class=\"bordered\">Result");
-    out.printf("<td class=\"bordered\"><b>%s</b>\n", result);
-    out.println("</table>");
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">Result");
+    writer.printf("<td class=\"bordered\"><b>%s</b>\n", result);
+    writer.println("</table>");
 
     // Proof
     if (refutation != null) {
-      out.println("<h1 id=\"Proof\">Proof</h1>");
-      out.println("<code>");
-      out.println("</code>");
+      writer.println("<h1 id=\"Proof\">Proof</h1>");
+      writer.println("<code>");
+      writer.println("</code>");
     }
 
+    // Memory
+    var runtime = Runtime.getRuntime();
+    writer.println("<h1 id=\"Memory\">Memory</h1>");
+    writer.println("<table class=\"bordered\">");
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">Current");
+    writer.println(
+        "<td class=\"bordered\"; style=\"text-align: right\">"
+            + numberFormat.format(runtime.totalMemory() - runtime.freeMemory()));
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">Free");
+    writer.println(
+        "<td class=\"bordered\"; style=\"text-align: right\">+ "
+            + numberFormat.format(runtime.freeMemory()));
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">Total");
+    writer.println(
+        "<td class=\"bordered\"; style=\"text-align: right\">= "
+            + numberFormat.format(runtime.totalMemory()));
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">Max");
+    writer.println(
+        "<td class=\"bordered\"; style=\"text-align: right\">"
+            + numberFormat.format(runtime.maxMemory()));
+    writer.println("</table>");
+
+    // Time
+    writer.println("<h1 id=\"Time\">Time</h1>");
+    writer.println(
+        "<p>"
+            + LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy, HH:mm:ss")));
+
     // Flush output
-    out.close();
+    writer.close();
   }
 
-  private static void wrap(String s, PrintWriter out) {
+  private static void wrap(String s, PrintWriter writer) {
     var column = 0;
     for (var i = 0; i < s.length(); ) {
       var j = i;
@@ -152,16 +191,16 @@ public final class Problem {
         while (i < j && s.charAt(i) == ' ') i++;
 
         // New line
-        out.println();
+        writer.println();
         column = 0;
       }
 
       // Print word
       var t = s.substring(i, j).replace("<", "&lt;");
-      out.print(t);
+      writer.print(t);
       column += t.length();
       i = j;
     }
-    out.println();
+    writer.println();
   }
 }
