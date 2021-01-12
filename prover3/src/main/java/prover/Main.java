@@ -186,6 +186,7 @@ public final class Main {
       file = Etc.removeDir(file);
       System.out.printf("%% SZS status %s for %s\n", problem.result, file);
       if (problem.refutation != null) new TptpPrinter(System.out).proof(file, problem.refutation);
+      problem.write();
 
       // Statistics
       attempted++;
@@ -224,7 +225,7 @@ public final class Main {
     System.exit(0);
   }
 
-  private static String version() throws IOException {
+  public static String version() throws IOException {
     var properties = new Properties();
     var stream =
         Main.class

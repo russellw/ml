@@ -1,7 +1,7 @@
 package prover;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public final class Problem {
     this.file = file;
   }
 
-  public void write() throws FileNotFoundException {
+  public void write() throws IOException {
     // Report
     new File("logs").mkdir();
     var writer = new PrintStream("logs/" + Etc.removeExtension(Etc.removeDir(file)) + ".html");
@@ -90,10 +90,52 @@ public final class Problem {
     writer.println("<li><a href=\"#Clauses\">Clauses</a>");
     writer.println("<li><a href=\"#Subsumption\">Subsumption</a>");
     writer.println("<li><a href=\"#Result\">Result</a>");
+    if (refutation != null) writer.println("<li><a href=\"#Proof\">Proof</a>");
     writer.println("<li><a href=\"#Memory\">Memory</a>");
     writer.println("<li><a href=\"#Time\">Time</a>");
+    if (Main.version() != null) writer.println("<li><a href=\"#Version\">Version</a>");
     writer.println("</ul>");
 
+    // Problem header
+    if (!header.isEmpty()) {
+      if (header.get(header.size() - 1).isEmpty()) {
+        header.remove(header.size() - 1);
+      }
+      writer.println("<h1 id=\"Problem-header\">Problem header</h1>");
+      writer.println("<pre>");
+      for (var s : header) {
+        wrap(s, writer);
+      }
+      writer.println("</pre>");
+    }
+
+    // Flush output
     writer.close();
+  }
+
+  private void wrap(String s, PrintStream writer) {
+    var col = 0;
+    for (var i = 0; i < s.length(); ) {
+      var j = i;
+      while ((j < s.length()) && (s.charAt(j) == ' ')) {
+        j++;
+      }
+      var word = j;
+      while ((j < s.length()) && (s.charAt(j) != ' ')) {
+        j++;
+      }
+      j = Math.min(j, word + 90);
+      if ((col > 0) && (col + (j - i) > 80)) {
+        while ((i < j) && (s.charAt(i) == ' ')) {
+          i++;
+        }
+        writer.println();
+        col = 0;
+      }
+      writer.print(s.substring(i, j).replace("<", "&lt;"));
+      col += j - i;
+      i = j;
+    }
+    writer.println();
   }
 }
