@@ -152,8 +152,6 @@ public final class Main {
     var attempted = 0;
     var solved = 0;
     for (var file : files) {
-      var start = System.currentTimeMillis();
-
       // Read
       Problem problem;
       try {
@@ -169,7 +167,7 @@ public final class Main {
           default:
             throw new IllegalStateException();
         }
-        problem.timeParser = System.currentTimeMillis() - start;
+        problem.timeParser = System.currentTimeMillis() - problem.start;
         for (var i = 0; i < problem.header.size() && i < 50; i++)
           System.out.println(problem.header.get(i));
       } catch (InappropriateException e) {
@@ -180,7 +178,7 @@ public final class Main {
       }
 
       // Solve
-      problem.solve(start + timeout);
+      problem.solve(timeout);
 
       // Result
       file = Etc.withoutDir(file);
@@ -199,7 +197,7 @@ public final class Main {
           solved++;
           break;
       }
-      System.out.printf("%% %f seconds\n", (System.currentTimeMillis() - start) * 0.001);
+      System.out.printf("%% %f seconds\n", (System.currentTimeMillis() - problem.start) * 0.001);
       System.out.println();
     }
     System.out.printf(

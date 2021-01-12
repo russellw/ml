@@ -30,13 +30,13 @@ public final class Problem {
     files.add("\t".repeat(includeDepth) + file);
   }
 
-  public void solve(long deadline) {
+  public void solve(long timeout) {
     if (conjecture != null)
       formulas.add(
           new Formula(List.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
     timeTypeInference = Etc.time(() -> Types.inferTypes(formulas, clauses));
     timeCnfConversion = Etc.time(() -> CNF.convert(formulas, clauses));
-    timeSuperposition = Etc.time(() -> Superposition.solve(this, deadline));
+    timeSuperposition = Etc.time(() -> Superposition.solve(this, start + timeout));
     if (conjecture != null)
       switch (result) {
         case Satisfiable:
