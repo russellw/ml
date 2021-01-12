@@ -15,10 +15,6 @@ public final class TptpPrinter {
     this.out = out;
   }
 
-  public void flush() {
-    out.flush();
-  }
-
   private void print(Symbol a) {
     switch (a) {
       case BOOLEAN:
@@ -170,7 +166,7 @@ public final class TptpPrinter {
     for (var formula : proof) if (formula.name == null) formula.name = ++i;
 
     // Names for anonymous Skolem functions
-    var pattern = Pattern.compile("sK\\d+");
+    var pattern = Pattern.compile("sK(\\d+)");
     var skolems = new LinkedHashSet<Func>();
     var j = new long[] {-1L};
     for (var formula : proof)

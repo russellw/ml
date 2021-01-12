@@ -75,7 +75,7 @@ public final class Main {
         case "h":
         case "help":
           help();
-          throw new IllegalStateException();
+          System.exit(0);
         case "T":
           {
             if (optArg == null) optArg = optArg(args, i++);
@@ -95,25 +95,21 @@ public final class Main {
         case "show-version":
         case "showversion":
         case "version":
-          {
-            var version = version();
-            System.out.printf(
-                "Prover %s, %s\n",
-                Objects.toString(version, "[unknown version, not running from jar]"),
-                System.getProperty("java.class.path"));
-            System.out.printf(
-                "%s, %s, %s\n",
-                System.getProperty("java.vm.name"),
-                System.getProperty("java.vm.version"),
-                System.getProperty("java.home"));
-            System.out.printf(
-                "%s, %s, %s\n",
-                System.getProperty("os.name"),
-                System.getProperty("os.version"),
-                System.getProperty("os.arch"));
-            System.exit(0);
-            throw new IllegalStateException();
-          }
+          System.out.printf(
+              "Prover %s, %s\n",
+              Objects.toString(version(), "[unknown version, not running from jar]"),
+              System.getProperty("java.class.path"));
+          System.out.printf(
+              "%s, %s, %s\n",
+              System.getProperty("java.vm.name"),
+              System.getProperty("java.vm.version"),
+              System.getProperty("java.home"));
+          System.out.printf(
+              "%s, %s, %s\n",
+              System.getProperty("os.name"),
+              System.getProperty("os.version"),
+              System.getProperty("os.arch"));
+          System.exit(0);
         case "dimacs":
           language = Language.DIMACS;
           break;
@@ -149,7 +145,10 @@ public final class Main {
 
   public static void main(String[] args) throws IOException {
     args(args);
-    if (files.isEmpty()) help();
+    if (files.isEmpty()) {
+      help();
+      return;
+    }
     var attempted = 0;
     var solved = 0;
     for (var file : files) {
@@ -186,9 +185,9 @@ public final class Main {
       file = Etc.removeDir(file);
       System.out.printf("%% SZS status %s for %s\n", problem.result, file);
       if (problem.refutation != null) {
-        var printer = new TptpPrinter(new PrintWriter(System.out));
-        printer.proof(file, problem.refutation);
-        printer.flush();
+        var out = new PrintWriter(System.out);
+        new TptpPrinter(out).proof(file, problem.refutation);
+        out.flush();
       }
       problem.write();
 
@@ -226,10 +225,9 @@ public final class Main {
     System.out.println("-T seconds  Hard timeout");
     System.out.println("-t seconds  Soft timeout");
     System.out.println("            Seconds can be floating point");
-    System.exit(0);
   }
 
-  public static String version() throws IOException {
+  private static String version() throws IOException {
     var properties = new Properties();
     var stream =
         Main.class

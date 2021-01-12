@@ -93,7 +93,6 @@ public final class Problem {
     if (refutation != null) out.println("<li><a href=\"#Proof\">Proof</a>");
     out.println("<li><a href=\"#Memory\">Memory</a>");
     out.println("<li><a href=\"#Time\">Time</a>");
-    if (Main.version() != null) out.println("<li><a href=\"#Version\">Version</a>");
     out.println("</ul>");
 
     // Problem header
@@ -107,6 +106,27 @@ public final class Problem {
         wrap(s, out);
       }
       out.println("</pre>");
+    }
+
+    // Result
+    out.println("<h1 id=\"Result\">Result</h1>");
+    out.println("<table class=\"bordered\">");
+    if (expected != null) {
+      out.println("<tr>");
+      out.println("<td class=\"bordered\">Expected");
+      out.println("<td class=\"bordered\">" + expected);
+    }
+    out.println("<tr>");
+    out.println("<td class=\"bordered\">Result");
+    out.printf("<td class=\"bordered\"><b>%s</b>\n", result);
+    out.println("</table>");
+
+    // Proof
+    if (refutation != null) {
+      out.println("<h1 id=\"Proof\">Proof</h1>");
+      out.println("<code>");
+      new TptpPrinter(out).proof(file, refutation);
+      out.println("</code>");
     }
 
     // Flush output
