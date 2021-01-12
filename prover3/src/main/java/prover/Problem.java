@@ -125,7 +125,6 @@ public final class Problem {
     if (refutation != null) {
       out.println("<h1 id=\"Proof\">Proof</h1>");
       out.println("<code>");
-      new TptpPrinter(out).proof(file, refutation);
       out.println("</code>");
     }
 

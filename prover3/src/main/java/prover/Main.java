@@ -184,11 +184,7 @@ public final class Main {
       // Result
       file = Etc.removeDir(file);
       System.out.printf("%% SZS status %s for %s\n", problem.result, file);
-      if (problem.refutation != null) {
-        var out = new PrintWriter(System.out);
-        new TptpPrinter(out).proof(file, problem.refutation);
-        out.flush();
-      }
+      if (problem.refutation != null) TptpPrinter.proof(file, problem.refutation);
       problem.write();
 
       // Statistics
