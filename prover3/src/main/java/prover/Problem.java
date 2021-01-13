@@ -217,13 +217,45 @@ public final class Problem {
     // Proof
     if (refutation != null) {
       writer.println("<h1 id=\"Proof\">Proof</h1>");
-      writer.println("<code>");
+      writer.println("<table class=\"bordered\">");
+      writer.println("<tr>");
+      writer.println("<td class=\"bordered\">From");
+      writer.println("<td class=\"bordered\">Name");
+      writer.println("<td class=\"bordered\">Negative");
+      writer.println("<td class=\"bordered\">Positive");
       var proof = refutation.proof();
       for (var formula : proof) {
         if (!(formula instanceof Clause)) continue;
         var c = (Clause) formula;
+        writer.println("<tr>");
+
+        writer.print("<td class=\"bordered\">");
+        for (var i = 0; i < c.from.length; i++) {
+          if (i > 0) writer.print(' ');
+          writer.print(c.from[i].name);
+        }
+        writer.println();
+
+        writer.print("<td class=\"bordered\">");
+        writer.println(c.name);
+
+        writer.print("<td class=\"bordered\">");
+        var negative = c.negative();
+        for (var i = 0; i < negative.length; i++) {
+          if (i > 0) writer.print(' ');
+          writer.print(negative[i]);
+        }
+        writer.println();
+
+        writer.print("<td class=\"bordered\">");
+        var positive = c.positive();
+        for (var i = 0; i < positive.length; i++) {
+          if (i > 0) writer.print(' ');
+          writer.print(positive[i]);
+        }
+        writer.println();
       }
-      writer.println("</code>");
+      writer.println("</table>");
     }
 
     // Memory
