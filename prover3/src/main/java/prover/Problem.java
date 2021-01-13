@@ -2,6 +2,7 @@ package prover;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,6 +25,9 @@ public final class Problem {
   private long timeTypeInference;
   private long timeCnfConversion;
   private long timeSuperposition;
+
+  // Output
+  private PrintWriter writer;
 
   public String file() {
     return files.get(0);
@@ -60,10 +64,14 @@ public final class Problem {
       }
   }
 
+  private void href(String s) {
+    s = Path.of(s).toAbsolutePath().toString();
+    writer.printf("<a href=\"%s\">%s</a>", s.replace('\\', '/'), s);
+  }
+
   public void write() throws IOException {
     // Report
-    var writer =
-        new PrintWriter("/t/" + Etc.withoutExtension(Etc.withoutDir(files.get(0))) + ".html");
+    writer = new PrintWriter("/t/" + Etc.withoutExtension(Etc.withoutDir(files.get(0))) + ".html");
     var numberFormat = NumberFormat.getInstance();
 
     // Header
@@ -119,7 +127,7 @@ public final class Problem {
       writer.println("<h1 id=\"Problem-header\">Problem header</h1>");
       writer.println("<pre>");
       for (var s : header) {
-        wrap(s, writer);
+        wrap(s);
       }
       writer.println("</pre>");
     }
@@ -133,7 +141,7 @@ public final class Problem {
       if (i > includeDepth) writer.println("<ul>");
       if (i < includeDepth) writer.println("</ul>");
       includeDepth = i;
-      writer.println(file);
+      href(file);
     }
     for (var i = 0; i < includeDepth; i++) writer.println("</ul>");
 
@@ -221,7 +229,7 @@ public final class Problem {
     writer.close();
   }
 
-  private static void wrap(String s, PrintWriter writer) {
+  private void wrap(String s) {
     var column = 0;
     for (var i = 0; i < s.length(); ) {
       var j = i;
