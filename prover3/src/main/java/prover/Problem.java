@@ -6,8 +6,7 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public final class Problem {
   public final long start = System.currentTimeMillis();
@@ -105,7 +104,7 @@ public final class Problem {
     writer.println("<ul>");
     writer.println("<li><a href=\"#Contents\">Contents</a>");
     writer.println("<li><a href=\"#Input-files\">Input files</a>");
-    writer.println("<li><a href=\"#Clauses\">Clauses</a>");
+    writer.println("<li><a href=\"#Functions\">Functions</a>");
     writer.println("<li><a href=\"#Subsumption\">Subsumption</a>");
     writer.println("<li><a href=\"#Result\">Result</a>");
     if (refutation != null) writer.println("<li><a href=\"#Proof\">Proof</a>");
@@ -114,15 +113,12 @@ public final class Problem {
     writer.println("</ul>");
 
     // Problem header
+    while (!header.isEmpty() && header.get(header.size() - 1).isBlank())
+      header.remove(header.size() - 1);
     if (!header.isEmpty()) {
-      if (header.get(header.size() - 1).isEmpty()) {
-        header.remove(header.size() - 1);
-      }
       writer.println("<h1 id=\"Problem-header\">Problem header</h1>");
       writer.println("<pre>");
-      for (var s : header) {
-        wrap(s);
-      }
+      for (var s : header) wrap(s);
       writer.println("</pre>");
     }
 
@@ -138,9 +134,36 @@ public final class Problem {
       includeDepth = i;
       writer.print("<li>");
       href(file);
-      writer.println("</li>");
+      writer.println();
     }
     for (var i = 0; i < includeDepth; i++) writer.println("</ul>");
+
+    // Functions
+    writer.println("<h1 id=\"Functions\">Functions</h1>");
+    writer.println("<table class=\"bordered\">");
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">Name");
+    writer.println("<td class=\"bordered\">Type");
+    writer.println("<td class=\"bordered\"; style=\"text-align: right\">Occurs");
+    var funcs = new Bag<Func>();
+    for (var c : clauses)
+      Etc.walk(
+          Arrays.asList(c.literals),
+          a -> {
+            if (a instanceof Func) funcs.add((Func) a);
+          });
+    var funcs1 = new ArrayList<>(funcs.keySet());
+    funcs1.sort(Comparator.comparing(Func::toString));
+    for (var a : funcs1) {
+      writer.println("<tr>");
+      writer.print("<td class=\"bordered\">");
+      writer.println(a);
+      writer.print("<td class=\"bordered\">");
+      writer.println(Types.typeof(a));
+      writer.print("<td class=\"bordered\"; style=\"text-align: right\">");
+      writer.println(funcs.get(a));
+    }
+    writer.println("</table>");
 
     // Result
     writer.println("<h1 id=\"Result\">Result</h1>");
@@ -159,6 +182,11 @@ public final class Problem {
     if (refutation != null) {
       writer.println("<h1 id=\"Proof\">Proof</h1>");
       writer.println("<code>");
+      var proof = refutation.proof();
+      for (var formula : proof) {
+        if (!(formula instanceof Clause)) continue;
+        var c = (Clause) formula;
+      }
       writer.println("</code>");
     }
 
