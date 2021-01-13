@@ -70,14 +70,15 @@ public final class Problem {
 
   public void write() throws IOException {
     // Report
-    writer = new PrintWriter("/t/" + Etc.withoutExtension(Etc.withoutDir(files.get(0))) + ".html");
+    var name = Etc.withoutExtension(Etc.withoutDir(file()));
+    writer = new PrintWriter("/t/" + name + ".html");
     var numberFormat = NumberFormat.getInstance();
 
     // Header
     writer.println("<!DOCTYPE html>");
     writer.println("<html lang=\"en\">");
     writer.println("<meta charset=\"utf-8\"/>");
-    writer.printf("<title>%s</title>\n", files.get(0));
+    writer.printf("<title>%s</title>\n", name);
     writer.println("<style>");
     writer.println("caption {");
     writer.println("text-align: left;");
