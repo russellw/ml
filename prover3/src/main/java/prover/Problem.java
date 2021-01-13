@@ -80,12 +80,6 @@ public final class Problem {
     writer.println("<meta charset=\"utf-8\"/>");
     writer.printf("<title>%s</title>\n", files.get(0));
     writer.println("<style>");
-    writer.println("h1 {");
-    writer.println("font-size: 150%;");
-    writer.println("}");
-    writer.println("h2 {");
-    writer.println("font-size: 125%;");
-    writer.println("}");
     writer.println("caption {");
     writer.println("text-align: left;");
     writer.println("white-space: nowrap;");
@@ -138,10 +132,13 @@ public final class Problem {
     for (var file : files) {
       var i = 0;
       while (file.charAt(i) == '\t') i++;
+      file = file.substring(i);
       if (i > includeDepth) writer.println("<ul>");
       if (i < includeDepth) writer.println("</ul>");
       includeDepth = i;
+      writer.print("<li>");
       href(file);
+      writer.println("</li>");
     }
     for (var i = 0; i < includeDepth; i++) writer.println("</ul>");
 
