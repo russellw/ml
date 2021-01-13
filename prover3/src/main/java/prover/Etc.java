@@ -69,21 +69,30 @@ public final class Etc {
   }
 
   @SuppressWarnings("unchecked")
-  public static Object treeMap(Object a, Function<Object, Object> f) {
+  public static Object mapLeaves(Object a, Function<Object, Object> f) {
     if (a instanceof List) {
       var a1 = (List) a;
-      return map(a1, b -> treeMap(b, f));
+      return map(a1, b -> mapLeaves(b, f));
     }
     return f.apply(a);
   }
 
-  public static void walk(Object a, Consumer<Object> f) {
+  public static void walkLeaves(Object a, Consumer<Object> f) {
     if (a instanceof List) {
       var a1 = (List) a;
-      for (var b : a1) walk(b, f);
+      for (var b : a1) walkLeaves(b, f);
       return;
     }
     f.accept(a);
+  }
+
+  public static void walkBranches(Object a, Consumer<List> f) {
+    if (a instanceof List) {
+      var a1 = (List) a;
+      f.accept(a1);
+      for (var b : a1) walkBranches(b, f);
+      return;
+    }
   }
 
   public static Object splice(Object a, List<Integer> position, int i, Object b) {
@@ -119,25 +128,25 @@ public final class Etc {
     return a.subtract(divideFloor(a, b).multiply(b));
   }
 
-  public static boolean exists(Object a, Predicate<Object> f) {
+  public static boolean existsLeaf(Object a, Predicate<Object> f) {
     if (a instanceof List) {
       var a1 = (List) a;
-      for (var b : a1) if (exists(b, f)) return true;
+      for (var b : a1) if (existsLeaf(b, f)) return true;
       return false;
     }
     return (f.test(a));
   }
 
-  public static Set<Object> collect(Object a, Predicate<Object> f) {
+  public static Set<Object> collectLeaves(Object a, Predicate<Object> f) {
     var r = new HashSet<>();
-    collect(a, f, r);
+    collectLeaves(a, f, r);
     return r;
   }
 
-  public static void collect(Object a, Predicate<Object> f, Set<Object> r) {
+  public static void collectLeaves(Object a, Predicate<Object> f, Set<Object> r) {
     if (a instanceof List) {
       var a1 = (List) a;
-      for (var b : a1) collect(b, f, r);
+      for (var b : a1) collectLeaves(b, f, r);
       return;
     }
     if (f.test(a)) r.add(a);

@@ -99,11 +99,22 @@ public final class Problem {
     writer.println("}");
     writer.println("</style>");
 
+    // Operators
+    var ops = new Bag<>();
+    for (var c : clauses)
+      Etc.walkBranches(
+          Arrays.asList(c.literals),
+          a -> {
+            var op = a.get(0);
+            if (op instanceof Symbol) ops.add(List.of(op, Types.typeof(a)));
+          });
+
     // Contents
     writer.println("<h1 id=\"Contents\">Contents</h1>");
     writer.println("<ul>");
     writer.println("<li><a href=\"#Contents\">Contents</a>");
     writer.println("<li><a href=\"#Input-files\">Input files</a>");
+    if (!ops.isEmpty()) writer.println("<li><a href=\"#Operators\">Operators</a>");
     writer.println("<li><a href=\"#Functions\">Functions</a>");
     writer.println("<li><a href=\"#Subsumption\">Subsumption</a>");
     writer.println("<li><a href=\"#Result\">Result</a>");
@@ -138,6 +149,29 @@ public final class Problem {
     }
     for (var i = 0; i < includeDepth; i++) writer.println("</ul>");
 
+    // Operators
+    writer.println("<h1 id=\"Operators\">Operators</h1>");
+    writer.println("<table class=\"bordered\">");
+    writer.println("<tr>");
+    writer.println("<td class=\"bordered\">Name");
+    writer.println("<td class=\"bordered\">Type");
+    writer.println("<td class=\"bordered\"; style=\"text-align: right\">Occurs");
+    var ops1 = new ArrayList<>(ops.keySet());
+    ops1.sort(Comparator.comparing(Object::toString));
+    for (var a : ops1) {
+      var a1 = (List) a;
+      var op = a1.get(0);
+      var type = a1.get(1);
+      writer.println("<tr>");
+      writer.print("<td class=\"bordered\">");
+      writer.println(op);
+      writer.print("<td class=\"bordered\">");
+      writer.println(type);
+      writer.print("<td class=\"bordered\"; style=\"text-align: right\">");
+      writer.println(ops.get(a));
+    }
+    writer.println("</table>");
+
     // Functions
     writer.println("<h1 id=\"Functions\">Functions</h1>");
     writer.println("<table class=\"bordered\">");
@@ -147,7 +181,7 @@ public final class Problem {
     writer.println("<td class=\"bordered\"; style=\"text-align: right\">Occurs");
     var funcs = new Bag<Func>();
     for (var c : clauses)
-      Etc.walk(
+      Etc.walkLeaves(
           Arrays.asList(c.literals),
           a -> {
             if (a instanceof Func) funcs.add((Func) a);

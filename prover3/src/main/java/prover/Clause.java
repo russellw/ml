@@ -38,7 +38,7 @@ public final class Clause extends AbstractFormula {
 
   public Set<Variable> variables() {
     var r = new HashSet<Variable>();
-    Etc.walk(
+    Etc.walkLeaves(
         Arrays.asList(literals),
         a -> {
           if (a instanceof Variable) r.add((Variable) a);
@@ -68,7 +68,7 @@ public final class Clause extends AbstractFormula {
     var map = new HashMap<Variable, Variable>();
     var r =
         (List)
-            Etc.treeMap(
+            Etc.mapLeaves(
                 Arrays.asList(literals),
                 a -> {
                   if (a instanceof Variable) {
@@ -93,7 +93,7 @@ public final class Clause extends AbstractFormula {
 
   public int volume() {
     int[] n = new int[1];
-    Etc.walk(Arrays.asList(literals), a -> n[0]++);
+    Etc.walkLeaves(Arrays.asList(literals), a -> n[0]++);
     return n[0];
   }
 

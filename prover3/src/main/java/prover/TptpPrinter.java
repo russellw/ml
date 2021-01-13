@@ -163,7 +163,7 @@ public final class TptpPrinter {
     var skolems = new LinkedHashSet<Func>();
     var j = new long[] {-1L};
     for (var formula : proof)
-      Etc.walk(
+      Etc.walkLeaves(
           formula.term(),
           a -> {
             if (a instanceof Func) {
@@ -232,8 +232,9 @@ public final class TptpPrinter {
         // If a formula introduces new symbols, then it is only equisatisfiable
         // This happens during subformula renaming in CNF conversion
         var fromFuncs = new HashSet<>();
-        for (var from : formula.from) Etc.collect(from.term(), a -> a instanceof Func, fromFuncs);
-        var funcs = Etc.collect(formula.term(), a -> a instanceof Func);
+        for (var from : formula.from)
+          Etc.collectLeaves(from.term(), a -> a instanceof Func, fromFuncs);
+        var funcs = Etc.collectLeaves(formula.term(), a -> a instanceof Func);
         System.out.print(fromFuncs.containsAll(funcs) ? "thm" : "esa");
 
         System.out.print(")],[");

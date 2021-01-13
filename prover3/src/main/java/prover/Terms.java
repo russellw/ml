@@ -106,7 +106,7 @@ public final class Terms {
   }
 
   public static Object replace(Object a, Map<Variable, Object> map) {
-    return Etc.treeMap(
+    return Etc.mapLeaves(
         a,
         b -> {
           if (b instanceof Variable) {
