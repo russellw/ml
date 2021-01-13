@@ -6,12 +6,7 @@
 *.png
 *.pth
 .idea/
-TPTP/
 bin/
-data/
-logs/
-satlib/
-tsplib/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

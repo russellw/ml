@@ -105,7 +105,7 @@ public final class DimacsParser {
   // Top level
   private void clause() {
     var c = new Clause(negative, positive, Inference.AXIOM);
-    c.file = problem.files.get(0);
+    c.file = problem.file();
     problem.clauses.add(c);
   }
 

@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class Problem {
-  public final List<String> files = new ArrayList<>();
+  public final long start = System.currentTimeMillis();
+  private final List<String> files = new ArrayList<>();
   public final List<String> header = new ArrayList<>();
   public SZS expected;
   public final List<Formula> formulas = new ArrayList<>();
@@ -19,11 +20,14 @@ public final class Problem {
   public SZS result;
 
   // Statistics
-  public final long start = System.currentTimeMillis();
   public long timeParser;
   private long timeTypeInference;
   private long timeCnfConversion;
   private long timeSuperposition;
+
+  public String file() {
+    return files.get(0);
+  }
 
   public void add(String file, int includeDepth) {
     files.add("\t".repeat(includeDepth) + file);
