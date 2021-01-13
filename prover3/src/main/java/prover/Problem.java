@@ -206,7 +206,8 @@ public final class Problem {
     if (expected != null) {
       writer.println("<tr>");
       writer.println("<td class=\"bordered\">Expected");
-      writer.println("<td class=\"bordered\">" + expected);
+      writer.print("<td class=\"bordered\">");
+      writer.println(expected);
     }
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Result");
@@ -229,61 +230,68 @@ public final class Problem {
     var runtime = Runtime.getRuntime();
     writer.println("<h1 id=\"Memory\">Memory</h1>");
     writer.println("<table class=\"bordered\">");
+
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Current");
-    writer.println(
-        "<td class=\"bordered\"; style=\"text-align: right\">"
-            + numberFormat.format(runtime.totalMemory() - runtime.freeMemory()));
+    writer.print("<td class=\"bordered\"; style=\"text-align: right\">");
+    writer.println(numberFormat.format(runtime.totalMemory() - runtime.freeMemory()));
+
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Free");
-    writer.println(
-        "<td class=\"bordered\"; style=\"text-align: right\">+ "
-            + numberFormat.format(runtime.freeMemory()));
+    writer.print("<td class=\"bordered\"; style=\"text-align: right\">+ ");
+    writer.println(numberFormat.format(runtime.freeMemory()));
+
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Total");
-    writer.println(
-        "<td class=\"bordered\"; style=\"text-align: right\">= "
-            + numberFormat.format(runtime.totalMemory()));
+    writer.print("<td class=\"bordered\"; style=\"text-align: right\">= ");
+    writer.println(numberFormat.format(runtime.totalMemory()));
+
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Max");
-    writer.println(
-        "<td class=\"bordered\"; style=\"text-align: right\">"
-            + numberFormat.format(runtime.maxMemory()));
+    writer.print("<td class=\"bordered\"; style=\"text-align: right\">");
+    writer.println(numberFormat.format(runtime.maxMemory()));
+
     writer.println("</table>");
 
     // Time
     writer.println("<h1 id=\"Time\">Time</h1>");
     writer.println("<table class=\"bordered\">");
+
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Parser");
     writer.printf("<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeParser * 0.001);
     writer.println("</tr>");
+
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Type inference");
     writer.printf(
         "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeTypeInference * 0.001);
     writer.println("</tr>");
+
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">CNF conversion");
     writer.printf(
         "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeCnfConversion * 0.001);
     writer.println("</tr>");
+
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Superposition");
     writer.printf(
         "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeSuperposition * 0.001);
     writer.println("</tr>");
+
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Total");
     writer.printf(
         "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n",
         (System.currentTimeMillis() - start) * 0.001);
     writer.println("</tr>");
+
     writer.println("</table>");
+
+    writer.println("<p>");
     writer.println(
-        "<p>"
-            + LocalDateTime.now()
-                .format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy, HH:mm:ss")));
+        LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy, HH:mm:ss")));
 
     // Flush output
     writer.close();
