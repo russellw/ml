@@ -74,7 +74,7 @@ public final class Problem {
     writer = new PrintWriter("/t/" + name + ".html");
     var numberFormat = NumberFormat.getInstance();
 
-    // Header
+    // HTML header
     writer.println("<!DOCTYPE html>");
     writer.println("<html lang=\"en\">");
     writer.println("<meta charset=\"utf-8\"/>");
@@ -100,6 +100,10 @@ public final class Problem {
     writer.println("}");
     writer.println("</style>");
 
+    // Problem header
+    while (!header.isEmpty() && header.get(header.size() - 1).isBlank())
+      header.remove(header.size() - 1);
+
     // Operators
     var ops = new Bag<>();
     for (var c : clauses)
@@ -115,6 +119,7 @@ public final class Problem {
     writer.println("<ul>");
     writer.println("<li><a href=\"#Contents\">Contents</a>");
     writer.println("<li><a href=\"#Input-files\">Input files</a>");
+    if (!header.isEmpty()) writer.println("<li><a href=\"#Problem-header\">Problem header</a>");
     if (!ops.isEmpty()) writer.println("<li><a href=\"#Operators\">Operators</a>");
     writer.println("<li><a href=\"#Functions\">Functions</a>");
     writer.println("<li><a href=\"#Subsumption\">Subsumption</a>");
@@ -123,16 +128,6 @@ public final class Problem {
     writer.println("<li><a href=\"#Memory\">Memory</a>");
     writer.println("<li><a href=\"#Time\">Time</a>");
     writer.println("</ul>");
-
-    // Problem header
-    while (!header.isEmpty() && header.get(header.size() - 1).isBlank())
-      header.remove(header.size() - 1);
-    if (!header.isEmpty()) {
-      writer.println("<h1 id=\"Problem-header\">Problem header</h1>");
-      writer.println("<pre>");
-      for (var s : header) wrap(s);
-      writer.println("</pre>");
-    }
 
     // Input files
     writer.println("<h1 id=\"Input-files\">Input files</h1>");
@@ -149,6 +144,14 @@ public final class Problem {
       writer.println();
     }
     for (var i = 0; i < includeDepth; i++) writer.println("</ul>");
+
+    // Problem header
+    if (!header.isEmpty()) {
+      writer.println("<h1 id=\"Problem-header\">Problem header</h1>");
+      writer.println("<pre>");
+      for (var s : header) wrap(s);
+      writer.println("</pre>");
+    }
 
     // Operators
     writer.println("<h1 id=\"Operators\">Operators</h1>");
