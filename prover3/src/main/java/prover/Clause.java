@@ -28,6 +28,13 @@ public final class Clause extends AbstractFormula {
         negativeSize = 0;
         return;
       }
+    for (var a : negative)
+      for (var b : positive)
+        if (a.equals(b)) {
+          literals = new Object[] {true};
+          negativeSize = 0;
+          return;
+        }
 
     // Literals
     literals = new Object[negative.size() + positive.size()];

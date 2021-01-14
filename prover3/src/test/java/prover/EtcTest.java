@@ -157,4 +157,19 @@ public class EtcTest {
     assertEquals(Etc.withoutDir("\\dir\\abc"), "abc");
     assertEquals(Etc.withoutDir("C:\\dir\\abc"), "abc");
   }
+
+  @Test
+  public void exists() {
+    assertTrue(Etc.exists(List.of('a', 'b', 'C'), c -> Character.isUpperCase((Character) c)));
+    assertFalse(Etc.exists(List.of('a', 'b', 'c'), c -> Character.isUpperCase((Character) c)));
+    assertFalse(Etc.exists(List.of(), c -> Character.isUpperCase((Character) c)));
+  }
+
+  @Test
+  public void all() {
+    assertTrue(Etc.all(List.of('A', 'B', 'C'), c -> Character.isUpperCase((Character) c)));
+    assertFalse(Etc.all(List.of('a', 'b', 'C'), c -> Character.isUpperCase((Character) c)));
+    assertFalse(Etc.all(List.of('a', 'b', 'c'), c -> Character.isUpperCase((Character) c)));
+    assertTrue(Etc.all(List.of(), c -> Character.isUpperCase((Character) c)));
+  }
 }

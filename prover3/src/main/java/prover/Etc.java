@@ -135,6 +135,16 @@ public final class Etc {
     return a.subtract(divideFloor(a, b).multiply(b));
   }
 
+  public static boolean exists(List<Object> a, Predicate<Object> f) {
+    for (var b : a) if (f.test(b)) return true;
+    return false;
+  }
+
+  public static boolean all(List<Object> a, Predicate<Object> f) {
+    for (var b : a) if (!f.test(b)) return false;
+    return true;
+  }
+
   public static boolean existsLeaf(Object a, Predicate<Object> f) {
     if (a instanceof List) {
       var a1 = (List) a;

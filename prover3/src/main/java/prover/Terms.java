@@ -76,6 +76,12 @@ public final class Terms {
     return true;
   }
 
+  @SuppressWarnings("unchecked")
+  public static boolean constant(Object a) {
+    if (a instanceof List) return Etc.all((List) a, Terms::constant);
+    return !(a instanceof Func || a instanceof Variable);
+  }
+
   public static boolean unify(Object a, Object b, Map<Variable, Object> map) {
     // Equal
     if (a == b) return true;
