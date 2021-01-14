@@ -5,8 +5,24 @@ import java.util.*;
 public final class Terms {
   private Terms() {}
 
-  public static boolean unequal(Object a, Object b) {
-    return constant(a) && constant(b) && !a.equals(b);
+  @SuppressWarnings("unchecked")
+  public static Object simplify(Object a0) {
+    if (!(a0 instanceof List)) return a0;
+    var a = (List) a0;
+    a = Etc.map(a, Terms::simplify);
+    var op = a.get(0);
+    if (!(op instanceof Symbol)) return a;
+    var op1 = (Symbol) op;
+    var x = a.get(1);
+    Object y = null;
+    if (a.size() > 2) y = a.get(2);
+    switch (op1) {
+      case EQUALS:
+        if (x.equals(y)) return true;
+        if (constant(x) && constant(y)) return false;
+        break;
+    }
+    return a;
   }
 
   public static boolean match(Object a, Object b, Map<Variable, Object> map) {

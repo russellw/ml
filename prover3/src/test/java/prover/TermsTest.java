@@ -310,11 +310,16 @@ public class TermsTest {
   }
 
   @Test
-  public void unequal() {
-    assertFalse(Terms.unequal(1, 1));
-    assertTrue(Terms.unequal(1, 2));
-    var p = new Func(Symbol.BOOLEAN, "p");
-    assertFalse(Terms.unequal(p, p));
-    assertFalse(Terms.unequal(p, false));
+  public void simplify() {
+    var x = new Variable(Symbol.INTEGER);
+    var y = new Variable(Symbol.INTEGER);
+    assertEquals(Terms.simplify(BigInteger.ZERO), BigInteger.ZERO);
+    assertEquals(Terms.simplify(x), x);
+
+    // Equals
+    assertEquals(Terms.simplify(List.of(Symbol.EQUALS, BigInteger.ZERO, BigInteger.ZERO)), true);
+    assertEquals(Terms.simplify(List.of(Symbol.EQUALS, BigInteger.ZERO, BigInteger.ONE)), false);
+    assertEquals(Terms.simplify(List.of(Symbol.EQUALS, x, x)), true);
+    assertEquals(Terms.simplify(List.of(Symbol.EQUALS, x, y)), List.of(Symbol.EQUALS, x, y));
   }
 }
