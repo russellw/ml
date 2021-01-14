@@ -229,12 +229,40 @@ public final class Problem {
     if (refutation != null) {
       writer.println("<h1 id=\"Proof\">Proof</h1>");
       writer.println("<table class=\"bordered\">");
+      var proof = refutation.proof();
+      if (!formulas.isEmpty()) {
+        writer.println("<tr>");
+        writer.println("<td class=\"bordered\">From");
+        writer.println("<td class=\"bordered\">Inference");
+        writer.println("<td class=\"bordered\">Name");
+        writer.println("<td class=\"bordered\" colspan=\"2\">Term");
+        for (var formula : proof) {
+          if (!(formula instanceof Formula)) continue;
+          writer.println("<tr>");
+
+          writer.print("<td class=\"bordered\">");
+          for (var i = 0; i < formula.from.length; i++) {
+            if (i > 0) writer.print(' ');
+            writer.print(formula.from[i].name);
+          }
+          writer.println();
+
+          writer.print("<td class=\"bordered\">");
+          writer.println(formula.inference);
+
+          writer.print("<td class=\"bordered\">");
+          writer.println(formula.name);
+
+          writer.print("<td class=\"bordered\" colspan=\"2\">");
+          writer.println(formula.term());
+        }
+      }
       writer.println("<tr>");
       writer.println("<td class=\"bordered\">From");
+      writer.println("<td class=\"bordered\">Inference");
       writer.println("<td class=\"bordered\">Name");
       writer.println("<td class=\"bordered\">Negative");
       writer.println("<td class=\"bordered\">Positive");
-      var proof = refutation.proof();
       for (var formula : proof) {
         if (!(formula instanceof Clause)) continue;
         var c = (Clause) formula;
@@ -246,6 +274,9 @@ public final class Problem {
           writer.print(c.from[i].name);
         }
         writer.println();
+
+        writer.print("<td class=\"bordered\">");
+        writer.println(c.inference);
 
         writer.print("<td class=\"bordered\">");
         writer.println(c.name);
