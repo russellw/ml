@@ -42,7 +42,7 @@ public final class Problem {
       formulas.add(
           new Formula(List.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
     timeTypeInference = Etc.time(() -> Types.inferTypes(formulas, clauses));
-    timeCnfConversion = Etc.time(() -> CNF.convert(this));
+    timeCnfConversion = Etc.time(() -> new CNF(this));
     timeSuperposition = Etc.time(() -> Superposition.solve(this, start + timeout));
     if (conjecture != null)
       switch (result) {

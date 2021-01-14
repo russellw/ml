@@ -245,14 +245,10 @@ public final class CNF {
     if (!c.isTrue()) problem.clauses.add(c);
   }
 
-  private CNF(Problem problem) {
+  public CNF(Problem problem) {
     this.problem = problem;
     checkSkolemId(problem.formulas);
     checkSkolemId(problem.clauses);
     for (var formula : problem.formulas) convert(formula);
-  }
-
-  public static void convert(Problem problem) {
-    new CNF(problem);
   }
 }
