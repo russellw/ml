@@ -508,5 +508,101 @@ public class TermsTest {
     assertEval(
         List.of(Symbol.REMAINDER_EUCLIDEAN, BigInteger.valueOf(-7), BigInteger.valueOf(-3)),
         BigInteger.valueOf(2));
+
+    // divideTruncate
+    assertEval(
+        List.of(Symbol.DIVIDE_TRUNCATE, BigRational.of(5), BigRational.of(3)), BigRational.of(1));
+    assertEval(
+        List.of(Symbol.DIVIDE_TRUNCATE, BigRational.of(-5), BigRational.of(3)), BigRational.of(-1));
+    assertEval(
+        List.of(Symbol.DIVIDE_TRUNCATE, BigRational.of(5), BigRational.of(-3)), BigRational.of(-1));
+    assertEval(
+        List.of(Symbol.DIVIDE_TRUNCATE, BigRational.of(-5), BigRational.of(-3)), BigRational.of(1));
+
+    // remainderTruncate
+    assertEval(
+        List.of(Symbol.REMAINDER_TRUNCATE, BigRational.of(5), BigRational.of(3)),
+        BigRational.of(2));
+    assertEval(
+        List.of(Symbol.REMAINDER_TRUNCATE, BigRational.of(-5), BigRational.of(3)),
+        BigRational.of(-2));
+    assertEval(
+        List.of(Symbol.REMAINDER_TRUNCATE, BigRational.of(5), BigRational.of(-3)),
+        BigRational.of(2));
+    assertEval(
+        List.of(Symbol.REMAINDER_TRUNCATE, BigRational.of(-5), BigRational.of(-3)),
+        BigRational.of(-2));
+
+    // divideFloor
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigRational.of(5), BigRational.of(3)),
+        BigRational.of(Math.floorDiv(5, 3)));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigRational.of(-5), BigRational.of(3)),
+        BigRational.of(Math.floorDiv(-5, 3)));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigRational.of(5), BigRational.of(-3)),
+        BigRational.of(Math.floorDiv(5, -3)));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigRational.of(-5), BigRational.of(-3)),
+        BigRational.of(Math.floorDiv(-5, -3)));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigRational.of(5), BigRational.of(3)), BigRational.of(1));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigRational.of(-5), BigRational.of(3)), BigRational.of(-2));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigRational.of(5), BigRational.of(-3)), BigRational.of(-2));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigRational.of(-5), BigRational.of(-3)), BigRational.of(1));
+
+    // remainderFloor
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigRational.of(5), BigRational.of(3)),
+        BigRational.of(Math.floorMod(5, 3)));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigRational.of(-5), BigRational.of(3)),
+        BigRational.of(Math.floorMod(-5, 3)));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigRational.of(5), BigRational.of(-3)),
+        BigRational.of(Math.floorMod(5, -3)));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigRational.of(-5), BigRational.of(-3)),
+        BigRational.of(Math.floorMod(-5, -3)));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigRational.of(5), BigRational.of(3)), BigRational.of(2));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigRational.of(-5), BigRational.of(3)), BigRational.of(1));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigRational.of(5), BigRational.of(-3)), BigRational.of(-1));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigRational.of(-5), BigRational.of(-3)),
+        BigRational.of(-2));
+
+    // divideEuclidean
+    assertEval(
+        List.of(Symbol.DIVIDE_EUCLIDEAN, BigRational.of(7), BigRational.of(3)), BigRational.of(2));
+    assertEval(
+        List.of(Symbol.DIVIDE_EUCLIDEAN, BigRational.of(7), BigRational.of(-3)),
+        BigRational.of(-2));
+    assertEval(
+        List.of(Symbol.DIVIDE_EUCLIDEAN, BigRational.of(-7), BigRational.of(3)),
+        BigRational.of(-3));
+    assertEval(
+        List.of(Symbol.DIVIDE_EUCLIDEAN, BigRational.of(-7), BigRational.of(-3)),
+        BigRational.of(3));
+
+    // remainderEuclidean
+    assertEval(
+        List.of(Symbol.REMAINDER_EUCLIDEAN, BigRational.of(7), BigRational.of(3)),
+        BigRational.of(1));
+    assertEval(
+        List.of(Symbol.REMAINDER_EUCLIDEAN, BigRational.of(7), BigRational.of(-3)),
+        BigRational.of(1));
+    assertEval(
+        List.of(Symbol.REMAINDER_EUCLIDEAN, BigRational.of(-7), BigRational.of(3)),
+        BigRational.of(2));
+    assertEval(
+        List.of(Symbol.REMAINDER_EUCLIDEAN, BigRational.of(-7), BigRational.of(-3)),
+        BigRational.of(2));
   }
 }
