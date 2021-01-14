@@ -10,6 +10,7 @@ import java.util.*;
 
 public final class Problem {
   public final long startTime = System.currentTimeMillis();
+  public long endTime;
   private final List<String> files = new ArrayList<>();
   public final List<String> header = new ArrayList<>();
   public SZS expected;
@@ -69,6 +70,7 @@ public final class Problem {
         case CounterSatisfiable:
           throw new IllegalStateException(result + " != " + expected);
       }
+    endTime = System.currentTimeMillis();
   }
 
   private void func(Func a, int n) {
@@ -365,8 +367,7 @@ public final class Problem {
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Total");
     writer.printf(
-        "<td class=\"bordered\" style=\"text-align: right\">%.3f\n",
-        (System.currentTimeMillis() - startTime) * 0.001);
+        "<td class=\"bordered\" style=\"text-align: right\">%.3f\n", (endTime - startTime) * 0.001);
     writer.println("</tr>");
 
     writer.println("</table>");

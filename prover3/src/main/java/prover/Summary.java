@@ -17,6 +17,7 @@ public final class Summary {
   public final SZS expected;
   public final SZS result;
   public final double rating;
+  public final long time;
 
   public Summary(Problem problem) {
     name = Etc.baseName(problem.file());
@@ -27,6 +28,7 @@ public final class Summary {
     expected = problem.expected;
     result = problem.result;
     rating = problem.rating;
+    time = problem.endTime - problem.startTime;
   }
 
   public static void write(String name, List<Summary> summaries) throws FileNotFoundException {
@@ -78,6 +80,7 @@ public final class Summary {
     writer.println("<th class=\"bordered\">Result");
     writer.println("<th class=\"bordered\">Solved");
     writer.println("<th class=\"bordered\">Rating");
+    writer.println("<th class=\"bordered\">Time");
     for (var summary : summaries) {
       writer.println("<tr>");
 
@@ -109,6 +112,9 @@ public final class Summary {
       writer.print("<td class=\"bordered\" style=\"text-align: right\">");
       if (summary.rating >= 0) writer.printf("%.2f", summary.rating);
       writer.println();
+
+      writer.printf(
+          "<td class=\"bordered\" style=\"text-align: right\">%.3f\n", summary.time * 0.001);
     }
     writer.println("</table>");
 
