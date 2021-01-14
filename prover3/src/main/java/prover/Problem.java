@@ -32,6 +32,20 @@ public final class Problem {
   // Output
   private PrintWriter writer;
 
+  private void term(Object a) {
+    if (a instanceof List) {
+      var a1 = (List) a;
+      writer.print('(');
+      for (var i = 0; i < a1.size(); i++) {
+        if (i > 0) writer.print(' ');
+        term(a1.get(i));
+      }
+      writer.print(')');
+      return;
+    }
+    writer.print(a);
+  }
+
   public String file() {
     return files.get(0);
   }
@@ -276,7 +290,8 @@ public final class Problem {
           writer.println(formula.name);
 
           writer.print("<td class=\"bordered\" colspan=\"2\">");
-          writer.println(formula.term());
+          term(formula.term());
+          writer.println();
         }
       }
       writer.println("<tr>");
@@ -307,7 +322,7 @@ public final class Problem {
         var negative = c.negative();
         for (var i = 0; i < negative.length; i++) {
           if (i > 0) writer.print(' ');
-          writer.print(negative[i]);
+          term(negative[i]);
         }
         writer.println();
 
@@ -315,7 +330,7 @@ public final class Problem {
         var positive = c.positive();
         for (var i = 0; i < positive.length; i++) {
           if (i > 0) writer.print(' ');
-          writer.print(positive[i]);
+          term(positive[i]);
         }
         writer.println();
       }
