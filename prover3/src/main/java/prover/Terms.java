@@ -5,6 +5,10 @@ import java.util.*;
 public final class Terms {
   private Terms() {}
 
+  public static boolean unequal(Object a, Object b) {
+    return constant(a) && constant(b) && !a.equals(b);
+  }
+
   public static boolean match(Object a, Object b, Map<Variable, Object> map) {
     // Equal
     if (a == b) return true;

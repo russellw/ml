@@ -297,4 +297,24 @@ public class TermsTest {
     assertEquals(
         Terms.freeVariables(List.of(Symbol.ALL, List.of(x, y), List.of(p3, x, y, z))), setOf(z));
   }
+
+  @Test
+  public void constant() {
+    assertTrue(Terms.constant(false));
+    assertTrue(Terms.constant(true));
+    assertTrue(Terms.constant(List.of(Symbol.ADD, BigInteger.ONE, BigInteger.ONE)));
+    var p = new Func(Symbol.BOOLEAN, "p");
+    assertFalse(Terms.constant(p));
+    var x = new Variable(Symbol.INTEGER);
+    assertFalse(Terms.constant(List.of(Symbol.ADD, x, x)));
+  }
+
+  @Test
+  public void unequal() {
+    assertFalse(Terms.unequal(1, 1));
+    assertTrue(Terms.unequal(1, 2));
+    var p = new Func(Symbol.BOOLEAN, "p");
+    assertFalse(Terms.unequal(p, p));
+    assertFalse(Terms.unequal(p, false));
+  }
 }
