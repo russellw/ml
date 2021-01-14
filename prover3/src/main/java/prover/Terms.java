@@ -131,6 +131,102 @@ public final class Terms {
                 return x.divide(y);
               }
             });
+      case DIVIDE_EUCLIDEAN:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return Etc.divideEuclidean(x, y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.divideEuclidean(y);
+              }
+            });
+      case DIVIDE_FLOOR:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return Etc.divideFloor(x, y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.divideFloor(y);
+              }
+            });
+      case DIVIDE_TRUNCATE:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.divide(y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.divideTruncate(y);
+              }
+            });
+      case REMAINDER_EUCLIDEAN:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return Etc.remainderEuclidean(x, y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.remainderEuclidean(y);
+              }
+            });
+      case REMAINDER_FLOOR:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return Etc.remainderFloor(x, y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.remainderFloor(y);
+              }
+            });
+      case REMAINDER_TRUNCATE:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.remainder(y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.remainderTruncate(y);
+              }
+            });
       case LESS:
         return eval2(
             a,

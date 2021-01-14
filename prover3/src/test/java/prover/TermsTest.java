@@ -400,5 +400,113 @@ public class TermsTest {
     assertEval(List.of(Symbol.LESS_EQ, BigInteger.valueOf(2), BigInteger.valueOf(1)), false);
     assertEval(List.of(Symbol.LESS_EQ, BigInteger.valueOf(1), BigInteger.valueOf(1)), true);
     assertEval(List.of(Symbol.LESS_EQ, BigInteger.valueOf(1), BigInteger.valueOf(2)), true);
+
+    // divideTruncate
+    assertEval(
+        List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.valueOf(5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(1));
+    assertEval(
+        List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(-1));
+    assertEval(
+        List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(-1));
+    assertEval(
+        List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(1));
+
+    // remainderTruncate
+    assertEval(
+        List.of(Symbol.REMAINDER_TRUNCATE, BigInteger.valueOf(5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(2));
+    assertEval(
+        List.of(Symbol.REMAINDER_TRUNCATE, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(-2));
+    assertEval(
+        List.of(Symbol.REMAINDER_TRUNCATE, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(2));
+    assertEval(
+        List.of(Symbol.REMAINDER_TRUNCATE, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(-2));
+
+    // divideFloor
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(Math.floorDiv(5, 3)));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(Math.floorDiv(-5, 3)));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(Math.floorDiv(5, -3)));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(Math.floorDiv(-5, -3)));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(1));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(-2));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(-2));
+    assertEval(
+        List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(1));
+
+    // remainderFloor
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(Math.floorMod(5, 3)));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(Math.floorMod(-5, 3)));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(Math.floorMod(5, -3)));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(Math.floorMod(-5, -3)));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(2));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
+        BigInteger.valueOf(1));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(-1));
+    assertEval(
+        List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(-2));
+
+    // divideEuclidean
+    assertEval(
+        List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.valueOf(7), BigInteger.valueOf(3)),
+        BigInteger.valueOf(2));
+    assertEval(
+        List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.valueOf(7), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(-2));
+    assertEval(
+        List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.valueOf(-7), BigInteger.valueOf(3)),
+        BigInteger.valueOf(-3));
+    assertEval(
+        List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.valueOf(-7), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(3));
+
+    // remainderEuclidean
+    assertEval(
+        List.of(Symbol.REMAINDER_EUCLIDEAN, BigInteger.valueOf(7), BigInteger.valueOf(3)),
+        BigInteger.valueOf(1));
+    assertEval(
+        List.of(Symbol.REMAINDER_EUCLIDEAN, BigInteger.valueOf(7), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(1));
+    assertEval(
+        List.of(Symbol.REMAINDER_EUCLIDEAN, BigInteger.valueOf(-7), BigInteger.valueOf(3)),
+        BigInteger.valueOf(2));
+    assertEval(
+        List.of(Symbol.REMAINDER_EUCLIDEAN, BigInteger.valueOf(-7), BigInteger.valueOf(-3)),
+        BigInteger.valueOf(2));
   }
 }
