@@ -1,8 +1,54 @@
 package prover;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public final class Terms {
+  private abstract static class Op2 {
+    abstract Object apply(BigInteger a, BigInteger b);
+
+    abstract Object apply(BigRational a, BigRational b);
+  }
+
+  private static Object eval2(Object a, Object x, Object y, Op2 op) {
+    if (x instanceof BigInteger) {
+      var x1 = (BigInteger) x;
+      if (y instanceof BigInteger) {
+        var y1 = (BigInteger) y;
+        return op.apply(x1, y1);
+      }
+      return a;
+    }
+    if (x instanceof BigRational) {
+      var x1 = (BigRational) x;
+      if (y instanceof BigRational) {
+        var y1 = (BigRational) y;
+        return op.apply(x1, y1);
+      }
+      return a;
+    }
+    if (x instanceof List) {
+      var x1 = (List) x;
+      if (x1.get(0) == Symbol.TO_REAL) {
+        var x2 = x1.get(1);
+        if (x2 instanceof BigRational) {
+          var x3 = (BigRational) x2;
+          if (y instanceof List) {
+            var y1 = (List) y;
+            if (y1.get(0) == Symbol.TO_REAL) {
+              var y2 = y1.get(1);
+              if (y2 instanceof BigRational) {
+                var y3 = (BigRational) y2;
+                return List.of(Symbol.TO_REAL, op.apply(x3, y3));
+              }
+            }
+          }
+        }
+      }
+    }
+    return a;
+  }
+
   private Terms() {}
 
   @SuppressWarnings("unchecked")
@@ -21,6 +67,22 @@ public final class Terms {
         if (x.equals(y)) return true;
         if (constant(x) && constant(y)) return false;
         break;
+      case ADD:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger a, BigInteger b) {
+                return a.add(b);
+              }
+
+              @Override
+              Object apply(BigRational a, BigRational b) {
+                return a.add(b);
+              }
+            });
     }
     return a;
   }

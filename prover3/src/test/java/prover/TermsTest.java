@@ -309,17 +309,25 @@ public class TermsTest {
     assertFalse(Terms.constant(List.of(Symbol.ADD, x, x)));
   }
 
+  private void assertEval(Object a, Object b) {
+    assertEquals(Terms.simplify(a), b);
+  }
+
   @Test
   public void simplify() {
     var x = new Variable(Symbol.INTEGER);
     var y = new Variable(Symbol.INTEGER);
-    assertEquals(Terms.simplify(BigInteger.ZERO), BigInteger.ZERO);
-    assertEquals(Terms.simplify(x), x);
+    assertEval(BigInteger.ZERO, BigInteger.ZERO);
+    assertEval(x, x);
 
-    // Equals
-    assertEquals(Terms.simplify(List.of(Symbol.EQUALS, BigInteger.ZERO, BigInteger.ZERO)), true);
-    assertEquals(Terms.simplify(List.of(Symbol.EQUALS, BigInteger.ZERO, BigInteger.ONE)), false);
-    assertEquals(Terms.simplify(List.of(Symbol.EQUALS, x, x)), true);
-    assertEquals(Terms.simplify(List.of(Symbol.EQUALS, x, y)), List.of(Symbol.EQUALS, x, y));
+    // equals
+    assertEval(List.of(Symbol.EQUALS, BigInteger.ZERO, BigInteger.ZERO), true);
+    assertEval(List.of(Symbol.EQUALS, BigInteger.ZERO, BigInteger.ONE), false);
+    assertEval(List.of(Symbol.EQUALS, x, x), true);
+    assertEval(List.of(Symbol.EQUALS, x, y), List.of(Symbol.EQUALS, x, y));
+
+    // add
+    assertEval(
+        List.of(Symbol.ADD, BigInteger.valueOf(1), BigInteger.valueOf(2)), BigInteger.valueOf(3));
   }
 }
