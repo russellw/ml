@@ -17,6 +17,7 @@ public final class Problem {
   public Formula conjecture;
   public final Set<Func> skolems = new LinkedHashSet<>();
   public final List<Clause> clauses = new ArrayList<>();
+  public Superposition superposition;
   public Clause refutation;
   public SZS result;
 
@@ -43,7 +44,12 @@ public final class Problem {
           new Formula(List.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
     timeTypeInference = Etc.time(() -> Types.inferTypes(formulas, clauses));
     timeCnfConversion = Etc.time(() -> new CNF(this));
-    timeSuperposition = Etc.time(() -> Superposition.solve(this, start + timeout));
+    timeSuperposition =
+        Etc.time(
+            () -> {
+              superposition = new Superposition();
+              superposition.solve(this, start + timeout);
+            });
     if (conjecture != null)
       switch (result) {
         case Satisfiable:

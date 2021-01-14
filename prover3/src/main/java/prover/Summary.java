@@ -11,15 +11,19 @@ public final class Summary {
   public final String name;
   public final int formulas;
   public final int clauses;
+  public final int processed;
+  public final int unprocessed;
   public final SZS expected;
   public final SZS result;
 
   public Summary(Problem problem) {
-    this.name = Etc.baseName(problem.file());
-    this.formulas = problem.formulas.size();
-    this.clauses = problem.clauses.size();
-    this.expected = problem.expected;
-    this.result = problem.result;
+    name = Etc.baseName(problem.file());
+    formulas = problem.formulas.size();
+    clauses = problem.clauses.size();
+    processed = problem.superposition.processed.size();
+    unprocessed = problem.superposition.unprocessed.size();
+    expected = problem.expected;
+    result = problem.result;
   }
 
   public static void write(String name, List<Summary> summaries) throws FileNotFoundException {
@@ -64,6 +68,8 @@ public final class Summary {
     writer.println("<th class=\"bordered\">Problem");
     writer.println("<th class=\"bordered\">Formulas");
     writer.println("<th class=\"bordered\">Clauses");
+    writer.println("<th class=\"bordered\">Processed");
+    writer.println("<th class=\"bordered\">Unprocessed");
     writer.println("<th class=\"bordered\">Expected");
     writer.println("<th class=\"bordered\">Result");
     writer.println("<th class=\"bordered\">Solved");
@@ -78,6 +84,12 @@ public final class Summary {
 
       writer.print("<td class=\"bordered\" style=\"text-align: right\">");
       writer.println(numberFormat.format(summary.clauses));
+
+      writer.print("<td class=\"bordered\" style=\"text-align: right\">");
+      writer.println(numberFormat.format(summary.processed));
+
+      writer.print("<td class=\"bordered\" style=\"text-align: right\">");
+      writer.println(numberFormat.format(summary.unprocessed));
 
       writer.print("<td class=\"bordered\">");
       if (summary.expected != null) writer.println(summary.expected);

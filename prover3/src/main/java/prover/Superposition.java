@@ -30,18 +30,17 @@ import java.util.*;
 // A full implementation would also implement an order on equations
 // e.g. lexicographic path ordering or Knuth-Bendix ordering
 public final class Superposition {
-  public static PriorityQueue<Clause> unprocessed;
-  public static List<Clause> processed;
+  public final PriorityQueue<Clause> unprocessed =
+      new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
+  public final List<Clause> processed = new ArrayList<>();
 
-  private Superposition() {}
-
-  private static void clause(Clause c) {
+  private void clause(Clause c) {
     if (c.isTrue()) return;
     unprocessed.add(c);
   }
 
   // Substitute and make new clause
-  private static void resolve(Clause c, int i, Map<Variable, Object> map) {
+  private void resolve(Clause c, int i, Map<Variable, Object> map) {
     // Negative literals
     var negative = new ArrayList<>(c.negativeSize - 1);
     for (var j = 0; j < c.negativeSize; j++)
@@ -57,7 +56,7 @@ public final class Superposition {
   }
 
   // For each negative equation
-  private static void resolve(Clause c) {
+  private void resolve(Clause c) {
     for (var i = 0; i < c.negativeSize; i++) {
       var e = c.literals[i];
       var map = new HashMap<Variable, Object>();
@@ -66,7 +65,7 @@ public final class Superposition {
   }
 
   // Substitute and make new clause
-  private static void factor(Clause c, Object c0, Object c1, int i, Object c2, Object c3) {
+  private void factor(Clause c, Object c0, Object c1, int i, Object c2, Object c3) {
     if (!Equality.equatable(c1, c3)) return;
     var map = new HashMap<Variable, Object>();
     if (!Terms.unify(c0, c2, map)) return;
@@ -86,7 +85,7 @@ public final class Superposition {
   }
 
   // For each positive equation (both directions) again
-  private static void factor(Clause c, int i, Object c0, Object c1) {
+  private void factor(Clause c, int i, Object c0, Object c1) {
     for (var j = c.negativeSize; j < c.literals.length; j++) {
       if (j == i) continue;
       var e = c.literals[j];
@@ -98,7 +97,7 @@ public final class Superposition {
   }
 
   // For each positive equation (both directions)
-  private static void factor(Clause c) {
+  private void factor(Clause c) {
     for (var i = c.negativeSize; i < c.literals.length; i++) {
       var e = c.literals[i];
       var c0 = Equality.left(e);
@@ -109,7 +108,7 @@ public final class Superposition {
   }
 
   // Check this subterm, substitute and make new clause
-  private static void superposition1(
+  private void superposition1(
       Clause c,
       Clause d,
       int ci,
@@ -145,7 +144,7 @@ public final class Superposition {
   }
 
   // Descend into subterms
-  private static void superposition(
+  private void superposition(
       Clause c,
       Clause d,
       int ci,
@@ -168,7 +167,7 @@ public final class Superposition {
   }
 
   // For each equation in d (both directions)
-  private static void superposition(Clause c, Clause d, int ci, Object c0, Object c1) {
+  private void superposition(Clause c, Clause d, int ci, Object c0, Object c1) {
     if (c0 == Boolean.TRUE) return;
     for (var i = 0; i < d.literals.length; i++) {
       var e = d.literals[i];
@@ -180,7 +179,7 @@ public final class Superposition {
   }
 
   // For each positive equation in c (both directions)
-  private static void superposition(Clause c, Clause d) {
+  private void superposition(Clause c, Clause d) {
     for (var i = c.negativeSize; i < c.literals.length; i++) {
       var e = c.literals[i];
       var c0 = Equality.left(e);
@@ -190,10 +189,8 @@ public final class Superposition {
     }
   }
 
-  public static void solve(Problem problem, long deadline) {
-    unprocessed = new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
+  public void solve(Problem problem, long deadline) {
     unprocessed.addAll(problem.clauses);
-    processed = new ArrayList<>();
     while (!unprocessed.isEmpty()) {
       // Given clause
       // Discount loop, given clause cannot have already been subsumed
