@@ -329,5 +329,76 @@ public class TermsTest {
     // add
     assertEval(
         List.of(Symbol.ADD, BigInteger.valueOf(1), BigInteger.valueOf(2)), BigInteger.valueOf(3));
+    assertEval(
+        List.of(Symbol.ADD, x, BigInteger.valueOf(2)),
+        List.of(Symbol.ADD, x, BigInteger.valueOf(2)));
+    assertEval(
+        List.of(Symbol.ADD, BigInteger.valueOf(1), y),
+        List.of(Symbol.ADD, BigInteger.valueOf(1), y));
+    assertEval(List.of(Symbol.ADD, x, y), List.of(Symbol.ADD, x, y));
+    assertEval(
+        List.of(Symbol.ADD, BigRational.of("1/10"), BigRational.of("2/10")),
+        BigRational.of("3/10"));
+    assertEval(
+        List.of(
+            Symbol.ADD,
+            List.of(Symbol.TO_REAL, BigRational.of("1/10")),
+            List.of(Symbol.TO_REAL, BigRational.of("2/10"))),
+        List.of(Symbol.TO_REAL, BigRational.of("3/10")));
+    var z = new Variable(Symbol.REAL);
+    assertEval(
+        List.of(
+            Symbol.ADD,
+            List.of(Symbol.TO_REAL, z),
+            List.of(Symbol.TO_REAL, BigRational.of("2/10"))),
+        List.of(
+            Symbol.ADD,
+            List.of(Symbol.TO_REAL, z),
+            List.of(Symbol.TO_REAL, BigRational.of("2/10"))));
+    assertEval(
+        List.of(
+            Symbol.ADD,
+            List.of(Symbol.TO_REAL, BigRational.of("1/10")),
+            List.of(Symbol.TO_REAL, z)),
+        List.of(
+            Symbol.ADD,
+            List.of(Symbol.TO_REAL, BigRational.of("1/10")),
+            List.of(Symbol.TO_REAL, z)));
+    assertEval(
+        List.of(Symbol.ADD, z, List.of(Symbol.TO_REAL, BigRational.of("2/10"))),
+        List.of(Symbol.ADD, z, List.of(Symbol.TO_REAL, BigRational.of("2/10"))));
+    assertEval(
+        List.of(Symbol.ADD, List.of(Symbol.TO_REAL, BigRational.of("1/10")), z),
+        List.of(Symbol.ADD, List.of(Symbol.TO_REAL, BigRational.of("1/10")), z));
+
+    // subtract
+    assertEval(
+        List.of(Symbol.SUBTRACT, BigInteger.valueOf(3), BigInteger.valueOf(1)),
+        BigInteger.valueOf(2));
+    assertEval(
+        List.of(Symbol.SUBTRACT, BigRational.of("3/10"), BigRational.of("1/10")),
+        BigRational.of("2/10"));
+
+    // multiply
+    assertEval(
+        List.of(Symbol.MULTIPLY, BigInteger.valueOf(2), BigInteger.valueOf(5)),
+        BigInteger.valueOf(10));
+    assertEval(
+        List.of(Symbol.MULTIPLY, BigRational.of("1/10"), BigRational.of("1/10")),
+        BigRational.of("1/100"));
+
+    // divide
+    assertEval(
+        List.of(Symbol.DIVIDE, BigRational.of("1"), BigRational.of("3")), BigRational.of("1/3"));
+
+    // <
+    assertEval(List.of(Symbol.LESS, BigInteger.valueOf(2), BigInteger.valueOf(1)), false);
+    assertEval(List.of(Symbol.LESS, BigInteger.valueOf(1), BigInteger.valueOf(1)), false);
+    assertEval(List.of(Symbol.LESS, BigInteger.valueOf(1), BigInteger.valueOf(2)), true);
+
+    // <=
+    assertEval(List.of(Symbol.LESS_EQ, BigInteger.valueOf(2), BigInteger.valueOf(1)), false);
+    assertEval(List.of(Symbol.LESS_EQ, BigInteger.valueOf(1), BigInteger.valueOf(1)), true);
+    assertEval(List.of(Symbol.LESS_EQ, BigInteger.valueOf(1), BigInteger.valueOf(2)), true);
   }
 }

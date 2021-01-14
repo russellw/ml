@@ -5,9 +5,9 @@ import java.util.*;
 
 public final class Terms {
   private abstract static class Op2 {
-    abstract Object apply(BigInteger a, BigInteger b);
+    abstract Object apply(BigInteger x, BigInteger y);
 
-    abstract Object apply(BigRational a, BigRational b);
+    abstract Object apply(BigRational x, BigRational y);
   }
 
   private static Object eval2(Object a, Object x, Object y, Op2 op) {
@@ -74,13 +74,93 @@ public final class Terms {
             y,
             new Op2() {
               @Override
-              Object apply(BigInteger a, BigInteger b) {
-                return a.add(b);
+              Object apply(BigInteger x, BigInteger y) {
+                return x.add(y);
               }
 
               @Override
-              Object apply(BigRational a, BigRational b) {
-                return a.add(b);
+              Object apply(BigRational x, BigRational y) {
+                return x.add(y);
+              }
+            });
+      case SUBTRACT:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.subtract(y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.subtract(y);
+              }
+            });
+      case MULTIPLY:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.multiply(y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.multiply(y);
+              }
+            });
+      case DIVIDE:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                throw new IllegalArgumentException(a0.toString());
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.divide(y);
+              }
+            });
+      case LESS:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.compareTo(y) < 0;
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.compareTo(y) < 0;
+              }
+            });
+      case LESS_EQ:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.compareTo(y) <= 0;
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.compareTo(y) <= 0;
               }
             });
     }
