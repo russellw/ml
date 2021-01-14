@@ -129,7 +129,12 @@ public final class Problem {
           Arrays.asList(c.literals),
           a -> {
             var op = a.get(0);
-            if (op instanceof Symbol) ops.add(List.of(op, Types.typeof(a)));
+            if (op instanceof Symbol) {
+              var type = new ArrayList<>();
+              type.add(Types.typeof(a));
+              for (var i = 1; i < a.size(); i++) type.add(Types.typeof(a.get(i)));
+              ops.add(List.of(op, type));
+            }
           });
 
     // Functions
