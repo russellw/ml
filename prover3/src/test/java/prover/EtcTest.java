@@ -172,4 +172,12 @@ public class EtcTest {
     assertFalse(Etc.all(List.of('a', 'b', 'c'), c -> Character.isUpperCase((Character) c)));
     assertTrue(Etc.all(List.of(), c -> Character.isUpperCase((Character) c)));
   }
+
+  @Test
+  public void count() {
+    assertEquals(Etc.count(List.of('A', 'B', 'C'), c -> Character.isUpperCase((Character) c)), 3);
+    assertEquals(Etc.count(List.of('a', 'b', 'C'), c -> Character.isUpperCase((Character) c)), 1);
+    assertEquals(Etc.count(List.of('a', 'b', 'c'), c -> Character.isUpperCase((Character) c)), 0);
+    assertEquals(Etc.count(List.of(), c -> Character.isUpperCase((Character) c)), 0);
+  }
 }
