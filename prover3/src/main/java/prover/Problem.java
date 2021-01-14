@@ -132,6 +132,15 @@ public final class Problem {
             if (op instanceof Symbol) ops.add(List.of(op, Types.typeof(a)));
           });
 
+    // Functions
+    var funcs = new Bag<Func>();
+    for (var c : clauses)
+      Etc.walkLeaves(
+          Arrays.asList(c.literals),
+          a -> {
+            if (a instanceof Func) funcs.add((Func) a);
+          });
+
     // Contents
     writer.println("<h1 id=\"Contents\">Contents</h1>");
     writer.println("<ul>");
@@ -139,7 +148,8 @@ public final class Problem {
     writer.println("<li><a href=\"#Input-files\">Input files</a>");
     if (!header.isEmpty()) writer.println("<li><a href=\"#Problem-header\">Problem header</a>");
     if (!ops.isEmpty()) writer.println("<li><a href=\"#Operators\">Operators</a>");
-    writer.println("<li><a href=\"#Functions\">Functions</a>");
+    if (!funcs.isEmpty() || !skolems.isEmpty())
+      writer.println("<li><a href=\"#Functions\">Functions</a>");
     writer.println("<li><a href=\"#Subsumption\">Subsumption</a>");
     writer.println("<li><a href=\"#Result\">Result</a>");
     if (refutation != null) writer.println("<li><a href=\"#Proof\">Proof</a>");
@@ -172,54 +182,51 @@ public final class Problem {
     }
 
     // Operators
-    writer.println("<h1 id=\"Operators\">Operators</h1>");
-    writer.println("<table class=\"bordered\">");
-    writer.println("<tr>");
-    writer.println("<th class=\"bordered\">Name");
-    writer.println("<th class=\"bordered\">Type");
-    writer.println("<th class=\"bordered\">Occurs");
-    var ops1 = new ArrayList<>(ops.keySet());
-    ops1.sort(Comparator.comparing(Object::toString));
-    for (var a : ops1) {
-      var a1 = (List) a;
-      var op = a1.get(0);
-      var type = a1.get(1);
+    if (!ops.isEmpty()) {
+      writer.println("<h1 id=\"Operators\">Operators</h1>");
+      writer.println("<table class=\"bordered\">");
       writer.println("<tr>");
+      writer.println("<th class=\"bordered\">Name");
+      writer.println("<th class=\"bordered\">Type");
+      writer.println("<th class=\"bordered\">Occurs");
+      var ops1 = new ArrayList<>(ops.keySet());
+      ops1.sort(Comparator.comparing(Object::toString));
+      for (var a : ops1) {
+        var a1 = (List) a;
+        var op = a1.get(0);
+        var type = a1.get(1);
+        writer.println("<tr>");
 
-      writer.print("<td class=\"bordered\">");
-      writer.println(op);
+        writer.print("<td class=\"bordered\">");
+        writer.println(op);
 
-      writer.print("<td class=\"bordered\">");
-      writer.println(type);
+        writer.print("<td class=\"bordered\">");
+        writer.println(type);
 
-      writer.print("<td class=\"bordered\" style=\"text-align: right\">");
-      writer.println(ops.get(a));
+        writer.print("<td class=\"bordered\" style=\"text-align: right\">");
+        writer.println(ops.get(a));
+      }
+      writer.println("</table>");
     }
-    writer.println("</table>");
 
     // Functions
-    writer.println("<h1 id=\"Functions\">Functions</h1>");
-    writer.println("<table class=\"bordered\">");
-    writer.println("<tr>");
-    writer.println("<th class=\"bordered\">Name");
-    writer.println("<th class=\"bordered\">Type");
-    writer.println("<th class=\"bordered\">Occurs");
-    var funcs = new Bag<Func>();
-    for (var c : clauses)
-      Etc.walkLeaves(
-          Arrays.asList(c.literals),
-          a -> {
-            if (a instanceof Func) funcs.add((Func) a);
-          });
-    var funcs1 = new ArrayList<>(funcs.keySet());
-    funcs1.sort(Comparator.comparing(Func::toString));
-    for (var a : funcs1) if (!skolems.contains(a)) func(a, funcs.get(a));
-    if (!skolems.isEmpty()) {
+    if (!funcs.isEmpty()) {
+      writer.println("<h1 id=\"Functions\">Functions</h1>");
+      writer.println("<table class=\"bordered\">");
       writer.println("<tr>");
-      writer.println("<th class=\"bordered\" colspan=\"3\">Skolem functions");
-      for (var a : skolems) func(a, funcs.get(a));
+      writer.println("<th class=\"bordered\">Name");
+      writer.println("<th class=\"bordered\">Type");
+      writer.println("<th class=\"bordered\">Occurs");
+      var funcs1 = new ArrayList<>(funcs.keySet());
+      funcs1.sort(Comparator.comparing(Func::toString));
+      for (var a : funcs1) if (!skolems.contains(a)) func(a, funcs.get(a));
+      if (!skolems.isEmpty()) {
+        writer.println("<tr>");
+        writer.println("<th class=\"bordered\" colspan=\"3\">Skolem functions");
+        for (var a : skolems) func(a, funcs.get(a));
+      }
+      writer.println("</table>");
     }
-    writer.println("</table>");
 
     // Result
     writer.println("<h1 id=\"Result\">Result</h1>");
