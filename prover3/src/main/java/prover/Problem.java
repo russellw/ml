@@ -64,11 +64,6 @@ public final class Problem {
       }
   }
 
-  private void href(String s) {
-    s = Path.of(s).toAbsolutePath().toString();
-    writer.printf("<a href=\"%s\">%s</a>", s.replace('\\', '/'), s);
-  }
-
   private void func(Func a, int n) {
     writer.println("<tr>");
     writer.print("<td class=\"bordered\">");
@@ -151,8 +146,8 @@ public final class Problem {
       if (i < includeDepth) writer.println("</ul>");
       includeDepth = i;
       writer.print("<li>");
-      href(file);
-      writer.println();
+      file = Path.of(file).toAbsolutePath().toString();
+      writer.printf("<a href=\"%s\">%s</a>\n", file.replace('\\', '/'), file);
     }
     for (var i = -1; i < includeDepth; i++) writer.println("</ul>");
 
