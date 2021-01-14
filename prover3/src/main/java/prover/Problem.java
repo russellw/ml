@@ -75,7 +75,7 @@ public final class Problem {
     writer.println(a);
     writer.print("<td class=\"bordered\">");
     writer.println(Types.typeof(a));
-    writer.print("<td class=\"bordered\"; style=\"text-align: right\">");
+    writer.print("<td class=\"bordered\" style=\"text-align: right\">");
     writer.println(n);
   }
 
@@ -142,7 +142,7 @@ public final class Problem {
 
     // Input files
     writer.println("<h1 id=\"Input-files\">Input files</h1>");
-    var includeDepth = 0;
+    var includeDepth = -1;
     for (var file : files) {
       var i = 0;
       while (file.charAt(i) == '\t') i++;
@@ -154,7 +154,7 @@ public final class Problem {
       href(file);
       writer.println();
     }
-    for (var i = 0; i < includeDepth; i++) writer.println("</ul>");
+    for (var i = -1; i < includeDepth; i++) writer.println("</ul>");
 
     // Problem header
     if (!header.isEmpty()) {
@@ -170,7 +170,7 @@ public final class Problem {
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Name");
     writer.println("<td class=\"bordered\">Type");
-    writer.println("<td class=\"bordered\"; style=\"text-align: right\">Occurs");
+    writer.println("<td class=\"bordered\" style=\"text-align: right\">Occurs");
     var ops1 = new ArrayList<>(ops.keySet());
     ops1.sort(Comparator.comparing(Object::toString));
     for (var a : ops1) {
@@ -182,7 +182,7 @@ public final class Problem {
       writer.println(op);
       writer.print("<td class=\"bordered\">");
       writer.println(type);
-      writer.print("<td class=\"bordered\"; style=\"text-align: right\">");
+      writer.print("<td class=\"bordered\" style=\"text-align: right\">");
       writer.println(ops.get(a));
     }
     writer.println("</table>");
@@ -193,7 +193,7 @@ public final class Problem {
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Name");
     writer.println("<td class=\"bordered\">Type");
-    writer.println("<td class=\"bordered\"; style=\"text-align: right\">Occurs");
+    writer.println("<td class=\"bordered\" style=\"text-align: right\">Occurs");
     var funcs = new Bag<Func>();
     for (var c : clauses)
       Etc.walkLeaves(
@@ -307,22 +307,22 @@ public final class Problem {
 
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Current");
-    writer.print("<td class=\"bordered\"; style=\"text-align: right\">");
+    writer.print("<td class=\"bordered\" style=\"text-align: right\">");
     writer.println(numberFormat.format(runtime.totalMemory() - runtime.freeMemory()));
 
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Free");
-    writer.print("<td class=\"bordered\"; style=\"text-align: right\">+ ");
+    writer.print("<td class=\"bordered\" style=\"text-align: right\">+ ");
     writer.println(numberFormat.format(runtime.freeMemory()));
 
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Total");
-    writer.print("<td class=\"bordered\"; style=\"text-align: right\">= ");
+    writer.print("<td class=\"bordered\" style=\"text-align: right\">= ");
     writer.println(numberFormat.format(runtime.totalMemory()));
 
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Max");
-    writer.print("<td class=\"bordered\"; style=\"text-align: right\">");
+    writer.print("<td class=\"bordered\" style=\"text-align: right\">");
     writer.println(numberFormat.format(runtime.maxMemory()));
 
     writer.println("</table>");
@@ -333,31 +333,31 @@ public final class Problem {
 
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Parser");
-    writer.printf("<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeParser * 0.001);
+    writer.printf("<td class=\"bordered\" style=\"text-align: right\">%.3f\n", timeParser * 0.001);
     writer.println("</tr>");
 
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Type inference");
     writer.printf(
-        "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeTypeInference * 0.001);
+        "<td class=\"bordered\" style=\"text-align: right\">%.3f\n", timeTypeInference * 0.001);
     writer.println("</tr>");
 
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">CNF conversion");
     writer.printf(
-        "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeCnfConversion * 0.001);
+        "<td class=\"bordered\" style=\"text-align: right\">%.3f\n", timeCnfConversion * 0.001);
     writer.println("</tr>");
 
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Superposition");
     writer.printf(
-        "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n", timeSuperposition * 0.001);
+        "<td class=\"bordered\" style=\"text-align: right\">%.3f\n", timeSuperposition * 0.001);
     writer.println("</tr>");
 
     writer.println("<tr>");
     writer.println("<td class=\"bordered\">Total");
     writer.printf(
-        "<td class=\"bordered\"; style=\"text-align: right\">%.3f\n",
+        "<td class=\"bordered\" style=\"text-align: right\">%.3f\n",
         (System.currentTimeMillis() - start) * 0.001);
     writer.println("</tr>");
 
