@@ -66,10 +66,13 @@ public final class Problem {
 
   private void func(Func a, int n) {
     writer.println("<tr>");
+
     writer.print("<td class=\"bordered\">");
     writer.println(a);
+
     writer.print("<td class=\"bordered\">");
     writer.println(Types.typeof(a));
+
     writer.print("<td class=\"bordered\" style=\"text-align: right\">");
     writer.println(n);
   }
@@ -173,10 +176,13 @@ public final class Problem {
       var op = a1.get(0);
       var type = a1.get(1);
       writer.println("<tr>");
+
       writer.print("<td class=\"bordered\">");
       writer.println(op);
+
       writer.print("<td class=\"bordered\">");
       writer.println(type);
+
       writer.print("<td class=\"bordered\" style=\"text-align: right\">");
       writer.println(ops.get(a));
     }
