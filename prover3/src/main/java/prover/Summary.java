@@ -71,7 +71,7 @@ public final class Summary {
       writer.println("<tr>");
 
       writer.print("<td class=\"bordered\">");
-      writer.println(summary.name);
+      writer.printf("<a href=\"%s.html\">%s</a>", summary.name, summary.name);
 
       writer.print("<td class=\"bordered\" style=\"text-align: right\">");
       if (summary.formulas > 0) writer.println(numberFormat.format(summary.formulas));
