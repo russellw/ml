@@ -73,7 +73,7 @@ public final class Problem {
     endTime = System.currentTimeMillis();
   }
 
-  private void func(Func a, int n) {
+  private void func(Func a, Integer n) {
     writer.println("<tr>");
 
     writer.print("<td class=\"bordered\">");
@@ -83,7 +83,7 @@ public final class Problem {
     writer.println(Types.typeof(a));
 
     writer.print("<td class=\"bordered\" style=\"text-align: right\">");
-    writer.println(n);
+    if (n != null) writer.println(n);
   }
 
   public void write() throws IOException {
