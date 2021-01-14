@@ -371,6 +371,18 @@ public final class Problem {
     writer.close();
   }
 
+  public static boolean solved(SZS szs) {
+    switch (szs) {
+      case Unsatisfiable:
+      case ContradictoryAxioms:
+      case Theorem:
+      case CounterSatisfiable:
+      case Satisfiable:
+        return true;
+    }
+    return false;
+  }
+
   private void wrap(String s) {
     var column = 0;
     for (var i = 0; i < s.length(); ) {

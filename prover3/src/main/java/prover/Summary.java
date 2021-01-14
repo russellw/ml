@@ -23,11 +23,12 @@ public final class Summary {
   }
 
   public static void write(String name, List<Summary> summaries) throws FileNotFoundException {
+    var now = LocalDateTime.now();
     var writer =
         new PrintWriter(
             Main.logDir
                 + '/'
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss"))
+                + now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss"))
                 + ".html");
     var numberFormat = NumberFormat.getInstance();
 
@@ -65,20 +66,34 @@ public final class Summary {
     writer.println("<th class=\"bordered\">Clauses");
     writer.println("<th class=\"bordered\">Expected");
     writer.println("<th class=\"bordered\">Result");
+    writer.println("<th class=\"bordered\">Solved");
     for (var summary : summaries) {
       writer.println("<tr>");
+
       writer.print("<td class=\"bordered\">");
       writer.println(summary.name);
+
       writer.print("<td class=\"bordered\" style=\"text-align: right\">");
       writer.println(numberFormat.format(summary.formulas));
+
       writer.print("<td class=\"bordered\" style=\"text-align: right\">");
       writer.println(numberFormat.format(summary.clauses));
+
       writer.print("<td class=\"bordered\">");
       if (summary.expected != null) writer.println(summary.expected);
+
       writer.print("<td class=\"bordered\">");
       writer.println(summary.result);
+
+      writer.print("<td class=\"bordered\">");
+      if (Problem.solved(summary.result)) writer.print("&#x2714;");
+      writer.println();
     }
     writer.println("</table>");
+
+    // Time
+    writer.println("<p>");
+    writer.println(now.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy, HH:mm:ss")));
 
     // Flush output
     writer.close();
