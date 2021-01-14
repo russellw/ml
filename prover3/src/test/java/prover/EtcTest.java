@@ -180,4 +180,25 @@ public class EtcTest {
     assertEquals(Etc.count(List.of('a', 'b', 'c'), c -> Character.isUpperCase((Character) c)), 0);
     assertEquals(Etc.count(List.of(), c -> Character.isUpperCase((Character) c)), 0);
   }
+
+  @Test
+  public void baseName() {
+    assertEquals(Etc.baseName("/tmp/abc.txt"), "abc");
+  }
+
+  @Test
+  public void removeAt() {
+    var a = new Object[] {'a', 'b', 'c'};
+    var a1 = Etc.removeAt(a, 1);
+    assertArrayEquals(a1, new Object[] {'a', 'c'});
+  }
+
+  @Test
+  public void splice() {}
+
+  @Test
+  public void head() {
+    assertNull(Etc.head(1));
+    assertEquals(Etc.head(List.of(1, 2, 3)), 1);
+  }
 }
