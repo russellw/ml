@@ -90,14 +90,17 @@ public final class Problem {
   private void func(Func a, Integer n) {
     writer.println("<tr>");
 
-    writer.print("<td class=\"bordered\">");
-    writer.println(a);
+    writer.print("<td class=\"bordered\"><code>");
+    writer.print(a);
+    writer.println("</code>");
 
-    writer.print("<td class=\"bordered\">");
-    writer.println(Types.typeof(a));
+    writer.print("<td class=\"bordered\"><code>");
+    writer.print(Types.typeof(a));
+    writer.println("</code>");
 
     writer.print("<td class=\"bordered\" style=\"text-align: right\">");
-    if (n != null) writer.println(n);
+    if (n != null) writer.print(n);
+    writer.println();
   }
 
   public void write() throws IOException {
@@ -216,11 +219,13 @@ public final class Problem {
         var type = a1.get(1);
         writer.println("<tr>");
 
-        writer.print("<td class=\"bordered\">");
-        writer.println(op);
+        writer.print("<td class=\"bordered\"><code>");
+        writer.print(op);
+        writer.println("</code>");
 
-        writer.print("<td class=\"bordered\">");
-        writer.println(type);
+        writer.print("<td class=\"bordered\"><code>");
+        writer.print(type);
+        writer.println("</code>");
 
         writer.print("<td class=\"bordered\" style=\"text-align: right\">");
         writer.println(ops.get(a));
@@ -276,22 +281,24 @@ public final class Problem {
           if (!(formula instanceof Formula)) continue;
           writer.println("<tr>");
 
-          writer.print("<td class=\"bordered\">");
+          writer.print("<td class=\"bordered\"><code>");
           for (var i = 0; i < formula.from.length; i++) {
             if (i > 0) writer.print(' ');
             writer.print(formula.from[i].name);
           }
-          writer.println();
+          writer.println("</code>");
 
-          writer.print("<td class=\"bordered\">");
-          writer.println(formula.inference);
+          writer.print("<td class=\"bordered\"><code>");
+          writer.print(formula.inference);
+          writer.println("</code>");
 
-          writer.print("<td class=\"bordered\">");
-          writer.println(formula.name);
+          writer.print("<td class=\"bordered\"><code>");
+          writer.print(formula.name);
+          writer.println("</code>");
 
-          writer.print("<td class=\"bordered\" colspan=\"2\">");
+          writer.print("<td class=\"bordered\" colspan=\"2\"><code>");
           term(formula.term());
-          writer.println();
+          writer.println("</code>");
         }
       }
       writer.println("<tr>");
@@ -305,34 +312,36 @@ public final class Problem {
         var c = (Clause) formula;
         writer.println("<tr>");
 
-        writer.print("<td class=\"bordered\">");
+        writer.print("<td class=\"bordered\"><code>");
         for (var i = 0; i < c.from.length; i++) {
           if (i > 0) writer.print(' ');
           writer.print(c.from[i].name);
         }
-        writer.println();
+        writer.println("</code>");
 
-        writer.print("<td class=\"bordered\">");
-        writer.println(c.inference);
+        writer.print("<td class=\"bordered\"><code>");
+        writer.print(c.inference);
+        writer.println("</code>");
 
-        writer.print("<td class=\"bordered\">");
-        writer.println(c.name);
+        writer.print("<td class=\"bordered\"><code>");
+        writer.print(c.name);
+        writer.println("</code>");
 
-        writer.print("<td class=\"bordered\">");
+        writer.print("<td class=\"bordered\"><code>");
         var negative = c.negative();
         for (var i = 0; i < negative.length; i++) {
           if (i > 0) writer.print(' ');
           term(negative[i]);
         }
-        writer.println();
+        writer.println("</code>");
 
-        writer.print("<td class=\"bordered\">");
+        writer.print("<td class=\"bordered\"><code>");
         var positive = c.positive();
         for (var i = 0; i < positive.length; i++) {
           if (i > 0) writer.print(' ');
           term(positive[i]);
         }
-        writer.println();
+        writer.println("</code>");
       }
       writer.println("</table>");
     }
