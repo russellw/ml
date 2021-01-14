@@ -7,7 +7,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public final class TptpParser {
-  private static final Pattern STATUS_PATTERN = Pattern.compile("\\s*Status\\s*:\\s*(\\w+)");
+  public static final Pattern STATUS_PATTERN = Pattern.compile("\\s*Status\\s*:\\s*(\\w+)");
+  public static final Pattern RATING_PATTERN = Pattern.compile("\\s*Rating\\s*:\\s*(\\d+\\.\\d+)");
 
   // Tokens
   private static final int DEFINED_WORD = -2;
@@ -211,6 +212,10 @@ public final class TptpParser {
             if (problem.expected == null) {
               var matcher = STATUS_PATTERN.matcher(s);
               if (matcher.matches()) problem.expected = SZS.valueOf(matcher.group(1));
+            }
+            if (problem.rating < 0) {
+              var matcher = RATING_PATTERN.matcher(s);
+              if (matcher.lookingAt()) problem.rating = Double.parseDouble(matcher.group(1));
             }
             continue;
           }

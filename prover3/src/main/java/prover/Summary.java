@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 
 public final class Summary {
@@ -15,6 +16,7 @@ public final class Summary {
   public final int unprocessed;
   public final SZS expected;
   public final SZS result;
+  public final double rating;
 
   public Summary(Problem problem) {
     name = Etc.baseName(problem.file());
@@ -24,6 +26,7 @@ public final class Summary {
     unprocessed = problem.superposition.unprocessed.size();
     expected = problem.expected;
     result = problem.result;
+    rating = problem.rating;
   }
 
   public static void write(String name, List<Summary> summaries) throws FileNotFoundException {
@@ -63,6 +66,7 @@ public final class Summary {
     writer.println("</style>");
 
     // Summaries
+    summaries.sort(Comparator.comparingDouble((Summary o) -> o.rating).thenComparing(o -> o.name));
     writer.println("<table class=\"bordered\">");
     writer.println("<tr>");
     writer.println("<th class=\"bordered\">Problem");
@@ -73,6 +77,7 @@ public final class Summary {
     writer.println("<th class=\"bordered\">Expected");
     writer.println("<th class=\"bordered\">Result");
     writer.println("<th class=\"bordered\">Solved");
+    writer.println("<th class=\"bordered\">Rating");
     for (var summary : summaries) {
       writer.println("<tr>");
 
@@ -99,6 +104,10 @@ public final class Summary {
 
       writer.print("<td class=\"bordered\" style=\"text-align: center\">");
       if (Problem.solved(summary.result)) writer.print("&#x2714;");
+      writer.println();
+
+      writer.print("<td class=\"bordered\" style=\"text-align: right\">");
+      if (summary.rating >= 0) writer.printf("%.2f", summary.rating);
       writer.println();
     }
     writer.println("</table>");

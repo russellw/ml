@@ -9,10 +9,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public final class Problem {
-  public final long start = System.currentTimeMillis();
+  public final long startTime = System.currentTimeMillis();
   private final List<String> files = new ArrayList<>();
   public final List<String> header = new ArrayList<>();
   public SZS expected;
+  public double rating = -1;
   public final List<Formula> formulas = new ArrayList<>();
   public Formula conjecture;
   public final Set<Func> skolems = new LinkedHashSet<>();
@@ -48,7 +49,7 @@ public final class Problem {
         Etc.time(
             () -> {
               superposition = new Superposition();
-              superposition.solve(this, start + timeout);
+              superposition.solve(this, startTime + timeout);
             });
     if (conjecture != null)
       switch (result) {
@@ -365,7 +366,7 @@ public final class Problem {
     writer.println("<td class=\"bordered\">Total");
     writer.printf(
         "<td class=\"bordered\" style=\"text-align: right\">%.3f\n",
-        (System.currentTimeMillis() - start) * 0.001);
+        (System.currentTimeMillis() - startTime) * 0.001);
     writer.println("</tr>");
 
     writer.println("</table>");
