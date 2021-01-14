@@ -194,7 +194,10 @@ public class EtcTest {
   }
 
   @Test
-  public void splice() {}
+  public void splice() {
+    assertEquals(Etc.splice('a', List.of(), 0, 'x'), 'x');
+    assertEquals(Etc.splice(List.of('a', 'b', 'c'), List.of(1), 0, 'x'), List.of('a', 'x', 'c'));
+  }
 
   @Test
   public void head() {
