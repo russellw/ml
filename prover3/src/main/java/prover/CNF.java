@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public final class CNF {
   private static final Pattern SKOLEM_PATTERN = Pattern.compile("\\s*Status\\s*:\\s*(\\w+)");
   private final Problem problem;
-  private long skolemId = -1;
+  private int skolemId = -1;
   private final List<Object> negative = new ArrayList<>();
   private final List<Object> positive = new ArrayList<>();
 
@@ -20,7 +20,7 @@ public final class CNF {
             if (a instanceof Func) {
               var matcher = SKOLEM_PATTERN.matcher(((Func) a).name);
               if (matcher.matches())
-                skolemId = Math.max(skolemId, Long.parseLong(matcher.group(1)));
+                skolemId = Math.max(skolemId, Integer.parseInt(matcher.group(1)));
             }
           });
   }

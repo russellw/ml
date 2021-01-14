@@ -12,6 +12,7 @@ public final class Main {
     TPTP,
   }
 
+  public static final String logDir = "/t";
   private static List<String> files = new ArrayList<>();
   private static Language language;
   private static long timeout = 60_000;
@@ -149,7 +150,7 @@ public final class Main {
       help();
       return;
     }
-    var attempted = 0;
+    var summaries = new ArrayList<Summary>();
     var solved = 0;
     for (var file : files) {
       // Read
@@ -187,7 +188,7 @@ public final class Main {
       problem.write();
 
       // Statistics
-      attempted++;
+      summaries.add(new Summary(problem));
       switch (problem.result) {
         case Unsatisfiable:
         case ContradictoryAxioms:
@@ -201,7 +202,8 @@ public final class Main {
       System.out.println();
     }
     System.out.printf(
-        "solved %d/%d (%f%%)\n", solved, attempted, solved * 100 / (double) attempted);
+        "solved %d/%d (%f%%)\n",
+        solved, summaries.size(), solved * 100 / (double) summaries.size());
   }
 
   private static void help() {

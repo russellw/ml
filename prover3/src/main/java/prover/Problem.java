@@ -82,7 +82,7 @@ public final class Problem {
   public void write() throws IOException {
     // Report
     var name = Etc.withoutExtension(Etc.withoutDir(file()));
-    writer = new PrintWriter("/t/" + name + ".html");
+    writer = new PrintWriter(Main.logDir + '/' + name + ".html");
     var numberFormat = NumberFormat.getInstance();
 
     // HTML header
