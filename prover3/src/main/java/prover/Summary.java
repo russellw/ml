@@ -74,7 +74,7 @@ public final class Summary {
       writer.println(summary.name);
 
       writer.print("<td class=\"bordered\" style=\"text-align: right\">");
-      writer.println(numberFormat.format(summary.formulas));
+      if (summary.formulas > 0) writer.println(numberFormat.format(summary.formulas));
 
       writer.print("<td class=\"bordered\" style=\"text-align: right\">");
       writer.println(numberFormat.format(summary.clauses));
@@ -85,14 +85,21 @@ public final class Summary {
       writer.print("<td class=\"bordered\">");
       writer.println(summary.result);
 
-      writer.print("<td class=\"bordered\">");
+      writer.print("<td class=\"bordered\" style=\"text-align: center\">");
       if (Problem.solved(summary.result)) writer.print("&#x2714;");
       writer.println();
     }
     writer.println("</table>");
 
+    // Overall statistics
+    writer.print("<p>");
+    var solved = Etc.count(summaries, summary -> Problem.solved(summary.result));
+    writer.printf(
+        "Solved %d/%d (%f%%)\n",
+        solved, summaries.size(), solved * 100 / (double) summaries.size());
+
     // Time
-    writer.println("<p>");
+    writer.print("<p>");
     writer.println(now.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy, HH:mm:ss")));
 
     // Flush output

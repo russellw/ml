@@ -363,7 +363,7 @@ public final class Problem {
 
     writer.println("</table>");
 
-    writer.println("<p>");
+    writer.print("<p>");
     writer.println(
         LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy, HH:mm:ss")));
 

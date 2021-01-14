@@ -56,6 +56,12 @@ public final class Etc {
     return System.currentTimeMillis() - start;
   }
 
+  public static <T> int count(List<T> a, Predicate<T> f) {
+    var n = 0;
+    for (var b : a) if (f.test(b)) n++;
+    return n;
+  }
+
   public static List<Object> map(List<Object> a, Function<Object, Object> f) {
     var r = new ArrayList<>();
     for (var b : a) r.add(f.apply(b));

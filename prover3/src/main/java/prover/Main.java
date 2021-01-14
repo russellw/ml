@@ -153,7 +153,6 @@ public final class Main {
       return;
     }
     var summaries = new ArrayList<Summary>();
-    var solved = 0;
     for (var file : files) {
       // Read
       Problem problem;
@@ -191,22 +190,16 @@ public final class Main {
 
       // Statistics
       summaries.add(new Summary(problem));
-      switch (problem.result) {
-        case Unsatisfiable:
-        case ContradictoryAxioms:
-        case Theorem:
-        case CounterSatisfiable:
-        case Satisfiable:
-          solved++;
-          break;
-      }
       System.out.printf("%% %f seconds\n", (System.currentTimeMillis() - problem.start) * 0.001);
       System.out.println();
     }
-    if (listFile != null) Summary.write(Etc.withoutDir(listFile), summaries);
-    System.out.printf(
-        "solved %d/%d (%f%%)\n",
-        solved, summaries.size(), solved * 100 / (double) summaries.size());
+    if (listFile != null) {
+      Summary.write(Etc.withoutDir(listFile), summaries);
+      var solved = Etc.count(summaries, summary -> Problem.solved(summary.result));
+      System.out.printf(
+          "Solved %d/%d (%f%%)\n",
+          solved, summaries.size(), solved * 100 / (double) summaries.size());
+    }
   }
 
   private static void help() {
