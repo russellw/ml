@@ -17,7 +17,8 @@ public final class Summary {
   public final SZS expected;
   public final SZS result;
   public final double rating;
-  public final long time;
+  public final long startTime;
+  public final long endTime;
 
   public Summary(Problem problem) {
     name = Etc.baseName(problem.file());
@@ -28,10 +29,12 @@ public final class Summary {
     expected = problem.expected;
     result = problem.result;
     rating = problem.rating;
-    time = problem.endTime - problem.startTime;
+    startTime = problem.startTime;
+    endTime = problem.endTime;
   }
 
   public static void write(String name, List<Summary> summaries) throws FileNotFoundException {
+    if (summaries.isEmpty()) return;
     var now = LocalDateTime.now();
     var writer =
         new PrintWriter(
@@ -39,7 +42,9 @@ public final class Summary {
                 + '/'
                 + now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss"))
                 + ".html");
+
     var numberFormat = NumberFormat.getInstance();
+    var time = summaries.get(summaries.size() - 1).endTime - summaries.get(0).startTime;
 
     // HTML header
     writer.println("<!DOCTYPE html>");
@@ -114,7 +119,8 @@ public final class Summary {
       writer.println();
 
       writer.printf(
-          "<td class=\"bordered\" style=\"text-align: right\">%.3f\n", summary.time * 0.001);
+          "<td class=\"bordered\" style=\"text-align: right\">%.3f\n",
+          (summary.endTime - summary.startTime) * 0.001);
     }
     writer.println("</table>");
 
@@ -126,6 +132,8 @@ public final class Summary {
         solved, summaries.size(), solved * 100 / (double) summaries.size());
 
     // Time
+    writer.print("<p>");
+    writer.printf("%.3f seconds\n", time * 0.001);
     writer.print("<p>");
     writer.println(now.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy, HH:mm:ss")));
 

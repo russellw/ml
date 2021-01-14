@@ -191,7 +191,7 @@ public final class Main {
       // Statistics
       summaries.add(new Summary(problem));
       System.out.printf(
-          "%% %f seconds\n", (System.currentTimeMillis() - problem.startTime) * 0.001);
+          "%% %.3f seconds\n", (System.currentTimeMillis() - problem.startTime) * 0.001);
       System.out.println();
     }
     if (listFile != null) {
