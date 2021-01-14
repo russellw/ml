@@ -13,6 +13,7 @@ public final class Main {
   }
 
   public static final String logDir = "/t";
+  private static String listFile;
   private static List<String> files = new ArrayList<>();
   private static Language language;
   private static long timeout = 60_000;
@@ -34,6 +35,7 @@ public final class Main {
           break;
         default:
           if ("lst".equals(Etc.extension(arg))) {
+            if (listFile == null) listFile = arg;
             args(Files.readAllLines(Path.of(arg), StandardCharsets.UTF_8).toArray(new String[0]));
             continue;
           }
@@ -201,6 +203,7 @@ public final class Main {
       System.out.printf("%% %f seconds\n", (System.currentTimeMillis() - problem.start) * 0.001);
       System.out.println();
     }
+    if (listFile != null) Summary.write(Etc.withoutDir(listFile), summaries);
     System.out.printf(
         "solved %d/%d (%f%%)\n",
         solved, summaries.size(), solved * 100 / (double) summaries.size());

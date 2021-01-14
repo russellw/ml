@@ -15,7 +15,7 @@ public final class Summary {
   public final SZS result;
 
   public Summary(Problem problem) {
-    this.name = Etc.withoutExtension(Etc.withoutDir(problem.file()));
+    this.name = Etc.baseName(problem.file());
     this.formulas = problem.formulas.size();
     this.clauses = problem.clauses.size();
     this.expected = problem.expected;
@@ -56,6 +56,29 @@ public final class Summary {
     writer.println("width: 100%");
     writer.println("}");
     writer.println("</style>");
+
+    // Summaries
+    writer.println("<table class=\"bordered\">");
+    writer.println("<tr>");
+    writer.println("<th class=\"bordered\">Problem");
+    writer.println("<th class=\"bordered\">Formulas");
+    writer.println("<th class=\"bordered\">Clauses");
+    writer.println("<th class=\"bordered\">Expected");
+    writer.println("<th class=\"bordered\">Result");
+    for (var summary : summaries) {
+      writer.println("<tr>");
+      writer.print("<td class=\"bordered\">");
+      writer.println(summary.name);
+      writer.print("<td class=\"bordered\" style=\"text-align: right\">");
+      writer.println(numberFormat.format(summary.formulas));
+      writer.print("<td class=\"bordered\" style=\"text-align: right\">");
+      writer.println(numberFormat.format(summary.clauses));
+      writer.print("<td class=\"bordered\">");
+      if (summary.expected != null) writer.println(summary.expected);
+      writer.print("<td class=\"bordered\">");
+      writer.println(summary.result);
+    }
+    writer.println("</table>");
 
     // Flush output
     writer.close();

@@ -81,7 +81,7 @@ public final class Problem {
 
   public void write() throws IOException {
     // Report
-    var name = Etc.withoutExtension(Etc.withoutDir(file()));
+    var name = Etc.baseName(file());
     writer = new PrintWriter(Main.logDir + '/' + name + ".html");
     var numberFormat = NumberFormat.getInstance();
 
@@ -168,9 +168,9 @@ public final class Problem {
     writer.println("<h1 id=\"Operators\">Operators</h1>");
     writer.println("<table class=\"bordered\">");
     writer.println("<tr>");
-    writer.println("<td class=\"bordered\">Name");
-    writer.println("<td class=\"bordered\">Type");
-    writer.println("<td class=\"bordered\" style=\"text-align: right\">Occurs");
+    writer.println("<th class=\"bordered\">Name");
+    writer.println("<th class=\"bordered\">Type");
+    writer.println("<th class=\"bordered\">Occurs");
     var ops1 = new ArrayList<>(ops.keySet());
     ops1.sort(Comparator.comparing(Object::toString));
     for (var a : ops1) {
@@ -191,9 +191,9 @@ public final class Problem {
     writer.println("<h1 id=\"Functions\">Functions</h1>");
     writer.println("<table class=\"bordered\">");
     writer.println("<tr>");
-    writer.println("<td class=\"bordered\">Name");
-    writer.println("<td class=\"bordered\">Type");
-    writer.println("<td class=\"bordered\" style=\"text-align: right\">Occurs");
+    writer.println("<th class=\"bordered\">Name");
+    writer.println("<th class=\"bordered\">Type");
+    writer.println("<th class=\"bordered\">Occurs");
     var funcs = new Bag<Func>();
     for (var c : clauses)
       Etc.walkLeaves(
@@ -206,7 +206,7 @@ public final class Problem {
     for (var a : funcs1) if (!skolems.contains(a)) func(a, funcs.get(a));
     if (!skolems.isEmpty()) {
       writer.println("<tr>");
-      writer.println("<td class=\"bordered\" colspan=\"3\">Skolem functions");
+      writer.println("<th class=\"bordered\" colspan=\"3\">Skolem functions");
       for (var a : skolems) func(a, funcs.get(a));
     }
     writer.println("</table>");
@@ -232,10 +232,10 @@ public final class Problem {
       var proof = refutation.proof();
       if (!formulas.isEmpty()) {
         writer.println("<tr>");
-        writer.println("<td class=\"bordered\">From");
-        writer.println("<td class=\"bordered\">Inference");
-        writer.println("<td class=\"bordered\">Name");
-        writer.println("<td class=\"bordered\" colspan=\"2\">Term");
+        writer.println("<th class=\"bordered\">From");
+        writer.println("<th class=\"bordered\">Inference");
+        writer.println("<th class=\"bordered\">Name");
+        writer.println("<th class=\"bordered\" colspan=\"2\">Term");
         for (var formula : proof) {
           if (!(formula instanceof Formula)) continue;
           writer.println("<tr>");
@@ -258,11 +258,11 @@ public final class Problem {
         }
       }
       writer.println("<tr>");
-      writer.println("<td class=\"bordered\">From");
-      writer.println("<td class=\"bordered\">Inference");
-      writer.println("<td class=\"bordered\">Name");
-      writer.println("<td class=\"bordered\">Negative");
-      writer.println("<td class=\"bordered\">Positive");
+      writer.println("<th class=\"bordered\">From");
+      writer.println("<th class=\"bordered\">Inference");
+      writer.println("<th class=\"bordered\">Name");
+      writer.println("<th class=\"bordered\">Negative");
+      writer.println("<th class=\"bordered\">Positive");
       for (var formula : proof) {
         if (!(formula instanceof Clause)) continue;
         var c = (Clause) formula;

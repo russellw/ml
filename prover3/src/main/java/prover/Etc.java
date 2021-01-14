@@ -33,6 +33,10 @@ public final class Etc {
     for (js[i] = 0; js[i] < qs.get(i).size(); js[i]++) cartesianProduct(qs, i + 1, js, rs);
   }
 
+  public static String baseName(String file) {
+    return withoutExtension(withoutDir(file));
+  }
+
   public static void debug(Object a) {
     System.out.print(Thread.currentThread().getStackTrace()[2] + ": ");
     System.out.println(a);
