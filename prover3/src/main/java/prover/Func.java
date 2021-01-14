@@ -11,7 +11,7 @@ public final class Func {
 
   @Override
   public String toString() {
-    if (name == null) return String.format("_%x", hashCode());
+    if (name == null) return super.toString();
     return name;
   }
 }

@@ -2,8 +2,6 @@ package prover;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
 
@@ -119,8 +117,9 @@ public class CNFTest {
   }
 
   private static List<Clause> convert1(Formula formula) {
-    var clauses = new ArrayList<Clause>();
-    CNF.convert(Collections.singletonList(formula), clauses);
-    return clauses;
+    var problem = new Problem();
+    problem.formulas.add(formula);
+    CNF.convert(problem);
+    return problem.clauses;
   }
 }

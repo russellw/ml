@@ -15,6 +15,7 @@ public final class Problem {
   public SZS expected;
   public final List<Formula> formulas = new ArrayList<>();
   public Formula conjecture;
+  public final Set<Func> skolems = new LinkedHashSet<>();
   public final List<Clause> clauses = new ArrayList<>();
   public Clause refutation;
   public SZS result;
@@ -41,7 +42,7 @@ public final class Problem {
       formulas.add(
           new Formula(List.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
     timeTypeInference = Etc.time(() -> Types.inferTypes(formulas, clauses));
-    timeCnfConversion = Etc.time(() -> CNF.convert(formulas, clauses));
+    timeCnfConversion = Etc.time(() -> CNF.convert(this));
     timeSuperposition = Etc.time(() -> Superposition.solve(this, start + timeout));
     if (conjecture != null)
       switch (result) {
@@ -66,6 +67,16 @@ public final class Problem {
   private void href(String s) {
     s = Path.of(s).toAbsolutePath().toString();
     writer.printf("<a href=\"%s\">%s</a>", s.replace('\\', '/'), s);
+  }
+
+  private void func(Func a, int n) {
+    writer.println("<tr>");
+    writer.print("<td class=\"bordered\">");
+    writer.println(a);
+    writer.print("<td class=\"bordered\">");
+    writer.println(Types.typeof(a));
+    writer.print("<td class=\"bordered\"; style=\"text-align: right\">");
+    writer.println(n);
   }
 
   public void write() throws IOException {
@@ -192,14 +203,11 @@ public final class Problem {
           });
     var funcs1 = new ArrayList<>(funcs.keySet());
     funcs1.sort(Comparator.comparing(Func::toString));
-    for (var a : funcs1) {
+    for (var a : funcs1) if (!skolems.contains(a)) func(a, funcs.get(a));
+    if (!skolems.isEmpty()) {
       writer.println("<tr>");
-      writer.print("<td class=\"bordered\">");
-      writer.println(a);
-      writer.print("<td class=\"bordered\">");
-      writer.println(Types.typeof(a));
-      writer.print("<td class=\"bordered\"; style=\"text-align: right\">");
-      writer.println(funcs.get(a));
+      writer.println("<td class=\"bordered\" colspan=\"3\">Skolem functions");
+      for (var a : skolems) func(a, funcs.get(a));
     }
     writer.println("</table>");
 

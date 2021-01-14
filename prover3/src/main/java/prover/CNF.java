@@ -1,17 +1,39 @@
 package prover;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 // Open problem:
 // https://stackoverflow.com/questions/53718986/converting-first-order-logic-to-cnf-without-exponential-blowup
 public final class CNF {
+  private static final Pattern SKOLEM_PATTERN = Pattern.compile("\\s*Status\\s*:\\s*(\\w+)");
+  private final Problem problem;
+  private long skolemId = -1;
   private final List<Object> negative = new ArrayList<>();
   private final List<Object> positive = new ArrayList<>();
-  private final List<Clause> clauses;
 
-  private static Object skolem(Object returnType, Collection<Variable> args) {
+  private void checkSkolemId(List<? extends AbstractFormula> formulas) {
+    for (var formula : formulas)
+      Etc.walkLeaves(
+          formula.term(),
+          a -> {
+            if (a instanceof Func) {
+              var matcher = SKOLEM_PATTERN.matcher(((Func) a).name);
+              if (matcher.matches())
+                skolemId = Math.max(skolemId, Long.parseLong(matcher.group(1)));
+            }
+          });
+  }
+
+  private Func skolem(Object type) {
+    var a = new Func(type, "sK" + ++skolemId);
+    problem.skolems.add(a);
+    return a;
+  }
+
+  private Object skolem(Object returnType, Collection<Variable> args) {
     // Atom
-    if (args.isEmpty()) return new Func(returnType, null);
+    if (args.isEmpty()) return skolem(returnType);
 
     // Type
     var type = new ArrayList<>();
@@ -20,7 +42,7 @@ public final class CNF {
 
     // Term
     var r = new ArrayList<>();
-    r.add(new Func(type, null));
+    r.add(skolem(type));
     r.addAll(args);
     return r;
   }
@@ -211,7 +233,7 @@ public final class CNF {
           positive.clear();
           split(a1.get(i));
           var c = new Clause(negative, positive, Inference.SPLIT, formula);
-          if (!c.isTrue()) clauses.add(c);
+          if (!c.isTrue()) problem.clauses.add(c);
         }
         return;
       }
@@ -220,15 +242,17 @@ public final class CNF {
     positive.clear();
     split(a);
     var c = new Clause(negative, positive, Inference.SPLIT, formula);
-    if (!c.isTrue()) clauses.add(c);
+    if (!c.isTrue()) problem.clauses.add(c);
   }
 
-  private CNF(List<Formula> formulas, List<Clause> clauses) {
-    this.clauses = clauses;
-    for (var formula : formulas) convert(formula);
+  private CNF(Problem problem) {
+    this.problem = problem;
+    checkSkolemId(problem.formulas);
+    checkSkolemId(problem.clauses);
+    for (var formula : problem.formulas) convert(formula);
   }
 
-  public static void convert(List<Formula> formulas, List<Clause> clauses) {
-    new CNF(formulas, clauses);
+  public static void convert(Problem problem) {
+    new CNF(problem);
   }
 }
