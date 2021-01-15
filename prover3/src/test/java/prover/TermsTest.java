@@ -404,6 +404,10 @@ public class TermsTest {
     // divide
     assertSimplify(
         List.of(Symbol.DIVIDE, BigRational.of("1"), BigRational.of("3")), BigRational.of("1/3"));
+    assertSimplify(List.of(Symbol.DIVIDE, BigRational.ZERO, z), BigRational.ZERO);
+    assertSimplify(
+        List.of(Symbol.DIVIDE, BigRational.ONE, z), List.of(Symbol.DIVIDE, BigRational.ONE, z));
+    assertSimplify(List.of(Symbol.DIVIDE, z, BigRational.ONE), z);
 
     // <
     assertSimplify(List.of(Symbol.LESS, BigInteger.valueOf(2), BigInteger.valueOf(1)), false);
@@ -428,6 +432,11 @@ public class TermsTest {
     assertSimplify(
         List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(1));
+    assertSimplify(List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.ZERO, x), BigInteger.ZERO);
+    assertSimplify(
+        List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.ONE, x),
+        List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.ONE, x));
+    assertSimplify(List.of(Symbol.DIVIDE_TRUNCATE, x, BigInteger.ONE), x);
 
     // remainderTruncate
     assertSimplify(
@@ -468,6 +477,11 @@ public class TermsTest {
     assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(1));
+    assertSimplify(List.of(Symbol.DIVIDE_FLOOR, BigInteger.ZERO, x), BigInteger.ZERO);
+    assertSimplify(
+        List.of(Symbol.DIVIDE_FLOOR, BigInteger.ONE, x),
+        List.of(Symbol.DIVIDE_FLOOR, BigInteger.ONE, x));
+    assertSimplify(List.of(Symbol.DIVIDE_FLOOR, x, BigInteger.ONE), x);
 
     // remainderFloor
     assertSimplify(
@@ -508,6 +522,11 @@ public class TermsTest {
     assertSimplify(
         List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.valueOf(-7), BigInteger.valueOf(-3)),
         BigInteger.valueOf(3));
+    assertSimplify(List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.ZERO, x), BigInteger.ZERO);
+    assertSimplify(
+        List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.ONE, x),
+        List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.ONE, x));
+    assertSimplify(List.of(Symbol.DIVIDE_EUCLIDEAN, x, BigInteger.ONE), x);
 
     // remainderEuclidean
     assertSimplify(
