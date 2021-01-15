@@ -67,7 +67,9 @@ public final class Terms {
               var y2 = y1.get(1);
               if (y2 instanceof BigRational) {
                 var y3 = (BigRational) y2;
-                return List.of(Symbol.TO_REAL, op.apply(x3, y3));
+                var r = op.apply(x3, y3);
+                if (r instanceof BigRational) return List.of(Symbol.TO_REAL, r);
+                return r;
               }
             }
           }
