@@ -370,6 +370,10 @@ public class TermsTest {
     assertSimplify(
         List.of(Symbol.ADD, List.of(Symbol.TO_REAL, BigRational.of("1/10")), z),
         List.of(Symbol.ADD, List.of(Symbol.TO_REAL, BigRational.of("1/10")), z));
+    assertSimplify(List.of(Symbol.ADD, BigInteger.ZERO, x), x);
+    assertSimplify(List.of(Symbol.ADD, x, BigInteger.ZERO), x);
+    assertSimplify(List.of(Symbol.ADD, BigRational.ZERO, z), z);
+    assertSimplify(List.of(Symbol.ADD, z, BigRational.ZERO), z);
 
     // subtract
     assertSimplify(
@@ -378,6 +382,8 @@ public class TermsTest {
     assertSimplify(
         List.of(Symbol.SUBTRACT, BigRational.of("3/10"), BigRational.of("1/10")),
         BigRational.of("2/10"));
+    assertSimplify(List.of(Symbol.SUBTRACT, BigInteger.ZERO, x), List.of(Symbol.NEGATE, x));
+    assertSimplify(List.of(Symbol.SUBTRACT, x, BigInteger.ZERO), x);
 
     // multiply
     assertSimplify(
@@ -386,6 +392,14 @@ public class TermsTest {
     assertSimplify(
         List.of(Symbol.MULTIPLY, BigRational.of("1/10"), BigRational.of("1/10")),
         BigRational.of("1/100"));
+    assertSimplify(List.of(Symbol.MULTIPLY, BigInteger.ZERO, x), BigInteger.ZERO);
+    assertSimplify(List.of(Symbol.MULTIPLY, x, BigInteger.ZERO), BigInteger.ZERO);
+    assertSimplify(List.of(Symbol.MULTIPLY, BigRational.ZERO, z), BigRational.ZERO);
+    assertSimplify(List.of(Symbol.MULTIPLY, z, BigRational.ZERO), BigRational.ZERO);
+    assertSimplify(List.of(Symbol.MULTIPLY, BigInteger.ONE, x), x);
+    assertSimplify(List.of(Symbol.MULTIPLY, x, BigInteger.ONE), x);
+    assertSimplify(List.of(Symbol.MULTIPLY, BigRational.ONE, z), z);
+    assertSimplify(List.of(Symbol.MULTIPLY, z, BigRational.ONE), z);
 
     // divide
     assertSimplify(
@@ -702,5 +716,25 @@ public class TermsTest {
         List.of(Symbol.TO_REAL, BigRational.of("1/10")));
     assertSimplify(List.of(Symbol.TO_REAL, z), List.of(Symbol.TO_REAL, z));
     assertSimplify(List.of(Symbol.TO_REAL, List.of(Symbol.TO_REAL, z)), List.of(Symbol.TO_REAL, z));
+  }
+
+  @Test
+  public void isZero() {
+    assertTrue(Terms.isZero(BigInteger.ZERO));
+    assertTrue(Terms.isZero(BigRational.ZERO));
+    assertTrue(Terms.isZero(List.of(Symbol.TO_REAL, BigRational.ZERO)));
+    assertFalse(Terms.isZero(BigInteger.ONE));
+    assertFalse(Terms.isZero(BigRational.ONE));
+    assertFalse(Terms.isZero(List.of(Symbol.TO_REAL, BigRational.ONE)));
+  }
+
+  @Test
+  public void isOne() {
+    assertFalse(Terms.isOne(BigInteger.ZERO));
+    assertFalse(Terms.isOne(BigRational.ZERO));
+    assertFalse(Terms.isOne(List.of(Symbol.TO_REAL, BigRational.ZERO)));
+    assertTrue(Terms.isOne(BigInteger.ONE));
+    assertTrue(Terms.isOne(BigRational.ONE));
+    assertTrue(Terms.isOne(List.of(Symbol.TO_REAL, BigRational.ONE)));
   }
 }

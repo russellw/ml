@@ -16,6 +16,26 @@ public final class Terms {
     abstract Object apply(BigRational x, BigRational y);
   }
 
+  public static boolean isZero(Object a) {
+    if (a.equals(BigInteger.ZERO)) return true;
+    if (a.equals(BigRational.ZERO)) return true;
+    if (a instanceof List) {
+      var a1 = (List) a;
+      if (a1.get(0) == Symbol.TO_REAL) return isZero(a1.get(1));
+    }
+    return false;
+  }
+
+  public static boolean isOne(Object a) {
+    if (a.equals(BigInteger.ONE)) return true;
+    if (a.equals(BigRational.ONE)) return true;
+    if (a instanceof List) {
+      var a1 = (List) a;
+      if (a1.get(0) == Symbol.TO_REAL) return isOne(a1.get(1));
+    }
+    return false;
+  }
+
   private static Object eval1(Object a, Object x, Op1 op) {
     if (x instanceof BigInteger) {
       var x1 = (BigInteger) x;
@@ -239,6 +259,9 @@ public final class Terms {
               }
             });
       case ADD:
+        assert y != null;
+        if (isZero(x)) return y;
+        if (isZero(y)) return x;
         return eval2(
             a,
             x,
@@ -255,6 +278,9 @@ public final class Terms {
               }
             });
       case SUBTRACT:
+        assert y != null;
+        if (isZero(x)) return List.of(Symbol.NEGATE, y);
+        if (isZero(y)) return x;
         return eval2(
             a,
             x,
@@ -271,6 +297,11 @@ public final class Terms {
               }
             });
       case MULTIPLY:
+        assert y != null;
+        if (isZero(x)) return x;
+        if (isZero(y)) return y;
+        if (isOne(x)) return y;
+        if (isOne(y)) return x;
         return eval2(
             a,
             x,
@@ -287,6 +318,9 @@ public final class Terms {
               }
             });
       case DIVIDE:
+        assert y != null;
+        if (isZero(x)) return x;
+        if (isOne(y)) return x;
         return eval2(
             a,
             x,
@@ -303,6 +337,9 @@ public final class Terms {
               }
             });
       case DIVIDE_EUCLIDEAN:
+        assert y != null;
+        if (isZero(x)) return x;
+        if (isOne(y)) return x;
         return eval2(
             a,
             x,
@@ -319,6 +356,9 @@ public final class Terms {
               }
             });
       case DIVIDE_FLOOR:
+        assert y != null;
+        if (isZero(x)) return x;
+        if (isOne(y)) return x;
         return eval2(
             a,
             x,
@@ -335,6 +375,9 @@ public final class Terms {
               }
             });
       case DIVIDE_TRUNCATE:
+        assert y != null;
+        if (isZero(x)) return x;
+        if (isOne(y)) return x;
         return eval2(
             a,
             x,
