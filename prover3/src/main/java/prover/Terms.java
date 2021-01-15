@@ -279,7 +279,7 @@ public final class Terms {
             });
       case SUBTRACT:
         assert y != null;
-        if (isZero(x)) return List.of(Symbol.NEGATE, y);
+        if (isZero(x)) return simplify(List.of(Symbol.NEGATE, y));
         if (isZero(y)) return x;
         return eval2(
             a,
