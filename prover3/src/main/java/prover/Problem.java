@@ -142,17 +142,18 @@ public final class Problem {
     // Operators
     var ops = new Bag<>();
     for (var c : clauses)
-      Etc.walkBranches(
-          Arrays.asList(c.literals),
-          a -> {
-            var op = a.get(0);
-            if (op instanceof Symbol) {
-              var type = new ArrayList<>();
-              type.add(Types.typeof(a));
-              for (var i = 1; i < a.size(); i++) type.add(Types.typeof(a.get(i)));
-              ops.add(List.of(op, type));
-            }
-          });
+      for (var a : c.literals)
+        Etc.walkBranches(
+            a,
+            b -> {
+              var op = b.get(0);
+              if (op instanceof Symbol) {
+                var type = new ArrayList<>();
+                type.add(Types.typeof(b));
+                for (var i = 1; i < b.size(); i++) type.add(Types.typeof(b.get(i)));
+                ops.add(List.of(op, type));
+              }
+            });
 
     // Functions
     var funcs = new Bag<Func>();
