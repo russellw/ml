@@ -110,6 +110,66 @@ public final class Terms {
                 return x.negate();
               }
             });
+      case CEIL:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return x;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return BigRational.of(x.ceil());
+              }
+            });
+      case FLOOR:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return x;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return BigRational.of(x.floor());
+              }
+            });
+      case ROUND:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return x;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return BigRational.of(x.round());
+              }
+            });
+      case TRUNCATE:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return x;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return BigRational.of(x.truncate());
+              }
+            });
       case ADD:
         return eval2(
             a,

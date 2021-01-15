@@ -608,5 +608,41 @@ public class TermsTest {
     // negate
     assertEval(List.of(Symbol.NEGATE, BigInteger.valueOf(3)), BigInteger.valueOf(-3));
     assertEval(List.of(Symbol.NEGATE, BigRational.of("3/10")), BigRational.of("-3/10"));
+
+    // ceil
+    assertEval(List.of(Symbol.CEIL, BigRational.of("0")), BigRational.of("0"));
+    assertEval(List.of(Symbol.CEIL, BigRational.of("1/10")), BigRational.of("1"));
+    assertEval(List.of(Symbol.CEIL, BigRational.of("5/10")), BigRational.of("1"));
+    assertEval(List.of(Symbol.CEIL, BigRational.of("9/10")), BigRational.of("1"));
+    assertEval(List.of(Symbol.CEIL, BigRational.of("-1/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.CEIL, BigRational.of("-5/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.CEIL, BigRational.of("-9/10")), BigRational.of("0"));
+
+    // floor
+    assertEval(List.of(Symbol.FLOOR, BigRational.of("0")), BigRational.of("0"));
+    assertEval(List.of(Symbol.FLOOR, BigRational.of("1/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.FLOOR, BigRational.of("5/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.FLOOR, BigRational.of("9/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.FLOOR, BigRational.of("-1/10")), BigRational.of("-1"));
+    assertEval(List.of(Symbol.FLOOR, BigRational.of("-5/10")), BigRational.of("-1"));
+    assertEval(List.of(Symbol.FLOOR, BigRational.of("-9/10")), BigRational.of("-1"));
+
+    // round
+    assertEval(List.of(Symbol.ROUND, BigRational.of("0")), BigRational.of("0"));
+    assertEval(List.of(Symbol.ROUND, BigRational.of("1/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.ROUND, BigRational.of("5/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.ROUND, BigRational.of("9/10")), BigRational.of("1"));
+    assertEval(List.of(Symbol.ROUND, BigRational.of("-1/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.ROUND, BigRational.of("-5/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.ROUND, BigRational.of("-9/10")), BigRational.of("-1"));
+
+    // truncate
+    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("0")), BigRational.of("0"));
+    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("1/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("5/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("9/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("-1/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("-5/10")), BigRational.of("0"));
+    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("-9/10")), BigRational.of("0"));
   }
 }
