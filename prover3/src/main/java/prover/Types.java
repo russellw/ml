@@ -203,14 +203,6 @@ public final class Types {
               checkTypes(Symbol.BOOLEAN, a1.get(2));
               return;
             }
-          case DIVIDE_FLOOR:
-          case DIVIDE_TRUNCATE:
-          case DIVIDE_EUCLIDEAN:
-          case REMAINDER_FLOOR:
-          case REMAINDER_TRUNCATE:
-          case REMAINDER_EUCLIDEAN:
-            for (var i = 1; i < a1.size(); i++) checkTypes(Symbol.INTEGER, a1.get(i));
-            return;
           case AND:
           case OR:
           case EQV:
