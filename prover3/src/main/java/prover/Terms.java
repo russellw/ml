@@ -99,6 +99,40 @@ public final class Terms {
         if (x.equals(y)) return true;
         if (constant(x) && constant(y)) return false;
         break;
+      case TO_INTEGER:
+        if (Types.typeof(x) == Symbol.INTEGER) return x;
+        if (x instanceof BigRational) {
+          var x1 = (BigRational) x;
+          return x1.floor();
+        }
+        if (x instanceof List) {
+          var x1 = (List) x;
+          if (x1.get(0) == Symbol.TO_REAL) {
+            var x2 = x1.get(1);
+            if (x2 instanceof BigRational) {
+              var x3 = (BigRational) x2;
+              return x3.floor();
+            }
+          }
+        }
+        return a;
+      case TO_RATIONAL:
+        if (x instanceof BigInteger) {
+          var x1 = (BigInteger) x;
+          return BigRational.of(x1);
+        }
+        if (Types.typeof(x) == Symbol.RATIONAL) return x;
+        if (x instanceof List) {
+          var x1 = (List) x;
+          if (x1.get(0) == Symbol.TO_REAL) {
+            var x2 = x1.get(1);
+            if (Types.typeof(x2) == Symbol.RATIONAL) return x2;
+          }
+        }
+        return a;
+      case TO_REAL:
+        if (Types.typeof(x) == Symbol.REAL) return x;
+        return a;
       case IS_INTEGER:
         return eval1(
             a,

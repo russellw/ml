@@ -51,9 +51,9 @@ public final class Etc {
   }
 
   public static long time(Runnable f) {
-    var start = System.currentTimeMillis();
+    var startTime = System.currentTimeMillis();
     f.run();
-    return System.currentTimeMillis() - start;
+    return System.currentTimeMillis() - startTime;
   }
 
   public static <T> int count(List<T> a, Predicate<T> f) {

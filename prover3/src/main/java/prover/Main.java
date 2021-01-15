@@ -152,6 +152,7 @@ public final class Main {
       help();
       return;
     }
+    var startTime = System.currentTimeMillis();
     var summaries = new ArrayList<Summary>();
     for (var file : files) {
       // Read
@@ -200,6 +201,7 @@ public final class Main {
       System.out.printf(
           "Solved %d/%d (%f%%)\n",
           solved, summaries.size(), solved * 100 / (double) summaries.size());
+      System.out.printf("%.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
     }
   }
 

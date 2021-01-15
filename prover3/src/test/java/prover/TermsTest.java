@@ -345,7 +345,7 @@ public class TermsTest {
             List.of(Symbol.TO_REAL, BigRational.of("1/10")),
             List.of(Symbol.TO_REAL, BigRational.of("2/10"))),
         List.of(Symbol.TO_REAL, BigRational.of("3/10")));
-    var z = new Variable(Symbol.REAL);
+    var z = new Variable(Symbol.RATIONAL);
     assertSimplify(
         List.of(
             Symbol.ADD,
@@ -666,5 +666,41 @@ public class TermsTest {
     assertSimplify(
         List.of(Symbol.IS_INTEGER, List.of(Symbol.TO_REAL, z)),
         List.of(Symbol.IS_INTEGER, List.of(Symbol.TO_REAL, z)));
+
+    // toInteger
+    assertSimplify(List.of(Symbol.TO_INTEGER, BigInteger.ZERO), BigInteger.ZERO);
+    assertSimplify(List.of(Symbol.TO_INTEGER, BigRational.of("0")), BigInteger.ZERO);
+    assertSimplify(List.of(Symbol.TO_INTEGER, BigRational.of("1/10")), BigInteger.ZERO);
+    assertSimplify(
+        List.of(Symbol.TO_INTEGER, List.of(Symbol.TO_REAL, BigRational.of("1/10"))),
+        BigInteger.ZERO);
+    assertSimplify(List.of(Symbol.TO_INTEGER, z), List.of(Symbol.TO_INTEGER, z));
+    assertSimplify(
+        List.of(Symbol.TO_INTEGER, List.of(Symbol.TO_REAL, z)),
+        List.of(Symbol.TO_INTEGER, List.of(Symbol.TO_REAL, z)));
+
+    // toRational
+    assertSimplify(List.of(Symbol.TO_RATIONAL, BigInteger.ZERO), BigRational.ZERO);
+    assertSimplify(List.of(Symbol.TO_RATIONAL, BigRational.of("0")), BigRational.ZERO);
+    assertSimplify(List.of(Symbol.TO_RATIONAL, BigRational.of("1/10")), BigRational.of("1/10"));
+    assertSimplify(
+        List.of(Symbol.TO_RATIONAL, List.of(Symbol.TO_REAL, BigRational.of("1/10"))),
+        BigRational.of("1/10"));
+    assertSimplify(List.of(Symbol.TO_RATIONAL, z), z);
+    assertSimplify(List.of(Symbol.TO_RATIONAL, List.of(Symbol.TO_REAL, z)), z);
+
+    // toReal
+    assertSimplify(
+        List.of(Symbol.TO_REAL, BigInteger.ZERO), List.of(Symbol.TO_REAL, BigInteger.ZERO));
+    assertSimplify(
+        List.of(Symbol.TO_REAL, BigRational.of("0")), List.of(Symbol.TO_REAL, BigRational.of("0")));
+    assertSimplify(
+        List.of(Symbol.TO_REAL, BigRational.of("1/10")),
+        List.of(Symbol.TO_REAL, BigRational.of("1/10")));
+    assertSimplify(
+        List.of(Symbol.TO_REAL, List.of(Symbol.TO_REAL, BigRational.of("1/10"))),
+        List.of(Symbol.TO_REAL, BigRational.of("1/10")));
+    assertSimplify(List.of(Symbol.TO_REAL, z), List.of(Symbol.TO_REAL, z));
+    assertSimplify(List.of(Symbol.TO_REAL, List.of(Symbol.TO_REAL, z)), List.of(Symbol.TO_REAL, z));
   }
 }
