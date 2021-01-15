@@ -604,5 +604,9 @@ public class TermsTest {
     assertEval(
         List.of(Symbol.REMAINDER_EUCLIDEAN, BigRational.of(-7), BigRational.of(-3)),
         BigRational.of(2));
+
+    // negate
+    assertEval(List.of(Symbol.NEGATE, BigInteger.valueOf(3)), BigInteger.valueOf(-3));
+    assertEval(List.of(Symbol.NEGATE, BigRational.of("3/10")), BigRational.of("-3/10"));
   }
 }

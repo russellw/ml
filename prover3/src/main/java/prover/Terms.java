@@ -4,10 +4,38 @@ import java.math.BigInteger;
 import java.util.*;
 
 public final class Terms {
+  private abstract static class Op1 {
+    abstract Object apply(BigInteger x);
+
+    abstract Object apply(BigRational x);
+  }
+
   private abstract static class Op2 {
     abstract Object apply(BigInteger x, BigInteger y);
 
     abstract Object apply(BigRational x, BigRational y);
+  }
+
+  private static Object eval1(Object a, Object x, Op1 op) {
+    if (x instanceof BigInteger) {
+      var x1 = (BigInteger) x;
+      return op.apply(x1);
+    }
+    if (x instanceof BigRational) {
+      var x1 = (BigRational) x;
+      return op.apply(x1);
+    }
+    if (x instanceof List) {
+      var x1 = (List) x;
+      if (x1.get(0) == Symbol.TO_REAL) {
+        var x2 = x1.get(1);
+        if (x2 instanceof BigRational) {
+          var x3 = (BigRational) x2;
+          return List.of(Symbol.TO_REAL, op.apply(x3));
+        }
+      }
+    }
+    return a;
   }
 
   private static Object eval2(Object a, Object x, Object y, Op2 op) {
@@ -67,6 +95,21 @@ public final class Terms {
         if (x.equals(y)) return true;
         if (constant(x) && constant(y)) return false;
         break;
+      case NEGATE:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return x.negate();
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return x.negate();
+              }
+            });
       case ADD:
         return eval2(
             a,
