@@ -31,7 +31,9 @@ public final class Terms {
         var x2 = x1.get(1);
         if (x2 instanceof BigRational) {
           var x3 = (BigRational) x2;
-          return List.of(Symbol.TO_REAL, op.apply(x3));
+          var r = op.apply(x3);
+          if (r instanceof BigRational) return List.of(Symbol.TO_REAL, r);
+          return r;
         }
       }
     }
@@ -97,6 +99,36 @@ public final class Terms {
         if (x.equals(y)) return true;
         if (constant(x) && constant(y)) return false;
         break;
+      case IS_INTEGER:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return true;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return x.den.equals(BigInteger.ONE);
+              }
+            });
+      case IS_RATIONAL:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return true;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return true;
+              }
+            });
       case NEGATE:
         return eval1(
             a,

@@ -644,5 +644,27 @@ public class TermsTest {
     assertSimplify(List.of(Symbol.TRUNCATE, BigRational.of("-1/10")), BigRational.of("0"));
     assertSimplify(List.of(Symbol.TRUNCATE, BigRational.of("-5/10")), BigRational.of("0"));
     assertSimplify(List.of(Symbol.TRUNCATE, BigRational.of("-9/10")), BigRational.of("0"));
+
+    // isRational
+    assertSimplify(List.of(Symbol.IS_RATIONAL, BigInteger.ZERO), true);
+    assertSimplify(List.of(Symbol.IS_RATIONAL, BigRational.of("0")), true);
+    assertSimplify(List.of(Symbol.IS_RATIONAL, BigRational.of("1/10")), true);
+    assertSimplify(List.of(Symbol.IS_RATIONAL, z), List.of(Symbol.IS_RATIONAL, z));
+    assertSimplify(
+        List.of(Symbol.IS_RATIONAL, List.of(Symbol.TO_REAL, BigRational.of("1/10"))), true);
+    assertSimplify(
+        List.of(Symbol.IS_RATIONAL, List.of(Symbol.TO_REAL, z)),
+        List.of(Symbol.IS_RATIONAL, List.of(Symbol.TO_REAL, z)));
+
+    // isInteger
+    assertSimplify(List.of(Symbol.IS_INTEGER, BigInteger.ZERO), true);
+    assertSimplify(List.of(Symbol.IS_INTEGER, BigRational.of("0")), true);
+    assertSimplify(List.of(Symbol.IS_INTEGER, BigRational.of("1/10")), false);
+    assertSimplify(List.of(Symbol.IS_INTEGER, z), List.of(Symbol.IS_INTEGER, z));
+    assertSimplify(
+        List.of(Symbol.IS_INTEGER, List.of(Symbol.TO_REAL, BigRational.of("1/10"))), false);
+    assertSimplify(
+        List.of(Symbol.IS_INTEGER, List.of(Symbol.TO_REAL, z)),
+        List.of(Symbol.IS_INTEGER, List.of(Symbol.TO_REAL, z)));
   }
 }
