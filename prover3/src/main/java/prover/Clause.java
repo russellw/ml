@@ -11,6 +11,10 @@ public final class Clause extends AbstractFormula {
       List<Object> negative, List<Object> positive, Inference inference, AbstractFormula... from) {
     super(inference, from);
 
+    // Simplify
+    for (var i = 0; i < negative.size(); i++) negative.set(i, Terms.simplify(negative.get(i)));
+    for (var i = 0; i < positive.size(); i++) positive.set(i, Terms.simplify(positive.get(i)));
+
     // Redundancy
     negative.removeIf(a -> a == Boolean.TRUE);
     positive.removeIf(a -> a == Boolean.FALSE);

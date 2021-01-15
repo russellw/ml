@@ -309,7 +309,7 @@ public class TermsTest {
     assertFalse(Terms.constant(List.of(Symbol.ADD, x, x)));
   }
 
-  private void assertEval(Object a, Object b) {
+  private void assertSimplify(Object a, Object b) {
     assertEquals(Terms.simplify(a), b);
   }
 
@@ -317,36 +317,36 @@ public class TermsTest {
   public void simplify() {
     var x = new Variable(Symbol.INTEGER);
     var y = new Variable(Symbol.INTEGER);
-    assertEval(BigInteger.ZERO, BigInteger.ZERO);
-    assertEval(x, x);
+    assertSimplify(BigInteger.ZERO, BigInteger.ZERO);
+    assertSimplify(x, x);
 
     // equals
-    assertEval(List.of(Symbol.EQUALS, BigInteger.ZERO, BigInteger.ZERO), true);
-    assertEval(List.of(Symbol.EQUALS, BigInteger.ZERO, BigInteger.ONE), false);
-    assertEval(List.of(Symbol.EQUALS, x, x), true);
-    assertEval(List.of(Symbol.EQUALS, x, y), List.of(Symbol.EQUALS, x, y));
+    assertSimplify(List.of(Symbol.EQUALS, BigInteger.ZERO, BigInteger.ZERO), true);
+    assertSimplify(List.of(Symbol.EQUALS, BigInteger.ZERO, BigInteger.ONE), false);
+    assertSimplify(List.of(Symbol.EQUALS, x, x), true);
+    assertSimplify(List.of(Symbol.EQUALS, x, y), List.of(Symbol.EQUALS, x, y));
 
     // add
-    assertEval(
+    assertSimplify(
         List.of(Symbol.ADD, BigInteger.valueOf(1), BigInteger.valueOf(2)), BigInteger.valueOf(3));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.ADD, x, BigInteger.valueOf(2)),
         List.of(Symbol.ADD, x, BigInteger.valueOf(2)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.ADD, BigInteger.valueOf(1), y),
         List.of(Symbol.ADD, BigInteger.valueOf(1), y));
-    assertEval(List.of(Symbol.ADD, x, y), List.of(Symbol.ADD, x, y));
-    assertEval(
+    assertSimplify(List.of(Symbol.ADD, x, y), List.of(Symbol.ADD, x, y));
+    assertSimplify(
         List.of(Symbol.ADD, BigRational.of("1/10"), BigRational.of("2/10")),
         BigRational.of("3/10"));
-    assertEval(
+    assertSimplify(
         List.of(
             Symbol.ADD,
             List.of(Symbol.TO_REAL, BigRational.of("1/10")),
             List.of(Symbol.TO_REAL, BigRational.of("2/10"))),
         List.of(Symbol.TO_REAL, BigRational.of("3/10")));
     var z = new Variable(Symbol.REAL);
-    assertEval(
+    assertSimplify(
         List.of(
             Symbol.ADD,
             List.of(Symbol.TO_REAL, z),
@@ -355,7 +355,7 @@ public class TermsTest {
             Symbol.ADD,
             List.of(Symbol.TO_REAL, z),
             List.of(Symbol.TO_REAL, BigRational.of("2/10"))));
-    assertEval(
+    assertSimplify(
         List.of(
             Symbol.ADD,
             List.of(Symbol.TO_REAL, BigRational.of("1/10")),
@@ -364,285 +364,285 @@ public class TermsTest {
             Symbol.ADD,
             List.of(Symbol.TO_REAL, BigRational.of("1/10")),
             List.of(Symbol.TO_REAL, z)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.ADD, z, List.of(Symbol.TO_REAL, BigRational.of("2/10"))),
         List.of(Symbol.ADD, z, List.of(Symbol.TO_REAL, BigRational.of("2/10"))));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.ADD, List.of(Symbol.TO_REAL, BigRational.of("1/10")), z),
         List.of(Symbol.ADD, List.of(Symbol.TO_REAL, BigRational.of("1/10")), z));
 
     // subtract
-    assertEval(
+    assertSimplify(
         List.of(Symbol.SUBTRACT, BigInteger.valueOf(3), BigInteger.valueOf(1)),
         BigInteger.valueOf(2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.SUBTRACT, BigRational.of("3/10"), BigRational.of("1/10")),
         BigRational.of("2/10"));
 
     // multiply
-    assertEval(
+    assertSimplify(
         List.of(Symbol.MULTIPLY, BigInteger.valueOf(2), BigInteger.valueOf(5)),
         BigInteger.valueOf(10));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.MULTIPLY, BigRational.of("1/10"), BigRational.of("1/10")),
         BigRational.of("1/100"));
 
     // divide
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE, BigRational.of("1"), BigRational.of("3")), BigRational.of("1/3"));
 
     // <
-    assertEval(List.of(Symbol.LESS, BigInteger.valueOf(2), BigInteger.valueOf(1)), false);
-    assertEval(List.of(Symbol.LESS, BigInteger.valueOf(1), BigInteger.valueOf(1)), false);
-    assertEval(List.of(Symbol.LESS, BigInteger.valueOf(1), BigInteger.valueOf(2)), true);
+    assertSimplify(List.of(Symbol.LESS, BigInteger.valueOf(2), BigInteger.valueOf(1)), false);
+    assertSimplify(List.of(Symbol.LESS, BigInteger.valueOf(1), BigInteger.valueOf(1)), false);
+    assertSimplify(List.of(Symbol.LESS, BigInteger.valueOf(1), BigInteger.valueOf(2)), true);
 
     // <=
-    assertEval(List.of(Symbol.LESS_EQ, BigInteger.valueOf(2), BigInteger.valueOf(1)), false);
-    assertEval(List.of(Symbol.LESS_EQ, BigInteger.valueOf(1), BigInteger.valueOf(1)), true);
-    assertEval(List.of(Symbol.LESS_EQ, BigInteger.valueOf(1), BigInteger.valueOf(2)), true);
+    assertSimplify(List.of(Symbol.LESS_EQ, BigInteger.valueOf(2), BigInteger.valueOf(1)), false);
+    assertSimplify(List.of(Symbol.LESS_EQ, BigInteger.valueOf(1), BigInteger.valueOf(1)), true);
+    assertSimplify(List.of(Symbol.LESS_EQ, BigInteger.valueOf(1), BigInteger.valueOf(2)), true);
 
     // divideTruncate
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.valueOf(5), BigInteger.valueOf(3)),
         BigInteger.valueOf(1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
         BigInteger.valueOf(-1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(-1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_TRUNCATE, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(1));
 
     // remainderTruncate
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_TRUNCATE, BigInteger.valueOf(5), BigInteger.valueOf(3)),
         BigInteger.valueOf(2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_TRUNCATE, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
         BigInteger.valueOf(-2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_TRUNCATE, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_TRUNCATE, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(-2));
 
     // divideFloor
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(3)),
         BigInteger.valueOf(Math.floorDiv(5, 3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
         BigInteger.valueOf(Math.floorDiv(-5, 3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(Math.floorDiv(5, -3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(Math.floorDiv(-5, -3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(3)),
         BigInteger.valueOf(1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
         BigInteger.valueOf(-2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(-2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(1));
 
     // remainderFloor
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(3)),
         BigInteger.valueOf(Math.floorMod(5, 3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
         BigInteger.valueOf(Math.floorMod(-5, 3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(Math.floorMod(5, -3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(Math.floorMod(-5, -3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(3)),
         BigInteger.valueOf(2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(3)),
         BigInteger.valueOf(1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(-1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigInteger.valueOf(-5), BigInteger.valueOf(-3)),
         BigInteger.valueOf(-2));
 
     // divideEuclidean
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.valueOf(7), BigInteger.valueOf(3)),
         BigInteger.valueOf(2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.valueOf(7), BigInteger.valueOf(-3)),
         BigInteger.valueOf(-2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.valueOf(-7), BigInteger.valueOf(3)),
         BigInteger.valueOf(-3));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_EUCLIDEAN, BigInteger.valueOf(-7), BigInteger.valueOf(-3)),
         BigInteger.valueOf(3));
 
     // remainderEuclidean
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_EUCLIDEAN, BigInteger.valueOf(7), BigInteger.valueOf(3)),
         BigInteger.valueOf(1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_EUCLIDEAN, BigInteger.valueOf(7), BigInteger.valueOf(-3)),
         BigInteger.valueOf(1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_EUCLIDEAN, BigInteger.valueOf(-7), BigInteger.valueOf(3)),
         BigInteger.valueOf(2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_EUCLIDEAN, BigInteger.valueOf(-7), BigInteger.valueOf(-3)),
         BigInteger.valueOf(2));
 
     // divideTruncate
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_TRUNCATE, BigRational.of(5), BigRational.of(3)), BigRational.of(1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_TRUNCATE, BigRational.of(-5), BigRational.of(3)), BigRational.of(-1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_TRUNCATE, BigRational.of(5), BigRational.of(-3)), BigRational.of(-1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_TRUNCATE, BigRational.of(-5), BigRational.of(-3)), BigRational.of(1));
 
     // remainderTruncate
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_TRUNCATE, BigRational.of(5), BigRational.of(3)),
         BigRational.of(2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_TRUNCATE, BigRational.of(-5), BigRational.of(3)),
         BigRational.of(-2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_TRUNCATE, BigRational.of(5), BigRational.of(-3)),
         BigRational.of(2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_TRUNCATE, BigRational.of(-5), BigRational.of(-3)),
         BigRational.of(-2));
 
     // divideFloor
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigRational.of(5), BigRational.of(3)),
         BigRational.of(Math.floorDiv(5, 3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigRational.of(-5), BigRational.of(3)),
         BigRational.of(Math.floorDiv(-5, 3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigRational.of(5), BigRational.of(-3)),
         BigRational.of(Math.floorDiv(5, -3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigRational.of(-5), BigRational.of(-3)),
         BigRational.of(Math.floorDiv(-5, -3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigRational.of(5), BigRational.of(3)), BigRational.of(1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigRational.of(-5), BigRational.of(3)), BigRational.of(-2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigRational.of(5), BigRational.of(-3)), BigRational.of(-2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_FLOOR, BigRational.of(-5), BigRational.of(-3)), BigRational.of(1));
 
     // remainderFloor
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigRational.of(5), BigRational.of(3)),
         BigRational.of(Math.floorMod(5, 3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigRational.of(-5), BigRational.of(3)),
         BigRational.of(Math.floorMod(-5, 3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigRational.of(5), BigRational.of(-3)),
         BigRational.of(Math.floorMod(5, -3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigRational.of(-5), BigRational.of(-3)),
         BigRational.of(Math.floorMod(-5, -3)));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigRational.of(5), BigRational.of(3)), BigRational.of(2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigRational.of(-5), BigRational.of(3)), BigRational.of(1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigRational.of(5), BigRational.of(-3)), BigRational.of(-1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_FLOOR, BigRational.of(-5), BigRational.of(-3)),
         BigRational.of(-2));
 
     // divideEuclidean
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_EUCLIDEAN, BigRational.of(7), BigRational.of(3)), BigRational.of(2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_EUCLIDEAN, BigRational.of(7), BigRational.of(-3)),
         BigRational.of(-2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_EUCLIDEAN, BigRational.of(-7), BigRational.of(3)),
         BigRational.of(-3));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.DIVIDE_EUCLIDEAN, BigRational.of(-7), BigRational.of(-3)),
         BigRational.of(3));
 
     // remainderEuclidean
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_EUCLIDEAN, BigRational.of(7), BigRational.of(3)),
         BigRational.of(1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_EUCLIDEAN, BigRational.of(7), BigRational.of(-3)),
         BigRational.of(1));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_EUCLIDEAN, BigRational.of(-7), BigRational.of(3)),
         BigRational.of(2));
-    assertEval(
+    assertSimplify(
         List.of(Symbol.REMAINDER_EUCLIDEAN, BigRational.of(-7), BigRational.of(-3)),
         BigRational.of(2));
 
     // negate
-    assertEval(List.of(Symbol.NEGATE, BigInteger.valueOf(3)), BigInteger.valueOf(-3));
-    assertEval(List.of(Symbol.NEGATE, BigRational.of("3/10")), BigRational.of("-3/10"));
+    assertSimplify(List.of(Symbol.NEGATE, BigInteger.valueOf(3)), BigInteger.valueOf(-3));
+    assertSimplify(List.of(Symbol.NEGATE, BigRational.of("3/10")), BigRational.of("-3/10"));
 
     // ceil
-    assertEval(List.of(Symbol.CEIL, BigRational.of("0")), BigRational.of("0"));
-    assertEval(List.of(Symbol.CEIL, BigRational.of("1/10")), BigRational.of("1"));
-    assertEval(List.of(Symbol.CEIL, BigRational.of("5/10")), BigRational.of("1"));
-    assertEval(List.of(Symbol.CEIL, BigRational.of("9/10")), BigRational.of("1"));
-    assertEval(List.of(Symbol.CEIL, BigRational.of("-1/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.CEIL, BigRational.of("-5/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.CEIL, BigRational.of("-9/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.CEIL, BigRational.of("0")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.CEIL, BigRational.of("1/10")), BigRational.of("1"));
+    assertSimplify(List.of(Symbol.CEIL, BigRational.of("5/10")), BigRational.of("1"));
+    assertSimplify(List.of(Symbol.CEIL, BigRational.of("9/10")), BigRational.of("1"));
+    assertSimplify(List.of(Symbol.CEIL, BigRational.of("-1/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.CEIL, BigRational.of("-5/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.CEIL, BigRational.of("-9/10")), BigRational.of("0"));
 
     // floor
-    assertEval(List.of(Symbol.FLOOR, BigRational.of("0")), BigRational.of("0"));
-    assertEval(List.of(Symbol.FLOOR, BigRational.of("1/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.FLOOR, BigRational.of("5/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.FLOOR, BigRational.of("9/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.FLOOR, BigRational.of("-1/10")), BigRational.of("-1"));
-    assertEval(List.of(Symbol.FLOOR, BigRational.of("-5/10")), BigRational.of("-1"));
-    assertEval(List.of(Symbol.FLOOR, BigRational.of("-9/10")), BigRational.of("-1"));
+    assertSimplify(List.of(Symbol.FLOOR, BigRational.of("0")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.FLOOR, BigRational.of("1/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.FLOOR, BigRational.of("5/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.FLOOR, BigRational.of("9/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.FLOOR, BigRational.of("-1/10")), BigRational.of("-1"));
+    assertSimplify(List.of(Symbol.FLOOR, BigRational.of("-5/10")), BigRational.of("-1"));
+    assertSimplify(List.of(Symbol.FLOOR, BigRational.of("-9/10")), BigRational.of("-1"));
 
     // round
-    assertEval(List.of(Symbol.ROUND, BigRational.of("0")), BigRational.of("0"));
-    assertEval(List.of(Symbol.ROUND, BigRational.of("1/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.ROUND, BigRational.of("5/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.ROUND, BigRational.of("9/10")), BigRational.of("1"));
-    assertEval(List.of(Symbol.ROUND, BigRational.of("-1/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.ROUND, BigRational.of("-5/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.ROUND, BigRational.of("-9/10")), BigRational.of("-1"));
+    assertSimplify(List.of(Symbol.ROUND, BigRational.of("0")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.ROUND, BigRational.of("1/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.ROUND, BigRational.of("5/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.ROUND, BigRational.of("9/10")), BigRational.of("1"));
+    assertSimplify(List.of(Symbol.ROUND, BigRational.of("-1/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.ROUND, BigRational.of("-5/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.ROUND, BigRational.of("-9/10")), BigRational.of("-1"));
 
     // truncate
-    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("0")), BigRational.of("0"));
-    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("1/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("5/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("9/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("-1/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("-5/10")), BigRational.of("0"));
-    assertEval(List.of(Symbol.TRUNCATE, BigRational.of("-9/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.TRUNCATE, BigRational.of("0")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.TRUNCATE, BigRational.of("1/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.TRUNCATE, BigRational.of("5/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.TRUNCATE, BigRational.of("9/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.TRUNCATE, BigRational.of("-1/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.TRUNCATE, BigRational.of("-5/10")), BigRational.of("0"));
+    assertSimplify(List.of(Symbol.TRUNCATE, BigRational.of("-9/10")), BigRational.of("0"));
   }
 }
