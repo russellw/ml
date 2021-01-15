@@ -155,6 +155,8 @@ public final class Main {
     var startTime = System.currentTimeMillis();
     var summaries = new ArrayList<Summary>();
     for (var file : files) {
+      if (file.startsWith("file:///")) file = file.substring(8);
+
       // Read
       Problem problem;
       try {

@@ -184,6 +184,10 @@ public final class Terms {
               }
             });
       case NEGATE:
+        if (x instanceof List) {
+          var x1 = (List) x;
+          if (x1.get(0) == Symbol.NEGATE) return x1.get(1);
+        }
         return eval1(
             a,
             x,
