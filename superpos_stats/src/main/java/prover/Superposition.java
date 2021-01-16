@@ -191,6 +191,7 @@ public final class Superposition {
 
   public void solve(Problem problem, long deadline) {
     passive.addAll(problem.clauses);
+    problem.records.add(new Record(active, passive));
     while (!passive.isEmpty()) {
       // Given clause
       var g = passive.poll();
@@ -231,6 +232,7 @@ public final class Superposition {
         superposition(c, g1);
         superposition(g1, c);
       }
+      problem.records.add(new Record(active, passive));
     }
 
     // Superposition is not complete on arithmetic

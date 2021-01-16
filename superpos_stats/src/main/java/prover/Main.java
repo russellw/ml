@@ -205,6 +205,12 @@ public final class Main {
           solved, summaries.size(), solved * 100 / (double) summaries.size());
       System.out.printf("%.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
     }
+    for (var summary : summaries) {
+      var w = new PrintWriter(logDir + '/' + summary.name + ".csv");
+      for (var r : summary.records)
+        w.printf("%d,%d,%d,%d\n", r.activeLive, r.activeTotal, r.passiveLive, r.passiveTotal);
+      w.close();
+    }
   }
 
   private static void help() {
