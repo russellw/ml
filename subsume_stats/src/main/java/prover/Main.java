@@ -154,6 +154,10 @@ public final class Main {
     }
     var startTime = System.currentTimeMillis();
     var summaries = new ArrayList<Summary>();
+    var gg=0.0;
+    var aa=0.0;
+    var pp=0.0;
+    var n=0;
     for (var file : files) {
       if (file.startsWith("file:///")) file = file.substring(8);
 
@@ -173,12 +177,8 @@ public final class Main {
             throw new IllegalStateException();
         }
         problem.timeParser = System.currentTimeMillis() - problem.startTime;
-        for (var i = 0; i < problem.header.size() && i < 50; i++)
-          System.out.println(problem.header.get(i));
       } catch (InappropriateException e) {
         file = Etc.withoutDir(file);
-        System.out.println("% SZS status Inappropriate for " + file);
-        System.out.println();
         continue;
       }
 
@@ -187,30 +187,24 @@ public final class Main {
 
       // Result
       file = Etc.withoutDir(file);
-      System.out.printf("%% SZS status %s for %s\n", problem.result, file);
-      if (problem.refutation != null) TptpPrinter.proof(file, problem.refutation);
       problem.write();
 
       // Statistics
       summaries.add(new Summary(problem));
-      System.out.printf(
-          "%% %.3f seconds\n", (System.currentTimeMillis() - problem.startTime) * 0.001);
-      System.out.println();
+      if(problem.records.size()>0){
+          var r=problem.records.get(problem.records.size()-1);
+          if(problem.superposition.givenTotal==0||r.activeTotal==0||r.passiveTotal==0)continue;
+          var g=problem.superposition.givenLive/(double)problem.superposition.givenTotal;
+          var a=r.activeLive/(double)r.activeTotal;
+          var p=r.passiveLive/(double)r.passiveTotal;
+          System.out.printf("%s\t%f\t%f\t%f\n",file,g,a,p);
+          gg+=g;
+          aa+=a;
+          pp+=p;
+          n++;
+      }
     }
-    if (listFile != null) {
-      Summary.write(Etc.withoutDir(listFile), summaries);
-      var solved = Etc.count(summaries, summary -> Problem.solved(summary.result));
-      System.out.printf(
-          "Solved %d/%d (%f%%)\n",
-          solved, summaries.size(), solved * 100 / (double) summaries.size());
-      System.out.printf("%.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
-    }
-    for (var summary : summaries) {
-      var w = new PrintWriter(logDir + '/' + summary.name + ".csv");
-      for (var r : summary.records)
-        w.printf("%d,%d,%d,%d\n", r.activeLive, r.activeTotal, r.passiveLive, r.passiveTotal);
-      w.close();
-    }
+      System.out.printf("%s\t%f\t%f\t%f\n","          ",gg/n,aa/n,pp/n);
   }
 
   private static void help() {

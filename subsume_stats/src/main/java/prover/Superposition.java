@@ -188,7 +188,8 @@ public final class Superposition {
       superposition(c, d, i, c1, c0);
     }
   }
-
+int givenLive;
+int givenTotal;
   public void solve(Problem problem, long deadline) {
     passive.addAll(problem.clauses);
     problem.records.add(new Record(active, passive));
@@ -214,8 +215,10 @@ public final class Superposition {
       var g1 = g.renameVariables();
 
       // Otter loop subsumes against passive clauses
+      givenTotal++;
       if (Subsumption.subsumesForward(active, g1)) continue;
-      if (Subsumption.subsumesForward(passive, g1)) continue;
+      //if (Subsumption.subsumesForward(passive, g1)) continue;
+      givenLive++;
       Subsumption.subsumeBackward(g1, active);
       Subsumption.subsumeBackward(g1, passive);
 
