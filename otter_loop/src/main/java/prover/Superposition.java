@@ -193,9 +193,8 @@ public final class Superposition {
     passive.addAll(problem.clauses);
     while (!passive.isEmpty()) {
       // Given clause
-      // Discount loop, given clause cannot have already been subsumed
-      // Otter loop would check it for subsumption here
       var g = passive.poll();
+      if (g.subsumed) continue;
 
       // Solved
       if (g.isFalse()) {
@@ -213,10 +212,11 @@ public final class Superposition {
       // Rename variables for subsumption and subsequent inference
       var g1 = g.renameVariables();
 
-      // Discount loop performed slightly better in tests
-      // Otter loop would also subsume against passive clauses
+      // Otter loop subsumes against passive clauses
       if (Subsumption.subsumesForward(active, g1)) continue;
+      if (Subsumption.subsumesForward(passive, g1)) continue;
       Subsumption.subsumeBackward(g1, active);
+      Subsumption.subsumeBackward(g1, passive);
 
       // Infer from one clause
       resolve(g);
