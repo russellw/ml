@@ -16,7 +16,6 @@ public final class DimacsParser {
   private static final int ZERO = -3;
 
   // Problem state
-  private final Map<String, Func> funcs = new HashMap<>();
   private final Problem problem;
 
   // File state
@@ -93,10 +92,10 @@ public final class DimacsParser {
   // Though DIMACS uses propositional terminology,
   // we use first-order terminology everywhere for consistency
   private Object func() throws IOException {
-    var a = funcs.get(tokenString);
+    var a = problem.funcs.get(tokenString);
     if (a == null) {
       a = new Func(Symbol.BOOLEAN, tokenString);
-      funcs.put(tokenString, a);
+      problem.funcs.put(tokenString, a);
     }
     lex();
     return a;

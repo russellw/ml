@@ -31,7 +31,6 @@ public final class TptpParser {
 
   // Problem state
   private static Problem problem;
-  private static Map<String, Func> funcs;
 
   // File state
   private final String file;
@@ -500,10 +499,10 @@ public final class TptpParser {
         }
       case WORD:
         {
-          var a = funcs.get(s);
+          var a = problem.funcs.get(s);
           if (a == null) {
             a = new Func(null, s);
-            funcs.put(s, a);
+            problem.funcs.put(s, a);
           }
           if (token == '(') {
             var r = new ArrayList<>();
@@ -770,10 +769,10 @@ public final class TptpParser {
                     if (token == '>') throw new InappropriateException();
                   } else {
                     var type = type();
-                    var a = funcs.get(funcName);
+                    var a = problem.funcs.get(funcName);
                     if (a == null) {
                       a = new Func(type, funcName);
-                      funcs.put(funcName, a);
+                      problem.funcs.put(funcName, a);
                     } else if (!Types.typeof(a).equals(type))
                       throw new ParseException(file, reader.getLineNumber(), "type mismatch");
                   }
@@ -826,13 +825,6 @@ public final class TptpParser {
 
   public static void read(Problem problem, InputStream stream) throws IOException {
     TptpParser.problem = problem;
-    funcs = new HashMap<>();
-
-    // Read
     new TptpParser(problem.file, stream, null);
-
-    // Free memory
-    TptpParser.problem = null;
-    funcs = null;
   }
 }

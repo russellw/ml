@@ -6,6 +6,7 @@ public final class Problem {
   public final String file;
   public final long startTime = System.currentTimeMillis();
   public long endTime;
+  public final Map<String, Func> funcs = new HashMap<>();
   public final List<String> header = new ArrayList<>();
   public SZS expected;
   public double rating = -1;
