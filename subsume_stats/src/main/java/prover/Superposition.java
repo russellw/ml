@@ -220,7 +220,7 @@ int givenTotal;
       //if (Subsumption.subsumesForward(passive, g1)) continue;
       givenLive++;
       Subsumption.subsumeBackward(g1, active);
-      Subsumption.subsumeBackward(g1, passive);
+      //Subsumption.subsumeBackward(g1, passive);
 
       // Infer from one clause
       resolve(g);
