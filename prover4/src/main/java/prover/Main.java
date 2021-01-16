@@ -172,7 +172,6 @@ public final class Main {
           default:
             throw new IllegalStateException();
         }
-        problem.timeParser = System.currentTimeMillis() - problem.startTime;
         for (var i = 0; i < problem.header.size() && i < 50; i++)
           System.out.println(problem.header.get(i));
       } catch (InappropriateException e) {
@@ -189,7 +188,6 @@ public final class Main {
       file = Etc.withoutDir(file);
       System.out.printf("%% SZS status %s for %s\n", problem.result, file);
       if (problem.refutation != null) TptpPrinter.proof(file, problem.refutation);
-      problem.write();
 
       // Statistics
       summaries.add(new Summary(problem));

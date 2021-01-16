@@ -50,12 +50,6 @@ public final class Etc {
     return Path.of(file).getFileName().toString();
   }
 
-  public static long time(Runnable f) {
-    var startTime = System.currentTimeMillis();
-    f.run();
-    return System.currentTimeMillis() - startTime;
-  }
-
   public static <T> int count(List<T> a, Predicate<T> f) {
     var n = 0;
     for (var b : a) if (f.test(b)) n++;
