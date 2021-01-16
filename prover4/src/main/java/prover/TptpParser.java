@@ -10,7 +10,6 @@ public final class TptpParser {
   public static final Pattern STATUS_PATTERN = Pattern.compile("\\s*Status\\s*:\\s*(\\w+)");
   public static final Pattern RATING_PATTERN = Pattern.compile("\\s*Rating\\s*:\\s*(\\d+\\.\\d+)");
 
-  // Tokens
   private static final int DEFINED_WORD = -2;
   private static final int DISTINCT_OBJECT = -3;
   private static final int EQV = -4;
@@ -26,20 +25,17 @@ public final class TptpParser {
   private static final int XOR = -15;
   private static final int VARIABLE = -16;
 
-  // Global state
-  private static Map<String, Func> types = new HashMap<>();
-
-  // Problem state
+  private static final Map<String, Func> types = new HashMap<>();
   private static Problem problem;
+  private static int header;
 
-  // File state
   private final String file;
   private final LineNumberReader reader;
   private int c;
-  private boolean header;
   private int token;
   private String tokenString;
-  private Map<String, Variable> free = new HashMap<>();
+
+  private final Map<String, Variable> free = new HashMap<>();
 
   // Tokenizer
   private void lexQuote() throws IOException {
@@ -206,9 +202,10 @@ public final class TptpParser {
           {
             var s = reader.readLine();
             c = reader.read();
-            if (header) {
-              problem.header.add('%' + s);
-              if (c == '\n') problem.header.add("");
+            if (header > 0) {
+              System.out.print('%');
+              System.out.println(s);
+              if (s.startsWith("--")) header--;
             }
             if (problem.expected == null) {
               var matcher = STATUS_PATTERN.matcher(s);
@@ -672,11 +669,7 @@ public final class TptpParser {
     reader = new LineNumberReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     reader.setLineNumber(1);
     c = reader.read();
-    header = true;
     lex();
-    header = false;
-    if (!problem.header.isEmpty() && !problem.header.get(problem.header.size() - 1).isBlank())
-      problem.header.add("");
     while (token != -1) {
       var s = word();
       expect('(');
@@ -825,6 +818,7 @@ public final class TptpParser {
 
   public static void read(Problem problem, InputStream stream) throws IOException {
     TptpParser.problem = problem;
+    header = 2;
     new TptpParser(problem.file, stream, null);
   }
 }

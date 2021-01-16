@@ -8,14 +8,12 @@ import java.util.regex.Pattern;
 public final class CNF {
   private static final Pattern SKOLEM_PATTERN = Pattern.compile("\\s*Status\\s*:\\s*(\\w+)");
   private final Problem problem;
-  private int skolemId = -1;
+  private long skolemId = -1;
   private final List<Object> negative = new ArrayList<>();
   private final List<Object> positive = new ArrayList<>();
 
   private Func skolem(Object type) {
-    var a = new Func(type, "sK" + ++skolemId);
-    problem.skolems.add(a);
-    return a;
+    return new Func(type, "sK" + ++skolemId);
   }
 
   private Object skolem(Object returnType, Collection<Variable> args) {
@@ -236,7 +234,7 @@ public final class CNF {
     this.problem = problem;
     for (var a : problem.funcs.values()) {
       var matcher = SKOLEM_PATTERN.matcher(a.name);
-      if (matcher.matches()) skolemId = Math.max(skolemId, Integer.parseInt(matcher.group(1)));
+      if (matcher.matches()) skolemId = Math.max(skolemId, Long.parseLong(matcher.group(1)));
     }
     for (var formula : problem.formulas) convert(formula);
   }

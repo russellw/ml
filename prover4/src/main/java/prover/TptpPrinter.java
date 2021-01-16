@@ -146,8 +146,7 @@ public final class TptpPrinter {
     print(a, null);
   }
 
-  public static void proof(String file, Clause refutation) {
-    System.out.println("% SZS output start CNFRefutation for " + file);
+  public static void proof(Clause refutation) {
     var proof = refutation.proof();
 
     // Names for anonymous formulas
@@ -158,7 +157,6 @@ public final class TptpPrinter {
 
     // Print
     for (var formula : proof) println(formula);
-    System.out.println("% SZS output end CNFRefutation for " + file);
   }
 
   public static void println(AbstractFormula formula) {

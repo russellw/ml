@@ -18,11 +18,11 @@ public final class Main {
     final SZS result;
     final long time;
 
-    private Summary(String name, Problem problem) {
-      this.name = name;
+    private Summary(Problem problem) {
+      this.name = Etc.baseName(problem.file);
       this.rating = problem.rating;
       this.result = problem.result;
-      this.time = problem.endTime - problem.startTime;
+      this.time = System.currentTimeMillis() - problem.startTime;
     }
   }
 
@@ -185,8 +185,6 @@ public final class Main {
           default:
             throw new IllegalStateException();
         }
-        for (var i = 0; i < problem.header.size() && i < 50; i++)
-          System.out.println(problem.header.get(i));
       } catch (InappropriateException e) {
         System.out.println("% SZS status Inappropriate for " + name);
         System.out.println();
@@ -199,11 +197,16 @@ public final class Main {
       // Result
       file = Etc.withoutDir(file);
       System.out.printf("%% SZS status %s for %s\n", problem.result, name);
-      if (problem.refutation != null) TptpPrinter.proof(file, problem.refutation);
+      if (problem.refutation != null) {
+        System.out.println("% SZS output start CNFRefutation for " + name);
+        TptpPrinter.proof(problem.refutation);
+        System.out.println("% SZS output end CNFRefutation for " + name);
+      }
 
       // Statistics
-      summaries.add(new Summary(name, problem));
-      System.out.printf("%% %.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
+      summaries.add(new Summary(problem));
+      System.out.printf(
+          "%% %.3f seconds\n", (System.currentTimeMillis() - problem.startTime) * 0.001);
       System.out.println();
     }
 

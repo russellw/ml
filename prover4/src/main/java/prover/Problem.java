@@ -5,14 +5,11 @@ import java.util.*;
 public final class Problem {
   public final String file;
   public final long startTime = System.currentTimeMillis();
-  public long endTime;
   public final Map<String, Func> funcs = new HashMap<>();
-  public final List<String> header = new ArrayList<>();
   public SZS expected;
   public double rating = -1;
   public final List<Formula> formulas = new ArrayList<>();
   public Formula conjecture;
-  public final Set<Func> skolems = new LinkedHashSet<>();
   public final List<Clause> clauses = new ArrayList<>();
   public Superposition superposition;
   public Clause refutation;
@@ -48,7 +45,6 @@ public final class Problem {
         case CounterSatisfiable:
           throw new IllegalStateException(result + " != " + expected);
       }
-    endTime = System.currentTimeMillis();
   }
 
   public static boolean solved(SZS szs) {

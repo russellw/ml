@@ -11,18 +11,16 @@ import java.util.regex.Pattern;
 public final class DimacsParser {
   private static final Pattern STATUS_PATTERN = Pattern.compile(".* (SAT|UNSAT) .*");
 
-  // Tokens
   private static final int INTEGER = -2;
   private static final int ZERO = -3;
 
-  // Problem state
   private final Problem problem;
 
-  // File state
   private final LineNumberReader reader;
   private int c;
   private int token;
   private String tokenString;
+
   private List<Object> negative = new ArrayList<>();
   private List<Object> positive = new ArrayList<>();
 
@@ -65,8 +63,7 @@ public final class DimacsParser {
           {
             var s = reader.readLine();
             c = reader.read();
-            problem.header.add('c' + s);
-            if (c == '\n') problem.header.add("");
+            System.out.println(s);
             if (problem.expected == null) {
               var matcher = STATUS_PATTERN.matcher(s);
               if (matcher.matches()) {
