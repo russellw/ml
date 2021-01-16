@@ -26,7 +26,6 @@ public final class Main {
     }
   }
 
-  private static String listFile;
   private static List<String> files = new ArrayList<>();
   private static Language language;
   private static long timeout = 60_000;
@@ -48,7 +47,6 @@ public final class Main {
           break;
         default:
           if ("lst".equals(Etc.extension(arg))) {
-            if (listFile == null) listFile = arg;
             args(Files.readAllLines(Path.of(arg), StandardCharsets.UTF_8).toArray(new String[0]));
             continue;
           }
@@ -195,7 +193,6 @@ public final class Main {
       problem.solve(timeout);
 
       // Result
-      file = Etc.withoutDir(file);
       System.out.printf("%% SZS status %s for %s\n", problem.result, name);
       if (problem.refutation != null) {
         System.out.println("% SZS output start CNFRefutation for " + name);
@@ -209,6 +206,7 @@ public final class Main {
           "%% %.3f seconds\n", (System.currentTimeMillis() - problem.startTime) * 0.001);
       System.out.println();
     }
+    if (summaries.isEmpty()) return;
 
     // Report
     var writer = new PrintWriter("/t/a.csv");
