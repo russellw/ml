@@ -174,7 +174,7 @@ public final class Subsumption {
     try {
       Map<Variable, Object> map = new HashMap<>();
 
-      if (true) {
+      if (false) {
         // Negative literals (unless swapped)
         var dm = deterministicMatches(c1, d1, map);
         if (dm == null) {

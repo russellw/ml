@@ -12,8 +12,8 @@ public final class Summary {
   public final String name;
   public final int formulas;
   public final int clauses;
-  public final int processed;
-  public final int unprocessed;
+  public final int active;
+  public final int passive;
   public final SZS expected;
   public final SZS result;
   public final double rating;
@@ -24,8 +24,8 @@ public final class Summary {
     name = Etc.baseName(problem.file());
     formulas = problem.formulas.size();
     clauses = problem.clauses.size();
-    processed = problem.superposition.processed.size();
-    unprocessed = problem.superposition.unprocessed.size();
+    active = problem.superposition.active.size();
+    passive = problem.superposition.passive.size();
     expected = problem.expected;
     result = problem.result;
     rating = problem.rating;
@@ -79,8 +79,8 @@ public final class Summary {
     writer.println("<th class=\"bordered\">Problem");
     writer.println("<th class=\"bordered\">Formulas");
     writer.println("<th class=\"bordered\">Clauses");
-    writer.println("<th class=\"bordered\">Processed");
-    writer.println("<th class=\"bordered\">Unprocessed");
+    writer.println("<th class=\"bordered\">Active");
+    writer.println("<th class=\"bordered\">Passive");
     writer.println("<th class=\"bordered\">Expected");
     writer.println("<th class=\"bordered\">Result");
     writer.println("<th class=\"bordered\">Solved");
@@ -99,10 +99,10 @@ public final class Summary {
       writer.println(numberFormat.format(summary.clauses));
 
       writer.print("<td class=\"bordered\" style=\"text-align: right\">");
-      writer.println(numberFormat.format(summary.processed));
+      writer.println(numberFormat.format(summary.active));
 
       writer.print("<td class=\"bordered\" style=\"text-align: right\">");
-      writer.println(numberFormat.format(summary.unprocessed));
+      writer.println(numberFormat.format(summary.passive));
 
       writer.print("<td class=\"bordered\">");
       if (summary.expected != null) writer.println(summary.expected);

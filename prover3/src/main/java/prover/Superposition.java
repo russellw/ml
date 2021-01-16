@@ -30,13 +30,13 @@ import java.util.*;
 // A full implementation would also implement an order on equations
 // e.g. lexicographic path ordering or Knuth-Bendix ordering
 public final class Superposition {
-  public final PriorityQueue<Clause> unprocessed =
+  public final PriorityQueue<Clause> passive =
       new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
-  public final List<Clause> processed = new ArrayList<>();
+  public final List<Clause> active = new ArrayList<>();
 
   private void clause(Clause c) {
     if (c.isTrue()) return;
-    unprocessed.add(c);
+    passive.add(c);
   }
 
   // Substitute and make new clause
@@ -190,12 +190,12 @@ public final class Superposition {
   }
 
   public void solve(Problem problem, long deadline) {
-    unprocessed.addAll(problem.clauses);
-    while (!unprocessed.isEmpty()) {
+    passive.addAll(problem.clauses);
+    while (!passive.isEmpty()) {
       // Given clause
       // Discount loop, given clause cannot have already been subsumed
       // Otter loop would check it for subsumption here
-      var g = unprocessed.poll();
+      var g = passive.poll();
 
       // Solved
       if (g.isFalse()) {
@@ -214,19 +214,19 @@ public final class Superposition {
       var g1 = g.renameVariables();
 
       // Discount loop performed slightly better in tests
-      // Otter loop would also subsume against unprocessed clauses
-      if (Subsumption.subsumesForward(processed, g1)) continue;
-      Subsumption.subsumeBackward(g1, processed);
+      // Otter loop would also subsume against passive clauses
+      if (Subsumption.subsumesForward(active, g1)) continue;
+      Subsumption.subsumeBackward(g1, active);
 
       // Infer from one clause
       resolve(g);
       factor(g);
 
       // Sometimes need to match g with itself
-      processed.add(g);
+      active.add(g);
 
       // Infer from two clauses
-      for (var c : processed) {
+      for (var c : active) {
         if (c.subsumed) continue;
         superposition(c, g1);
         superposition(g1, c);
@@ -234,7 +234,7 @@ public final class Superposition {
     }
 
     // Superposition is not complete on arithmetic
-    for (var c : processed) {
+    for (var c : active) {
       if (c.subsumed) continue;
       if (Etc.existsLeaf(
           c.term(),
