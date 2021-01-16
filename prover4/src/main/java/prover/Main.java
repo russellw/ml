@@ -12,7 +12,20 @@ public final class Main {
     TPTP,
   }
 
-  public static final String logDir = "/t";
+  private static final class Summary {
+    final String name;
+    final double rating;
+    final SZS result;
+    final long time;
+
+    private Summary(String name, Problem problem) {
+      this.name = name;
+      this.rating = problem.rating;
+      this.result = problem.result;
+      this.time = problem.endTime - problem.startTime;
+    }
+  }
+
   private static String listFile;
   private static List<String> files = new ArrayList<>();
   private static Language language;
@@ -155,19 +168,19 @@ public final class Main {
     var startTime = System.currentTimeMillis();
     var summaries = new ArrayList<Summary>();
     for (var file : files) {
-      if (file.startsWith("file:///")) file = file.substring(8);
+      var name = Etc.baseName(file);
 
       // Read
-      Problem problem;
+      var problem = new Problem(file);
       try {
         var stream = System.in;
         if (!file.equals(STDIN)) stream = new FileInputStream(file);
         switch (language(file)) {
           case TPTP:
-            problem = TptpParser.read(file, stream);
+            TptpParser.read(problem, stream);
             break;
           case DIMACS:
-            problem = DimacsParser.read(file, stream);
+            DimacsParser.read(problem, stream);
             break;
           default:
             throw new IllegalStateException();
@@ -175,8 +188,7 @@ public final class Main {
         for (var i = 0; i < problem.header.size() && i < 50; i++)
           System.out.println(problem.header.get(i));
       } catch (InappropriateException e) {
-        file = Etc.withoutDir(file);
-        System.out.println("% SZS status Inappropriate for " + file);
+        System.out.println("% SZS status Inappropriate for " + name);
         System.out.println();
         continue;
       }
@@ -186,23 +198,26 @@ public final class Main {
 
       // Result
       file = Etc.withoutDir(file);
-      System.out.printf("%% SZS status %s for %s\n", problem.result, file);
+      System.out.printf("%% SZS status %s for %s\n", problem.result, name);
       if (problem.refutation != null) TptpPrinter.proof(file, problem.refutation);
 
       // Statistics
-      summaries.add(new Summary(problem));
-      System.out.printf(
-          "%% %.3f seconds\n", (System.currentTimeMillis() - problem.startTime) * 0.001);
+      summaries.add(new Summary(name, problem));
+      System.out.printf("%% %.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
       System.out.println();
     }
-    if (listFile != null) {
-      Summary.write(Etc.withoutDir(listFile), summaries);
-      var solved = Etc.count(summaries, summary -> Problem.solved(summary.result));
-      System.out.printf(
-          "Solved %d/%d (%f%%)\n",
-          solved, summaries.size(), solved * 100 / (double) summaries.size());
-      System.out.printf("%.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
-    }
+
+    // Report
+    var writer = new PrintWriter("/t/a.csv");
+    for (var summary : summaries) writer.printf("%s\n", summary.name);
+    writer.close();
+
+    // Overall
+    var solved = Etc.count(summaries, summary -> Problem.solved(summary.result));
+    System.out.printf(
+        "Solved %d/%d (%f%%)\n",
+        solved, summaries.size(), solved * 100 / (double) summaries.size());
+    System.out.printf("%.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
   }
 
   private static void help() {

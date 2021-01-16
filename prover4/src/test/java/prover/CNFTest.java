@@ -117,7 +117,7 @@ public class CNFTest {
   }
 
   private static List<Clause> convert1(Formula formula) {
-    var problem = new Problem();
+    var problem = new Problem(null);
     problem.formulas.add(formula);
     new CNF(problem);
     return problem.clauses;

@@ -105,13 +105,12 @@ public final class DimacsParser {
   // Top level
   private void clause() {
     var c = new Clause(negative, positive, Inference.AXIOM);
-    c.file = problem.file();
+    c.file = problem.file;
     problem.clauses.add(c);
   }
 
-  private DimacsParser(String file, InputStream stream) throws IOException {
-    problem = new Problem();
-    problem.add(file, 0);
+  private DimacsParser(Problem problem, InputStream stream) throws IOException {
+    this.problem = problem;
     reader = new LineNumberReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     reader.setLineNumber(1);
     c = reader.read();
@@ -122,22 +121,25 @@ public final class DimacsParser {
       while (Character.isWhitespace(c)) c = reader.read();
 
       // cnf
-      if (c != 'c') throw new ParseException(file, reader.getLineNumber(), "'cnf' expected");
+      if (c != 'c')
+        throw new ParseException(problem.file, reader.getLineNumber(), "'cnf' expected");
       c = reader.read();
-      if (c != 'n') throw new ParseException(file, reader.getLineNumber(), "'cnf' expected");
+      if (c != 'n')
+        throw new ParseException(problem.file, reader.getLineNumber(), "'cnf' expected");
       c = reader.read();
-      if (c != 'f') throw new ParseException(file, reader.getLineNumber(), "'cnf' expected");
+      if (c != 'f')
+        throw new ParseException(problem.file, reader.getLineNumber(), "'cnf' expected");
       c = reader.read();
       lex();
 
       // Variables
       if (token != INTEGER)
-        throw new ParseException(file, reader.getLineNumber(), "count expected");
+        throw new ParseException(problem.file, reader.getLineNumber(), "count expected");
       lex();
 
       // Clauses
       if (token != INTEGER)
-        throw new ParseException(file, reader.getLineNumber(), "count expected");
+        throw new ParseException(problem.file, reader.getLineNumber(), "count expected");
       lex();
     }
 
@@ -161,11 +163,11 @@ public final class DimacsParser {
           positive.clear();
           break;
         default:
-          throw new ParseException(file, reader.getLineNumber(), "syntax error");
+          throw new ParseException(problem.file, reader.getLineNumber(), "syntax error");
       }
   }
 
-  public static Problem read(String file, InputStream stream) throws IOException {
-    return new DimacsParser(file, stream).problem;
+  public static void read(Problem problem, InputStream stream) throws IOException {
+    new DimacsParser(problem, stream);
   }
 }

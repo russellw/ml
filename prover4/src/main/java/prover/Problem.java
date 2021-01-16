@@ -3,9 +3,9 @@ package prover;
 import java.util.*;
 
 public final class Problem {
+  public final String file;
   public final long startTime = System.currentTimeMillis();
   public long endTime;
-  private final List<String> files = new ArrayList<>();
   public final List<String> header = new ArrayList<>();
   public SZS expected;
   public double rating = -1;
@@ -17,12 +17,8 @@ public final class Problem {
   public Clause refutation;
   public SZS result;
 
-  public String file() {
-    return files.get(0);
-  }
-
-  public void add(String file, int includeDepth) {
-    files.add("\t".repeat(includeDepth) + file);
+  public Problem(String file) {
+    this.file = file;
   }
 
   public void solve(long timeout) {
