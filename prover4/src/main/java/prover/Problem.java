@@ -11,7 +11,6 @@ public final class Problem {
   public final List<Formula> formulas = new ArrayList<>();
   public Formula conjecture;
   public final List<Clause> clauses = new ArrayList<>();
-  public Superposition superposition;
   public Clause refutation;
   public SZS result;
 
@@ -25,8 +24,7 @@ public final class Problem {
           new Formula(List.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
     Types.inferTypes(formulas, clauses);
     new CNF(this);
-    superposition = new Superposition();
-    superposition.solve(this, startTime + timeout);
+    new Superposition(this, startTime + timeout);
     if (conjecture != null)
       switch (result) {
         case Satisfiable:

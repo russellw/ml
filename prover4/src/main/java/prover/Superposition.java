@@ -189,7 +189,7 @@ public final class Superposition {
     }
   }
 
-  public void solve(Problem problem, long deadline) {
+  public Superposition(Problem problem, long deadline) {
     passive.addAll(problem.clauses);
     while (!passive.isEmpty()) {
       // Given clause
