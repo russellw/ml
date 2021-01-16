@@ -12,19 +12,6 @@ public final class CNF {
   private final List<Object> negative = new ArrayList<>();
   private final List<Object> positive = new ArrayList<>();
 
-  private void checkSkolemId(List<? extends AbstractFormula> formulas) {
-    for (var formula : formulas)
-      Etc.walkLeaves(
-          formula.term(),
-          a -> {
-            if (a instanceof Func) {
-              var matcher = SKOLEM_PATTERN.matcher(((Func) a).name);
-              if (matcher.matches())
-                skolemId = Math.max(skolemId, Integer.parseInt(matcher.group(1)));
-            }
-          });
-  }
-
   private Func skolem(Object type) {
     var a = new Func(type, "sK" + ++skolemId);
     problem.skolems.add(a);
@@ -247,8 +234,10 @@ public final class CNF {
 
   public CNF(Problem problem) {
     this.problem = problem;
-    checkSkolemId(problem.formulas);
-    checkSkolemId(problem.clauses);
+    for (var a : problem.funcs.values()) {
+      var matcher = SKOLEM_PATTERN.matcher(a.name);
+      if (matcher.matches()) skolemId = Math.max(skolemId, Integer.parseInt(matcher.group(1)));
+    }
     for (var formula : problem.formulas) convert(formula);
   }
 }

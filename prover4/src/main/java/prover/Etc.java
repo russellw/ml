@@ -87,15 +87,6 @@ public final class Etc {
     f.accept(a);
   }
 
-  public static void walkBranches(Object a, Consumer<List> f) {
-    if (a instanceof List) {
-      var a1 = (List) a;
-      f.accept(a1);
-      for (var b : a1) walkBranches(b, f);
-      return;
-    }
-  }
-
   public static Object splice(Object a, List<Integer> position, int i, Object b) {
     if (i == position.size()) return b;
     var a1 = (List) a;
