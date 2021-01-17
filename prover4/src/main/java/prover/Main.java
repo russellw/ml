@@ -15,12 +15,14 @@ public final class Main {
   private static final class Summary {
     final String name;
     final double rating;
+    final SZS expected;
     final SZS result;
     final long time;
 
     private Summary(Problem problem) {
       this.name = Etc.baseName(problem.file);
       this.rating = problem.rating;
+      this.expected = problem.expected;
       this.result = problem.result;
       this.time = System.currentTimeMillis() - problem.startTime;
     }
@@ -209,8 +211,12 @@ public final class Main {
     if (summaries.isEmpty()) return;
 
     // Report
+    summaries.sort(Comparator.comparingDouble((Summary o) -> o.rating).thenComparing(o -> o.name));
     var writer = new PrintWriter("/t/a.csv");
-    for (var summary : summaries) writer.printf("%s\n", summary.name);
+    for (var summary : summaries)
+      writer.printf(
+          "%s,%s,%s,%f,%d\n",
+          summary.name, summary.expected, summary.result, summary.rating, summary.time);
     writer.close();
 
     // Overall
