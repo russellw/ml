@@ -212,12 +212,12 @@ public final class Main {
 
     // Report
     summaries.sort(Comparator.comparingDouble((Summary o) -> o.rating).thenComparing(o -> o.name));
-    var writer = new PrintWriter("/t/a.csv");
-    for (var summary : summaries)
-      writer.printf(
-          "%s,%s,%s,%f,%d\n",
-          summary.name, summary.expected, summary.result, summary.rating, summary.time);
-    writer.close();
+    try (var writer = new PrintWriter("/t/a.csv")) {
+      for (var summary : summaries)
+        writer.printf(
+            "%s,%s,%s,%f,%d\n",
+            summary.name, summary.expected, summary.result, summary.rating, summary.time);
+    }
 
     // Overall
     var solved = Etc.count(summaries, summary -> Problem.solved(summary.result));
