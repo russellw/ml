@@ -18,13 +18,13 @@ public final class Problem {
     this.file = file;
   }
 
-  public void solve(long timeout) {
+  public void solve(int clauseLimit, long timeout) {
     if (conjecture != null)
       formulas.add(
           new Formula(List.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
     Types.inferTypes(formulas, clauses);
     new CNF(this);
-    new Superposition(this, startTime + timeout);
+    new Superposition(this, clauseLimit, startTime + timeout);
     if (conjecture != null)
       switch (result) {
         case Satisfiable:

@@ -30,12 +30,19 @@ import java.util.*;
 // A full implementation would also implement an order on equations
 // e.g. lexicographic path ordering or Knuth-Bendix ordering
 public final class Superposition {
-  public final PriorityQueue<Clause> passive =
+  private final int clauseLimit;
+  private PriorityQueue<Clause> passive =
       new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
-  public final List<Clause> active = new ArrayList<>();
+  private boolean complete = true;
 
   private void clause(Clause c) {
     if (c.isTrue()) return;
+    if (passive.size() >= clauseLimit) {
+      var passive1 = new PriorityQueue<>(Comparator.comparingInt(Clause::volume));
+      for (var i = 0; i < clauseLimit / 2; i++) passive1.add(passive.poll());
+      passive = passive1;
+      complete = false;
+    }
     passive.add(c);
   }
 
@@ -189,8 +196,10 @@ public final class Superposition {
     }
   }
 
-  public Superposition(Problem problem, long deadline) {
-    passive.addAll(problem.clauses);
+  public Superposition(Problem problem, int clauseLimit, long deadline) {
+    this.clauseLimit = clauseLimit;
+    for (var c : problem.clauses) clause(c);
+    var active = new ArrayList<Clause>();
     while (!passive.isEmpty()) {
       // Given clause
       // Discount loop, given clause cannot have already been subsumed
@@ -233,14 +242,21 @@ public final class Superposition {
       }
     }
 
+    // If we had to discard clauses to save memory, completeness was lost
+    // so running out of inferences doesn't prove anything
+    if (!complete) {
+      problem.result = SZS.ResourceOut;
+      return;
+    }
+
     // Superposition is not complete on arithmetic
-    for (var c : active) {
-      if (c.subsumed) continue;
+    for (var c : problem.clauses) {
       if (Etc.existsLeaf(
           c.term(),
           a -> {
             if (a instanceof List) return false;
             if (a instanceof Symbol) return false;
+            // If a term uses arithmetic, one of its constituent atoms must be numeric
             return Types.isNumeric(Types.typeof(a));
           })) {
         problem.result = SZS.GaveUp;
@@ -248,8 +264,9 @@ public final class Superposition {
       }
     }
 
-    // Proof of satisfiability by running out of inferences
-    // is rare, but can happen for very simple problems
+    // Proof of satisfiability by running out of inferences, is rare
+    // but can happen for very simple problems
+    // and is a good way to detect some kinds of incompleteness errors in the prover
     problem.result = SZS.Satisfiable;
   }
 }

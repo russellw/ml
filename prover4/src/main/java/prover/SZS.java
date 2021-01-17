@@ -10,5 +10,5 @@ public enum SZS {
   Theorem,
   Timeout,
   Unknown,
-  Unsatisfiable;
+  Unsatisfiable,
 }

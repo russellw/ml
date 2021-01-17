@@ -31,6 +31,7 @@ public final class Main {
   private static List<String> files = new ArrayList<>();
   private static Language language;
   private static long timeout = 60_000;
+  private static int clauseLimit = 1000000;
   private static final String STDIN = "stdin";
 
   private static String optArg(String[] args, int i) throws IOException {
@@ -93,6 +94,7 @@ public final class Main {
           help();
           System.exit(0);
         case "T":
+        case "cpu-limit":
           {
             if (optArg == null) optArg = optArg(args, i++);
             var seconds = Double.parseDouble(optArg);
@@ -129,7 +131,13 @@ public final class Main {
         case "dimacs":
           language = Language.DIMACS;
           break;
+        case "delete-bad-limit":
+        case "c":
+          if (optArg == null) optArg = optArg(args, i++);
+          clauseLimit = Integer.parseInt(optArg);
+          break;
         case "t":
+        case "soft-cpu-limit":
           {
             if (optArg == null) optArg = optArg(args, i++);
             var seconds = Double.parseDouble(optArg);
@@ -192,7 +200,7 @@ public final class Main {
       }
 
       // Solve
-      problem.solve(timeout);
+      problem.solve(clauseLimit, timeout);
 
       // Result
       System.out.printf("%% SZS status %s for %s\n", problem.result, name);
@@ -240,8 +248,10 @@ public final class Main {
     System.out.println("-           Read from stdin");
     System.out.println();
     System.out.println("Resources:");
+    System.out.println("-c n        Clause limit, default 1000000");
+    System.out.println("            Passive clauses over this limit will be discarded");
     System.out.println("-T seconds  Hard timeout");
-    System.out.println("-t seconds  Soft timeout");
+    System.out.println("-t seconds  Soft timeout, default 60");
     System.out.println("            Seconds can be floating point");
   }
 
