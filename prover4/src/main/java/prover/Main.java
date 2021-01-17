@@ -103,7 +103,7 @@ public final class Main {
                     new TimerTask() {
                       @Override
                       public void run() {
-                        System.exit(1);
+                        System.exit(7);
                       }
                     },
                     (long) (seconds * 1000));
@@ -251,7 +251,7 @@ public final class Main {
     System.out.println("-c n        Clause limit, default 1000000");
     System.out.println("            Passive clauses over this limit will be discarded");
     System.out.println("-T seconds  Hard timeout");
-    System.out.println("-t seconds  Soft timeout, default 300, 0=inf");
+    System.out.println("-t seconds  Soft timeout, default 300, 0=none");
     System.out.println("            Seconds can be floating point");
   }
 
