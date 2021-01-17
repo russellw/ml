@@ -24,7 +24,7 @@ public final class Problem {
           new Formula(List.of(Symbol.NOT, conjecture.term()), Inference.NEGATE, conjecture));
     Types.inferTypes(formulas, clauses);
     new CNF(this);
-    new Superposition(this, clauseLimit, startTime + timeout);
+    new Superposition(this, clauseLimit, timeout == 0 ? Long.MAX_VALUE : startTime + timeout);
     if (conjecture != null)
       switch (result) {
         case Satisfiable:

@@ -30,7 +30,7 @@ public final class Main {
 
   private static List<String> files = new ArrayList<>();
   private static Language language;
-  private static long timeout = 60_000;
+  private static long timeout = 300_000;
   private static int clauseLimit = 1000000;
   private static final String STDIN = "stdin";
 
@@ -251,7 +251,7 @@ public final class Main {
     System.out.println("-c n        Clause limit, default 1000000");
     System.out.println("            Passive clauses over this limit will be discarded");
     System.out.println("-T seconds  Hard timeout");
-    System.out.println("-t seconds  Soft timeout, default 60");
+    System.out.println("-t seconds  Soft timeout, default 300, 0=inf");
     System.out.println("            Seconds can be floating point");
   }
 
