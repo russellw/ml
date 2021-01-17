@@ -205,6 +205,7 @@ public final class Superposition {
       // Discount loop, given clause cannot have already been subsumed
       // Otter loop would check it for subsumption here
       var g = passive.poll();
+      assert !g.subsumed;
 
       // Solved
       if (g.isFalse()) {

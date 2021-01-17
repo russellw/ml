@@ -196,7 +196,6 @@ public final class Subsumption {
 
       // Search for nondeterministic matches
       map = search(c1, c2, d1, d2, map);
-      if (map != null) {}
       return map != null;
     } catch (TimeoutException e) {
       return false;
