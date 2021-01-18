@@ -219,7 +219,7 @@ public final class Superposition {
       assert !g.subsumed;
       // Etc.debug(g);
       if (Main.memo != null) {
-        System.out.print(g.volume < 0 ? '*' : '.');
+        // System.out.print(g.volume < 0 ? '*' : '.');
         if (g.volume < 0 && false) {
           TptpPrinter.println(g);
           var d = g.renameVariables();

@@ -176,6 +176,7 @@ public final class Main {
     }
     var startTime = System.currentTimeMillis();
     var summaries = new ArrayList<Summary>();
+    var memo1 = new ArrayList<Clause>();
 
     for (var file : files) {
       memo = null;
@@ -204,10 +205,6 @@ public final class Main {
 
       // Solve
       problem.solve(clauseLimit, timeout);
-      if (false && problem.result == SZS.Timeout) {
-        System.out.println();
-        continue;
-      }
 
       // Result
       System.out.printf(
@@ -216,18 +213,27 @@ public final class Main {
           problem.iterations,
           (System.currentTimeMillis() - problem.startTime) * 0.001);
       summaries.add(new Summary(problem));
+
+      if (problem.refutation != null)
+        for (var f : problem.refutation.proof())
+          if (f instanceof Clause) {
+            var c = (Clause) f;
+            c = c.memo();
+            memo1.add(c);
+          }
     }
     var solved = Etc.count(summaries, summary -> Problem.solved(summary.result));
     System.out.printf(
         "Solved %d/%d (%f%%)\n",
         solved, summaries.size(), solved * 100 / (double) summaries.size());
     System.out.printf("%.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
-    System.exit(0);
+    System.out.println();
 
+    memo = memo1;
+    summaries.clear();
     for (var file : files) {
-      System.out.println(file);
-      memo = null;
       var name = Etc.baseName(file);
+      System.out.print(name);
 
       // Read
       var problem = new Problem(file);
@@ -245,8 +251,7 @@ public final class Main {
             throw new IllegalStateException();
         }
       } catch (InappropriateException e) {
-        System.out.println("% SZS status Inappropriate for " + name);
-        System.out.println();
+        System.out.println("\tInappropriate");
         continue;
       }
 
@@ -254,48 +259,26 @@ public final class Main {
       problem.solve(clauseLimit, timeout);
 
       // Result
-      System.out.printf("%% SZS status %s for %s\n", problem.result, name);
-      if (problem.refutation != null) {
-        TptpPrinter.proof(problem.refutation);
-      }
       System.out.printf(
-          "%% %.3f seconds\n", (System.currentTimeMillis() - problem.startTime) * 0.001);
-      problem.startTime = System.currentTimeMillis();
-
-      // Solve
-      memo = new ArrayList<>();
-      for (var f : problem.refutation.proof())
-        if (f instanceof Clause) {
-          var c = (Clause) f;
-          c = c.memo();
-          memo.add(c);
-        }
-      problem.solve2(clauseLimit, timeout);
-
-      // Result
-      System.out.printf("%% SZS status %s for %s\n", problem.result, name);
-      if (problem.refutation != null) {
-        TptpPrinter.proof(problem.refutation);
-      }
-
-      // Statistics
+          "\t%s\t%d\t%.3f\n",
+          problem.result,
+          problem.iterations,
+          (System.currentTimeMillis() - problem.startTime) * 0.001);
       summaries.add(new Summary(problem));
-      System.out.printf(
-          "%% %.3f seconds\n", (System.currentTimeMillis() - problem.startTime) * 0.001);
-      System.out.println();
-    }
-    if (summaries.isEmpty()) return;
 
-    // Report
-    summaries.sort(Comparator.comparingDouble((Summary o) -> o.rating).thenComparing(o -> o.name));
-    try (var writer = new PrintWriter("/t/a.csv")) {
-      for (var summary : summaries)
-        writer.printf(
-            "%s,%s,%s,%f,%d\n",
-            summary.name, summary.expected, summary.result, summary.rating, summary.time);
+      if (problem.refutation != null)
+        for (var f : problem.refutation.proof())
+          if (f instanceof Clause) {
+            var c = (Clause) f;
+            c = c.memo();
+            memo1.add(c);
+          }
     }
-
-    // Overall
+    solved = Etc.count(summaries, summary -> Problem.solved(summary.result));
+    System.out.printf(
+        "Solved %d/%d (%f%%)\n",
+        solved, summaries.size(), solved * 100 / (double) summaries.size());
+    System.out.printf("%.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
   }
 
   private static void help() {
