@@ -206,9 +206,11 @@ public final class Superposition {
       // Otter loop would check it for subsumption here
       var g = passive.poll();
       assert !g.subsumed;
+      if (Main.memo != null) System.out.print(g.volume < 0 ? '*' : '.');
 
       // Solved
       if (g.isFalse()) {
+        if (Main.memo != null) System.out.println();
         Etc.debug(active.size());
         problem.refutation = g;
         problem.result = SZS.Unsatisfiable;
