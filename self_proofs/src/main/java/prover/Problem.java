@@ -5,6 +5,7 @@ import java.util.*;
 public final class Problem {
   public final String file;
   public long startTime = System.currentTimeMillis();
+  int iterations;
   public final Map<String, Func> funcs = new HashMap<>();
   public SZS expected;
   public double rating = -1;

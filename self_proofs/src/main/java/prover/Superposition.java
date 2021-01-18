@@ -207,11 +207,17 @@ public final class Superposition {
     for (var c : problem.clauses) clause(c);
     var active = new ArrayList<Clause>();
     while (!passive.isEmpty()) {
+      if (problem.iterations == 1000000) {
+        problem.result = SZS.Timeout;
+        return;
+      }
+      problem.iterations++;
       // Given clause
       // Discount loop, given clause cannot have already been subsumed
       // Otter loop would check it for subsumption here
       var g = passive.poll();
       assert !g.subsumed;
+      // Etc.debug(g);
       if (Main.memo != null) {
         System.out.print(g.volume < 0 ? '*' : '.');
         if (g.volume < 0 && false) {
@@ -228,15 +234,15 @@ public final class Superposition {
 
       // Solved
       if (g.isFalse()) {
-        if (Main.memo != null) System.out.println();
-        Etc.debug(active.size());
+        // if (Main.memo != null) System.out.println();
+        // Etc.debug(active.size());
         problem.refutation = g;
         problem.result = SZS.Unsatisfiable;
         return;
       }
 
       // Check resources
-      if (System.currentTimeMillis() > deadline) {
+      if (false && System.currentTimeMillis() > deadline) {
         problem.result = SZS.Timeout;
         return;
       }

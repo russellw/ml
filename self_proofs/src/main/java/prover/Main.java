@@ -176,6 +176,48 @@ public final class Main {
     }
     var startTime = System.currentTimeMillis();
     var summaries = new ArrayList<Summary>();
+
+    for (var file : files) {
+      memo = null;
+      var name = Etc.baseName(file);
+      System.out.print(name);
+
+      // Read
+      var problem = new Problem(file);
+      try {
+        var stream = System.in;
+        if (!file.equals(STDIN)) stream = new FileInputStream(file);
+        switch (language(file)) {
+          case TPTP:
+            TptpParser.read(problem, stream);
+            break;
+          case DIMACS:
+            DimacsParser.read(problem, stream);
+            break;
+          default:
+            throw new IllegalStateException();
+        }
+      } catch (InappropriateException e) {
+        System.out.println(",Inappropriate");
+        continue;
+      }
+
+      // Solve
+      problem.solve(clauseLimit, timeout);
+      if (problem.result == SZS.Timeout) {
+        System.out.println();
+        continue;
+      }
+
+      // Result
+      System.out.printf(
+          "%s,%d,%.3f\n",
+          problem.result,
+          problem.iterations,
+          (System.currentTimeMillis() - problem.startTime) * 0.001);
+    }
+    System.exit(0);
+
     for (var file : files) {
       System.out.println(file);
       memo = null;
