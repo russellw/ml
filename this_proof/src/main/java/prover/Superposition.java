@@ -209,6 +209,7 @@ public final class Superposition {
 
       // Solved
       if (g.isFalse()) {
+        Etc.debug(active.size());
         problem.refutation = g;
         problem.result = SZS.Unsatisfiable;
         return;

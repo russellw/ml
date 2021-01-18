@@ -24,12 +24,14 @@ public final class Clause extends AbstractFormula {
       if (a == Boolean.FALSE) {
         literals = new Object[] {true};
         negativeSize = 0;
+        volume = calcVolume();
         return;
       }
     for (var a : positive)
       if (a == Boolean.TRUE) {
         literals = new Object[] {true};
         negativeSize = 0;
+        volume = calcVolume();
         return;
       }
     for (var a : negative)
@@ -37,6 +39,7 @@ public final class Clause extends AbstractFormula {
         if (a.equals(b)) {
           literals = new Object[] {true};
           negativeSize = 0;
+          volume = calcVolume();
           return;
         }
 
@@ -45,6 +48,25 @@ public final class Clause extends AbstractFormula {
     for (var i = 0; i < negative.size(); i++) literals[i] = negative.get(i);
     for (var i = 0; i < positive.size(); i++) literals[negative.size() + i] = positive.get(i);
     negativeSize = negative.size();
+    volume = calcVolume();
+  }
+
+  private int calcVolume() {
+    int[] n = new int[1];
+    Etc.walkLeaves(Arrays.asList(literals), a -> n[0]++);
+    if (Main.memo != null) {
+      var d = renameVariables();
+      var i = 0;
+      for (var c : Main.memo) {
+        if (Isomorphism.subsumes(d, c)) {
+          n[0] -= 1000000;
+          n[0] += i * 1000;
+          break;
+        }
+        i++;
+      }
+    }
+    return n[0];
   }
 
   public Set<Variable> variables() {
@@ -57,10 +79,16 @@ public final class Clause extends AbstractFormula {
     return r;
   }
 
-  private Clause(Object[] literals, int negativeSize, Inference inference, AbstractFormula[] from) {
+  private Clause(
+      Object[] literals,
+      int volume,
+      int negativeSize,
+      Inference inference,
+      AbstractFormula[] from) {
     super(inference, from);
     this.literals = literals;
     this.negativeSize = negativeSize;
+    this.volume = volume;
   }
 
   public final boolean isFalse() {
@@ -94,7 +122,8 @@ public final class Clause extends AbstractFormula {
                   return a;
                 });
     if (map.isEmpty()) return this;
-    return new Clause(r.toArray(), negativeSize, Inference.RENAME_VARIABLES, new Clause[] {this});
+    return new Clause(
+        r.toArray(), volume, negativeSize, Inference.RENAME_VARIABLES, new Clause[] {this});
   }
 
   public Clause original() {
@@ -102,10 +131,10 @@ public final class Clause extends AbstractFormula {
     return this;
   }
 
+  public final int volume;
+
   public int volume() {
-    int[] n = new int[1];
-    Etc.walkLeaves(Arrays.asList(literals), a -> n[0]++);
-    return n[0];
+    return volume;
   }
 
   @Override

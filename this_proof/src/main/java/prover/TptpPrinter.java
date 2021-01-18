@@ -148,6 +148,7 @@ public final class TptpPrinter {
 
   public static void proof(Clause refutation) {
     var proof = refutation.proof();
+    Etc.debug(proof.size());
 
     // Names for anonymous formulas
     var i = -1L;
@@ -156,7 +157,7 @@ public final class TptpPrinter {
     for (var formula : proof) if (formula.name == null) formula.name = ++i;
 
     // Print
-    for (var formula : proof) println(formula);
+    //    for (var formula : proof) println(formula);
   }
 
   public static void println(AbstractFormula formula) {

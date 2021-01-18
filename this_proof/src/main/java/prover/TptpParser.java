@@ -203,8 +203,6 @@ public final class TptpParser {
             var s = reader.readLine();
             c = reader.read();
             if (header > 0) {
-              System.out.print('%');
-              System.out.println(s);
               if (s.startsWith("--")) header--;
             }
             if (problem.expected == null) {

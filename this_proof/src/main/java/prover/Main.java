@@ -28,6 +28,7 @@ public final class Main {
     }
   }
 
+  public static List<Clause> memo;
   private static List<String> files = new ArrayList<>();
   private static Language language;
   private static long timeout = 300_000;
@@ -176,6 +177,8 @@ public final class Main {
     var startTime = System.currentTimeMillis();
     var summaries = new ArrayList<Summary>();
     for (var file : files) {
+      System.out.println(file);
+      memo = null;
       var name = Etc.baseName(file);
 
       // Read
@@ -205,9 +208,21 @@ public final class Main {
       // Result
       System.out.printf("%% SZS status %s for %s\n", problem.result, name);
       if (problem.refutation != null) {
-        System.out.println("% SZS output start CNFRefutation for " + name);
         TptpPrinter.proof(problem.refutation);
-        System.out.println("% SZS output end CNFRefutation for " + name);
+      }
+      System.out.printf(
+          "%% %.3f seconds\n", (System.currentTimeMillis() - problem.startTime) * 0.001);
+      problem.startTime = System.currentTimeMillis();
+
+      // Solve
+      memo = new ArrayList<>();
+      for (var f : problem.refutation.proof()) if (f instanceof Clause) memo.add((Clause) f);
+      problem.solve2(clauseLimit, timeout);
+
+      // Result
+      System.out.printf("%% SZS status %s for %s\n", problem.result, name);
+      if (problem.refutation != null) {
+        TptpPrinter.proof(problem.refutation);
       }
 
       // Statistics
