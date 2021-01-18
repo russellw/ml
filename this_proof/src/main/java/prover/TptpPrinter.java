@@ -1,6 +1,5 @@
 package prover;
 
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -157,7 +156,7 @@ public final class TptpPrinter {
     for (var formula : proof) if (formula.name == null) formula.name = ++i;
 
     // Print
-    //    for (var formula : proof) println(formula);
+    if (Main.memo == null) for (var formula : proof) println(formula);
   }
 
   public static void println(AbstractFormula formula) {
@@ -193,9 +192,7 @@ public final class TptpPrinter {
         break;
       case CONJECTURE:
       case AXIOM:
-        System.out.printf(
-            "file(%s,%s)",
-            Etc.quote('\'', Path.of(formula.file).getFileName().toString()), formula.name);
+        System.out.printf("file");
         break;
       case NEGATE:
         System.out.printf("inference(negate,[status(ceq)],[%s])", formula.from[0].name);

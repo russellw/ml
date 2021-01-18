@@ -198,7 +198,12 @@ public final class Superposition {
 
   public Superposition(Problem problem, int clauseLimit, long deadline) {
     this.clauseLimit = clauseLimit;
-    for (var c : problem.clauses) c.volume = c.calcVolume();
+    int k = 0;
+    for (var c : problem.clauses) {
+      // Etc.debug(c);
+      c.volume = c.calcVolume();
+      k++;
+    }
     for (var c : problem.clauses) clause(c);
     var active = new ArrayList<Clause>();
     while (!passive.isEmpty()) {
@@ -207,7 +212,19 @@ public final class Superposition {
       // Otter loop would check it for subsumption here
       var g = passive.poll();
       assert !g.subsumed;
-      if (Main.memo != null) System.out.print(g.volume < 0 ? '*' : '.');
+      if (Main.memo != null) {
+        System.out.print(g.volume < 0 ? '*' : '.');
+        if (g.volume < 0 && false) {
+          TptpPrinter.println(g);
+          var d = g.renameVariables();
+          for (var c : Main.memo) {
+            if (ParaSubsumption.subsumes(d, c)) {
+              TptpPrinter.println(c);
+            }
+          }
+          System.out.println();
+        }
+      }
 
       // Solved
       if (g.isFalse()) {

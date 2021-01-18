@@ -60,6 +60,7 @@ public final class Clause extends AbstractFormula {
       for (var c : Main.memo) {
         if (ParaSubsumption.subsumes(d, c)) {
           n[0] -= 1000000;
+          // System.out.println(d);
           // n[0] += i * 1000;
           break;
         }
@@ -67,6 +68,23 @@ public final class Clause extends AbstractFormula {
       }
     }
     return n[0];
+  }
+
+  private static Object memo(Object a, Map<Func, Variable> map) {
+    if (a instanceof Func) {
+      var a1 = (Func) a;
+      var x = map.get(a1);
+      if (x == null) {
+        x = new Variable(null);
+        map.put(a1, x);
+      }
+      return x;
+    }
+    if (a instanceof List) {
+      var a1 = (List) a;
+      return Etc.map(a1, b -> memo(b, map));
+    }
+    return a;
   }
 
   public Set<Variable> variables() {
@@ -101,6 +119,13 @@ public final class Clause extends AbstractFormula {
 
   public final int positiveSize() {
     return literals.length - negativeSize;
+  }
+
+  public Clause memo() {
+    var map = new HashMap<Func, Variable>();
+    var r = new Object[literals.length];
+    for (var i = 0; i < r.length; i++) r[i] = memo(literals[i], map);
+    return new Clause(r, 0, negativeSize, Inference.AXIOM, null);
   }
 
   public Clause renameVariables() {

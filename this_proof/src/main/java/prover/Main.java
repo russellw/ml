@@ -216,7 +216,12 @@ public final class Main {
 
       // Solve
       memo = new ArrayList<>();
-      for (var f : problem.refutation.proof()) if (f instanceof Clause) memo.add((Clause) f);
+      for (var f : problem.refutation.proof())
+        if (f instanceof Clause) {
+          var c = (Clause) f;
+          c = c.memo();
+          memo.add(c);
+        }
       problem.solve2(clauseLimit, timeout);
 
       // Result

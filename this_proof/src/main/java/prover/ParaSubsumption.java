@@ -18,6 +18,68 @@ public final class ParaSubsumption {
 
   private static int steps;
 
+  public static boolean occurs(Variable a, Object b, Map<Variable, Object> map) {
+    if (b instanceof Variable) {
+      if (a == b) return true;
+      var b1 = map.get(b);
+      if (b1 != null) return occurs(a, b1, map);
+      return false;
+    }
+    if (b instanceof List) {
+      var b1 = (List) b;
+      for (var x : b1) if (occurs(a, x, map)) return true;
+    }
+    return false;
+  }
+
+  private static boolean unifyVariable(Variable a, Object b, Map<Variable, Object> map) {
+    // Existing mappings
+    var a1 = map.get(a);
+    if (a1 != null) return unify(a1, b, map);
+    if (b instanceof Variable) {
+      var b1 = map.get(b);
+      if (b1 != null) return unify(a, b1, map);
+    }
+
+    // Occurs check
+    if (occurs(a, b, map)) return false;
+
+    // New mapping
+    map.put(a, b);
+    return true;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static boolean constant(Object a) {
+    if (a instanceof List) return Etc.all((List) a, Terms::constant);
+    return !(a instanceof Func || a instanceof Variable);
+  }
+
+  public static boolean unify(Object a, Object b, Map<Variable, Object> map) {
+    // Equal
+    if (a == b) return true;
+
+    // Variable
+    if (a instanceof Variable) return unifyVariable((Variable) a, b, map);
+    if (b instanceof Variable) return unifyVariable((Variable) b, a, map);
+
+    // Compounds
+    if (a instanceof List) {
+      var a1 = (List) a;
+      if (b instanceof List) {
+        var b1 = (List) b;
+        int n = a1.size();
+        if (n != b1.size()) return false;
+        for (var i = 0; i < n; i++) if (!unify(a1.get(i), b1.get(i), map)) return false;
+        return true;
+      }
+      return false;
+    }
+
+    // Atoms
+    return a.equals(b);
+  }
+
   public static boolean match(Object a, Object b, Map<Variable, Object> map) {
     // Equal
     if (a == b) return true;
@@ -35,6 +97,11 @@ public final class ParaSubsumption {
       return true;
     }
 
+    if (b instanceof Variable) {
+      var b1 = (Variable) b;
+      if (b1.type == null && a instanceof Func) return match(b, a, map);
+    }
+
     // Compounds
     if (a instanceof List) {
       var a1 = (List) a;
@@ -44,8 +111,8 @@ public final class ParaSubsumption {
         assert b1.get(0) != Symbol.EQUALS;
         int n = a1.size();
         if (n != b1.size()) return false;
-        if (!match(b1.get(0), a1.get(0), map)) return false;
-        for (var i = 1; i < n; i++) if (!match(a1.get(i), b1.get(i), map)) return false;
+        // if (!match(b1.get(0), a1.get(0), map)) return false;
+        for (var i = 0; i < n; i++) if (!match(a1.get(i), b1.get(i), map)) return false;
         return true;
       }
       return false;
