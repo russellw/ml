@@ -198,6 +198,7 @@ public final class Superposition {
 
   public Superposition(Problem problem, int clauseLimit, long deadline) {
     this.clauseLimit = clauseLimit;
+    for (var c : problem.clauses) c.volume = c.calcVolume();
     for (var c : problem.clauses) clause(c);
     var active = new ArrayList<Clause>();
     while (!passive.isEmpty()) {

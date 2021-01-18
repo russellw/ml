@@ -51,7 +51,7 @@ public final class Clause extends AbstractFormula {
     volume = calcVolume();
   }
 
-  private int calcVolume() {
+  public int calcVolume() {
     int[] n = new int[1];
     Etc.walkLeaves(Arrays.asList(literals), a -> n[0]++);
     if (Main.memo != null) {
@@ -131,7 +131,7 @@ public final class Clause extends AbstractFormula {
     return this;
   }
 
-  public final int volume;
+  public int volume;
 
   public int volume() {
     return volume;
