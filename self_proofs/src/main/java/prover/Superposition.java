@@ -207,7 +207,7 @@ public final class Superposition {
     for (var c : problem.clauses) clause(c);
     var active = new ArrayList<Clause>();
     while (!passive.isEmpty()) {
-      if (problem.iterations == 1000000) {
+      if (problem.iterations == 10000) {
         problem.result = SZS.Timeout;
         return;
       }

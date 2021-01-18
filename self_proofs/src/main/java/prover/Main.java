@@ -198,24 +198,30 @@ public final class Main {
             throw new IllegalStateException();
         }
       } catch (InappropriateException e) {
-        System.out.println(",Inappropriate");
+        System.out.println("\tInappropriate");
         continue;
       }
 
       // Solve
       problem.solve(clauseLimit, timeout);
-      if (problem.result == SZS.Timeout) {
+      if (false && problem.result == SZS.Timeout) {
         System.out.println();
         continue;
       }
 
       // Result
       System.out.printf(
-          "%s,%d,%.3f\n",
+          "\t%s\t%d\t%.3f\n",
           problem.result,
           problem.iterations,
           (System.currentTimeMillis() - problem.startTime) * 0.001);
+      summaries.add(new Summary(problem));
     }
+    var solved = Etc.count(summaries, summary -> Problem.solved(summary.result));
+    System.out.printf(
+        "Solved %d/%d (%f%%)\n",
+        solved, summaries.size(), solved * 100 / (double) summaries.size());
+    System.out.printf("%.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
     System.exit(0);
 
     for (var file : files) {
@@ -290,11 +296,6 @@ public final class Main {
     }
 
     // Overall
-    var solved = Etc.count(summaries, summary -> Problem.solved(summary.result));
-    System.out.printf(
-        "Solved %d/%d (%f%%)\n",
-        solved, summaries.size(), solved * 100 / (double) summaries.size());
-    System.out.printf("%.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
   }
 
   private static void help() {
