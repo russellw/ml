@@ -58,9 +58,9 @@ public final class Clause extends AbstractFormula {
       var d = renameVariables();
       var i = 0;
       for (var c : Main.memo) {
-        if (Isomorphism.subsumes(d, c)) {
+        if (Subsumption.subsumes(d, c)) {
           n[0] -= 1000000;
-          n[0] += i * 1000;
+          // n[0] += i * 1000;
           break;
         }
         i++;
