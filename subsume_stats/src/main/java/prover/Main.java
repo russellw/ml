@@ -154,10 +154,10 @@ public final class Main {
     }
     var startTime = System.currentTimeMillis();
     var summaries = new ArrayList<Summary>();
-    var gg=0.0;
-    var aa=0.0;
-    var pp=0.0;
-    var n=0;
+    var gg = 0.0;
+    var aa = 0.0;
+    var pp = 0.0;
+    var n = 0;
     for (var file : files) {
       if (file.startsWith("file:///")) file = file.substring(8);
 
@@ -191,20 +191,21 @@ public final class Main {
 
       // Statistics
       summaries.add(new Summary(problem));
-      if(problem.records.size()>0){
-          var r=problem.records.get(problem.records.size()-1);
-          if(problem.superposition.givenTotal==0||r.activeTotal==0||r.passiveTotal==0)continue;
-          var g=problem.superposition.givenLive/(double)problem.superposition.givenTotal;
-          var a=r.activeLive/(double)r.activeTotal;
-          var p=r.passiveLive/(double)r.passiveTotal;
-          System.out.printf("%s\t%f\t%f\t%f\n",file,g,a,p);
-          gg+=g;
-          aa+=a;
-          pp+=p;
-          n++;
+      if (problem.records.size() > 0) {
+        var r = problem.records.get(problem.records.size() - 1);
+        if (problem.superposition.givenTotal == 0 || r.activeTotal == 0 || r.passiveTotal == 0)
+          continue;
+        var g = problem.superposition.givenLive / (double) problem.superposition.givenTotal;
+        var a = r.activeLive / (double) r.activeTotal;
+        var p = r.passiveLive / (double) r.passiveTotal;
+        System.out.printf("%s\t%f\t%f\t%f\n", file, g, a, p);
+        gg += g;
+        aa += a;
+        pp += p;
+        n++;
       }
     }
-      System.out.printf("%s\t%f\t%f\t%f\n","          ",gg/n,aa/n,pp/n);
+    System.out.printf("%s\t%f\t%f\t%f\n", "          ", gg / n, aa / n, pp / n);
   }
 
   private static void help() {
