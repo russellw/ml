@@ -32,7 +32,7 @@ public final class Main {
   private static List<String> files = new ArrayList<>();
   private static Language language;
   private static long timeout = 300_000;
-  private static int clauseLimit = 1000000;
+  private static int clauseLimit = 100000;
   private static final String STDIN = "stdin";
 
   private static String optArg(String[] args, int i) throws IOException {
