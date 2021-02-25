@@ -170,8 +170,7 @@ public final class Main {
   public static void main(String[] args) throws IOException {
     args(args);
     if (files.isEmpty()) {
-      help();
-      return;
+      files.add("a.p");
     }
     var startTime = System.currentTimeMillis();
     var summaries = new ArrayList<Summary>();
@@ -198,40 +197,8 @@ public final class Main {
         System.out.println();
         continue;
       }
-
-      // Solve
-      problem.solve(clauseLimit, timeout);
-
-      // Result
-      System.out.printf("%% SZS status %s for %s\n", problem.result, name);
-      if (problem.refutation != null) {
-        System.out.println("% SZS output start CNFRefutation for " + name);
-        TptpPrinter.proof(problem.refutation);
-        System.out.println("% SZS output end CNFRefutation for " + name);
-      }
-
-      // Statistics
-      summaries.add(new Summary(problem));
-      System.out.printf(
-          "%% %.3f seconds\n", (System.currentTimeMillis() - problem.startTime) * 0.001);
-      System.out.println();
+      break;
     }
-    if (summaries.isEmpty()) return;
-
-    // Report
-    summaries.sort(Comparator.comparingDouble((Summary o) -> o.rating).thenComparing(o -> o.name));
-    try (var writer = new PrintWriter("/t/a.csv")) {
-      for (var summary : summaries)
-        writer.printf(
-            "%s,%s,%s,%f,%d\n",
-            summary.name, summary.expected, summary.result, summary.rating, summary.time);
-    }
-
-    // Overall
-    var solved = Etc.count(summaries, summary -> Problem.solved(summary.result));
-    System.out.printf(
-        "Solved %d/%d (%f%%)\n",
-        solved, summaries.size(), solved * 100 / (double) summaries.size());
     System.out.printf("%.3f seconds\n", (System.currentTimeMillis() - startTime) * 0.001);
   }
 

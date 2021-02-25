@@ -142,7 +142,7 @@ public final class TptpPrinter {
     print(a.get(2), a);
   }
 
-  private static void print(Object a) {
+  public static void print(Object a) {
     print(a, null);
   }
 

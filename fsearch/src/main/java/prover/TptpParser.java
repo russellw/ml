@@ -736,6 +736,10 @@ public final class TptpParser {
                   formula.file = file;
                   formula.name = name;
                   problem.formulas.add(formula);
+                  TptpPrinter.print(a);
+                  System.out.print(" -> ");
+                  TptpPrinter.print(Terms.simplify(a));
+                  System.out.println();
                   break;
                 }
               case "conjecture":
