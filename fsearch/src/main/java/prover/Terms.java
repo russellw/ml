@@ -115,23 +115,25 @@ public final class Terms {
     Object y = null;
     if (a.size() > 2) y = a.get(2);
     switch (op1) {
-        case AND:{
-            for(int i=1;i<a.size();i++){
-                x=a.get(i);
-                if(x==Boolean.FALSE)return false;
-            }
-            return true;
+      case AND:
+        {
+          for (int i = 1; i < a.size(); i++) {
+            x = a.get(i);
+            if (x == Boolean.FALSE) return false;
+          }
+          return true;
         }
-        case OR:{
-            for(int i=1;i<a.size();i++){
-                x=a.get(i);
-                if(x==Boolean.TRUE)return true;
-            }
-            return false;
+      case OR:
+        {
+          for (int i = 1; i < a.size(); i++) {
+            x = a.get(i);
+            if (x == Boolean.TRUE) return true;
+          }
+          return false;
         }
-        case NOT:
-            return !(boolean) x;
-        case EQV:
+      case NOT:
+        return !(boolean) x;
+      case EQV:
       case EQUALS:
         if (x.equals(y)) return true;
         if (constant(x) && constant(y)) return false;
