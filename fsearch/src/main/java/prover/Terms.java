@@ -1016,6 +1016,18 @@ public final class Terms {
         });
   }
 
+  public static Set<Func> funcs = new LinkedHashSet<>();
+
+  public static void getFuncs(Object a) {
+    if (a instanceof Func) {
+      funcs.add((Func) a);
+      return;
+    }
+    if (!(a instanceof List)) return;
+    var a1 = (List) a;
+    for (var b : a1) getFuncs(b);
+  }
+
   @SuppressWarnings("unchecked")
   private static void getFreeVariables(Set<Variable> bound, Object a, Set<Variable> r) {
     if (a instanceof List) {

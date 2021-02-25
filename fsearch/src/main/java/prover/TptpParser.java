@@ -736,6 +736,18 @@ public final class TptpParser {
                   formula.file = file;
                   formula.name = name;
                   problem.formulas.add(formula);
+
+                  Types.inferTypes(List.of(formula), List.of());
+
+                  Terms.funcs.clear();
+                  Terms.getFuncs(a);
+                  System.out.println(Terms.funcs);
+                  for (var f : Terms.funcs) {
+                    System.out.print(f);
+                    System.out.print(": ");
+                    System.out.println(Types.typeof(f));
+                  }
+
                   TptpPrinter.print(a);
                   System.out.print(" -> ");
                   TptpPrinter.print(Terms.eval(a));
