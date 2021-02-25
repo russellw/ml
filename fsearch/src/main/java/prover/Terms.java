@@ -121,7 +121,7 @@ public final class Terms {
             x = a.get(i);
             if (x == Boolean.FALSE) return false;
           }
-          return true;
+          return a;
         }
       case OR:
         {
@@ -129,10 +129,11 @@ public final class Terms {
             x = a.get(i);
             if (x == Boolean.TRUE) return true;
           }
-          return false;
+          return a;
         }
       case NOT:
-        return !(boolean) x;
+        if (x instanceof Boolean) return !(boolean) x;
+        return a;
       case EQV:
       case EQUALS:
         if (x.equals(y)) return true;
@@ -498,6 +499,403 @@ public final class Terms {
             });
     }
     return a;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Object eval(Object a0) {
+    if (!(a0 instanceof List)) return a0;
+    var a = (List) a0;
+    a = Etc.map(a, Terms::eval);
+    var op = a.get(0);
+    if (!(op instanceof Symbol)) return a;
+    var op1 = (Symbol) op;
+    var x = a.get(1);
+    Object y = null;
+    if (a.size() > 2) y = a.get(2);
+    switch (op1) {
+      case AND:
+        {
+          for (int i = 1; i < a.size(); i++) {
+            x = a.get(i);
+            if (x == Boolean.FALSE) return false;
+          }
+          return true;
+        }
+      case OR:
+        {
+          for (int i = 1; i < a.size(); i++) {
+            x = a.get(i);
+            if (x == Boolean.TRUE) return true;
+          }
+          return false;
+        }
+      case NOT:
+        return !(boolean) x;
+      case EQV:
+      case EQUALS:
+        if (x.equals(y)) return true;
+        if (constant(x) && constant(y)) return false;
+        break;
+      case TO_INTEGER:
+        if (Types.typeof(x) == Symbol.INTEGER) return x;
+        if (x instanceof BigRational) {
+          var x1 = (BigRational) x;
+          return x1.floor();
+        }
+        if (x instanceof List) {
+          var x1 = (List) x;
+          if (x1.get(0) == Symbol.TO_REAL) {
+            var x2 = x1.get(1);
+            if (x2 instanceof BigRational) {
+              var x3 = (BigRational) x2;
+              return x3.floor();
+            }
+          }
+        }
+        break;
+      case TO_RATIONAL:
+        if (x instanceof BigInteger) {
+          var x1 = (BigInteger) x;
+          return BigRational.of(x1);
+        }
+        if (Types.typeof(x) == Symbol.RATIONAL) return x;
+        if (x instanceof List) {
+          var x1 = (List) x;
+          if (x1.get(0) == Symbol.TO_REAL) {
+            var x2 = x1.get(1);
+            if (Types.typeof(x2) == Symbol.RATIONAL) return x2;
+          }
+        }
+        break;
+      case TO_REAL:
+        if (Types.typeof(x) == Symbol.REAL) return x;
+        break;
+      case IS_INTEGER:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return true;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return x.den.equals(BigInteger.ONE);
+              }
+            });
+      case IS_RATIONAL:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return true;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return true;
+              }
+            });
+      case NEGATE:
+        if (x instanceof List) {
+          var x1 = (List) x;
+          if (x1.get(0) == Symbol.NEGATE) return x1.get(1);
+        }
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return x.negate();
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return x.negate();
+              }
+            });
+      case CEIL:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return x;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return BigRational.of(x.ceil());
+              }
+            });
+      case FLOOR:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return x;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return BigRational.of(x.floor());
+              }
+            });
+      case ROUND:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return x;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return BigRational.of(x.round());
+              }
+            });
+      case TRUNCATE:
+        return eval1(
+            a,
+            x,
+            new Op1() {
+              @Override
+              Object apply(BigInteger x) {
+                return x;
+              }
+
+              @Override
+              Object apply(BigRational x) {
+                return BigRational.of(x.truncate());
+              }
+            });
+      case ADD:
+        assert y != null;
+        if (isZero(x)) return y;
+        if (isZero(y)) return x;
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.add(y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.add(y);
+              }
+            });
+      case SUBTRACT:
+        assert y != null;
+        if (isZero(x)) return simplify(List.of(Symbol.NEGATE, y));
+        if (isZero(y)) return x;
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.subtract(y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.subtract(y);
+              }
+            });
+      case MULTIPLY:
+        assert y != null;
+        if (isZero(x)) return x;
+        if (isZero(y)) return y;
+        if (isOne(x)) return y;
+        if (isOne(y)) return x;
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.multiply(y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.multiply(y);
+              }
+            });
+      case DIVIDE:
+        assert y != null;
+        if (isZero(x)) return x;
+        if (isOne(y)) return x;
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                throw new IllegalArgumentException(a0.toString());
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.divide(y);
+              }
+            });
+      case DIVIDE_EUCLIDEAN:
+        assert y != null;
+        if (isZero(x)) return x;
+        if (isOne(y)) return x;
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return Etc.divideEuclidean(x, y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.divideEuclidean(y);
+              }
+            });
+      case DIVIDE_FLOOR:
+        assert y != null;
+        if (isZero(x)) return x;
+        if (isOne(y)) return x;
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return Etc.divideFloor(x, y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.divideFloor(y);
+              }
+            });
+      case DIVIDE_TRUNCATE:
+        assert y != null;
+        if (isZero(x)) return x;
+        if (isOne(y)) return x;
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.divide(y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.divideTruncate(y);
+              }
+            });
+      case REMAINDER_EUCLIDEAN:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return Etc.remainderEuclidean(x, y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.remainderEuclidean(y);
+              }
+            });
+      case REMAINDER_FLOOR:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return Etc.remainderFloor(x, y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.remainderFloor(y);
+              }
+            });
+      case REMAINDER_TRUNCATE:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.remainder(y);
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.remainderTruncate(y);
+              }
+            });
+      case LESS:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.compareTo(y) < 0;
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.compareTo(y) < 0;
+              }
+            });
+      case LESS_EQ:
+        return eval2(
+            a,
+            x,
+            y,
+            new Op2() {
+              @Override
+              Object apply(BigInteger x, BigInteger y) {
+                return x.compareTo(y) <= 0;
+              }
+
+              @Override
+              Object apply(BigRational x, BigRational y) {
+                return x.compareTo(y) <= 0;
+              }
+            });
+    }
+    throw new IllegalArgumentException(a.toString());
   }
 
   public static boolean match(Object a, Object b, Map<Variable, Object> map) {

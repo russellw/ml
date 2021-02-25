@@ -738,7 +738,7 @@ public final class TptpParser {
                   problem.formulas.add(formula);
                   TptpPrinter.print(a);
                   System.out.print(" -> ");
-                  TptpPrinter.print(Terms.simplify(a));
+                  TptpPrinter.print(Terms.eval(a));
                   System.out.println();
                   break;
                 }
