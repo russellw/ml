@@ -1016,13 +1016,46 @@ public final class Terms {
         });
   }
 
+  public static Map<Func, Object>env=new HashMap<>();
   public static Set<Func> funcs = new LinkedHashSet<>();
+  public static List<Func> funcList = new ArrayList<>();
+  public static Set<String> distinctObjs = new LinkedHashSet<>();
+
+public static boolean outerExists(int i,Object a){
+    if(i<funcList.size()){
+        var f=funcList.get(i);
+        var t=f.type;
+        if(t  instanceof List){
+            throw new IllegalArgumentException();
+        }
+        switch ((Symbol)t){
+            case INDIVIDUAL:
+            for(var val:distinctObjs){
+                env.put(f,val);
+                if(outerExists(i+1,a))return true;
+            }
+            return false;
+            case BOOLEAN:
+                env.put(f,false);
+                if(outerExists(i+1,a))return true;
+                env.put(f,true);
+                if(outerExists(i+1,a))return true;
+                return false;
+        }
+        throw new IllegalArgumentException(t.toString());
+    }
+    return eval(a)==Boolean.TRUE;
+}
 
   public static void getFuncs(Object a) {
     if (a instanceof Func) {
       funcs.add((Func) a);
       return;
     }
+      if (a instanceof String) {
+          distinctObjs.add((String) a);
+          return;
+      }
     if (!(a instanceof List)) return;
     var a1 = (List) a;
     for (var b : a1) getFuncs(b);

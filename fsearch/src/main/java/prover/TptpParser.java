@@ -741,6 +741,9 @@ public final class TptpParser {
 
                   Terms.funcs.clear();
                   Terms.getFuncs(a);
+                  Terms.funcList.clear();
+                  Terms.funcList.addAll(Terms.funcs);
+                  System.out.println(Terms.distinctObjs);
                   System.out.println(Terms.funcs);
                   for (var f : Terms.funcs) {
                     System.out.print(f);
