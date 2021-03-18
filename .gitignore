@@ -7,6 +7,9 @@
 *.pth
 .idea/
 bin/
+*.obj
+*.dll
+*.exe
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
