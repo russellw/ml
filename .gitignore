@@ -10,6 +10,8 @@ bin/
 *.obj
 *.dll
 *.exe
+*.pdb
+*.pch
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
