@@ -12,6 +12,8 @@ bin/
 *.exe
 *.pdb
 *.pch
+*.ilk
+*.out
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

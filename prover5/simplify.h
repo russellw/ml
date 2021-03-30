@@ -1,0 +1,1 @@
+term simplify(term a);
