@@ -1,4 +1,4 @@
 black .
-clang-format -i *.cc
+clang-format -i *.c
 clang-format -i *.h
 git diff
