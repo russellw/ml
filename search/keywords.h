@@ -51,4 +51,4 @@ k_uminus,
 k_v,
 k_version,
 };
-extern sym keywords[50];
+extern struct sym keywords[50];
