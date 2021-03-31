@@ -8,6 +8,7 @@
 // windows.h must be first
 #include <psapi.h>
 
+#ifdef DEBUG
 static LONG WINAPI handler(struct _EXCEPTION_POINTERS *ExceptionInfo) {
   if (ExceptionInfo->ExceptionRecord->ExceptionCode ==
       EXCEPTION_STACK_OVERFLOW) {
@@ -19,6 +20,7 @@ static LONG WINAPI handler(struct _EXCEPTION_POINTERS *ExceptionInfo) {
   stacktrace();
   ExitProcess(1);
 }
+#endif
 
 static VOID CALLBACK timeout(PVOID a, BOOLEAN b) {
   // on Linux the exit code associated with hard timeout is 128+SIGALRM; there
@@ -122,10 +124,16 @@ void parse(si argc, char **argv) {
 }
 
 int main(int argc, char **argv) {
-#ifdef DEBUG
-#ifdef _WIN32
+#if defined(DEBUG) && defined(_WIN32)
   AddVectoredExceptionHandler(0, handler);
 #endif
+
+  // SORT
+  init_syms();
+  init_ints();
+  ///
+
+#ifdef DEBUG
   test();
   assert(_CrtCheckMemory());
 #endif
