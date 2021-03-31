@@ -18,6 +18,7 @@ typedef struct {
 
 #include "int.h"
 #include "keywords.h"
+#include "rat.h"
 #include "sym.h"
 #include "term.h"
 

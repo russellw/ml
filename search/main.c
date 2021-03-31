@@ -130,6 +130,7 @@ int main(int argc, char **argv) {
 
   // SORT
   init_ints();
+  init_rats();
   init_syms();
   ///
 
