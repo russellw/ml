@@ -55,60 +55,54 @@ void mpz_qround(mpz_t q, mpz_t n, mpz_t d) {
   mpz_fdiv_q(q, q, d);
 }
 
-//interned integers
-static  si cap = 0x10;
-static  si count;
-static  Int **entries ;
+// interned integers
+static si cap = 0x10;
+static si count;
+static Int **entries;
 
-static  size_t hash(Int *x) { return mpz_get_ui(x->val); }
+static size_t hash(Int *x) { return mpz_get_ui(x->val); }
 
-static si eq(Int*x,Int*y){
-	return!mpz_cmp(x->val,y->val);
+static si eq(Int *x, Int *y) { return !mpz_cmp(x->val, y->val); }
+
+static si slot(Int **entries, si cap, Int *x) {
+  si mask = cap - 1;
+  si i = hash(x) & mask;
+  while (entries[i] && !eq(entries[i], x))
+    i = (i + 1) & mask;
+  return i;
 }
 
-static  si slot(Int **entries, si cap, Int *x) {
-    si mask = cap - 1;
-    si i = hash(x) & mask;
-    while (entries[i] && !eq(entries[i],x))
-      i = (i + 1) & mask;
-    return i;
+static void expand(void) {
+  assert(ispow2(cap));
+  si cap1 = cap * 2;
+  Int **entries1 = xcalloc(cap1, sizeof *entries);
+  for (si i = 0; i < cap; i++) {
+    Int *x = entries[i];
+    if (x)
+      entries1[slot(entries1, cap1, x)] = x;
   }
-
-static  void expand(void) {
-    assert(ispow2(cap));
-    si cap1 = cap * 2;
-    Int** entries1 = xcalloc(cap1, sizeof *entries);
-    for(si i=0;i<cap;i++){
-      Int* x = entries[i];
-      if (x)
-        entries1[slot(entries1, cap1, x)] = x;
-    }
-    free(entries);
-    cap = cap1;
-    entries = entries1;
-  }
-
-static  Int *store(const Int *x) {
-     Int * r =xmalloc(sizeof *x);
-    *r = *x;
-    return r;
-  }
-
-void init_ints(void) {
-	entries = xcalloc(cap, sizeof *entries);
+  free(entries);
+  cap = cap1;
+  entries = entries1;
 }
+
+static Int *store(const Int *x) {
+  Int *r = xmalloc(sizeof *x);
+  *r = *x;
+  return r;
+}
+
+void init_ints(void) { entries = xcalloc(cap, sizeof *entries); }
 
 Int *intern_int(Int *x) {
-    si i = slot(entries, cap, x);
-    if (entries[i]) {
-      mpz_clear(x->val);
-      return entries[i];
-    }
-    if (++count > cap * 3 / 4) {
-      expand();
-      i = slot(entries, cap, x);
-    }
-    return entries[i] = store(x);
+  si i = slot(entries, cap, x);
+  if (entries[i]) {
+    mpz_clear(x->val);
+    return entries[i];
   }
-
-
+  if (++count > cap * 3 / 4) {
+    expand();
+    i = slot(entries, cap, x);
+  }
+  return entries[i] = store(x);
+}

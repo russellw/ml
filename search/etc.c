@@ -90,7 +90,7 @@ void *mmalloc(si n) {
     p = xmalloc(chunk);
     e = p + chunk;
   }
-  char* r = p;
+  char *r = p;
 #ifdef DEBUG
   memset(r, 0xcc, n);
 #endif
@@ -110,7 +110,7 @@ void quote(char q, const char *s) {
 }
 
 void *xcalloc(si n, si size) {
-  void* r = calloc(n, size);
+  void *r = calloc(n, size);
   if (!r) {
     perror("calloc");
     exit(1);
@@ -119,7 +119,7 @@ void *xcalloc(si n, si size) {
 }
 
 void *xmalloc(si n) {
-  void* r = malloc(n);
+  void *r = malloc(n);
   if (!r) {
     perror("malloc");
     exit(1);
@@ -131,7 +131,7 @@ void *xmalloc(si n) {
 }
 
 void *xrealloc(void *p, si n) {
-  void* r = realloc(p, n);
+  void *r = realloc(p, n);
   if (!r) {
     perror("realloc");
     exit(1);

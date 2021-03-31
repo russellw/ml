@@ -37,13 +37,13 @@ void help() {
 
 const char *ext(const char *file) {
   // don't care about a.b/c
-  char* s = strrchr(file, '.');
+  char *s = strrchr(file, '.');
   return s ? s + 1 : "";
 }
 
 void parse(si argc, char **argv) {
   for (si i = 0; i != argc; ++i) {
-    char* s = argv[i];
+    char *s = argv[i];
 
     // file
     if (!strcmp(s, "-")) {
@@ -58,7 +58,7 @@ void parse(si argc, char **argv) {
       s++;
 
     // optArg
-    char* t = s;
+    char *t = s;
     while (isalpha1(*t))
       t++;
     const char *optArg = 0;
@@ -84,7 +84,7 @@ void parse(si argc, char **argv) {
     }
 
     // option
-    switch (keyword(intern(s,strlen(s)))) {
+    switch (keyword(intern(s, strlen(s)))) {
     case k_V:
     case k_v:
     case k_version:
