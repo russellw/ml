@@ -9,7 +9,7 @@ typedef intptr_t si;
 #ifdef DEBUG
 
 void stacktrace();
-si assertfail(const char *file, si line, const char *s);
+si assertfail(char *file, si line, char *s);
 #define assert(a) (a) || assertfail(__FILE__, __LINE__, #a)
 #define unreachable assert(0)
 #define debug(a) printf("%s:%d: %s: %zx\n", __FILE__, __LINE__, #a, a);
@@ -38,11 +38,11 @@ extern char buf[20000];
 #define isupper1(c) ('A' <= (c) && (c) <= 'Z')
 
 // SORT
-const char *basename(const char *file);
-noret err(const char *msg);
-size_t fnv(const char *s, si n);
+char *basename(char *file);
+noret err(char *msg);
+size_t fnv(char *s, si n);
 void *mmalloc(si n);
-void quote(char q, const char *s);
+void quote(char q, char *s);
 void *xcalloc(si n, si size);
 void *xmalloc(si n);
 void *xrealloc(void *p, si n);

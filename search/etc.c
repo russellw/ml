@@ -33,7 +33,7 @@ void stacktrace() {
 #endif
 }
 
-si assertfail(const char *file, si line, const char *s) {
+si assertfail(char *file, si line, char *s) {
   printf("%s:%zu: assert failed: %s\n", file, line, s);
   stacktrace();
   exit(1);
@@ -46,7 +46,7 @@ si assertfail(const char *file, si line, const char *s) {
 char buf[20000];
 
 // SORT
-const char *basename(const char *file) {
+char *basename(char *file) {
   si i = strlen(file);
   while (i) {
     if (file[i - 1] == '/')
@@ -60,13 +60,13 @@ const char *basename(const char *file) {
   return file;
 }
 
-noret err(const char *msg) {
+noret err(char *msg) {
   fprintf(stderr, "%s\n", msg);
   stacktrace();
   exit(1);
 }
 
-size_t fnv(const char *s, si n) {
+size_t fnv(char *s, si n) {
   // Fowler-Noll-Vo-1a is slower than more sophisticated hash algorithms for
   // large chunks of data, but faster for tiny ones, so it still sees use
   size_t h = 2166136261u;
@@ -98,7 +98,7 @@ void *mmalloc(si n) {
   return r;
 }
 
-void quote(char q, const char *s) {
+void quote(char q, char *s) {
   putchar(q);
   while (*s) {
     char c = *s++;

@@ -35,7 +35,7 @@ void help() {
          "-T seconds  hard time limit\n");
 }
 
-const char *ext(const char *file) {
+char *ext(char *file) {
   // don't care about a.b/c
   char *s = strrchr(file, '.');
   return s ? s + 1 : "";
@@ -61,7 +61,7 @@ void parse(si argc, char **argv) {
     char *t = s;
     while (isalpha1(*t))
       t++;
-    const char *optArg = 0;
+    char *optArg = 0;
     switch (*t) {
     case '0':
     case '1':

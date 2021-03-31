@@ -86,7 +86,7 @@ static void expand(void) {
   entries = entries1;
 }
 
-static Int *store(const Int *x) {
+static Int *store(Int *x) {
   Int *r = xmalloc(sizeof *x);
   *r = *x;
   return r;

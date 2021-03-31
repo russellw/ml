@@ -3,5 +3,5 @@
 #include "main.h"
 
 #ifdef DEBUG
-void test(void) {}
+void test(void) { internz("abc"); }
 #endif

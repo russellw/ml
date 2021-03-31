@@ -7,7 +7,7 @@ static si cap = 0x100;
 static si count;
 static sym **entries;
 
-static si eq(const char *s, si n, const char *s1, si n1) {
+static si eq(char *s, si n, char *s1, si n1) {
   if (n != n1)
     return 0;
   while (n--)
@@ -16,7 +16,7 @@ static si eq(const char *s, si n, const char *s1, si n1) {
   return 1;
 }
 
-static si slot(sym **entries, si cap, const char *s, si n) {
+static si slot(sym **entries, si cap, char *s, si n) {
   si mask = cap - 1;
   si i = fnv(s, n) & mask;
   while (entries[i] && !eq(entries[i]->v, entries[i]->n, s, n))
@@ -38,7 +38,7 @@ static void expand(void) {
   entries = entries1;
 }
 
-static sym *store(const char *s, si n) {
+static sym *store(char *s, si n) {
   sym *r = mmalloc(offsetof(sym, v) + n);
   r->n = n;
   memcpy(r->v, s, n);
@@ -58,7 +58,7 @@ void init_syms(void) {
   }
 }
 
-sym *intern(const char *p, si n) {
+sym *intern(char *p, si n) {
   si i = slot(entries, cap, p, n);
   if (entries[i])
     return entries[i];
