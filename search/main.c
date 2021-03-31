@@ -7,6 +7,19 @@
 #include <windows.h>
 // windows.h must be first
 #include <psapi.h>
+
+static LONG WINAPI handler(struct _EXCEPTION_POINTERS *ExceptionInfo) {
+  if (ExceptionInfo->ExceptionRecord->ExceptionCode ==
+      EXCEPTION_STACK_OVERFLOW) {
+    WriteFile(GetStdHandle(STD_ERROR_HANDLE), "Stack overflow\n", 15, 0, 0);
+    ExitProcess(1);
+  }
+  fprintf(stderr, "Exception code %lx\n",
+          ExceptionInfo->ExceptionRecord->ExceptionCode);
+  stacktrace();
+  ExitProcess(1);
+}
+
 static VOID CALLBACK timeout(PVOID a, BOOLEAN b) {
   // on Linux the exit code associated with hard timeout is 128+SIGALRM; there
   // is no particular reason why we have to use the same exit code on Windows,
@@ -84,7 +97,7 @@ void parse(si argc, char **argv) {
     }
 
     // option
-    switch (keyword(intern(s, strlen(s)))) {
+    switch (keyword(internz(s))) {
     case k_V:
     case k_v:
     case k_version:
@@ -110,6 +123,9 @@ void parse(si argc, char **argv) {
 
 int main(int argc, char **argv) {
 #ifdef DEBUG
+#ifdef _WIN32
+  AddVectoredExceptionHandler(0, handler);
+#endif
   test();
   assert(_CrtCheckMemory());
 #endif
