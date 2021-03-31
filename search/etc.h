@@ -6,38 +6,17 @@
 
 typedef intptr_t si;
 
-// SORT
-inline void print(int32_t a) { printf("%d", a); }
-inline void print(int64_t a) { printf("%lld", a); }
-inline void print(uint32_t a) { printf("%u", a); }
-inline void print(uint64_t a) { printf("%llu", a); }
-inline void print(void *a) { printf("%p", a); }
-///
-
-template <class T, class U> void print(const pair<T, U> &p) {
-  putchar('(');
-  print(p.first);
-  putchar(',');
-  print(p.second);
-  putchar(')');
-}
-
 #ifdef DEBUG
 
-void stackTrace();
-bool assertFail(const char *file, si line, const char *s);
-#define assert(a) (a) || assertFail(__FILE__, __LINE__, #a)
+void stacktrace();
+bool assertfail(const char *file, si line, const char *s);
+#define assert(a) (a) || assertfail(__FILE__, __LINE__, #a)
 #define unreachable assert(0)
-#define debug(a)                                                               \
-  do {                                                                         \
-    printf("%s:%d: %s: ", __FILE__, __LINE__, #a);                             \
-    print(a);                                                                  \
-    putchar('\n');                                                             \
-  } while (0)
+#define debug(a)                                                                   printf("%s:%d: %s: %zx\n", __FILE__, __LINE__, #a,a);
 
 #else
 
-#define stackTrace()
+#define stacktrace()
 #ifdef _MSC_VER
 #define assert(a) __assume(a)
 #define unreachable __assume(0)
