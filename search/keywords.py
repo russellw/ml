@@ -37,12 +37,12 @@ with open("keywords.h", "w") as f:
     f.write(f"extern sym keywords[{len(lines)}];\n")
 
 # data
-with open("keywords.cc", "w") as f:
+with open("keywords.c", "w") as f:
     f.write("// AUTO GENERATED FILE - DO NOT MODIFY\n")
     f.write('#include "stdafx.h"\n')
     f.write("// stdafx.h must be first\n")
     f.write('#include "main.h"\n')
     f.write("sym keywords [] = {\n")
     for s in lines:
-        f.write('{type::none, type::none,"' + s + '"},\n')
+        f.write('{0,"' + s + '"},\n')
     f.write("};\n")
