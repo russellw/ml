@@ -9,5 +9,7 @@ struct sym ;
 #include "term.h"
 
 // parsers
-#include "parser.h"
+//#include "parser.h"
 
+//unit tests
+#include "test.h"

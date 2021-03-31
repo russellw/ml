@@ -40,7 +40,7 @@ extern char buf[20000];
 // SORT
 const char *basename(const char *file);
 noret err(const char *msg);
-size_t fnv(const void *p, si n);
+size_t fnv(const char *s, si n) ;
 void *mmalloc(si n);
 void quote(char q, const char *s);
 void *xcalloc(si n, si size);

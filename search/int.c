@@ -58,40 +58,50 @@ void round(mpz_t q, mpz_t n, mpz_t d) {
 //interned integers
 static  si cap = 0x10;
 static  si count;
-static  Int **entries = (Int **)xcalloc(cap, sizeof *entries);
+static  Int **entries ;
 
-static  si slot(Int **entries, si cap, const Int &x) {
-    auto mask = cap - 1;
-    auto i = x.hash() & mask;
-    while (entries[i] && !entries[i]->eq(x))
+static  size_t hash(Int *x) { return mpz_get_ui(x->val); }
+
+static si eq(Int*x,Int*y){
+	return!mpz_cmp(x->val,y->val);
+}
+
+static  si slot(Int **entries, si cap, Int *x) {
+    si mask = cap - 1;
+    si i = hash(x) & mask;
+    while (entries[i] && !eq(entries[i],x))
       i = (i + 1) & mask;
     return i;
   }
 
-static  void expand() {
-    assert(isPow2(cap));
-    auto cap1 = cap * 2;
-    auto entries1 = (Int **)xcalloc(cap1, sizeof *entries);
-    for (auto i = entries, e = entries + cap; i != e; ++i) {
-      auto x = *i;
+static  void expand(void) {
+    assert(ispow2(cap));
+    si cap1 = cap * 2;
+    Int** entries1 = xcalloc(cap1, sizeof *entries);
+    for(si i=0;i<cap;i++){
+      Int* x = entries[i];
       if (x)
-        entries1[slot(entries1, cap1, *x)] = x;
+        entries1[slot(entries1, cap1, x)] = x;
     }
     free(entries);
     cap = cap1;
     entries = entries1;
   }
 
-static  Int *store(const Int &x) {
-    auto r = (Int *)xmalloc(sizeof x);
-    *r = x;
+static  Int *store(const Int *x) {
+     Int * r =xmalloc(sizeof *x);
+    *r = *x;
     return r;
   }
 
-Int *intern_int(Int &x) {
-    auto i = slot(entries, cap, x);
+void init_ints(void) {
+	entries = xcalloc(cap, sizeof *entries);
+}
+
+Int *intern_int(Int *x) {
+    si i = slot(entries, cap, x);
     if (entries[i]) {
-      x.clear();
+      mpz_clear(x->val);
       return entries[i];
     }
     if (++count > cap * 3 / 4) {
@@ -102,14 +112,3 @@ Int *intern_int(Int &x) {
   }
 
 
-
-void init_ints() {
-  for (auto i = ints.entries, e = ints.entries + ints.cap; i != e; ++i) {
-    auto x = *i;
-    if (x) {
-      mpz_clear(x->val);
-      free(x);
-    }
-  }
-  memset(ints.entries, 0, ints.cap * sizeof *ints.entries);
-}

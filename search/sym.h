@@ -1,4 +1,6 @@
-struct sym {
+typedef struct sym {
+	si n;
+
   // for the keyword system to work, the size of the declared character array
   // must be large enough to hold the longest keyword
 
@@ -7,10 +9,10 @@ struct sym {
 
   // when symbols are allocated on the heap, the code doing the allocation is
   // responsible for allocating enough space to hold the corresponding strings
-  char v[0x20 ];
-};
+  char v[0x20 -sizeof(si)];
+}sym;
 
-inline si keyword(const sym *s) {
+static si keyword(const sym *s) {
   // turn a symbol into a keyword number by subtracting the base of the keyword
   // array and dividing by the declared size of a symbol structure (which is
   // efficient as long as that size is a power of 2)
@@ -22,13 +24,5 @@ inline si keyword(const sym *s) {
   return i / sizeof *s;
 }
 
+void init_syms(void);
 sym *intern(const char *s, si n);
-inline sym *intern(const char *s) { return intern(s, strlen(s)); }
-
-void initSyms();
-
-#ifdef DEBUG
-void ck(const sym *s);
-#else
-inline void ck(const sym *s) {}
-#endif

@@ -47,7 +47,7 @@ char buf[20000];
 
 // SORT
 const char *basename(const char *file) {
-  auto i = strlen(file);
+  si i = strlen(file);
   while (i) {
     if (file[i - 1] == '/')
       return file + i;
@@ -66,13 +66,12 @@ noret err(const char *msg) {
   exit(1);
 }
 
-size_t fnv(const void *p, si n) {
+size_t fnv(const char *s, si n) {
   // Fowler-Noll-Vo-1a is slower than more sophisticated hash algorithms for
   // large chunks of data, but faster for tiny ones, so it still sees use
-  auto p1 = (const char *)p;
   size_t h = 2166136261u;
   while (n--) {
-    h ^= *p1++;
+    h ^= *s++;
     h *= 16777619;
   }
   return h;
@@ -87,11 +86,11 @@ void *mmalloc(si n) {
   assert(!((si)p & 7));
   assert(!((si)e & 7));
   if (e - p < n) {
-    auto chunk = max(n, 10000);
-    p = (char *)xmalloc(chunk);
+    si chunk = max(n, 10000);
+    p = xmalloc(chunk);
     e = p + chunk;
   }
-  auto r = p;
+  char* r = p;
 #ifdef DEBUG
   memset(r, 0xcc, n);
 #endif
@@ -111,7 +110,7 @@ void quote(char q, const char *s) {
 }
 
 void *xcalloc(si n, si size) {
-  auto r = calloc(n, size);
+  void* r = calloc(n, size);
   if (!r) {
     perror("calloc");
     exit(1);
@@ -120,7 +119,7 @@ void *xcalloc(si n, si size) {
 }
 
 void *xmalloc(si n) {
-  auto r = malloc(n);
+  void* r = malloc(n);
   if (!r) {
     perror("malloc");
     exit(1);
@@ -132,7 +131,7 @@ void *xmalloc(si n) {
 }
 
 void *xrealloc(void *p, si n) {
-  auto r = realloc(p, n);
+  void* r = realloc(p, n);
   if (!r) {
     perror("realloc");
     exit(1);
