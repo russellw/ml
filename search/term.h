@@ -14,3 +14,8 @@ static Int *intp(si a) {
   assert(tag(a) == t_int);
   return (Int *)(a - t_int);
 }
+
+static Rat *ratp(si a) {
+  assert(tag(a) == t_rat);
+  return (Rat *)(a - t_rat);
+}
