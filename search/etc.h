@@ -9,7 +9,7 @@ typedef intptr_t si;
 #ifdef DEBUG
 
 void stacktrace();
-bool assertfail(const char *file, si line, const char *s);
+si assertfail(const char *file, si line, const char *s);
 #define assert(a) (a) || assertfail(__FILE__, __LINE__, #a)
 #define unreachable assert(0)
 #define debug(a)                                                                   printf("%s:%d: %s: %zx\n", __FILE__, __LINE__, #a,a);
@@ -30,23 +30,12 @@ bool assertfail(const char *file, si line, const char *s);
 
 extern char buf[20000];
 
-// SORT
-inline bool isDigit(char c) { return '0' <= c && c <= '9'; }
-
-inline bool isLower(char c) { return 'a' <= c && c <= 'z'; }
-
-inline bool isPow2(si n) {
-  // doesn't work for 0
-  assert(n);
-  return !(n & n - 1);
-}
-
-inline bool isSpace(char c) { return c <= ' ' && c; }
-
-inline bool isUpper(char c) { return 'A' <= c && c <= 'Z'; }
-///
-
-inline bool isAlpha(char c) { return isLower(c) || isUpper(c); }
+#define isalpha1(c)(islower1(c)||isupper1(c))
+#define isdigit1(c)('0'<=(c)&&(c)<='9')
+#define islower1(c)('a'<=(c)&&(c)<='z')
+#define ispow2(n)(!((n) & (n) - 1))
+#define isspace1(c)((c)<=' '&&(c))
+#define isupper1(c)('A'<=(c)&&(c)<='Z')
 
 // SORT
 const char *basename(const char *file);
@@ -58,11 +47,3 @@ void *xcalloc(si n, si size);
 void *xmalloc(si n);
 void *xrealloc(void *p, si n);
 ///
-
-#ifdef DEBUG
-void ckPtr(const void *p);
-void ckStr(const char *s);
-#else
-inline void ckPtr(const void *p) {}
-inline void ckStr(const char *s) {}
-#endif

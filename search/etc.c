@@ -11,28 +11,29 @@
 
 void stacktrace() {
 #ifdef _WIN32
-  auto process = GetCurrentProcess();
+  HANDLE process = GetCurrentProcess();
   SymInitialize(process, 0, 1);
-  static void *stack[1000];
-  auto nframes =
+  void *stack[100];
+  int nframes =
       CaptureStackBackTrace(1, sizeof stack / sizeof *stack, stack, 0);
-  auto symbol = (SYMBOL_INFO *)buf;
-  symbol->MaxNameLen = 1000;
-  symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+  char buf[sizeof(SYMBOL_INFO) + 256];
+  SYMBOL_INFO *syminfo = (SYMBOL_INFO *)buf;
+  syminfo->MaxNameLen = 256;
+  syminfo->SizeOfStruct = sizeof(SYMBOL_INFO);
   IMAGEHLP_LINE64 location;
   location.SizeOfStruct = sizeof location;
-  for (si i = 0; i != nframes; ++i) {
-    auto address = (DWORD64)(stack[i]);
-    SymFromAddr(process, address, 0, symbol);
+  for (si i = 0; i < nframes; i++) {
+    DWORD64 address = (DWORD64)(stack[i]);
+    SymFromAddr(process, address, 0, syminfo);
     DWORD displacement;
     if (SymGetLineFromAddr64(process, address, &displacement, &location))
-      printf("%s:%lu: ", location.FileName, location.LineNumber);
-    printf("%s\n", symbol->Name);
+      fprintf(stderr, "%s:%lu: ", location.FileName, location.LineNumber);
+    fprintf(stderr, "%s\n", syminfo->Name);
   }
 #endif
 }
 
-bool assertfail(const char *file, si line, const char *s) {
+si assertfail(const char *file, si line, const char *s) {
   printf("%s:%zu: assert failed: %s\n", file, line, s);
   stacktrace();
   exit(1);
@@ -41,7 +42,7 @@ bool assertfail(const char *file, si line, const char *s) {
 }
 #endif
 
-// sized for largest tptp symbols
+// sized for largest TPTP symbols
 char buf[20000];
 
 // SORT
@@ -66,7 +67,7 @@ noret err(const char *msg) {
 }
 
 size_t fnv(const void *p, si n) {
-  // fowler-noll-vo-1a is slower than more sophisticated hash algorithms for
+  // Fowler-Noll-Vo-1a is slower than more sophisticated hash algorithms for
   // large chunks of data, but faster for tiny ones, so it still sees use
   auto p1 = (const char *)p;
   size_t h = 2166136261u;
@@ -86,7 +87,7 @@ void *mmalloc(si n) {
   assert(!((si)p & 7));
   assert(!((si)e & 7));
   if (e - p < n) {
-    auto chunk = max(n, (si)10000);
+    auto chunk = max(n, 10000);
     p = (char *)xmalloc(chunk);
     e = p + chunk;
   }
@@ -139,30 +140,3 @@ void *xrealloc(void *p, si n) {
   return r;
 }
 ///
-
-#ifdef DEBUG
-void ckPtr(const void *p) {
-  // a valid pointer will not point to the first page of address space
-  assert(0xfff < (si)p);
-
-  // a valid pointer is unlikely to point past the first petabyte of address
-  // space
-  assert((uint64_t)p < (uint64_t)1 << 50);
-
-  // testing the validity of a pointer by trying to read a byte is not
-  // guaranteed to give useful diagnostics (if p is not in fact valid then it is
-  // undefined behavior) but for debug-build checking code, heuristic usefulness
-  // is all that's expected
-  *buf = *(const char *)p;
-}
-
-void ckStr(const char *s) {
-  ckPtr(s);
-  for (si i = 0; s[i]; ++i) {
-    assert(i < sizeof buf);
-    auto c = s[i];
-    assert(32 < c);
-    assert(c < 127);
-  }
-}
-#endif
