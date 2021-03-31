@@ -1,9 +1,9 @@
 enum {
   // SORT
+  t_float,
   t_int,
   t_rat,
   t_sym,
-  t_float,
   ///
 };
 
