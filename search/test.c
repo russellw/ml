@@ -3,5 +3,5 @@
 #include "main.h"
 
 #ifdef DEBUG
-void test(void) { internz("abc"); }
+void test(void) { assert(internz("abc") == internz("abc")); }
 #endif
