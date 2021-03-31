@@ -1,4 +1,4 @@
-# Sort elements of C++ code
+# Sort elements of C code
 # Assumes clang-format already run
 # Does not work for all possible programs!
 # Test carefully before reusing in other projects
@@ -8,7 +8,7 @@ import os
 import re
 import tempfile
 
-parser = argparse.ArgumentParser(description="Sort elements of C++ code")
+parser = argparse.ArgumentParser(description="Sort elements of C code")
 parser.add_argument("files", nargs="+")
 args = parser.parse_args()
 
@@ -152,7 +152,6 @@ def caseBlockTerminated(i):
             "exit",
             "goto",
             "return",
-            "throw",
             "unreachable",
         )
 
@@ -244,11 +243,11 @@ def sortMarked():
 def sortFile():
     global text
 
-    # Skip files that are not C++ source files
+    # Skip files that are not C source files
     # The omission of other common extensions is intentional
     # This program should be carefully evaluated for required modification
     # before being reused in other projects
-    if os.path.splitext(filename)[1] not in (".cc", ".h"):
+    if os.path.splitext(filename)[1] not in (".c", ".h"):
         return
 
     with open(filename) as f:

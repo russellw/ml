@@ -129,8 +129,8 @@ int main(int argc, char **argv) {
 #endif
 
   // SORT
-  init_syms();
   init_ints();
+  init_syms();
   ///
 
 #ifdef DEBUG
