@@ -101,7 +101,7 @@ void *mmalloc(si n) {
 void quote(char q, const char *s) {
   putchar(q);
   while (*s) {
-    auto c = *s++;
+    char c = *s++;
     if (c == q || c == '\\')
       putchar('\\');
     putchar(c);

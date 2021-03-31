@@ -24,7 +24,7 @@ void mpz_ediv_r(mpz_t r, mpz_t n, mpz_t d) {
 
 // calculate q = n/d, assuming common factors have already been canceled out,
 // and applying bankers rounding
-void round(mpz_t q, mpz_t n, mpz_t d) {
+void mpz_qround(mpz_t q, mpz_t n, mpz_t d) {
   // if we are dividing by 2, the result could be exactly halfway between two
   // integers, so need special case to apply bankers rounding
   if (!mpz_cmp_ui(d, 2)) {

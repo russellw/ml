@@ -51,4 +51,4 @@ enum {
   k_v,
   k_version,
 };
-extern struct sym keywords[50];
+extern sym keywords[50];

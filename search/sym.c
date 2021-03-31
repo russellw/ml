@@ -59,7 +59,7 @@ void init_syms(void) {
 }
 
 sym *intern(const char *p, si n) {
-  auto i = slot(entries, cap, p, n);
+  si i = slot(entries, cap, p, n);
   if (entries[i])
     return entries[i];
   if (++count > cap * 3 / 4) {
