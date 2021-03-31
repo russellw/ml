@@ -24,5 +24,8 @@ typedef struct {
 // parsers
 //#include "parser.h"
 
+// algorithms
+#include "eval.h"
+
 // unit tests
 #include "test.h"
