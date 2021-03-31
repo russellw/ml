@@ -2,14 +2,14 @@
 #include "vec.h"
 
 // data
-struct sym ;
-#include "keywords.h"
+struct sym;
 #include "int.h"
+#include "keywords.h"
 #include "sym.h"
 #include "term.h"
 
 // parsers
 //#include "parser.h"
 
-//unit tests
+// unit tests
 #include "test.h"

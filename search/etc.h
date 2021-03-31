@@ -12,7 +12,7 @@ void stacktrace();
 si assertfail(const char *file, si line, const char *s);
 #define assert(a) (a) || assertfail(__FILE__, __LINE__, #a)
 #define unreachable assert(0)
-#define debug(a)                                                                   printf("%s:%d: %s: %zx\n", __FILE__, __LINE__, #a,a);
+#define debug(a) printf("%s:%d: %s: %zx\n", __FILE__, __LINE__, #a, a);
 
 #else
 
@@ -30,17 +30,17 @@ si assertfail(const char *file, si line, const char *s);
 
 extern char buf[20000];
 
-#define isalpha1(c)(islower1(c)||isupper1(c))
-#define isdigit1(c)('0'<=(c)&&(c)<='9')
-#define islower1(c)('a'<=(c)&&(c)<='z')
-#define ispow2(n)(!((n) & (n) - 1))
-#define isspace1(c)((c)<=' '&&(c))
-#define isupper1(c)('A'<=(c)&&(c)<='Z')
+#define isalpha1(c) (islower1(c) || isupper1(c))
+#define isdigit1(c) ('0' <= (c) && (c) <= '9')
+#define islower1(c) ('a' <= (c) && (c) <= 'z')
+#define ispow2(n) (!((n) & (n)-1))
+#define isspace1(c) ((c) <= ' ' && (c))
+#define isupper1(c) ('A' <= (c) && (c) <= 'Z')
 
 // SORT
 const char *basename(const char *file);
 noret err(const char *msg);
-size_t fnv(const char *s, si n) ;
+size_t fnv(const char *s, si n);
 void *mmalloc(si n);
 void quote(char q, const char *s);
 void *xcalloc(si n, si size);
