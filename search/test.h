@@ -1,3 +1,3 @@
 #ifdef DEBUG
-void test();
+void test(void);
 #endif
