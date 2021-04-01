@@ -123,5 +123,19 @@ void test(void) {
 
   assert(div_f(mkrat("10"), mkrat("-1/10")) == mkrat("-100"));
   assert(div_f(mkrat("1/10"), mkrat("10")) == mkrat("0"));
+
+  // ceiling division
+  assert(div_c(mkint(5), mkint(3)) == mkint(2));
+  assert(div_c(mkint(-5), mkint(3)) == mkint(-1));
+  assert(div_c(mkint(5), mkint(-3)) == mkint(-1));
+  assert(div_c(mkint(-5), mkint(-3)) == mkint(2));
+
+  assert(div_c(mkrat("5/997"), mkrat("3/997")) == mkint(2));
+  assert(div_c(mkrat("-5/997"), mkrat("3/997")) == mkint(-1));
+  assert(div_c(mkrat("5/997"), mkrat("-3/997")) == mkint(-1));
+  assert(div_c(mkrat("-5/997"), mkrat("-3/997")) == mkint(2));
+
+  assert(div_c(mkrat("10"), mkrat("-1/10")) == mkrat("-100"));
+  assert(div_c(mkrat("1/10"), mkrat("10")) == mkrat("1"));
 }
 #endif
