@@ -63,5 +63,7 @@ void test(void) {
   si half = mkrat("1/2");
   si third = mkrat("1/3");
   si sixth = mkrat("1/6");
+
+  assert(add(mkfloat(0.5), mkfloat(0.5)) == mkfloat(1.0));
 }
 #endif
