@@ -124,6 +124,16 @@ void test(void) {
   assert(div_f(mkrat("10"), mkrat("-1/10")) == mkrat("-100"));
   assert(div_f(mkrat("1/10"), mkrat("10")) == mkrat("0"));
 
+  assert(rem_f(mkint(5), mkint(3)) == mkint(2));
+  assert(rem_f(mkint(-5), mkint(3)) == mkint(1));
+  assert(rem_f(mkint(5), mkint(-3)) == mkint(-1));
+  assert(rem_f(mkint(-5), mkint(-3)) == mkint(-2));
+
+  assert(rem_f(mkrat("5/997"), mkrat("3/997")) == mkint(2 * 997));
+  assert(rem_f(mkrat("-5/997"), mkrat("3/997")) == mkint(1 * 997));
+  assert(rem_f(mkrat("5/997"), mkrat("-3/997")) == mkint(-1 * 997));
+  assert(rem_f(mkrat("-5/997"), mkrat("-3/997")) == mkint(-2 * 997));
+
   // ceiling division
   assert(div_c(mkint(5), mkint(3)) == mkint(2));
   assert(div_c(mkint(-5), mkint(3)) == mkint(-1));
@@ -137,6 +147,16 @@ void test(void) {
 
   assert(div_c(mkrat("10"), mkrat("-1/10")) == mkrat("-100"));
   assert(div_c(mkrat("1/10"), mkrat("10")) == mkrat("1"));
+
+  assert(rem_c(mkint(5), mkint(3)) == mkint(-1));
+  assert(rem_c(mkint(-5), mkint(3)) == mkint(-2));
+  assert(rem_c(mkint(5), mkint(-3)) == mkint(2));
+  assert(rem_c(mkint(-5), mkint(-3)) == mkint(1));
+
+  assert(rem_c(mkrat("5/997"), mkrat("3/997")) == mkint(-1 * 997));
+  assert(rem_c(mkrat("-5/997"), mkrat("3/997")) == mkint(-2 * 997));
+  assert(rem_c(mkrat("5/997"), mkrat("-3/997")) == mkint(2 * 997));
+  assert(rem_c(mkrat("-5/997"), mkrat("-3/997")) == mkint(1 * 997));
 
   // truncating division
   assert(div_t2(mkint(5), mkint(3)) == mkint(5 / 3));
@@ -156,6 +176,20 @@ void test(void) {
   assert(div_t2(mkrat("10"), mkrat("-1/10")) == mkrat("-100"));
   assert(div_t2(mkrat("1/10"), mkrat("10")) == mkrat("0"));
 
+  assert(rem_t(mkint(5), mkint(3)) == mkint(5 % 3));
+  assert(rem_t(mkint(-5), mkint(3)) == mkint(-5 % 3));
+  assert(rem_t(mkint(5), mkint(-3)) == mkint(5 % -3));
+  assert(rem_t(mkint(-5), mkint(-3)) == mkint(-5 % -3));
+  assert(rem_t(mkint(5), mkint(3)) == mkint(2));
+  assert(rem_t(mkint(-5), mkint(3)) == mkint(-2));
+  assert(rem_t(mkint(5), mkint(-3)) == mkint(2));
+  assert(rem_t(mkint(-5), mkint(-3)) == mkint(-2));
+
+  assert(rem_t(mkrat("5/997"), mkrat("3/997")) == mkint(2 * 997));
+  assert(rem_t(mkrat("-5/997"), mkrat("3/997")) == mkint(-2 * 997));
+  assert(rem_t(mkrat("5/997"), mkrat("-3/997")) == mkint(2 * 997));
+  assert(rem_t(mkrat("-5/997"), mkrat("-3/997")) == mkint(-2 * 997));
+
   // euclidean division
   assert(div_e(mkint(7), mkint(3)) == mkint(2));
   assert(div_e(mkint(-7), mkint(3)) == mkint(-3));
@@ -169,5 +203,15 @@ void test(void) {
 
   assert(div_e(mkrat("10"), mkrat("-1/10")) == mkrat("-100"));
   assert(div_e(mkrat("1/10"), mkrat("10")) == mkrat("0"));
+
+  assert(rem_e(mkint(7), mkint(3)) == mkint(1));
+  assert(rem_e(mkint(-7), mkint(3)) == mkint(2));
+  assert(rem_e(mkint(7), mkint(-3)) == mkint(1));
+  assert(rem_e(mkint(-7), mkint(-3)) == mkint(2));
+
+  assert(rem_e(mkrat("7/997"), mkrat("3/997")) == mkint(1 * 997));
+  assert(rem_e(mkrat("-7/997"), mkrat("3/997")) == mkint(2 * 997));
+  assert(rem_e(mkrat("7/997"), mkrat("-3/997")) == mkint(1 * 997));
+  assert(rem_e(mkrat("-7/997"), mkrat("-3/997")) == mkint(2 * 997));
 }
 #endif

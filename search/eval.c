@@ -319,6 +319,71 @@ si div_f(si a, si b) {
   return 0;
 }
 
+si rem_f(si a, si b) {
+  switch (tag(a)) {
+  case t_int:
+    switch (tag(b)) {
+    case t_int: {
+      if (!mpz_sgn(intp(b)->val))
+        err("division by zero");
+      Int r;
+      mpz_init(r.val);
+      mpz_fdiv_r(r.val, intp(a)->val, intp(b)->val);
+      return iint(&r);
+    }
+    case t_rat: {
+      assert(mpq_sgn(ratp(b)->val));
+      Int r;
+      mpz_init(r.val);
+      mpz_mul(r.val, intp(a)->val, mpq_denref(ratp(b)->val));
+      mpz_fdiv_r(r.val, r.val, mpq_numref(ratp(b)->val));
+      return iint(&r);
+    }
+    }
+    break;
+  case t_rat:
+    switch (tag(b)) {
+    case t_int: {
+      if (!mpz_sgn(intp(b)->val))
+        err("division by zero");
+
+      mpz_t nden_d;
+      mpz_init(nden_d);
+      mpz_mul(nden_d, mpq_denref(ratp(a)->val), intp(b)->val);
+
+      Int r;
+      mpz_init(r.val);
+      mpz_fdiv_r(r.val, mpq_numref(ratp(a)->val), nden_d);
+
+      mpz_clear(nden_d);
+      return iint(&r);
+    }
+    case t_rat: {
+      assert(mpq_sgn(ratp(b)->val));
+
+      mpz_t nnum_dden;
+      mpz_init(nnum_dden);
+      mpz_mul(nnum_dden, mpq_numref(ratp(a)->val), mpq_denref(ratp(b)->val));
+
+      mpz_t nden_dnum;
+      mpz_init(nden_dnum);
+      mpz_mul(nden_dnum, mpq_denref(ratp(a)->val), mpq_numref(ratp(b)->val));
+
+      Int r;
+      mpz_init(r.val);
+      mpz_fdiv_r(r.val, nnum_dden, nden_dnum);
+
+      mpz_clear(nden_dnum);
+      mpz_clear(nnum_dden);
+      return iint(&r);
+    }
+    }
+    break;
+  }
+  err("rem_f: not an exact number");
+  return 0;
+}
+
 si div_c(si a, si b) {
   switch (tag(a)) {
   case t_int:
@@ -511,6 +576,201 @@ si div_e(si a, si b) {
     break;
   }
   err("div_e: not an exact number");
+  return 0;
+}
+
+si rem_c(si a, si b) {
+  switch (tag(a)) {
+  case t_int:
+    switch (tag(b)) {
+    case t_int: {
+      if (!mpz_sgn(intp(b)->val))
+        err("division by zero");
+      Int r;
+      mpz_init(r.val);
+      mpz_cdiv_r(r.val, intp(a)->val, intp(b)->val);
+      return iint(&r);
+    }
+    case t_rat: {
+      assert(mpq_sgn(ratp(b)->val));
+      Int r;
+      mpz_init(r.val);
+      mpz_mul(r.val, intp(a)->val, mpq_denref(ratp(b)->val));
+      mpz_cdiv_r(r.val, r.val, mpq_numref(ratp(b)->val));
+      return iint(&r);
+    }
+    }
+    break;
+  case t_rat:
+    switch (tag(b)) {
+    case t_int: {
+      if (!mpz_sgn(intp(b)->val))
+        err("division by zero");
+
+      mpz_t nden_d;
+      mpz_init(nden_d);
+      mpz_mul(nden_d, mpq_denref(ratp(a)->val), intp(b)->val);
+
+      Int r;
+      mpz_init(r.val);
+      mpz_cdiv_r(r.val, mpq_numref(ratp(a)->val), nden_d);
+
+      mpz_clear(nden_d);
+      return iint(&r);
+    }
+    case t_rat: {
+      assert(mpq_sgn(ratp(b)->val));
+
+      mpz_t nnum_dden;
+      mpz_init(nnum_dden);
+      mpz_mul(nnum_dden, mpq_numref(ratp(a)->val), mpq_denref(ratp(b)->val));
+
+      mpz_t nden_dnum;
+      mpz_init(nden_dnum);
+      mpz_mul(nden_dnum, mpq_denref(ratp(a)->val), mpq_numref(ratp(b)->val));
+
+      Int r;
+      mpz_init(r.val);
+      mpz_cdiv_r(r.val, nnum_dden, nden_dnum);
+
+      mpz_clear(nden_dnum);
+      mpz_clear(nnum_dden);
+      return iint(&r);
+    }
+    }
+    break;
+  }
+  err("rem_c: not an exact number");
+  return 0;
+}
+
+si rem_e(si a, si b) {
+  switch (tag(a)) {
+  case t_int:
+    switch (tag(b)) {
+    case t_int: {
+      if (!mpz_sgn(intp(b)->val))
+        err("division by zero");
+      Int r;
+      mpz_init(r.val);
+      mpz_ediv_r(r.val, intp(a)->val, intp(b)->val);
+      return iint(&r);
+    }
+    case t_rat: {
+      assert(mpq_sgn(ratp(b)->val));
+      Int r;
+      mpz_init(r.val);
+      mpz_mul(r.val, intp(a)->val, mpq_denref(ratp(b)->val));
+      mpz_ediv_r(r.val, r.val, mpq_numref(ratp(b)->val));
+      return iint(&r);
+    }
+    }
+    break;
+  case t_rat:
+    switch (tag(b)) {
+    case t_int: {
+      if (!mpz_sgn(intp(b)->val))
+        err("division by zero");
+
+      mpz_t nden_d;
+      mpz_init(nden_d);
+      mpz_mul(nden_d, mpq_denref(ratp(a)->val), intp(b)->val);
+
+      Int r;
+      mpz_init(r.val);
+      mpz_ediv_r(r.val, mpq_numref(ratp(a)->val), nden_d);
+
+      mpz_clear(nden_d);
+      return iint(&r);
+    }
+    case t_rat: {
+      assert(mpq_sgn(ratp(b)->val));
+
+      mpz_t nnum_dden;
+      mpz_init(nnum_dden);
+      mpz_mul(nnum_dden, mpq_numref(ratp(a)->val), mpq_denref(ratp(b)->val));
+
+      mpz_t nden_dnum;
+      mpz_init(nden_dnum);
+      mpz_mul(nden_dnum, mpq_denref(ratp(a)->val), mpq_numref(ratp(b)->val));
+
+      Int r;
+      mpz_init(r.val);
+      mpz_ediv_r(r.val, nnum_dden, nden_dnum);
+
+      mpz_clear(nden_dnum);
+      mpz_clear(nnum_dden);
+      return iint(&r);
+    }
+    }
+    break;
+  }
+  err("rem_e: not an exact number");
+  return 0;
+}
+
+si rem_t(si a, si b) {
+  switch (tag(a)) {
+  case t_int:
+    switch (tag(b)) {
+    case t_int: {
+      if (!mpz_sgn(intp(b)->val))
+        err("division by zero");
+      Int r;
+      mpz_init(r.val);
+      mpz_tdiv_r(r.val, intp(a)->val, intp(b)->val);
+      return iint(&r);
+    }
+    case t_rat: {
+      assert(mpq_sgn(ratp(b)->val));
+      Int r;
+      mpz_init(r.val);
+      mpz_mul(r.val, intp(a)->val, mpq_denref(ratp(b)->val));
+      mpz_tdiv_r(r.val, r.val, mpq_numref(ratp(b)->val));
+      return iint(&r);
+    }
+    }
+    break;
+  case t_rat:
+    switch (tag(b)) {
+    case t_int: {
+      if (!mpz_sgn(intp(b)->val))
+        err("division by zero");
+
+      mpz_t nden_d;
+      mpz_init(nden_d);
+      mpz_mul(nden_d, mpq_denref(ratp(a)->val), intp(b)->val);
+
+      Int r;
+      mpz_init(r.val);
+      mpz_tdiv_r(r.val, mpq_numref(ratp(a)->val), nden_d);
+
+      mpz_clear(nden_d);
+      return iint(&r);
+    }
+    case t_rat: {
+      assert(mpq_sgn(ratp(b)->val));
+
+      mpz_t nnum_dden;
+      mpz_init(nnum_dden);
+      mpz_mul(nnum_dden, mpq_numref(ratp(a)->val), mpq_denref(ratp(b)->val));
+
+      mpz_t nden_dnum;
+      mpz_init(nden_dnum);
+      mpz_mul(nden_dnum, mpq_denref(ratp(a)->val), mpq_numref(ratp(b)->val));
+
+      Int r;
+      mpz_init(r.val);
+      mpz_tdiv_r(r.val, nnum_dden, nden_dnum);
+
+      mpz_clear(nden_dnum);
+      mpz_clear(nnum_dden);
+      return iint(&r);
+    }
+    }
+    break;
+  }
+  err("rem_t: not an exact number");
   return 0;
 }
 ///
