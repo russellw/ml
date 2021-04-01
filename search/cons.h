@@ -4,4 +4,9 @@ typedef struct {
 } Cons;
 
 void init_cons(void);
+
+// SORT
 si cons(si hd, si tl);
+si hd(si s);
+si tl(si s);
+///

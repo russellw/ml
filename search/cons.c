@@ -39,6 +39,7 @@ static Cons *store(Cons *x) {
 
 void init_cons(void) { entries = xcalloc(cap, sizeof *entries); }
 
+// SORT
 si cons(si hd, si tl) {
   if (tag(tl) != t_cons)
     err("cons: not a list");
@@ -55,3 +56,20 @@ si cons(si hd, si tl) {
   }
   return term(entries[i], t_cons);
 }
+
+si hd(si s) {
+  if (tag(s) != t_cons)
+    err("hd: not a list");
+  if (s == nil)
+    err("hd: empty list");
+  return consp(s)->hd;
+}
+
+si tl(si s) {
+  if (tag(s) != t_cons)
+    err("tl: not a list");
+  if (s == nil)
+    err("tl: empty list");
+  return consp(s)->tl;
+}
+///

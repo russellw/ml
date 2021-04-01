@@ -469,14 +469,6 @@ si floor1(si a) {
   return 0;
 }
 
-si hd(si s) {
-  if (tag(s) != t_cons)
-    err("hd: not a list");
-  if (s == nil)
-    err("hd: empty list");
-  return consp(s)->hd;
-}
-
 si inexact(si a) {
   switch (tag(a)) {
   case t_float:
@@ -1054,14 +1046,6 @@ si sub(si a, si b) {
   }
   err("-: not a number");
   return 0;
-}
-
-si tl(si s) {
-  if (tag(s) != t_cons)
-    err("tl: not a list");
-  if (s == nil)
-    err("tl: empty list");
-  return consp(s)->tl;
 }
 
 si trunc1(si a) {

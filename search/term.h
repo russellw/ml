@@ -78,7 +78,6 @@ si div_f(si a, si b);
 si div_t2(si a, si b);
 si exact(si a);
 si floor1(si a);
-si hd(si s);
 si inexact(si a);
 int istrue(si a);
 int le(si a, si b);
@@ -93,6 +92,5 @@ si rem_f(si a, si b);
 si rem_t(si a, si b);
 si round1(si a);
 si sub(si a, si b);
-si tl(si s);
 si trunc1(si a);
 ///
