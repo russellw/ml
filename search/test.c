@@ -53,5 +53,61 @@ void test(void) {
   else
     caught = 1;
   assert(caught);
+
+  assert(sub(mkfloat(0.5), mkfloat(0.5)) == mkfloat(0.0));
+  assert(sub(mkfloat(1.0), mkfloat(2.0)) == mkfloat(-1.0));
+  assert(sub(mkfloat(10.0), mkfloat(-0.5)) == mkfloat(10.5));
+  assert(sub(mkint(11), mkint(12)) == mkint(-1));
+  assert(sub(mkint(11), mkint(-12)) == mkint(23));
+  assert(sub(mkint(0), mkint(-12)) == mkint(12));
+  assert(sub(mkfloat(1.0), mkint(5)) == mkfloat(-4.0));
+  assert(sub(mkint(100), mkfloat(-1.0)) == mkfloat(101.0));
+  assert(sub(mkrat("1/3"), mkrat("1/2")) == mkrat("-1/6"));
+  assert(sub(mkrat("1/2"), mkfloat(0.5)) == mkfloat(0.0));
+  assert(sub(mkfloat(0.5), mkrat("1/2")) == mkfloat(0.0));
+  assert(sub(mkint(-1), mkrat("1/2")) == mkrat("-3/2"));
+  assert(sub(mkrat("1/2"), mkint(-1)) == mkrat("3/2"));
+
+  assert(mul(mkfloat(0.5), mkfloat(0.5)) == mkfloat(0.25));
+  assert(mul(mkfloat(1.0), mkfloat(2.0)) == mkfloat(2.0));
+  assert(mul(mkfloat(10.0), mkfloat(-0.5)) == mkfloat(-5.0));
+  assert(mul(mkint(11), mkint(12)) == mkint(132));
+  assert(mul(mkint(11), mkint(-12)) == mkint(-132));
+  assert(mul(mkint(0), mkint(-12)) == mkint(0));
+  assert(mul(mkfloat(1.0), mkint(5)) == mkfloat(5));
+  assert(mul(mkint(100), mkfloat(-1.0)) == mkfloat(-100.0));
+  assert(mul(mkrat("1/3"), mkrat("1/2")) == mkrat("1/6"));
+  assert(mul(mkrat("1/2"), mkfloat(0.5)) == mkfloat(0.25));
+  assert(mul(mkfloat(0.5), mkrat("1/2")) == mkfloat(0.25));
+  assert(mul(mkint(-1), mkrat("1/2")) == mkrat("-1/2"));
+  assert(mul(mkrat("1/2"), mkint(-1)) == mkrat("-1/2"));
+
+  assert(div2(mkfloat(0.5), mkfloat(0.5)) == mkfloat(1));
+  assert(div2(mkfloat(1.0), mkfloat(2.0)) == mkfloat(.5));
+  assert(div2(mkfloat(10.0), mkfloat(-0.5)) == mkfloat(-20.0));
+  assert(div2(mkint(11), mkint(12)) == mkrat("11/12"));
+  assert(div2(mkint(11), mkint(-12)) == mkrat("-11/12"));
+  assert(div2(mkint(0), mkint(-12)) == mkint(0));
+  assert(div2(mkint(10), mkint(5)) == mkint(2));
+  assert(div2(mkint(100), mkfloat(-1.0)) == mkfloat(-100.0));
+  assert(div2(mkrat("1/3"), mkrat("1/2")) == mkrat("2/3"));
+  assert(div2(mkrat("1/2"), mkfloat(0.5)) == mkfloat(1));
+  assert(div2(mkfloat(0.5), mkrat("1/2")) == mkfloat(1));
+  assert(div2(mkint(-1), mkrat("1/2")) == mkrat("-2"));
+  assert(div2(mkrat("1/2"), mkint(-1)) == mkrat("-1/2"));
+
+  caught = 0;
+  if (!setjmp(jmpbuf))
+    div2( mkint(1),mkint(0));
+  else
+    caught = 1;
+  assert(caught);
+
+  caught = 0;
+  if (!setjmp(jmpbuf))
+    div2( mkrat("2/3"),mkint(0));
+  else
+    caught = 1;
+  assert(caught);
 }
 #endif
