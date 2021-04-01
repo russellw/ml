@@ -30,7 +30,7 @@ si add(si a, si b) {
       Rat r;
       mpq_init(r.val);
       mpq_add(r.val, ratp(a)->val, ratp(b)->val);
-      return term(irat(&r), t_rat);
+      return irat(&r);
     }
     }
     break;

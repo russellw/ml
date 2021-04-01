@@ -3,4 +3,4 @@ typedef struct {
 } Rat;
 
 void init_rats(void);
-Rat *irat(Rat *x);
+si irat(Rat *x);

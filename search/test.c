@@ -19,17 +19,7 @@ static si mkrat(char *s) {
   Rat x;
   mpq_init(x.val);
   mpq_set_str(x.val, s, 10);
-  Rat *p = irat(&x);
-
-  Rat y;
-  mpq_init(y.val);
-  mpq_set_str(y.val, s, 10);
-  assert(irat(&y) == p);
-
-  si r = term(p, t_rat);
-  assert(tag(r) == t_rat);
-  assert(ratp(r) == p);
-  return r;
+  return irat(&x);
 }
 
 void test(void) {
