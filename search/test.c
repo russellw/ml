@@ -433,5 +433,37 @@ void test(void) {
   assert(cons(mkint(1), empty) == cons(mkint(1), empty));
   assert(cons(mkint(1), cons(mkint(2), empty)) ==
          cons(mkint(1), cons(mkint(2), empty)));
+
+  // lists
+  caught = 0;
+  if (!setjmp(jmpbuf))
+    hd(mkint(0));
+  else
+    caught = 1;
+  assert(caught);
+
+  caught = 0;
+  if (!setjmp(jmpbuf))
+    tl(mkint(0));
+  else
+    caught = 1;
+  assert(caught);
+
+  caught = 0;
+  if (!setjmp(jmpbuf))
+    hd(empty);
+  else
+    caught = 1;
+  assert(caught);
+
+  caught = 0;
+  if (!setjmp(jmpbuf))
+    tl(empty);
+  else
+    caught = 1;
+  assert(caught);
+
+  assert(hd(cons(mkint(1), empty)) == mkint(1));
+  assert(tl(cons(mkint(1), empty)) == empty);
 }
 #endif

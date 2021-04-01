@@ -7,7 +7,7 @@ static Cons **entries;
 
 static size_t hash(Cons *x) { return XXH64(x, sizeof *x, 0); }
 
-static int eq(Cons *x, Cons *y) { return x->car == y->car && x->cdr == y->cdr; }
+static int eq(Cons *x, Cons *y) { return x->hd == y->hd && x->tl == y->tl; }
 
 static si slot(Cons **entries, si cap, Cons *x) {
   si mask = cap - 1;
@@ -39,12 +39,12 @@ static Cons *store(Cons *x) {
 
 void init_cons(void) { entries = xcalloc(cap, sizeof *entries); }
 
-si cons(si car, si cdr) {
-  if (tag(cdr) != t_cons)
+si cons(si hd, si tl) {
+  if (tag(tl) != t_cons)
     err("cons: not a list");
   Cons x;
-  x.car = car;
-  x.cdr = cdr;
+  x.hd = hd;
+  x.tl = tl;
   si i = slot(entries, cap, &x);
   if (!entries[i]) {
     if (++count > cap * 3 / 4) {

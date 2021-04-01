@@ -83,6 +83,12 @@ si add(si a, si b) {
   return 0;
 }
 
+si at(si s, si i) {
+  if (tag(s) != t_cons)
+    err("at: not a list");
+  return 0;
+}
+
 si ceil1(si a) {
   switch (tag(a)) {
   case t_float:
@@ -461,6 +467,14 @@ si floor1(si a) {
   }
   err("floor: not a number");
   return 0;
+}
+
+si hd(si s) {
+  if (tag(s) != t_cons)
+    err("hd: not a list");
+  if (s == empty)
+    err("hd: empty list");
+  return consp(s)->hd;
 }
 
 si inexact(si a) {
@@ -1006,6 +1020,14 @@ si sub(si a, si b) {
   return 0;
 }
 
+si tl(si s) {
+  if (tag(s) != t_cons)
+    err("tl: not a list");
+  if (s == empty)
+    err("tl: empty list");
+  return consp(s)->tl;
+}
+
 si trunc1(si a) {
   switch (tag(a)) {
   case t_float:
@@ -1024,4 +1046,10 @@ si trunc1(si a) {
 }
 ///
 
-si eval(si a) { return a; }
+si eval(si env, si a) {
+  if (tag(a) != t_cons)
+    return a;
+  si op = hd(a);
+  a = tl(a);
+  return a;
+}
