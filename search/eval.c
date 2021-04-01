@@ -2,31 +2,41 @@
 
 si add(si a, si b) {
   switch (tag(a)) {
-  case t_float: {
-    Float *a1 = floatp(a);
+  case t_float:
     switch (tag(b)) {
-    case t_float: {
-      Float *b1 = floatp(b);
-      return term(intern_float(a1->val + b1->val), t_float);
+    case t_float:
+      return term(intern_float(floatp(a)->val + floatp(b)->val), t_float);
+    case t_int:
+      return term(intern_float(floatp(a)->val + mpz_get_d(intp(b)->val)),
+                  t_float);
     }
-    case t_int: {
-      Int *b1 = intp(b);
-      return term(intern_float(a1->val + mpz_get_d(b1->val)), t_float);
-    }
-    }
-  }
-  case t_int: {
-    Int *a1 = intp(a);
+    break;
+  case t_int:
     switch (tag(b)) {
+    case t_float:
+      return term(intern_float(mpz_get_d(intp(a)->val) + floatp(b)->val),
+                  t_float);
     case t_int: {
-      Int *b1 = intp(b);
       Int r;
       mpz_init(r.val);
-      mpz_add(r.val, a1->val, b1->val);
+      mpz_add(r.val, intp(a)->val, intp(b)->val);
       return term(intern_int(&r), t_int);
     }
     }
-  }
+    break;
+  case t_rat:
+    switch (tag(b)) {
+    case t_float:
+      return term(intern_float(mpq_get_d(ratp(a)->val) + floatp(b)->val),
+                  t_float);
+    case t_rat: {
+      Rat r;
+      mpq_init(r.val);
+      mpq_add(r.val, ratp(a)->val, ratp(b)->val);
+      return term(intern_rat(&r), t_rat);
+    }
+    }
+    break;
   }
   return 0;
 }

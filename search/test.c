@@ -34,8 +34,6 @@ static si mkrat(char *s) {
   mpq_init(x.val);
   mpq_set_str(x.val, s, 10);
   Rat *p = intern_rat(&x);
-  mpq_get_str(buf, 10, p->val);
-  assert(!strcmp(buf, s));
 
   Rat y;
   mpq_init(y.val);
@@ -50,13 +48,22 @@ static si mkrat(char *s) {
 
 void test(void) {
   assert(internz("abc") == internz("abc"));
+  assert(internz("") == internz(""));
+  assert(internz("\t") == internz("\t"));
+
+  assert(mkrat("1/2") == mkrat("2/4"));
+  assert(mkrat("0/1") == mkrat("0/2"));
+  assert(mkrat("0/1") == mkrat("-0/2"));
 
   assert(add(mkfloat(0.5), mkfloat(0.5)) == mkfloat(1.0));
   assert(add(mkfloat(1.0), mkfloat(2.0)) == mkfloat(3.0));
   assert(add(mkfloat(10.0), mkfloat(-0.5)) == mkfloat(9.5));
-
   assert(add(mkint(11), mkint(12)) == mkint(23));
   assert(add(mkint(11), mkint(-12)) == mkint(-1));
   assert(add(mkint(0), mkint(-12)) == mkint(-12));
+  assert(add(mkfloat(1.0), mkint(5)) == mkfloat(6.0));
+  assert(add(mkint(100), mkfloat(-1.0)) == mkfloat(99.0));
+  assert(add(mkrat("1/3"), mkrat("1/2")) == mkrat("5/6"));
+  assert(add(mkrat("1/2"), mkfloat(0.5)) == mkfloat(1.0));
 }
 #endif
