@@ -1,6 +1,5 @@
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
-#define _CRTDBG_MAP_ALLOC_NEW
 #endif
 #include <errno.h>
 #include <math.h>
@@ -36,7 +35,7 @@
 #include "term.h"
 
 // parsers
-//#include "parser.h"
+#include "parser.h"
 
 // algorithms
 #include "eval.h"
