@@ -13,6 +13,7 @@ char *file;
 char *txtstart;
 char *txt;
 char *tokstart;
+si tok;
 
 void readfile(char *file0) {
   file = file0;
@@ -84,4 +85,32 @@ void readfile(char *file0) {
   txtstart = s;
   txt = s;
   tokstart = s;
+}
+
+enum {
+  k_sym,
+};
+
+// tokenizer
+static void lex(void) {
+loop:
+  char *s = tokstart = txt;
+  switch (*s) {
+  case ' ':
+  case '\f':
+  case '\n':
+  case '\r':
+  case '\t':
+  case '\v':
+    txt = s + 1;
+    goto loop;
+  case ';':
+    txt = strchr(s, '\n');
+    goto loop;
+  case 0:
+    tok = 0;
+    return;
+  }
+  txt = s + 1;
+  tok = *s;
 }
