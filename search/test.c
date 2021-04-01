@@ -43,5 +43,8 @@ void test(void) {
   assert(add(mkint(100), mkfloat(-1.0)) == mkfloat(99.0));
   assert(add(mkrat("1/3"), mkrat("1/2")) == mkrat("5/6"));
   assert(add(mkrat("1/2"), mkfloat(0.5)) == mkfloat(1.0));
+  assert(add(mkfloat(0.5), mkrat("1/2")) == mkfloat(1.0));
+  assert(add(mkint(-1), mkrat("1/2")) == mkrat("-1/2"));
+  assert(add(mkrat("1/2"), mkint(-1)) == mkrat("-1/2"));
 }
 #endif
