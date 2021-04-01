@@ -98,14 +98,14 @@ void test(void) {
 
   caught = 0;
   if (!setjmp(jmpbuf))
-    div2( mkint(1),mkint(0));
+    div2(mkint(1), mkint(0));
   else
     caught = 1;
   assert(caught);
 
   caught = 0;
   if (!setjmp(jmpbuf))
-    div2( mkrat("2/3"),mkint(0));
+    div2(mkrat("2/3"), mkint(0));
   else
     caught = 1;
   assert(caught);
