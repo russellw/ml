@@ -1,6 +1,13 @@
 // AUTO GENERATED FILE - DO NOT MODIFY
 enum {
+  s_mul,
   s_add,
+  s_sub,
+  s_div,
+  s_ne,
+  s_lt,
+  s_le,
+  s_eq,
   w_T,
   w_V,
   w_ceiling,
@@ -9,6 +16,10 @@ enum {
   w_difference,
   w_dimacs,
   w_distinct,
+  w_div_c,
+  w_div_e,
+  w_div_f,
+  w_div_t,
   w_false,
   w_floor,
   w_fof,
@@ -33,6 +44,10 @@ enum {
   w_quotient_t,
   w_rat,
   w_real,
+  w_rem_c,
+  w_rem_e,
+  w_rem_f,
+  w_rem_t,
   w_remainder_e,
   w_remainder_f,
   w_remainder_t,
@@ -52,4 +67,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[51];
+extern sym keywords[66];

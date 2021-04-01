@@ -1,4 +1,11 @@
+*,mul
 +,add
+-,sub
+/,div
+/=,ne
+<,lt
+<=,le
+=,eq
 T
 V
 ceiling
@@ -7,6 +14,10 @@ conjecture
 difference
 dimacs
 distinct
+div_c
+div_e
+div_f
+div_t
 false
 floor
 fof
@@ -31,6 +42,10 @@ quotient_f
 quotient_t
 rat
 real
+rem_c
+rem_e
+rem_f
+rem_t
 remainder_e
 remainder_f
 remainder_t
