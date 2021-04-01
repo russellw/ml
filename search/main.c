@@ -126,6 +126,7 @@ int main(int argc, char **argv) {
 #endif
 
   // SORT
+  init_cons();
   init_floats();
   init_ints();
   init_rats();

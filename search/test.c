@@ -418,5 +418,19 @@ void test(void) {
   assert(exact(mkfloat(-4)) == mkint(-4));
   assert(exact(mkfloat(.5)) == mkrat("1/2"));
   assert(exact(mkfloat(-0.0)) == mkint(0));
+
+  // cons
+  assert(tag(empty) == t_cons);
+
+  caught = 0;
+  if (!setjmp(jmpbuf))
+    cons(mkrat("2/3"), mkfloat(1));
+  else
+    caught = 1;
+  assert(caught);
+
+  assert(cons(mkint(1), empty) == cons(mkint(1), empty));
+  assert(cons(mkint(1), cons(mkint(2), empty)) ==
+         cons(mkint(1), cons(mkint(2), empty)));
 }
 #endif

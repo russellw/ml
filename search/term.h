@@ -12,7 +12,7 @@ enum {
 
 // make a term
 static si term(void *p, si t) {
-  assert(p);
+  assert(p || t == t_cons);
   assert(0 <= t);
   assert(t < t_max);
   return (si)p + t;
