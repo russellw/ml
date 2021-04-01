@@ -322,5 +322,83 @@ void test(void) {
   assert(abs1(mkfloat(-0.1)) == mkfloat(0.1));
   assert(abs1(mkfloat(-0.5)) == mkfloat(0.5));
   assert(abs1(mkfloat(-0.9)) == mkfloat(0.9));
+
+  // lt
+  assert(lt(mkint(1), mkint(2)));
+  assert(!lt(mkint(1), mkint(1)));
+  assert(!lt(mkint(2), mkint(1)));
+  assert(!lt(mkint(-1), mkint(-2)));
+  assert(!lt(mkint(-1), mkint(-1)));
+  assert(lt(mkint(-2), mkint(-1)));
+
+  assert(lt(mkfloat(1), mkfloat(2)));
+  assert(!lt(mkfloat(1), mkfloat(1)));
+  assert(!lt(mkfloat(2), mkfloat(1)));
+  assert(!lt(mkfloat(-1), mkfloat(-2)));
+  assert(!lt(mkfloat(-1), mkfloat(-1)));
+  assert(lt(mkfloat(-2), mkfloat(-1)));
+
+  assert(lt(mkint(1), mkfloat(2)));
+  assert(!lt(mkint(1), mkfloat(1)));
+  assert(!lt(mkint(2), mkfloat(1)));
+  assert(!lt(mkint(-1), mkfloat(-2)));
+  assert(!lt(mkint(-1), mkfloat(-1)));
+  assert(lt(mkint(-2), mkfloat(-1)));
+
+  assert(lt(mkfloat(1), mkint(2)));
+  assert(!lt(mkfloat(1), mkint(1)));
+  assert(!lt(mkfloat(2), mkint(1)));
+  assert(!lt(mkfloat(-1), mkint(-2)));
+  assert(!lt(mkfloat(-1), mkint(-1)));
+  assert(lt(mkfloat(-2), mkint(-1)));
+
+  assert(lt(mkrat("1/997"), mkrat("2/997")));
+  assert(!lt(mkrat("1/997"), mkrat("1/997")));
+  assert(!lt(mkrat("2/997"), mkrat("1/997")));
+  assert(!lt(mkrat("-1/997"), mkrat("-2/997")));
+  assert(!lt(mkrat("-1/997"), mkrat("-1/997")));
+  assert(lt(mkrat("-2/997"), mkrat("-1/997")));
+
+  assert(lt(mkrat("3/10"), mkrat("10/10")));
+  assert(!lt(mkrat("13/10"), mkrat("10/10")));
+
+  // le
+  assert(le(mkint(1), mkint(2)));
+  assert(le(mkint(1), mkint(1)));
+  assert(!le(mkint(2), mkint(1)));
+  assert(!le(mkint(-1), mkint(-2)));
+  assert(le(mkint(-1), mkint(-1)));
+  assert(le(mkint(-2), mkint(-1)));
+
+  assert(le(mkfloat(1), mkfloat(2)));
+  assert(le(mkfloat(1), mkfloat(1)));
+  assert(!le(mkfloat(2), mkfloat(1)));
+  assert(!le(mkfloat(-1), mkfloat(-2)));
+  assert(le(mkfloat(-1), mkfloat(-1)));
+  assert(le(mkfloat(-2), mkfloat(-1)));
+
+  assert(le(mkint(1), mkfloat(2)));
+  assert(le(mkint(1), mkfloat(1)));
+  assert(!le(mkint(2), mkfloat(1)));
+  assert(!le(mkint(-1), mkfloat(-2)));
+  assert(le(mkint(-1), mkfloat(-1)));
+  assert(le(mkint(-2), mkfloat(-1)));
+
+  assert(le(mkfloat(1), mkint(2)));
+  assert(le(mkfloat(1), mkint(1)));
+  assert(!le(mkfloat(2), mkint(1)));
+  assert(!le(mkfloat(-1), mkint(-2)));
+  assert(le(mkfloat(-1), mkint(-1)));
+  assert(le(mkfloat(-2), mkint(-1)));
+
+  assert(le(mkrat("1/997"), mkrat("2/997")));
+  assert(le(mkrat("1/997"), mkrat("1/997")));
+  assert(!le(mkrat("2/997"), mkrat("1/997")));
+  assert(!le(mkrat("-1/997"), mkrat("-2/997")));
+  assert(le(mkrat("-1/997"), mkrat("-1/997")));
+  assert(le(mkrat("-2/997"), mkrat("-1/997")));
+
+  assert(le(mkrat("3/10"), mkrat("10/10")));
+  assert(!le(mkrat("13/10"), mkrat("10/10")));
 }
 #endif

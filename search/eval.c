@@ -447,6 +447,104 @@ si floor1(si a) {
   return 0;
 }
 
+int le(si a, si b) {
+  switch (tag(a)) {
+  case t_float:
+    switch (tag(b)) {
+    case t_float:
+      return floatp(a)->val <= floatp(b)->val;
+    case t_int:
+      return floatp(a)->val <= mpz_get_d(intp(b)->val);
+    case t_rat:
+      return floatp(a)->val <= mpq_get_d(ratp(b)->val);
+    }
+    break;
+  case t_int:
+    switch (tag(b)) {
+    case t_float:
+      return mpz_get_d(intp(a)->val) <= floatp(b)->val;
+    case t_int:
+      return mpz_cmp(intp(a)->val, intp(b)->val) <= 0;
+    case t_rat: {
+      mpq_t a1;
+      mpq_init(a1);
+      mpq_set_z(a1, intp(a)->val);
+      int c = mpq_cmp(a1, ratp(b)->val);
+      mpq_clear(a1);
+      return c <= 0;
+    }
+    }
+    break;
+  case t_rat:
+    switch (tag(b)) {
+    case t_float:
+      return mpq_get_d(ratp(a)->val) <= floatp(b)->val;
+    case t_int: {
+      mpq_t b1;
+      mpq_init(b1);
+      mpq_set_z(b1, intp(b)->val);
+      int c = mpq_cmp(ratp(a)->val, b1);
+      mpq_clear(b1);
+      return c <= 0;
+    }
+    case t_rat:
+      return mpq_cmp(ratp(a)->val, ratp(b)->val) <= 0;
+    }
+    break;
+  }
+  err("<=: not a number");
+  return 0;
+}
+
+int lt(si a, si b) {
+  switch (tag(a)) {
+  case t_float:
+    switch (tag(b)) {
+    case t_float:
+      return floatp(a)->val < floatp(b)->val;
+    case t_int:
+      return floatp(a)->val < mpz_get_d(intp(b)->val);
+    case t_rat:
+      return floatp(a)->val < mpq_get_d(ratp(b)->val);
+    }
+    break;
+  case t_int:
+    switch (tag(b)) {
+    case t_float:
+      return mpz_get_d(intp(a)->val) < floatp(b)->val;
+    case t_int:
+      return mpz_cmp(intp(a)->val, intp(b)->val) < 0;
+    case t_rat: {
+      mpq_t a1;
+      mpq_init(a1);
+      mpq_set_z(a1, intp(a)->val);
+      int c = mpq_cmp(a1, ratp(b)->val);
+      mpq_clear(a1);
+      return c < 0;
+    }
+    }
+    break;
+  case t_rat:
+    switch (tag(b)) {
+    case t_float:
+      return mpq_get_d(ratp(a)->val) < floatp(b)->val;
+    case t_int: {
+      mpq_t b1;
+      mpq_init(b1);
+      mpq_set_z(b1, intp(b)->val);
+      int c = mpq_cmp(ratp(a)->val, b1);
+      mpq_clear(b1);
+      return c < 0;
+    }
+    case t_rat:
+      return mpq_cmp(ratp(a)->val, ratp(b)->val) < 0;
+    }
+    break;
+  }
+  err("<: not a number");
+  return 0;
+}
+
 si minus(si a) {
   switch (tag(a)) {
   case t_float:
