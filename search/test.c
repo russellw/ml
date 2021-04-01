@@ -155,5 +155,19 @@ void test(void) {
 
   assert(div_t2(mkrat("10"), mkrat("-1/10")) == mkrat("-100"));
   assert(div_t2(mkrat("1/10"), mkrat("10")) == mkrat("0"));
+
+  // euclidean division
+  assert(div_e(mkint(7), mkint(3)) == mkint(2));
+  assert(div_e(mkint(-7), mkint(3)) == mkint(-3));
+  assert(div_e(mkint(7), mkint(-3)) == mkint(-2));
+  assert(div_e(mkint(-7), mkint(-3)) == mkint(3));
+
+  assert(div_e(mkrat("7/997"), mkrat("3/997")) == mkint(2));
+  assert(div_e(mkrat("-7/997"), mkrat("3/997")) == mkint(-3));
+  assert(div_e(mkrat("7/997"), mkrat("-3/997")) == mkint(-2));
+  assert(div_e(mkrat("-7/997"), mkrat("-3/997")) == mkint(3));
+
+  assert(div_e(mkrat("10"), mkrat("-1/10")) == mkrat("-100"));
+  assert(div_e(mkrat("1/10"), mkrat("10")) == mkrat("0"));
 }
 #endif
