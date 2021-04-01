@@ -831,6 +831,8 @@ si sub(si a, si b) {
 
 si trunc1(si a) {
   switch (tag(a)) {
+  case t_float:
+    return ifloat(trunc(floatp(a)->val));
   case t_int:
     return a;
   case t_rat: {
@@ -840,7 +842,7 @@ si trunc1(si a) {
     return iint(&r);
   }
   }
-  err("trunc: not an exact number");
+  err("trunc: not a number");
   return 0;
 }
 ///

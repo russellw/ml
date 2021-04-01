@@ -278,5 +278,13 @@ void test(void) {
   assert(trunc1(mkrat("-1/10")) == mkrat("0"));
   assert(trunc1(mkrat("-5/10")) == mkrat("0"));
   assert(trunc1(mkrat("-9/10")) == mkrat("0"));
+
+  assert(trunc1(mkfloat(0)) == mkfloat(0));
+  assert(trunc1(mkfloat(0.1)) == mkfloat(0));
+  assert(trunc1(mkfloat(0.5)) == mkfloat(0));
+  assert(trunc1(mkfloat(0.9)) == mkfloat(0));
+  assert(trunc1(mkfloat(-0.1)) == mkfloat(-0.0));
+  assert(trunc1(mkfloat(-0.5)) == mkfloat(-0.0));
+  assert(trunc1(mkfloat(-0.9)) == mkfloat(-0.0));
 }
 #endif
