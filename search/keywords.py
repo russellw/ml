@@ -42,5 +42,5 @@ with open("keywords.c", "w") as f:
     f.write('#include "main.h"\n')
     f.write("sym keywords [] = {\n")
     for s in lines:
-        f.write('{0,"' + s + '"},\n')
+        f.write("{" + str(len(s)) + ',"' + s + '"},\n')
     f.write("};\n")

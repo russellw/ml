@@ -27,6 +27,7 @@ void test(void) {
   assert(internz("abc") == internz("abc"));
   assert(internz("") == internz(""));
   assert(internz("\t") == internz("\t"));
+  assert(keyword(internz("round")) == k_round);
 
   // rationals
   assert(mkrat("1/2") == mkrat("2/4"));

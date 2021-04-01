@@ -47,10 +47,11 @@ void init_syms(void) {
   entries = xcalloc(cap, sizeof *entries);
   for (si i = 0; i < sizeof keywords / sizeof *keywords; i++) {
     sym *x = keywords + i;
-    assert(strlen(x->v) < sizeof x->v);
+    assert(x->n == strlen(x->v));
+    assert(x->n < sizeof x->v);
     count++;
     assert(count <= cap * 3 / 4);
-    si j = slot(entries, cap, x->v, strlen(x->v));
+    si j = slot(entries, cap, x->v, x->n);
     assert(!entries[j]);
     entries[j] = x;
   }
