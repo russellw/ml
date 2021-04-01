@@ -38,3 +38,20 @@ static Rat *ratp(si a) {
   assert(tag(a) == t_rat);
   return (Rat *)(a - t_rat);
 }
+
+static sym *symp(si a) {
+  assert(tag(a) == t_sym);
+  return (sym *)(a - t_sym);
+}
+
+static si keyword(si a) {
+  // turn a symbol into a keyword number by subtracting the base of the keyword
+  // array and dividing by the declared size of a symbol structure (which is
+  // efficient as long as that size is a power of 2)
+
+  // it's okay if the symbol is not a keyword; that just means the resulting
+  // number will not correspond to any keyword and will not match any case in a
+  // switch statement
+  size_t i = (char *)symp(a) - (char *)keywords;
+  return i / sizeof(sym);
+}

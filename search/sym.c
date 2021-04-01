@@ -56,13 +56,14 @@ void init_syms(void) {
   }
 }
 
-sym *intern(char *p, si n) {
+si intern(char *p, si n) {
   si i = slot(entries, cap, p, n);
-  if (entries[i])
-    return entries[i];
-  if (++count > cap * 3 / 4) {
-    expand();
-    i = slot(entries, cap, p, n);
+  if (!entries[i]) {
+    if (++count > cap * 3 / 4) {
+      expand();
+      i = slot(entries, cap, p, n);
+    }
+    entries[i] = store(p, n);
   }
-  return entries[i] = store(p, n);
+  return term(entries[i], t_sym);
 }

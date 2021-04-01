@@ -86,7 +86,6 @@ void parse(si argc, char **argv) {
     case '7':
     case '8':
     case '9':
-      s = intern(s, t - s)->v;
       optArg = t;
       break;
     case ':':
