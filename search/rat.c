@@ -9,7 +9,7 @@ static size_t hash(Rat *x) {
   return mpz_get_ui(mpq_numref(x->val)) ^ mpz_get_ui(mpq_denref(x->val));
 }
 
-static si eq(Rat *x, Rat *y) { return mpq_equal(x->val, y->val); }
+static int eq(Rat *x, Rat *y) { return mpq_equal(x->val, y->val); }
 
 static si slot(Rat **entries, si cap, Rat *x) {
   si mask = cap - 1;

@@ -60,7 +60,7 @@ static Int **entries;
 
 static size_t hash(Int *x) { return mpz_get_ui(x->val); }
 
-static si eq(Int *x, Int *y) { return !mpz_cmp(x->val, y->val); }
+static int eq(Int *x, Int *y) { return !mpz_cmp(x->val, y->val); }
 
 static si slot(Int **entries, si cap, Int *x) {
   si mask = cap - 1;

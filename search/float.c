@@ -7,7 +7,7 @@ static Float **entries;
 
 static size_t hash(Float *x) { return XXH64(&x->val, sizeof x->val, 0); }
 
-static si eq(Float *x, Float *y) {
+static int eq(Float *x, Float *y) {
   return !memcmp(&x->val, &y->val, sizeof x->val);
 }
 

@@ -5,7 +5,7 @@ static si cap = 0x100;
 static si count;
 static sym **entries;
 
-static si eq(char *s, si n, char *s1, si n1) {
+static int eq(char *s, si n, char *s1, si n1) {
   if (n != n1)
     return 0;
   while (n--)
