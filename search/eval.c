@@ -845,6 +845,23 @@ si trunc1(si a) {
   err("trunc: not a number");
   return 0;
 }
+
+si round1(si a) {
+  switch (tag(a)) {
+  case t_float:
+    return ifloat(round(floatp(a)->val));
+  case t_int:
+    return a;
+  case t_rat: {
+    Int r;
+    mpz_init(r.val);
+    mpz_qround(r.val, mpq_numref(ratp(a)->val), mpq_denref(ratp(a)->val));
+    return iint(&r);
+  }
+  }
+  err("round: not a number");
+  return 0;
+}
 ///
 
 si eval(si a) { return a; }

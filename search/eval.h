@@ -16,6 +16,7 @@ si rem_f(si a, si b);
 si rem_t(si a, si b);
 si sub(si a, si b);
 si trunc1(si a);
+si round1(si a);
 ///
 
 si eval(si a);
