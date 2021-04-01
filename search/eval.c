@@ -24,6 +24,13 @@ si eval(si env, si a) {
   }
   case w_not:
     return mkint(!istrue(eval(env, hd(a))));
+  case w_or:
+    while (a != nil) {
+      if (istrue(eval(env, hd(a))))
+        return mkint(1);
+      a = tl(a);
+    }
+    return mkint(0);
   case w_quote:
     return hd(a);
   }

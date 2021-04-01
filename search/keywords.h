@@ -40,6 +40,7 @@ enum {
   w_lst,
   w_not,
   w_o,
+  w_or,
   w_product,
   w_quote,
   w_quotient,
@@ -71,4 +72,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[70];
+extern sym keywords[71];

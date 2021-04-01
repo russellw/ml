@@ -489,6 +489,12 @@ void test(void) {
 
     // and
     assert(eval(nil, list1(internz("and"))) == mkint(1));
+    assert(eval(nil, list2(internz("and"), mkint(0))) == mkint(0));
+    assert(eval(nil, list2(internz("and"), mkint(1))) == mkint(1));
+    assert(eval(nil, list3(internz("and"), mkint(0), mkint(0))) == mkint(0));
+    assert(eval(nil, list3(internz("and"), mkint(0), mkint(1))) == mkint(0));
+    assert(eval(nil, list3(internz("and"), mkint(1), mkint(0))) == mkint(0));
+    assert(eval(nil, list3(internz("and"), mkint(1), mkint(1))) == mkint(1));
   } else {
     puts(buf);
     exit(1);

@@ -38,6 +38,7 @@ lesseq
 lst
 not
 o
+or
 product
 quote
 quotient
