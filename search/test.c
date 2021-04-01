@@ -137,5 +137,23 @@ void test(void) {
 
   assert(div_c(mkrat("10"), mkrat("-1/10")) == mkrat("-100"));
   assert(div_c(mkrat("1/10"), mkrat("10")) == mkrat("1"));
+
+  // truncating division
+  assert(div_t2(mkint(5), mkint(3)) == mkint(5 / 3));
+  assert(div_t2(mkint(-5), mkint(3)) == mkint(-5 / 3));
+  assert(div_t2(mkint(5), mkint(-3)) == mkint(5 / -3));
+  assert(div_t2(mkint(-5), mkint(-3)) == mkint(-5 / -3));
+  assert(div_t2(mkint(5), mkint(3)) == mkint(1));
+  assert(div_t2(mkint(-5), mkint(3)) == mkint(-1));
+  assert(div_t2(mkint(5), mkint(-3)) == mkint(-1));
+  assert(div_t2(mkint(-5), mkint(-3)) == mkint(1));
+
+  assert(div_t2(mkrat("5/997"), mkrat("3/997")) == mkint(1));
+  assert(div_t2(mkrat("-5/997"), mkrat("3/997")) == mkint(-1));
+  assert(div_t2(mkrat("5/997"), mkrat("-3/997")) == mkint(-1));
+  assert(div_t2(mkrat("-5/997"), mkrat("-3/997")) == mkint(1));
+
+  assert(div_t2(mkrat("10"), mkrat("-1/10")) == mkrat("-100"));
+  assert(div_t2(mkrat("1/10"), mkrat("10")) == mkrat("0"));
 }
 #endif
