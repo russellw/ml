@@ -430,6 +430,22 @@ si div_t2(si a, si b) {
   return 0;
 }
 
+si exact(si a) {
+  switch (tag(a)) {
+  case t_float: {
+    Rat r;
+    mpq_init(r.val);
+    mpq_set_d(r.val, floatp(a)->val);
+    return irat(&r);
+  }
+  case t_int:
+  case t_rat:
+    return a;
+  }
+  err("exact: not a number");
+  return 0;
+}
+
 si floor1(si a) {
   switch (tag(a)) {
   case t_float:
@@ -444,6 +460,19 @@ si floor1(si a) {
   }
   }
   err("floor: not a number");
+  return 0;
+}
+
+si inexact(si a) {
+  switch (tag(a)) {
+  case t_float:
+    return a;
+  case t_int:
+    return ifloat(mpz_get_d(intp(a)->val));
+  case t_rat:
+    return ifloat(mpq_get_d(ratp(a)->val));
+  }
+  err("inexact: not a number");
   return 0;
 }
 

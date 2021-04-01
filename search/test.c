@@ -407,5 +407,16 @@ void test(void) {
   assert(istrue(mkrat("-1/65535")));
   assert(istrue(mkfloat(0.1)));
   assert(!istrue(mkfloat(0.0)));
+
+  // inexact
+  assert(inexact(mkint(-4)) == mkfloat(-4));
+  assert(inexact(mkfloat(-4)) == mkfloat(-4));
+  assert(inexact(mkrat("1/2")) == mkfloat(.5));
+
+  // exact
+  assert(exact(mkint(-4)) == mkint(-4));
+  assert(exact(mkfloat(-4)) == mkint(-4));
+  assert(exact(mkfloat(.5)) == mkrat("1/2"));
+  assert(exact(mkfloat(-0.0)) == mkint(0));
 }
 #endif
