@@ -51,6 +51,10 @@ static si mkrat(char *s) {
 void test(void) {
   assert(internz("abc") == internz("abc"));
 
+  mkfloat(0.123);
+  mkfloat(0.456);
+  mkfloat(0.789);
+
   si zero = mkint(0);
   si one = mkint(1);
   si two = mkint(2);
