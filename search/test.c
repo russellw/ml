@@ -495,6 +495,15 @@ void test(void) {
     assert(eval(nil, list3(internz("and"), mkint(0), mkint(1))) == mkint(0));
     assert(eval(nil, list3(internz("and"), mkint(1), mkint(0))) == mkint(0));
     assert(eval(nil, list3(internz("and"), mkint(1), mkint(1))) == mkint(1));
+
+    // or
+    assert(eval(nil, list1(internz("or"))) == mkint(0));
+    assert(eval(nil, list2(internz("or"), mkint(0))) == mkint(0));
+    assert(eval(nil, list2(internz("or"), mkint(1))) == mkint(1));
+    assert(eval(nil, list3(internz("or"), mkint(0), mkint(0))) == mkint(0));
+    assert(eval(nil, list3(internz("or"), mkint(0), mkint(1))) == mkint(1));
+    assert(eval(nil, list3(internz("or"), mkint(1), mkint(0))) == mkint(1));
+    assert(eval(nil, list3(internz("or"), mkint(1), mkint(1))) == mkint(1));
   } else {
     puts(buf);
     exit(1);
