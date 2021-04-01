@@ -37,10 +37,10 @@ typedef struct {
   char v[0x20 - sizeof(si)];
 } sym;
 
+#include "float.h"
 #include "int.h"
 #include "keywords.h"
 #include "rat.h"
-#include "float.h"
 #include "sym.h"
 #include "term.h"
 

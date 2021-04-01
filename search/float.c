@@ -5,9 +5,11 @@ static si cap = 0x10;
 static si count;
 static Float **entries;
 
-static size_t hash(Float *x) { return XXH64(&x->val,sizeof x->val,0); }
+static size_t hash(Float *x) { return XXH64(&x->val, sizeof x->val, 0); }
 
-static si eq(Float *x, Float *y) { return !memcmp(&x->val, &y->val,sizeof x->val); }
+static si eq(Float *x, Float *y) {
+  return !memcmp(&x->val, &y->val, sizeof x->val);
+}
 
 static si slot(Float **entries, si cap, Float *x) {
   si mask = cap - 1;
