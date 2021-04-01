@@ -65,3 +65,6 @@ static si keyword(si a) {
   size_t i = (char *)symp(a) - (char *)keywords;
   return i / sizeof(sym);
 }
+
+void print(si a);
+void println(si a);

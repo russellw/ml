@@ -443,7 +443,6 @@ void test(void) {
          cons(mkint(1), cons(mkint(2), empty)));
   assert(list4(internz("if"), mkint(1), mkint(2), mkint(3)) ==
          list4(internz("if"), mkint(1), mkint(2), mkint(3)));
-  exit(0);
 
   // lists
   caught = 0;
@@ -481,9 +480,14 @@ void test(void) {
   assert(eval(empty, mkint(5)) == mkint(5));
 
   // if
-  assert(eval(empty, list4(internz("if"), mkint(1), mkint(2), mkint(3))) ==
-         mkint(2));
-  assert(eval(empty, list4(internz("if"), mkint(0), mkint(2), mkint(3))) ==
-         mkint(3));
+  if (!setjmp(jmpbuf)) {
+    assert(eval(empty, list4(internz("if"), mkint(1), mkint(2), mkint(3))) ==
+           mkint(2));
+    assert(eval(empty, list4(internz("if"), mkint(0), mkint(2), mkint(3))) ==
+           mkint(3));
+  } else {
+    puts(buf);
+    exit(1);
+  }
 }
 #endif

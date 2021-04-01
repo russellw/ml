@@ -1051,7 +1051,7 @@ si eval(si env, si a) {
     return a;
   si op = hd(a);
   a = tl(a);
-  if (tag(op) != t_cons)
+  if (tag(op) != t_sym)
     err("eval: op is not a symbol");
   switch (keyword(op)) {
   case w_if: {
