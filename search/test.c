@@ -23,16 +23,19 @@ static si mkrat(char *s) {
 }
 
 void test(void) {
+  // symbols
   assert(internz("abc") == internz("abc"));
   assert(internz("") == internz(""));
   assert(internz("\t") == internz("\t"));
 
+  // rationals
   assert(mkrat("1/2") == mkrat("2/4"));
   assert(mkrat("0/1") == mkrat("0/2"));
   assert(mkrat("0/1") == mkrat("-0/2"));
   assert(mkrat("0/1") == mkint(0));
   assert(mkrat("10/1") == mkint(10));
 
+  // arithmetic
   assert(add(mkfloat(0.5), mkfloat(0.5)) == mkfloat(1.0));
   assert(add(mkfloat(1.0), mkfloat(2.0)) == mkfloat(3.0));
   assert(add(mkfloat(10.0), mkfloat(-0.5)) == mkfloat(9.5));
@@ -227,5 +230,10 @@ void test(void) {
   assert(rem_e(mkrat("-7/997"), mkrat("3/997")) == mkint(2 * 997));
   assert(rem_e(mkrat("7/997"), mkrat("-3/997")) == mkint(1 * 997));
   assert(rem_e(mkrat("-7/997"), mkrat("-3/997")) == mkint(2 * 997));
+
+  // unary arithmetic
+  assert(minus(mkfloat(2.5)) == mkfloat(-2.5));
+  assert(minus(mkint(2)) == mkint(-2));
+  assert(minus(mkrat("-1/7")) == mkrat("1/7"));
 }
 #endif

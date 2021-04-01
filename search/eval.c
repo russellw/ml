@@ -392,6 +392,27 @@ si div_t2(si a, si b) {
   return 0;
 }
 
+si minus(si a) {
+  switch (tag(a)) {
+  case t_float:
+    return ifloat(-floatp(a)->val);
+  case t_int: {
+    Int r;
+    mpz_init(r.val);
+    mpz_neg(r.val, intp(a)->val);
+    return iint(&r);
+  }
+  case t_rat: {
+    Rat r;
+    mpq_init(r.val);
+    mpq_neg(r.val, ratp(a)->val);
+    return irat(&r);
+  }
+  }
+  err("minus: not a number");
+  return 0;
+}
+
 si mul(si a, si b) {
   switch (tag(a)) {
   case t_float:

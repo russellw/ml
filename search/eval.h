@@ -6,6 +6,7 @@ si div_c(si a, si b);
 si div_e(si a, si b);
 si div_f(si a, si b);
 si div_t2(si a, si b);
+si minus(si a);
 si mul(si a, si b);
 si rem_c(si a, si b);
 si rem_e(si a, si b);
