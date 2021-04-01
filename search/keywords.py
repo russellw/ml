@@ -32,7 +32,11 @@ with open("keywords.h", "w") as f:
     f.write("// AUTO GENERATED FILE - DO NOT MODIFY\n")
     f.write("enum {\n")
     for s in lines:
-        f.write("k_" + s + ",\n")
+        s1 = s.split(",")
+        if len(s1) == 1:
+            f.write("w_" + s + ",\n")
+        else:
+            f.write("s_" + s1[1] + ",\n")
     f.write("};\n")
     f.write(f"extern sym keywords[{len(lines)}];\n")
 
@@ -42,5 +46,8 @@ with open("keywords.c", "w") as f:
     f.write('#include "main.h"\n')
     f.write("sym keywords [] = {\n")
     for s in lines:
+        s1 = s.split(",")
+        if len(s1) == 2:
+            s = s1[0]
         f.write("{" + str(len(s)) + ',"' + s + '"},\n')
     f.write("};\n")

@@ -97,9 +97,9 @@ void parse(si argc, char **argv) {
 
     // option
     switch (keyword(internz(s))) {
-    case k_V:
-    case k_v:
-    case k_version:
+    case w_V:
+    case w_v:
+    case w_version:
       printf("Aklo " version ", %zu-bit "
 #ifdef DEBUG
              "debug"
@@ -109,8 +109,8 @@ void parse(si argc, char **argv) {
              " build\n",
              sizeof(void *) * 8);
       exit(0);
-    case k_h:
-    case k_help:
+    case w_h:
+    case w_help:
       help();
       exit(0);
     default:

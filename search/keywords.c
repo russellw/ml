@@ -1,6 +1,7 @@
 // AUTO GENERATED FILE - DO NOT MODIFY
 #include "main.h"
 sym keywords[] = {
+    {1, "+"},
     {1, "T"},
     {1, "V"},
     {7, "ceiling"},
