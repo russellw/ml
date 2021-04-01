@@ -43,6 +43,12 @@ void init_rats(void) { entries = xcalloc(cap, sizeof *entries); }
 
 si irat(Rat *x) {
   mpq_canonicalize(x->val);
+  if (!mpz_cmp_ui(mpq_denref(x->val), 1)) {
+    Int x1;
+    mpz_init_set(x1.val, mpq_numref(x->val));
+    mpq_clear(x->val);
+    return iint(&x1);
+  }
   si i = slot(entries, cap, x);
   if (entries[i])
     mpq_clear(x->val);

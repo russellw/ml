@@ -30,6 +30,8 @@ void test(void) {
   assert(mkrat("1/2") == mkrat("2/4"));
   assert(mkrat("0/1") == mkrat("0/2"));
   assert(mkrat("0/1") == mkrat("-0/2"));
+  assert(mkrat("0/1") == mkint(0));
+  assert(mkrat("10/1") == mkint(10));
 
   assert(add(mkfloat(0.5), mkfloat(0.5)) == mkfloat(1.0));
   assert(add(mkfloat(1.0), mkfloat(2.0)) == mkfloat(3.0));
