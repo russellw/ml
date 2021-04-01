@@ -1,17 +1,15 @@
 #include "main.h"
 
-// interned rationals
+// interned floating-point numbers
 static si cap = 0x10;
 static si count;
-static Rat **entries;
+static Float **entries;
 
-static size_t hash(Rat *x) {
-  return mpz_get_ui(mpq_numref(x->val)) ^ mpz_get_ui(mpq_denref(x->val));
-}
+static size_t hash(Float *x) { return XXH64(&x->val,sizeof x->val,0); }
 
-static si eq(Rat *x, Rat *y) { return mpq_equal(x->val, y->val); }
+static si eq(Float *x, Float *y) { return !memcmp(&x->val, &y->val,sizeof x->val); }
 
-static si slot(Rat **entries, si cap, Rat *x) {
+static si slot(Float **entries, si cap, Float *x) {
   si mask = cap - 1;
   si i = hash(x) & mask;
   while (entries[i] && !eq(entries[i], x))
@@ -22,9 +20,9 @@ static si slot(Rat **entries, si cap, Rat *x) {
 static void expand(void) {
   assert(ispow2(cap));
   si cap1 = cap * 2;
-  Rat **entries1 = xcalloc(cap1, sizeof *entries);
+  Float **entries1 = xcalloc(cap1, sizeof *entries);
   for (si i = 0; i < cap; i++) {
-    Rat *x = entries[i];
+    Float *x = entries[i];
     if (x)
       entries1[slot(entries1, cap1, x)] = x;
   }
@@ -33,20 +31,18 @@ static void expand(void) {
   entries = entries1;
 }
 
-static Rat *store(Rat *x) {
-  Rat *r = xmalloc(sizeof *x);
+static Float *store(Float *x) {
+  Float *r = xmalloc(sizeof *x);
   *r = *x;
   return r;
 }
 
-void init_rats(void) { entries = xcalloc(cap, sizeof *entries); }
+void init_floats(void) { entries = xcalloc(cap, sizeof *entries); }
 
-Rat *intern_rat(Rat *x) {
+Float *intern_float(Float *x) {
   si i = slot(entries, cap, x);
-  if (entries[i]) {
-    mpq_clear(x->val);
+  if (entries[i])
     return entries[i];
-  }
   if (++count > cap * 3 / 4) {
     expand();
     i = slot(entries, cap, x);

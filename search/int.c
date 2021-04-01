@@ -1,5 +1,3 @@
-#include "stdafx.h"
-// stdafx.h must be first
 #include "main.h"
 
 void mpz_ediv_q(mpz_t q, mpz_t n, mpz_t d) {
