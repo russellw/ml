@@ -11,6 +11,7 @@ sym keywords[] = {
     {1, "="},
     {1, "T"},
     {1, "V"},
+    {3, "and"},
     {7, "ceiling"},
     {3, "cnf"},
     {10, "conjecture"},

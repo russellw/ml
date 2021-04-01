@@ -8,6 +8,7 @@
 =,eq
 T
 V
+and
 ceiling
 cnf
 conjecture

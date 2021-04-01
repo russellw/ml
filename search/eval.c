@@ -8,6 +8,13 @@ si eval(si env, si a) {
   if (tag(op) != t_sym)
     err("eval: op is not a symbol");
   switch (keyword(op)) {
+  case w_and:
+    while (a != nil) {
+      if (!istrue(eval(env, hd(a))))
+        return mkint(0);
+      a = tl(a);
+    }
+    return mkint(1);
   case w_if: {
     si test = eval(env, hd(a));
     a = tl(a);

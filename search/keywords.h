@@ -10,6 +10,7 @@ enum {
   s_eq,
   w_T,
   w_V,
+  w_and,
   w_ceiling,
   w_cnf,
   w_conjecture,
@@ -70,4 +71,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[69];
+extern sym keywords[70];

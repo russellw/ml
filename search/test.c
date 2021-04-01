@@ -470,15 +470,25 @@ void test(void) {
 
   // eval
   if (!setjmp(jmpbuf)) {
+    // constant
     assert(eval(nil, mkint(5)) == mkint(5));
+
+    // if
     assert(eval(nil, list4(internz("if"), mkint(1), mkint(2), mkint(3))) ==
            mkint(2));
     assert(eval(nil, list4(internz("if"), mkint(0), mkint(2), mkint(3))) ==
            mkint(3));
+
+    // quote
     assert(eval(nil, list2(internz("quote"), internz("foo"))) ==
            internz("foo"));
+
+    // not
     assert(eval(nil, list2(internz("not"), mkint(2))) == mkint(0));
     assert(eval(nil, list2(internz("not"), mkint(0))) == mkint(1));
+
+    // and
+    assert(eval(nil, list1(internz("and"))) == mkint(1));
   } else {
     puts(buf);
     exit(1);
