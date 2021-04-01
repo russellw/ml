@@ -15,6 +15,8 @@ si eval(si env, si a) {
       a = tl(a);
     return eval(env, hd(a));
   }
+  case w_not:
+    return mkint(!istrue(eval(env, hd(a))));
   case w_quote:
     return hd(a);
   }

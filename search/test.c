@@ -7,14 +7,6 @@ static si mkfloat(double val) {
   return r;
 }
 
-static si mkint(si val) {
-  Int x;
-  mpz_init_set_si(x.val, val);
-  si r = iint(&x);
-  assert(mpz_get_si(intp(r)->val) == val);
-  return r;
-}
-
 static si mkrat(char *s) {
   Rat x;
   mpq_init(x.val);
@@ -485,6 +477,8 @@ void test(void) {
            mkint(3));
     assert(eval(nil, list2(internz("quote"), internz("foo"))) ==
            internz("foo"));
+    assert(eval(nil, list2(internz("not"), mkint(2))) == mkint(0));
+    assert(eval(nil, list2(internz("not"), mkint(0))) == mkint(1));
   } else {
     puts(buf);
     exit(1);

@@ -38,6 +38,7 @@ sym keywords[] = {
     {4, "less"},
     {6, "lesseq"},
     {3, "lst"},
+    {3, "not"},
     {1, "o"},
     {7, "product"},
     {5, "quote"},

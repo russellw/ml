@@ -35,6 +35,7 @@ ite
 less
 lesseq
 lst
+not
 o
 product
 quote

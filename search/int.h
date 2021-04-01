@@ -8,4 +8,8 @@ typedef struct {
 } Int;
 
 void init_ints(void);
+
+// SORT
 si iint(Int *x);
+si mkint(si val);
+///

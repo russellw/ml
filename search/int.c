@@ -92,6 +92,7 @@ static Int *store(Int *x) {
 
 void init_ints(void) { entries = xcalloc(cap, sizeof *entries); }
 
+// SORT
 si iint(Int *x) {
   si i = slot(entries, cap, x);
   if (entries[i])
@@ -105,3 +106,10 @@ si iint(Int *x) {
   }
   return term(entries[i], t_int);
 }
+
+si mkint(si val) {
+  Int x;
+  mpz_init_set_si(x.val, val);
+  return iint(&x);
+}
+///
