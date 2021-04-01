@@ -269,5 +269,14 @@ void test(void) {
   assert(floor1(mkfloat(-0.1)) == mkfloat(-1.0));
   assert(floor1(mkfloat(-0.5)) == mkfloat(-1.0));
   assert(floor1(mkfloat(-0.9)) == mkfloat(-1.0));
+
+  // truncate
+  assert(trunc1(mkrat("0")) == mkrat("0"));
+  assert(trunc1(mkrat("1/10")) == mkrat("0"));
+  assert(trunc1(mkrat("5/10")) == mkrat("0"));
+  assert(trunc1(mkrat("9/10")) == mkrat("0"));
+  assert(trunc1(mkrat("-1/10")) == mkrat("0"));
+  assert(trunc1(mkrat("-5/10")) == mkrat("0"));
+  assert(trunc1(mkrat("-9/10")) == mkrat("0"));
 }
 #endif
