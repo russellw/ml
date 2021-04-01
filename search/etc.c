@@ -40,8 +40,11 @@ si assertfail(char *file, si line, char *s) {
 }
 #endif
 
-// sized for largest TPTP symbols
+// buf is sized for largest TPTP symbols
+// SORT
 char buf[20000];
+jmp_buf jmpbuf;
+///
 
 // SORT
 char *basename(char *file) {
@@ -59,9 +62,8 @@ char *basename(char *file) {
 }
 
 noret err(char *msg) {
-  fprintf(stderr, "%s\n", msg);
-  stacktrace();
-  exit(1);
+  strcpy(buf, msg);
+  longjmp(jmpbuf, 1);
 }
 
 size_t fnv(char *s, si n) {

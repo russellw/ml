@@ -57,6 +57,7 @@ si add(si a, si b) {
     }
     break;
   }
+  err("+: not a number");
   return 0;
 }
 

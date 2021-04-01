@@ -28,14 +28,17 @@ si assertfail(char *file, si line, char *s);
 
 #endif
 
-extern char buf[20000];
-
 #define isalpha1(c) (islower1(c) || isupper1(c))
 #define isdigit1(c) ('0' <= (c) && (c) <= '9')
 #define islower1(c) ('a' <= (c) && (c) <= 'z')
 #define ispow2(n) (!((n) & (n)-1))
 #define isspace1(c) ((c) <= ' ' && (c))
 #define isupper1(c) ('A' <= (c) && (c) <= 'Z')
+
+// SORT
+extern char buf[20000];
+extern jmp_buf jmpbuf;
+///
 
 // SORT
 char *basename(char *file);

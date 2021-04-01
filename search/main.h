@@ -3,6 +3,7 @@
 #define _CRTDBG_MAP_ALLOC_NEW
 #endif
 #include <errno.h>
+#include <setjmp.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
