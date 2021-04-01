@@ -9,6 +9,22 @@ si add(si a, si b) {
       Float *b1 = floatp(b);
       return term(intern_float(a1->val + b1->val), t_float);
     }
+    case t_int: {
+      Int *b1 = intp(b);
+      return term(intern_float(a1->val + mpz_get_d(b1->val)), t_float);
+    }
+    }
+  }
+  case t_int: {
+    Int *a1 = intp(a);
+    switch (tag(b)) {
+    case t_int: {
+      Int *b1 = intp(b);
+      Int r;
+      mpz_init(r.val);
+      mpz_add(r.val, a1->val, b1->val);
+      return term(intern_int(&r), t_int);
+    }
     }
   }
   }

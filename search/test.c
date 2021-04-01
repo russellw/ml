@@ -51,19 +51,12 @@ static si mkrat(char *s) {
 void test(void) {
   assert(internz("abc") == internz("abc"));
 
-  mkfloat(0.123);
-  mkfloat(0.456);
-  mkfloat(0.789);
-
-  si zero = mkint(0);
-  si one = mkint(1);
-  si two = mkint(2);
-  si three = mkint(3);
-
-  si half = mkrat("1/2");
-  si third = mkrat("1/3");
-  si sixth = mkrat("1/6");
-
   assert(add(mkfloat(0.5), mkfloat(0.5)) == mkfloat(1.0));
+  assert(add(mkfloat(1.0), mkfloat(2.0)) == mkfloat(3.0));
+  assert(add(mkfloat(10.0), mkfloat(-0.5)) == mkfloat(9.5));
+
+  assert(add(mkint(11), mkint(12)) == mkint(23));
+  assert(add(mkint(11), mkint(-12)) == mkint(-1));
+  assert(add(mkint(0), mkint(-12)) == mkint(-12));
 }
 #endif
