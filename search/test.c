@@ -134,6 +134,20 @@ void test(void) {
   assert(rem_f(mkrat("5/997"), mkrat("-3/997")) == mkint(-1 * 997));
   assert(rem_f(mkrat("-5/997"), mkrat("-3/997")) == mkint(-2 * 997));
 
+  caught = 0;
+  if (!setjmp(jmpbuf))
+    div_f(mkrat("2/3"), mkint(0));
+  else
+    caught = 1;
+  assert(caught);
+
+  caught = 0;
+  if (!setjmp(jmpbuf))
+    div_f(mkrat("2/3"), mkfloat(1));
+  else
+    caught = 1;
+  assert(caught);
+
   // ceiling division
   assert(div_c(mkint(5), mkint(3)) == mkint(2));
   assert(div_c(mkint(-5), mkint(3)) == mkint(-1));
