@@ -1,6 +1,18 @@
 #include "main.h"
 
 #ifdef DEBUG
+static si mkfloat(double val) {
+  Float *p = intern_float(val);
+  assert(p->val == val);
+
+  assert(intern_float(val) == p);
+
+  si r = term(p, t_float);
+  assert(tag(r) == t_float);
+  assert(floatp(r) == p);
+  return r;
+}
+
 static si mkint(si val) {
   Int x;
   mpz_init_set_si(x.val, val);
