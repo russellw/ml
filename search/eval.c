@@ -18,7 +18,7 @@ si add(si a, si b) {
       Int r;
       mpz_init(r.val);
       mpz_add(r.val, intp(a)->val, intp(b)->val);
-      return term(iint(&r), t_int);
+      return iint(&r);
     }
     }
     break;

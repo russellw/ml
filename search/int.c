@@ -92,15 +92,16 @@ static Int *store(Int *x) {
 
 void init_ints(void) { entries = xcalloc(cap, sizeof *entries); }
 
-Int *iint(Int *x) {
+si iint(Int *x) {
   si i = slot(entries, cap, x);
-  if (entries[i]) {
+  if (entries[i])
     mpz_clear(x->val);
-    return entries[i];
+  else {
+    if (++count > cap * 3 / 4) {
+      expand();
+      i = slot(entries, cap, x);
+    }
+    entries[i] = store(x);
   }
-  if (++count > cap * 3 / 4) {
-    expand();
-    i = slot(entries, cap, x);
-  }
-  return entries[i] = store(x);
+  return term(entries[i], t_int);
 }

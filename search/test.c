@@ -3,7 +3,6 @@
 #ifdef DEBUG
 static si mkfloat(double val) {
   si r = ifloat(val);
-  assert(tag(r) == t_float);
   assert(floatp(r)->val == val);
   return r;
 }
@@ -11,16 +10,8 @@ static si mkfloat(double val) {
 static si mkint(si val) {
   Int x;
   mpz_init_set_si(x.val, val);
-  Int *p = iint(&x);
-  assert(mpz_get_si(p->val) == val);
-
-  Int y;
-  mpz_init_set_si(y.val, val);
-  assert(iint(&y) == p);
-
-  si r = term(p, t_int);
-  assert(tag(r) == t_int);
-  assert(intp(r) == p);
+  si r = iint(&x);
+  assert(mpz_get_si(intp(r)->val) == val);
   return r;
 }
 
