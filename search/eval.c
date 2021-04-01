@@ -5,15 +5,15 @@ si add(si a, si b) {
   case t_float:
     switch (tag(b)) {
     case t_float:
-      return term(ifloat(floatp(a)->val + floatp(b)->val), t_float);
+      return ifloat(floatp(a)->val + floatp(b)->val);
     case t_int:
-      return term(ifloat(floatp(a)->val + mpz_get_d(intp(b)->val)), t_float);
+      return ifloat(floatp(a)->val + mpz_get_d(intp(b)->val));
     }
     break;
   case t_int:
     switch (tag(b)) {
     case t_float:
-      return term(ifloat(mpz_get_d(intp(a)->val) + floatp(b)->val), t_float);
+      return ifloat(mpz_get_d(intp(a)->val) + floatp(b)->val);
     case t_int: {
       Int r;
       mpz_init(r.val);
@@ -25,7 +25,7 @@ si add(si a, si b) {
   case t_rat:
     switch (tag(b)) {
     case t_float:
-      return term(ifloat(mpq_get_d(ratp(a)->val) + floatp(b)->val), t_float);
+      return ifloat(mpq_get_d(ratp(a)->val) + floatp(b)->val);
     case t_rat: {
       Rat r;
       mpq_init(r.val);

@@ -3,4 +3,4 @@ typedef struct {
 } Float;
 
 void init_floats(void);
-Float *ifloat(double val);
+si ifloat(double val);

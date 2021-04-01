@@ -41,15 +41,16 @@ static Float *store(Float *x) {
 
 void init_floats(void) { entries = xcalloc(cap, sizeof *entries); }
 
-Float *ifloat(double val) {
+si ifloat(double val) {
   Float x;
   x.val = val;
   si i = slot(entries, cap, &x);
-  if (entries[i])
-    return entries[i];
-  if (++count > cap * 3 / 4) {
-    expand();
-    i = slot(entries, cap, &x);
+  if (!entries[i]) {
+    if (++count > cap * 3 / 4) {
+      expand();
+      i = slot(entries, cap, &x);
+    }
+    entries[i] = store(&x);
   }
-  return entries[i] = store(&x);
+  return term(entries[i], t_float);
 }

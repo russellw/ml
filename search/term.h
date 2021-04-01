@@ -5,10 +5,24 @@ enum {
   t_rat,
   t_sym,
   ///
+
+  t_max
 };
 
-#define term(p, t) ((si)(p) + (t))
-#define tag(a) ((a)&7)
+// make a term
+static si term(void *p, si t) {
+  assert(p);
+  assert(0 <= t);
+  assert(t < t_max);
+  return (si)p + t;
+}
+
+// unpack a term
+static si tag(si a) {
+  si t = a & 7;
+  assert(t < t_max);
+  return t;
+}
 
 static Float *floatp(si a) {
   assert(tag(a) == t_float);

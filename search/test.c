@@ -2,14 +2,9 @@
 
 #ifdef DEBUG
 static si mkfloat(double val) {
-  Float *p = ifloat(val);
-  assert(p->val == val);
-
-  assert(ifloat(val) == p);
-
-  si r = term(p, t_float);
+  si r = ifloat(val);
   assert(tag(r) == t_float);
-  assert(floatp(r) == p);
+  assert(floatp(r)->val == val);
   return r;
 }
 
