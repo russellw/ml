@@ -109,5 +109,19 @@ void test(void) {
   else
     caught = 1;
   assert(caught);
+
+  // floor division
+  assert(div_f(mkint(5), mkint(3)) == mkint(1));
+  assert(div_f(mkint(-5), mkint(3)) == mkint(-2));
+  assert(div_f(mkint(5), mkint(-3)) == mkint(-2));
+  assert(div_f(mkint(-5), mkint(-3)) == mkint(1));
+
+  assert(div_f(mkrat("5/997"), mkrat("3/997")) == mkint(1));
+  assert(div_f(mkrat("-5/997"), mkrat("3/997")) == mkint(-2));
+  assert(div_f(mkrat("5/997"), mkrat("-3/997")) == mkint(-2));
+  assert(div_f(mkrat("-5/997"), mkrat("-3/997")) == mkint(1));
+
+  assert(div_f(mkrat("10"), mkrat("-1/10")) == mkrat("-100"));
+  assert(div_f(mkrat("1/10"), mkrat("10")) == mkrat("0"));
 }
 #endif

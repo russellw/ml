@@ -253,6 +253,71 @@ si sub(si a, si b) {
   err("-: not a number");
   return 0;
 }
+
+si div_f(si a, si b) {
+  switch (tag(a)) {
+  case t_int:
+    switch (tag(b)) {
+    case t_int: {
+      if (!mpz_sgn(intp(b)->val))
+        err("division by zero");
+      Int q;
+      mpz_init(q.val);
+      mpz_fdiv_q(q.val, intp(a)->val, intp(b)->val);
+      return iint(&q);
+    }
+    case t_rat: {
+      assert(mpq_sgn(ratp(b)->val));
+      Int q;
+      mpz_init(q.val);
+      mpz_mul(q.val, intp(a)->val, mpq_denref(ratp(b)->val));
+      mpz_fdiv_q(q.val, q.val, mpq_numref(ratp(b)->val));
+      return iint(&q);
+    }
+    }
+    break;
+  case t_rat:
+    switch (tag(b)) {
+    case t_int: {
+      if (!mpz_sgn(intp(b)->val))
+        err("division by zero");
+
+      mpz_t nden_d;
+      mpz_init(nden_d);
+      mpz_mul(nden_d, mpq_denref(ratp(a)->val), intp(b)->val);
+
+      Int q;
+      mpz_init(q.val);
+      mpz_fdiv_q(q.val, mpq_numref(ratp(a)->val), nden_d);
+
+      mpz_clear(nden_d);
+      return iint(&q);
+    }
+    case t_rat: {
+      assert(mpq_sgn(ratp(b)->val));
+
+      mpz_t nnum_dden;
+      mpz_init(nnum_dden);
+      mpz_mul(nnum_dden, mpq_numref(ratp(a)->val), mpq_denref(ratp(b)->val));
+
+      mpz_t nden_dnum;
+      mpz_init(nden_dnum);
+      mpz_mul(nden_dnum, mpq_denref(ratp(a)->val), mpq_numref(ratp(b)->val));
+
+      Int q;
+      mpz_init(q.val);
+      mpz_fdiv_q(q.val, nnum_dden, nden_dnum);
+
+      mpz_clear(nden_dnum);
+      mpz_clear(nnum_dden);
+      return iint(&q);
+    }
+    }
+    break;
+  }
+  err("div_f: not an exact number");
+  return 0;
+}
 ///
 
 si eval(si a) { return a; }
