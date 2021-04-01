@@ -40,6 +40,7 @@ sym keywords[] = {
     {3, "lst"},
     {1, "o"},
     {7, "product"},
+    {5, "quote"},
     {8, "quotient"},
     {10, "quotient_e"},
     {10, "quotient_f"},

@@ -39,6 +39,7 @@ enum {
   w_lst,
   w_o,
   w_product,
+  w_quote,
   w_quotient,
   w_quotient_e,
   w_quotient_f,
@@ -68,4 +69,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[67];
+extern sym keywords[68];

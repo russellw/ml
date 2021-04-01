@@ -477,14 +477,14 @@ void test(void) {
   assert(tl(cons(mkint(1), empty)) == empty);
 
   // eval
-  assert(eval(empty, mkint(5)) == mkint(5));
-
-  // if
   if (!setjmp(jmpbuf)) {
+    assert(eval(empty, mkint(5)) == mkint(5));
     assert(eval(empty, list4(internz("if"), mkint(1), mkint(2), mkint(3))) ==
            mkint(2));
     assert(eval(empty, list4(internz("if"), mkint(0), mkint(2), mkint(3))) ==
            mkint(3));
+    assert(eval(empty, list2(internz("quote"), internz("foo"))) ==
+           internz("foo"));
   } else {
     puts(buf);
     exit(1);

@@ -37,6 +37,7 @@ lesseq
 lst
 o
 product
+quote
 quotient
 quotient_e
 quotient_f
