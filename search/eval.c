@@ -1,6 +1,27 @@
 #include "main.h"
 
 // SORT
+si abs1(si a) {
+  switch (tag(a)) {
+  case t_float:
+    return ifloat(fabs(floatp(a)->val));
+  case t_int: {
+    Int r;
+    mpz_init(r.val);
+    mpz_abs(r.val, intp(a)->val);
+    return iint(&r);
+  }
+  case t_rat: {
+    Rat r;
+    mpq_init(r.val);
+    mpq_abs(r.val, ratp(a)->val);
+    return irat(&r);
+  }
+  }
+  err("abs: not a number");
+  return 0;
+}
+
 si add(si a, si b) {
   switch (tag(a)) {
   case t_float:
@@ -768,6 +789,23 @@ si rem_t(si a, si b) {
   return 0;
 }
 
+si round1(si a) {
+  switch (tag(a)) {
+  case t_float:
+    return ifloat(round(floatp(a)->val));
+  case t_int:
+    return a;
+  case t_rat: {
+    Int r;
+    mpz_init(r.val);
+    mpz_qround(r.val, mpq_numref(ratp(a)->val), mpq_denref(ratp(a)->val));
+    return iint(&r);
+  }
+  }
+  err("round: not a number");
+  return 0;
+}
+
 si sub(si a, si b) {
   switch (tag(a)) {
   case t_float:
@@ -843,23 +881,6 @@ si trunc1(si a) {
   }
   }
   err("trunc: not a number");
-  return 0;
-}
-
-si round1(si a) {
-  switch (tag(a)) {
-  case t_float:
-    return ifloat(round(floatp(a)->val));
-  case t_int:
-    return a;
-  case t_rat: {
-    Int r;
-    mpz_init(r.val);
-    mpz_qround(r.val, mpq_numref(ratp(a)->val), mpq_denref(ratp(a)->val));
-    return iint(&r);
-  }
-  }
-  err("round: not a number");
   return 0;
 }
 ///

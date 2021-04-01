@@ -305,5 +305,22 @@ void test(void) {
   assert(round1(mkfloat(0.9)) == mkfloat(1.0));
   assert(round1(mkfloat(-0.1)) == mkfloat(-0.0));
   assert(round1(mkfloat(-0.9)) == mkfloat(-1.0));
+
+  // abs
+  assert(abs1(mkrat("0")) == mkrat("0"));
+  assert(abs1(mkrat("1/10")) == mkrat("1/10"));
+  assert(abs1(mkrat("5/10")) == mkrat("5/10"));
+  assert(abs1(mkrat("9/10")) == mkrat("9/10"));
+  assert(abs1(mkrat("-1/10")) == mkrat("1/10"));
+  assert(abs1(mkrat("-5/10")) == mkrat("5/10"));
+  assert(abs1(mkrat("-9/10")) == mkrat("9/10"));
+
+  assert(abs1(mkfloat(0)) == mkfloat(0));
+  assert(abs1(mkfloat(0.1)) == mkfloat(0.1));
+  assert(abs1(mkfloat(0.5)) == mkfloat(0.5));
+  assert(abs1(mkfloat(0.9)) == mkfloat(0.9));
+  assert(abs1(mkfloat(-0.1)) == mkfloat(0.1));
+  assert(abs1(mkfloat(-0.5)) == mkfloat(0.5));
+  assert(abs1(mkfloat(-0.9)) == mkfloat(0.9));
 }
 #endif

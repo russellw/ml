@@ -1,5 +1,6 @@
 // some obvious names e.g. 'div' and 'div_t' are taken
 // SORT
+si abs1(si a);
 si add(si a, si b);
 si ceil1(si a);
 si div2(si a, si b);
@@ -14,9 +15,9 @@ si rem_c(si a, si b);
 si rem_e(si a, si b);
 si rem_f(si a, si b);
 si rem_t(si a, si b);
+si round1(si a);
 si sub(si a, si b);
 si trunc1(si a);
-si round1(si a);
 ///
 
 si eval(si a);
