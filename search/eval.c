@@ -447,6 +447,18 @@ si floor1(si a) {
   return 0;
 }
 
+int istrue(si a) {
+  switch (tag(a)) {
+  case t_float:
+    return floatp(a)->val != 0;
+  case t_int:
+    return mpz_sgn(intp(a)->val);
+  case t_rat:
+    return mpq_sgn(ratp(a)->val);
+  }
+  return 1;
+}
+
 int le(si a, si b) {
   switch (tag(a)) {
   case t_float:

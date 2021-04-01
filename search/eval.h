@@ -9,6 +9,7 @@ si div_e(si a, si b);
 si div_f(si a, si b);
 si div_t2(si a, si b);
 si floor1(si a);
+int istrue(si a);
 int le(si a, si b);
 int lt(si a, si b);
 si minus(si a);

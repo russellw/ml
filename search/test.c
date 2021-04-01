@@ -400,5 +400,12 @@ void test(void) {
 
   assert(le(mkrat("3/10"), mkrat("10/10")));
   assert(!le(mkrat("13/10"), mkrat("10/10")));
+
+  // truth
+  assert(istrue(mkint(5)));
+  assert(!istrue(mkint(0)));
+  assert(istrue(mkrat("-1/65535")));
+  assert(istrue(mkfloat(0.1)));
+  assert(!istrue(mkfloat(0.0)));
 }
 #endif
