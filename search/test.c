@@ -231,9 +231,43 @@ void test(void) {
   assert(rem_e(mkrat("7/997"), mkrat("-3/997")) == mkint(1 * 997));
   assert(rem_e(mkrat("-7/997"), mkrat("-3/997")) == mkint(2 * 997));
 
-  // unary arithmetic
+  // unary minus
   assert(minus(mkfloat(2.5)) == mkfloat(-2.5));
   assert(minus(mkint(2)) == mkint(-2));
   assert(minus(mkrat("-1/7")) == mkrat("1/7"));
+
+  // ceiling
+  assert(ceil1(mkrat("0")) == mkrat("0"));
+  assert(ceil1(mkrat("1/10")) == mkrat("1"));
+  assert(ceil1(mkrat("5/10")) == mkrat("1"));
+  assert(ceil1(mkrat("9/10")) == mkrat("1"));
+  assert(ceil1(mkrat("-1/10")) == mkrat("0"));
+  assert(ceil1(mkrat("-5/10")) == mkrat("0"));
+  assert(ceil1(mkrat("-9/10")) == mkrat("0"));
+
+  assert(ceil1(mkfloat(0)) == mkfloat(0));
+  assert(ceil1(mkfloat(0.1)) == mkfloat(1));
+  assert(ceil1(mkfloat(0.5)) == mkfloat(1));
+  assert(ceil1(mkfloat(0.9)) == mkfloat(1));
+  assert(ceil1(mkfloat(-0.1)) == mkfloat(-0.0));
+  assert(ceil1(mkfloat(-0.5)) == mkfloat(-0.0));
+  assert(ceil1(mkfloat(-0.9)) == mkfloat(-0.0));
+
+  // floor
+  assert(floor1(mkrat("0")) == mkrat("0"));
+  assert(floor1(mkrat("1/10")) == mkrat("0"));
+  assert(floor1(mkrat("5/10")) == mkrat("0"));
+  assert(floor1(mkrat("9/10")) == mkrat("0"));
+  assert(floor1(mkrat("-1/10")) == mkrat("-1"));
+  assert(floor1(mkrat("-5/10")) == mkrat("-1"));
+  assert(floor1(mkrat("-9/10")) == mkrat("-1"));
+
+  assert(floor1(mkfloat(0)) == mkfloat(0));
+  assert(floor1(mkfloat(0.1)) == mkfloat(0));
+  assert(floor1(mkfloat(0.5)) == mkfloat(0));
+  assert(floor1(mkfloat(0.9)) == mkfloat(0));
+  assert(floor1(mkfloat(-0.1)) == mkfloat(-1.0));
+  assert(floor1(mkfloat(-0.5)) == mkfloat(-1.0));
+  assert(floor1(mkfloat(-0.9)) == mkfloat(-1.0));
 }
 #endif

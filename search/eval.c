@@ -413,6 +413,40 @@ si minus(si a) {
   return 0;
 }
 
+si ceil1(si a) {
+  switch (tag(a)) {
+  case t_float:
+    return ifloat(ceil(floatp(a)->val));
+  case t_int:
+    return a;
+  case t_rat: {
+    Int r;
+    mpz_init(r.val);
+    mpz_cdiv_q(r.val, mpq_numref(ratp(a)->val), mpq_denref(ratp(a)->val));
+    return iint(&r);
+  }
+  }
+  err("ceil: not a number");
+  return 0;
+}
+
+si floor1(si a) {
+  switch (tag(a)) {
+  case t_float:
+    return ifloat(floor(floatp(a)->val));
+  case t_int:
+    return a;
+  case t_rat: {
+    Int r;
+    mpz_init(r.val);
+    mpz_fdiv_q(r.val, mpq_numref(ratp(a)->val), mpq_denref(ratp(a)->val));
+    return iint(&r);
+  }
+  }
+  err("floor: not a number");
+  return 0;
+}
+
 si mul(si a, si b) {
   switch (tag(a)) {
   case t_float:
