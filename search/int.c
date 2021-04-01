@@ -92,7 +92,7 @@ static Int *store(Int *x) {
 
 void init_ints(void) { entries = xcalloc(cap, sizeof *entries); }
 
-Int *intern_int(Int *x) {
+Int *iint(Int *x) {
   si i = slot(entries, cap, x);
   if (entries[i]) {
     mpz_clear(x->val);

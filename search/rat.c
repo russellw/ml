@@ -41,7 +41,7 @@ static Rat *store(Rat *x) {
 
 void init_rats(void) { entries = xcalloc(cap, sizeof *entries); }
 
-Rat *intern_rat(Rat *x) {
+Rat *irat(Rat *x) {
   mpq_canonicalize(x->val);
   si i = slot(entries, cap, x);
   if (entries[i]) {

@@ -2,10 +2,10 @@
 
 #ifdef DEBUG
 static si mkfloat(double val) {
-  Float *p = intern_float(val);
+  Float *p = ifloat(val);
   assert(p->val == val);
 
-  assert(intern_float(val) == p);
+  assert(ifloat(val) == p);
 
   si r = term(p, t_float);
   assert(tag(r) == t_float);
@@ -16,12 +16,12 @@ static si mkfloat(double val) {
 static si mkint(si val) {
   Int x;
   mpz_init_set_si(x.val, val);
-  Int *p = intern_int(&x);
+  Int *p = iint(&x);
   assert(mpz_get_si(p->val) == val);
 
   Int y;
   mpz_init_set_si(y.val, val);
-  assert(intern_int(&y) == p);
+  assert(iint(&y) == p);
 
   si r = term(p, t_int);
   assert(tag(r) == t_int);
@@ -33,12 +33,12 @@ static si mkrat(char *s) {
   Rat x;
   mpq_init(x.val);
   mpq_set_str(x.val, s, 10);
-  Rat *p = intern_rat(&x);
+  Rat *p = irat(&x);
 
   Rat y;
   mpq_init(y.val);
   mpq_set_str(y.val, s, 10);
-  assert(intern_rat(&y) == p);
+  assert(irat(&y) == p);
 
   si r = term(p, t_rat);
   assert(tag(r) == t_rat);

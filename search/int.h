@@ -8,4 +8,4 @@ typedef struct {
 } Int;
 
 void init_ints(void);
-Int *intern_int(Int *x);
+Int *iint(Int *x);

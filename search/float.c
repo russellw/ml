@@ -41,7 +41,7 @@ static Float *store(Float *x) {
 
 void init_floats(void) { entries = xcalloc(cap, sizeof *entries); }
 
-Float *intern_float(double val) {
+Float *ifloat(double val) {
   Float x;
   x.val = val;
   si i = slot(entries, cap, &x);
