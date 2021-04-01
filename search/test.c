@@ -22,7 +22,7 @@ static si mkrat(char *s) {
   return irat(&x);
 }
 
-static si list1(si a) { return cons(a, empty); }
+static si list1(si a) { return cons(a, nil); }
 
 static si list2(si a, si b) { return cons(a, list1(b)); }
 
@@ -429,7 +429,7 @@ void test(void) {
   assert(exact(mkfloat(-0.0)) == mkint(0));
 
   // cons
-  assert(tag(empty) == t_cons);
+  assert(tag(nil) == t_cons);
 
   caught = 0;
   if (!setjmp(jmpbuf))
@@ -438,9 +438,9 @@ void test(void) {
     caught = 1;
   assert(caught);
 
-  assert(cons(mkint(1), empty) == cons(mkint(1), empty));
-  assert(cons(mkint(1), cons(mkint(2), empty)) ==
-         cons(mkint(1), cons(mkint(2), empty)));
+  assert(cons(mkint(1), nil) == cons(mkint(1), nil));
+  assert(cons(mkint(1), cons(mkint(2), nil)) ==
+         cons(mkint(1), cons(mkint(2), nil)));
   assert(list4(internz("if"), mkint(1), mkint(2), mkint(3)) ==
          list4(internz("if"), mkint(1), mkint(2), mkint(3)));
 
@@ -461,29 +461,29 @@ void test(void) {
 
   caught = 0;
   if (!setjmp(jmpbuf))
-    hd(empty);
+    hd(nil);
   else
     caught = 1;
   assert(caught);
 
   caught = 0;
   if (!setjmp(jmpbuf))
-    tl(empty);
+    tl(nil);
   else
     caught = 1;
   assert(caught);
 
-  assert(hd(cons(mkint(1), empty)) == mkint(1));
-  assert(tl(cons(mkint(1), empty)) == empty);
+  assert(hd(cons(mkint(1), nil)) == mkint(1));
+  assert(tl(cons(mkint(1), nil)) == nil);
 
   // eval
   if (!setjmp(jmpbuf)) {
-    assert(eval(empty, mkint(5)) == mkint(5));
-    assert(eval(empty, list4(internz("if"), mkint(1), mkint(2), mkint(3))) ==
+    assert(eval(nil, mkint(5)) == mkint(5));
+    assert(eval(nil, list4(internz("if"), mkint(1), mkint(2), mkint(3))) ==
            mkint(2));
-    assert(eval(empty, list4(internz("if"), mkint(0), mkint(2), mkint(3))) ==
+    assert(eval(nil, list4(internz("if"), mkint(0), mkint(2), mkint(3))) ==
            mkint(3));
-    assert(eval(empty, list2(internz("quote"), internz("foo"))) ==
+    assert(eval(nil, list2(internz("quote"), internz("foo"))) ==
            internz("foo"));
   } else {
     puts(buf);

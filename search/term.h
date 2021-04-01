@@ -18,7 +18,7 @@ static si term(void *p, si t) {
   return (si)p + t;
 }
 
-#define empty term(0, t_cons)
+#define nil term(0, t_cons)
 
 // unpack a term
 static si tag(si a) {

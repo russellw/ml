@@ -472,7 +472,7 @@ si floor1(si a) {
 si hd(si s) {
   if (tag(s) != t_cons)
     err("hd: not a list");
-  if (s == empty)
+  if (s == nil)
     err("hd: empty list");
   return consp(s)->hd;
 }
@@ -687,7 +687,7 @@ void print(si a) {
   case t_cons: {
     putchar('(');
     int more = 0;
-    while (a != empty) {
+    while (a != nil) {
       if (more)
         putchar(' ');
       more = 1;
@@ -1059,7 +1059,7 @@ si sub(si a, si b) {
 si tl(si s) {
   if (tag(s) != t_cons)
     err("tl: not a list");
-  if (s == empty)
+  if (s == nil)
     err("tl: empty list");
   return consp(s)->tl;
 }
