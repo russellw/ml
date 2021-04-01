@@ -1051,5 +1051,16 @@ si eval(si env, si a) {
     return a;
   si op = hd(a);
   a = tl(a);
-  return a;
+  if (tag(op) != t_cons)
+    err("eval: op is not a symbol");
+  switch (keyword(op)) {
+  case w_if: {
+    si test = eval(env, hd(a));
+    a = tl(a);
+    if (!istrue(test))
+      a = tl(a);
+    return eval(env, hd(a));
+  }
+  }
+  err("eval: operator not found");
 }

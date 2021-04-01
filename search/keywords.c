@@ -29,6 +29,7 @@ sym keywords[] = {
     {1, "h"},
     {4, "help"},
     {1, "i"},
+    {2, "if"},
     {7, "include"},
     {3, "int"},
     {6, "is_int"},

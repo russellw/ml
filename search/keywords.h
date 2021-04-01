@@ -28,6 +28,7 @@ enum {
   w_h,
   w_help,
   w_i,
+  w_if,
   w_include,
   w_int,
   w_is_int,
@@ -67,4 +68,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[66];
+extern sym keywords[67];

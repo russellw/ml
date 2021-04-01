@@ -22,6 +22,14 @@ static si mkrat(char *s) {
   return irat(&x);
 }
 
+static si list1(si a) { return cons(a, empty); }
+
+static si list2(si a, si b) { return cons(a, list1(b)); }
+
+static si list3(si a, si b, si c) { return cons(a, list2(b, c)); }
+
+static si list4(si a, si b, si c, si d) { return cons(a, list3(b, c, d)); }
+
 void test(void) {
   // symbols
   assert(internz("abc") == internz("abc"));
@@ -433,6 +441,9 @@ void test(void) {
   assert(cons(mkint(1), empty) == cons(mkint(1), empty));
   assert(cons(mkint(1), cons(mkint(2), empty)) ==
          cons(mkint(1), cons(mkint(2), empty)));
+  assert(list4(internz("if"), mkint(1), mkint(2), mkint(3)) ==
+         list4(internz("if"), mkint(1), mkint(2), mkint(3)));
+  exit(0);
 
   // lists
   caught = 0;
@@ -465,5 +476,14 @@ void test(void) {
 
   assert(hd(cons(mkint(1), empty)) == mkint(1));
   assert(tl(cons(mkint(1), empty)) == empty);
+
+  // eval
+  assert(eval(empty, mkint(5)) == mkint(5));
+
+  // if
+  assert(eval(empty, list4(internz("if"), mkint(1), mkint(2), mkint(3))) ==
+         mkint(2));
+  assert(eval(empty, list4(internz("if"), mkint(0), mkint(2), mkint(3))) ==
+         mkint(3));
 }
 #endif
