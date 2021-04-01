@@ -1,5 +1,6 @@
 enum {
   // SORT
+  t_cons,
   t_float,
   t_int,
   t_rat,
@@ -17,11 +18,19 @@ static si term(void *p, si t) {
   return (si)p + t;
 }
 
+#define empty term(0, t_cons)
+
 // unpack a term
 static si tag(si a) {
   si t = a & 7;
   assert(t < t_max);
   return t;
+}
+
+// SORT
+static Cons *consp(si a) {
+  assert(tag(a) == t_cons);
+  return (Cons *)(a - t_cons);
 }
 
 static Float *floatp(si a) {
@@ -43,6 +52,7 @@ static sym *symp(si a) {
   assert(tag(a) == t_sym);
   return (sym *)(a - t_sym);
 }
+///
 
 static si keyword(si a) {
   // turn a symbol into a keyword number by subtracting the base of the keyword

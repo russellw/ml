@@ -25,6 +25,7 @@
 #include "vec.h"
 
 // data
+#include "cons.h"
 #include "float.h"
 #include "int.h"
 #include "rat.h"
