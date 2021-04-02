@@ -442,6 +442,14 @@ static si expr(void) {
       vpush(&v, expr());
     return list(&v);
   }
+  case '[': {
+    lex();
+    vec v;
+    vinit(&v);
+    while (!eat(']'))
+      vpush(&v, expr());
+    return list(&v);
+  }
   case k_term: {
     si a = tokterm;
     lex();

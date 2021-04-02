@@ -524,7 +524,14 @@ void test(void) {
 
   // parsing
   txt = "123";
-  si a = parse();
-  assert(a == list1(mkint(123)));
+  assert(parse() == list1(mkint(123)));
+
+  txt = "1 (2 3 4) 5";
+  assert(parse() ==
+         list3(mkint(1), list3(mkint(2), mkint(3), mkint(4)), mkint(5)));
+
+  txt = "1 [2 3 4] 5";
+  assert(parse() ==
+         list3(mkint(1), list3(mkint(2), mkint(3), mkint(4)), mkint(5)));
 }
 #endif
