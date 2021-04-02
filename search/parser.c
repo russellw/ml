@@ -131,6 +131,16 @@ static si list(vec *v) {
   return r;
 }
 
+static void id(void) {
+  char *s = txt;
+  assert(isid[*s]);
+  do
+    s++;
+  while (isid[*s]);
+  txt = s;
+  tok = k_id;
+}
+
 static int xdigit(int c) {
   if (isdigit1(c))
     return c - '0';
@@ -154,11 +164,10 @@ static int xescape(char **sp, int n) {
   return c;
 }
 
-static void quote(void) {
+static void quote(vec *v) {
   char *s = txt;
   int q = *s++;
-  vec v;
-  vinit(&v);
+  vinit(v);
   while (*s != q) {
     int c = *s++;
     switch (c) {
@@ -221,15 +230,13 @@ static void quote(void) {
       }
       break;
     case '\n': {
-      vfree(&v);
       err("unclosed quote");
     }
     }
-    vpush(&v, mkint(c));
+    vpush(v, mkint(c));
   }
   txt = s + 1;
   tok = k_term;
-  tokterm = list(&v);
 }
 
 static void numbase(char *s, int base) {
@@ -300,6 +307,7 @@ static void num(void) {
 static void lex(void) {
 loop:
   char *s = tokstart = txt;
+  vec v;
   switch (*s) {
   case ' ':
   case '\f':
@@ -310,7 +318,8 @@ loop:
     txt = s + 1;
     goto loop;
   case '"':
-    quote();
+    quote(&v);
+    tokterm = list2(term(keywords + w_quote, t_sym), list(&v));
     return;
   case '*':
   case '+':
@@ -372,18 +381,15 @@ loop:
   case 'x':
   case 'y':
   case 'z':
-    assert(isid[*s]);
-    do
-      s++;
-    while (isid[*s]);
-    txt = s;
-    tok = k_id;
+    id();
     return;
   case '-':
     if (isdigit1(s[1])) {
       num();
       return;
     }
+    id();
+    return;
   case '.':
     if (isdigit1(s[1])) {
       num();
@@ -406,7 +412,10 @@ loop:
     txt = strchr(s, '\n');
     goto loop;
   case '\'':
-    quote();
+    quote(&v);
+    if (v.n != 1)
+      err("expected one character");
+    tokterm = mkint(*v.p);
     return;
   case 0:
     tok = 0;
