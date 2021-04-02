@@ -10,7 +10,7 @@ static si mkfloat(double val) {
 static si mkrat(char *s) {
   Rat x;
   mpq_init(x.val);
-  mpq_set_str(x.val, s, 10);
+  mpq_set_str(x.val, s, 0);
   return irat(&x);
 }
 
@@ -508,5 +508,11 @@ void test(void) {
     puts(buf);
     exit(1);
   }
+
+  // parsing
+  assert(mkrat("0b10000") == mkint(16));
+  assert(mkrat(" -0B10000 ") == mkint(-16));
+  assert(mkrat("0x100") == mkrat("256"));
+  assert(mkrat("0x1/0x100") == mkrat("1/256"));
 }
 #endif
