@@ -104,18 +104,18 @@ char isid[0x100];
 
 void init_parser(void) {
   // SORT
+  isid['*'] = 1;
+  isid['+'] = 1;
+  isid['-'] = 1;
+  isid['/'] = 1;
+  isid['<'] = 1;
+  isid['='] = 1;
+  isid['>'] = 1;
+  isid['?'] = 1;
+  isid['_'] = 1;
   memset(isid + '0', 1, 10);
   memset(isid + 'A', 1, 26);
   memset(isid + 'a', 1, 26);
-  isid['_'] = 1;
-  isid['+'] = 1;
-  isid['-'] = 1;
-  isid['*'] = 1;
-  isid['/'] = 1;
-  isid['<'] = 1;
-  isid['>'] = 1;
-  isid['='] = 1;
-  isid['?'] = 1;
   ///
 }
 
@@ -162,17 +162,32 @@ static void quote(void) {
   while (*s != q) {
     int c = *s++;
     switch (c) {
-    case '\n': {
-      vfree(&v);
-      err("unclosed quote");
-    }
     case '\\':
       c = *s++;
       switch (c) {
-      case '\\':
-      case '\'':
       case '"':
       case '?':
+      case '\'':
+      case '\\':
+        break;
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+        s--;
+        c = 0;
+        for (int i = 0; i < 3; i++) {
+          if (!('0' <= *s && *s <= '7'))
+            break;
+          c = c * 8 + *s++ - '0';
+        }
+        break;
+      case 'U':
+        c = xescape(&s, 8);
         break;
       case 'a':
         c = '\a';
@@ -192,38 +207,23 @@ static void quote(void) {
       case 't':
         c = '\t';
         break;
-      case 'v':
-        c = '\v';
-        break;
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-        s--;
-        c = 0;
-        for (int i = 0; i < 3; i++) {
-          if (!('0' <= *s && *s <= '7'))
-            break;
-          c = c * 8 + *s++ - '0';
-        }
-        break;
-      case 'x':
-        c = xescape(&s, 2);
-        break;
       case 'u':
         c = xescape(&s, 4);
         break;
-      case 'U':
-        c = xescape(&s, 8);
+      case 'v':
+        c = '\v';
+        break;
+      case 'x':
+        c = xescape(&s, 2);
         break;
       default:
         err("unknown escape character");
       }
       break;
+    case '\n': {
+      vfree(&v);
+      err("unclosed quote");
+    }
     }
     vpush(&v, mkint(c));
   }
@@ -262,10 +262,10 @@ static void num(void) {
   // not a valid digit and therefore indicates a floating-point number
   if (*s == '0')
     switch (s[1]) {
-    case 'b':
     case 'B':
-    case 'x':
     case 'X':
+    case 'b':
+    case 'x':
       numbase(s, 0);
       return;
     }
@@ -276,9 +276,9 @@ static void num(void) {
 
   // floating-point number
   switch (*s) {
-  case 'e':
-  case 'E':
   case '.':
+  case 'E':
+  case 'e':
     char *end = 0;
     errno = 0;
     // strtod does tolerate non-whitespace after the number, and will tell us
@@ -309,41 +309,16 @@ loop:
   case '\v':
     txt = s + 1;
     goto loop;
-  case '\'':
-    quote();
-    return;
   case '"':
     quote();
     return;
-  case ';':
-    txt = strchr(s, '\n');
-    goto loop;
-  case 0:
-    tok = 0;
-    return;
-  case '.':
-    if (isdigit1(s[1])) {
-      num();
-      return;
-    }
-    break;
-  case '0':
-  case '1':
-  case '2':
-  case '3':
-  case '4':
-  case '5':
-  case '6':
-  case '7':
-  case '8':
-  case '9':
-    num();
-    return;
-  case '-':
-    if (isdigit1(s[1])) {
-      num();
-      return;
-    }
+  case '*':
+  case '+':
+  case '/':
+  case '<':
+  case '=':
+  case '>':
+  case '?':
   case 'A':
   case 'B':
   case 'C':
@@ -370,6 +345,7 @@ loop:
   case 'X':
   case 'Y':
   case 'Z':
+  case '_':
   case 'a':
   case 'b':
   case 'c':
@@ -396,20 +372,44 @@ loop:
   case 'x':
   case 'y':
   case 'z':
-  case '_':
-  case '+':
-  case '*':
-  case '/':
-  case '<':
-  case '>':
-  case '=':
-  case '?':
     assert(isid[*s]);
     do
       s++;
     while (isid[*s]);
     txt = s;
     tok = k_id;
+    return;
+  case '-':
+    if (isdigit1(s[1])) {
+      num();
+      return;
+    }
+  case '.':
+    if (isdigit1(s[1])) {
+      num();
+      return;
+    }
+    break;
+  case '0':
+  case '1':
+  case '2':
+  case '3':
+  case '4':
+  case '5':
+  case '6':
+  case '7':
+  case '8':
+  case '9':
+    num();
+    return;
+  case ';':
+    txt = strchr(s, '\n');
+    goto loop;
+  case '\'':
+    quote();
+    return;
+  case 0:
+    tok = 0;
     return;
   }
   assert(!isid[*s]);
@@ -427,11 +427,6 @@ static int eat(int k) {
 // parser
 static si expr(void) {
   switch (tok) {
-  case k_term: {
-    si a = tokterm;
-    lex();
-    return a;
-  }
   case '(': {
     lex();
     vec v;
@@ -439,6 +434,11 @@ static si expr(void) {
     while (!eat(')'))
       vpush(&v, expr());
     return list(&v);
+  }
+  case k_term: {
+    si a = tokterm;
+    lex();
+    return a;
   }
   }
   err("expected expression");
