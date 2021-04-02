@@ -540,5 +540,48 @@ void test(void) {
   txt = "\"ABC\"";
   assert(parse() == list1(list2(internz("quote"),
                                 list3(mkint(65), mkint(66), mkint(67)))));
+
+  txt = "1 (2 3 ";
+  caught = 0;
+  if (!setjmp(jmpbuf))
+    parse();
+  else
+    caught = 1;
+  assert(caught);
+
+  txt = "\" ";
+  caught = 0;
+  if (!setjmp(jmpbuf))
+    parse();
+  else
+    caught = 1;
+  assert(caught);
+
+  txt = "123/456";
+  assert(parse() == list1(mkrat("123/456")));
+
+  txt = "-123/456";
+  assert(parse() == list1(mkrat("-123/456")));
+
+  txt = "0x100";
+  assert(parse() == list1(mkrat("256")));
+
+  txt = ".5";
+  assert(parse() == list1(mkfloat(.5)));
+
+  txt = "0.5";
+  assert(parse() == list1(mkfloat(.5)));
+
+  txt = "0.5e0";
+  assert(parse() == list1(mkfloat(.5)));
+
+  txt = "0.0005e3";
+  assert(parse() == list1(mkfloat(.5)));
+
+  txt = "0.0005E+3";
+  assert(parse() == list1(mkfloat(.5)));
+
+  txt = "0.0005e-3";
+  assert(parse() == list1(mkfloat(.0000005)));
 }
 #endif
