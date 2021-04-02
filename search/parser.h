@@ -1,1 +1,2 @@
-void readfile(char *file0);
+void readfile(void);
+void init_parser(void);

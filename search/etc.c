@@ -98,17 +98,6 @@ void *mmalloc(si n) {
   return r;
 }
 
-void quote(char q, char *s) {
-  putchar(q);
-  while (*s) {
-    char c = *s++;
-    if (c == q || c == '\\')
-      putchar('\\');
-    putchar(c);
-  }
-  putchar(q);
-}
-
 void *xcalloc(si n, si size) {
   void *r = calloc(n, size);
   if (!r) {

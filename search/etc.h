@@ -45,7 +45,6 @@ char *basename(char *file);
 noret err(char *msg);
 size_t fnv(char *s, si n);
 void *mmalloc(si n);
-void quote(char q, char *s);
 void *xcalloc(si n, si size);
 void *xmalloc(si n);
 void *xrealloc(void *p, si n);

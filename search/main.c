@@ -130,6 +130,7 @@ int main(int argc, char **argv) {
   init_floats();
   init_ints();
   init_rats();
+  init_parser();
   init_syms();
   ///
 
