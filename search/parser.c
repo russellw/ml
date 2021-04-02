@@ -121,6 +121,12 @@ void init_parser(void) {
   ///
 }
 
+void pushc(int c) {
+  if (bufi == sizeof buf - 1)
+    err("token too long");
+  buf[bufi++] = c;
+}
+
 static int xdigit(int c) {
   if (isdigit1(c))
     return c - '0';
@@ -129,12 +135,6 @@ static int xdigit(int c) {
   if ('A' <= c && c <= 'F')
     return c - 'A' + 10;
   return -1;
-}
-
-void pushc(int c) {
-  if (bufi == sizeof buf - 1)
-    err("token too long");
-  buf[bufi++] = c;
 }
 
 static void quote(void) {
@@ -210,32 +210,69 @@ static void quote(void) {
   txt = s + 1;
 }
 
+static void numbase(char *s, int base) {
+  while (isid[*s])
+    s++;
+  // mpq_set_str does not tolerate non-whitespace after the number, so it must
+  // be null terminated
+  int c = *s;
+  *s = 0;
+  Rat r;
+  mpq_init(r.val);
+  int e = mpq_set_str(r.val, txt, 0);
+  // and restore the byte we overwrote
+  *s = c;
+  if (e)
+    err("invalid number");
+  txt = s;
+  tokterm = irat(&r);
+}
+
 static void num(void) {
   char *s = txt;
-  bufi = 0;
+  tok = k_term;
+
+  // sign
   if (*s == '-')
-    pushc(*s++);
-  Int int1;
+    s++;
+
+  // explicit base must be handled first so the rest of the code can assume E is
+  // not a valid digit and therefore indicates a floating-point number
   if (*s == '0')
     switch (s[1]) {
     case 'b':
     case 'B':
-      s += 2;
-      while (isid[*s])
-        pushc(*s++);
-      if (mpz_init_set_str(int1.val, buf, 2))
-        err("invalid binary integer");
-      tok = k_term;
-      tokterm = iint(&int1);
+    case 'x':
+    case 'X':
+      numbase(s, 0);
+      return;
     }
+
+  // now the integer part contains only decimal digits
   while (isdigit1(*s))
     s++;
+
+  // floating-point number
   switch (*s) {
-  case '/':
-    do
-      s++;
-    while (isdigit1(*s));
+  case 'e':
+  case 'E':
+  case '.':
+    char *end = 0;
+    errno = 0;
+    // strtod does tolerate non-whitespace after the number, and will tell us
+    // where the number ended
+    double r = strtod(txt, &end);
+    if (errno || !end)
+      err(strerror(errno));
+    txt = end;
+    tokterm = ifloat(r);
+    return;
   }
+
+  // mpq_set_str would take leading 0 for octal, but that's not desirable in a
+  // language that does not attempt to be compatible with C, so specify the base
+  // as 10
+  numbase(s, 10);
 }
 
 static void lex(void) {
