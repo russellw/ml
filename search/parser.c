@@ -301,6 +301,12 @@ loop:
   case 0:
     tok = 0;
     return;
+  case '.':
+    if (isdigit1(s[1])) {
+      num();
+      return;
+    }
+    break;
   case '0':
   case '1':
   case '2':
@@ -313,6 +319,11 @@ loop:
   case '9':
     num();
     return;
+  case '-':
+    if (isdigit1(s[1])) {
+      num();
+      return;
+    }
   case 'A':
   case 'B':
   case 'C':
@@ -367,7 +378,6 @@ loop:
   case 'z':
   case '_':
   case '+':
-  case '-':
   case '*':
   case '/':
   case '<':
