@@ -1,8 +1,8 @@
 #define vsmall 4
 
 typedef struct {
-  uint32_t cap;
-  uint32_t n;
+  int cap;
+  int n;
   si *p;
   si w[vsmall];
 } vec;

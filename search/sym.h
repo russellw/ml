@@ -1,5 +1,5 @@
 typedef struct {
-  si n;
+  int n;
 
   // for the keyword system to work, the size of the declared character array
   // must be large enough to hold the longest keyword
@@ -9,7 +9,7 @@ typedef struct {
 
   // when symbols are allocated on the heap, the code doing the allocation is
   // responsible for allocating enough space to hold the corresponding strings
-  char v[0x20 - sizeof(si)];
+  char v[0x20 - sizeof(int)];
 } sym;
 
 void init_syms(void);
