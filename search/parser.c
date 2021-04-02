@@ -95,9 +95,7 @@ void readfile(void) {
 
 // tokenizer
 enum {
-  k_char = 1,
-  k_id,
-  k_str,
+  k_id = 1,
   k_sym,
   k_term,
 };
@@ -121,10 +119,16 @@ void init_parser(void) {
   ///
 }
 
-void pushc(int c) {
-  if (bufi == sizeof buf - 1)
-    err("token too long");
-  buf[bufi++] = c;
+static si listr(si *p, si *end) {
+  if (p == end)
+    return nil;
+  return cons(*p, listr(p + 1, end));
+}
+
+static si list(vec *v) {
+  si r = listr(v->p, v->p + v->n);
+  vfree(v);
+  return r;
 }
 
 static int xdigit(int c) {
@@ -137,15 +141,31 @@ static int xdigit(int c) {
   return -1;
 }
 
+static int xescape(char **sp, int n) {
+  char *s = *sp;
+  int c = 0;
+  for (int i = 0; i < n; i++) {
+    int d = xdigit(*s++);
+    if (d < 0)
+      break;
+    c = c * 16 + d;
+  }
+  *sp = s;
+  return c;
+}
+
 static void quote(void) {
   char *s = txt;
   int q = *s++;
-  bufi = 0;
+  vec v;
+  vinit(&v);
   while (*s != q) {
     int c = *s++;
     switch (c) {
-    case '\n':
+    case '\n': {
+      vfree(&v);
       err("unclosed quote");
+    }
     case '\\':
       c = *s++;
       switch (c) {
@@ -192,22 +212,24 @@ static void quote(void) {
         }
         break;
       case 'x':
-        c = 0;
-        for (int i = 0; i < 2; i++) {
-          int d = hexdigit(*s++);
-          if (d < 0)
-            break;
-          c = c * 16 + d;
-        }
+        c = xescape(&s, 2);
+        break;
+      case 'u':
+        c = xescape(&s, 4);
+        break;
+      case 'U':
+        c = xescape(&s, 8);
         break;
       default:
         err("unknown escape character");
       }
       break;
     }
-    pushc(c);
+    vpush(&v, mkint(c));
   }
   txt = s + 1;
+  tok = k_term;
+  tokterm = list(&v);
 }
 
 static void numbase(char *s, int base) {
@@ -288,11 +310,9 @@ loop:
     txt = s + 1;
     goto loop;
   case '\'':
-    tok = k_char;
     quote();
     return;
   case '"':
-    tok = k_str;
     quote();
     return;
   case ';':
@@ -395,4 +415,39 @@ loop:
   assert(!isid[*s]);
   txt = s + 1;
   tok = *s;
+}
+
+static int eat(int k) {
+  if (tok != k)
+    return 0;
+  lex();
+  return 1;
+}
+
+// parser
+static si expr(void) {
+  switch (tok) {
+  case k_term: {
+    si a = tokterm;
+    lex();
+    return a;
+  }
+  case '(': {
+    lex();
+    vec v;
+    vinit(&v);
+    while (!eat(')'))
+      vpush(&v, expr());
+    return list(&v);
+  }
+  }
+  err("expected expression");
+}
+
+si parse(void) {
+  vec v;
+  vinit(&v);
+  while (tok)
+    vpush(&v, expr());
+  return list(&v);
 }

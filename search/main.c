@@ -54,8 +54,8 @@ char *ext(char *file) {
   return s ? s + 1 : "";
 }
 
-void parse(si argc, char **argv) {
-  for (si i = 0; i != argc; ++i) {
+void parseargv(int argc, char **argv) {
+  for (int i = 0; i != argc; ++i) {
     char *s = argv[i];
 
     // file
