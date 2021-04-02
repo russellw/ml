@@ -20,7 +20,7 @@ void stacktrace() {
   syminfo->SizeOfStruct = sizeof(SYMBOL_INFO);
   IMAGEHLP_LINE64 location;
   location.SizeOfStruct = sizeof location;
-  for (si i = 0; i < nframes; i++) {
+  for (int i = 0; i < nframes; i++) {
     DWORD64 address = (DWORD64)(stack[i]);
     SymFromAddr(process, address, 0, syminfo);
     DWORD displacement;

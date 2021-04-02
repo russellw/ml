@@ -45,7 +45,7 @@ static sym *store(char *s, si n) {
 
 void init_syms(void) {
   entries = xcalloc(cap, sizeof *entries);
-  for (si i = 0; i < sizeof keywords / sizeof *keywords; i++) {
+  for (int i = 0; i < sizeof keywords / sizeof *keywords; i++) {
     sym *x = keywords + i;
     assert(x->n == strlen(x->v));
     assert(x->n < sizeof x->v);
