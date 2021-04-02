@@ -21,7 +21,7 @@ static si term(void *p, int t) {
 #define nil term(0, t_cons)
 
 // unpack a term
-static si tag(si a) {
+static int tag(si a) {
   si t = a & 7;
   assert(t < t_max);
   return t;
