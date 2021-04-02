@@ -521,5 +521,10 @@ void test(void) {
   }
   vfree(&v);
   assert(_CrtCheckMemory());
+
+  // parsing
+  txt = "123";
+  si a = parse();
+  assert(a == list1(mkint(123)));
 }
 #endif

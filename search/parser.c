@@ -13,8 +13,8 @@
 char *file;
 
 // input text
-char *txtstart;
 char *txt;
+char *txtstart;
 
 // input token
 char *tokstart;
@@ -88,9 +88,7 @@ void readfile(void) {
   }
 
   // start at the beginning
-  txtstart = s;
   txt = s;
-  tokstart = s;
 }
 
 // tokenizer
@@ -169,7 +167,7 @@ static void quote(vec *v) {
   int q = *s++;
   vinit(v);
   while (*s != q) {
-    int c = *s++;
+    si c = *s++;
     switch (c) {
     case '\\':
       c = *s++;
@@ -454,6 +452,8 @@ static si expr(void) {
 }
 
 si parse(void) {
+  txtstart = txt;
+  lex();
   vec v;
   vinit(&v);
   while (tok)
