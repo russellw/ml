@@ -583,5 +583,8 @@ void test(void) {
 
   txt = "0.0005e-3";
   assert(parse() == list1(mkfloat(.0000005)));
+
+  txt = "1.0 2.0";
+  assert(parse() == list2(mkfloat(1), mkfloat(2)));
 }
 #endif
