@@ -72,4 +72,12 @@ si tl(si s) {
     err("tl: empty list");
   return consp(s)->tl;
 }
+
+si list1(si a) { return cons(a, nil); }
+
+si list2(si a, si b) { return cons(a, list1(b)); }
+
+si list3(si a, si b, si c) { return cons(a, list2(b, c)); }
+
+si list4(si a, si b, si c, si d) { return cons(a, list3(b, c, d)); }
 ///

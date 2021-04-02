@@ -9,4 +9,8 @@ void init_cons(void);
 si cons(si hd, si tl);
 si hd(si s);
 si tl(si s);
+si list1(si a);
+si list2(si a, si b);
+si list3(si a, si b, si c);
+si list4(si a, si b, si c, si d);
 ///

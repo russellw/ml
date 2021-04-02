@@ -14,14 +14,6 @@ static si mkrat(char *s) {
   return irat(&x);
 }
 
-static si list1(si a) { return cons(a, nil); }
-
-static si list2(si a, si b) { return cons(a, list1(b)); }
-
-static si list3(si a, si b, si c) { return cons(a, list2(b, c)); }
-
-static si list4(si a, si b, si c, si d) { return cons(a, list3(b, c, d)); }
-
 void test(void) {
   // symbols
   assert(internz("abc") == internz("abc"));
