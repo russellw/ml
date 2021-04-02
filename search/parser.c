@@ -13,7 +13,8 @@ char *file;
 char *txtstart;
 char *txt;
 char *tokstart;
-si tok;
+int bufi;
+int tok;
 
 void readfile(char *file0) {
   file = file0;
@@ -92,6 +93,12 @@ enum {
 };
 
 // tokenizer
+void pushc(char c) {
+  if (bufi == sizeof buf - 1)
+    err("token too long");
+  buf[bufi++] = c;
+}
+
 static void lex(void) {
 loop:
   char *s = tokstart = txt;
