@@ -533,5 +533,12 @@ void test(void) {
   txt = "1 [2 3 4] 5";
   assert(parse() ==
          list3(mkint(1), list3(mkint(2), mkint(3), mkint(4)), mkint(5)));
+
+  txt = "'A'";
+  assert(parse() == list1(mkint(65)));
+
+  txt = "\"ABC\"";
+  assert(parse() == list1(list2(internz("quote"),
+                                list3(mkint(65), mkint(66), mkint(67)))));
 }
 #endif

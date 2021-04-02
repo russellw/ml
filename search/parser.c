@@ -413,7 +413,7 @@ loop:
     quote(&v);
     if (v.n != 1)
       err("expected one character");
-    tokterm = mkint(*v.p);
+    tokterm = *v.p;
     return;
   case 0:
     tok = 0;
@@ -433,23 +433,20 @@ static int eat(int k) {
 
 // parser
 static si expr(void) {
+  vec v;
   switch (tok) {
-  case '(': {
+  case '(':
     lex();
-    vec v;
     vinit(&v);
     while (!eat(')'))
       vpush(&v, expr());
     return list(&v);
-  }
-  case '[': {
+  case '[':
     lex();
-    vec v;
     vinit(&v);
     while (!eat(']'))
       vpush(&v, expr());
     return list(&v);
-  }
   case k_term: {
     si a = tokterm;
     lex();
