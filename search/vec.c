@@ -1,9 +1,9 @@
 #include "main.h"
 
-static void reserve(vec *v, si m) {
-  if (m <= v->cap)
+static void reserve(vec *v, si n) {
+  if (n <= v->cap)
     return;
-  v->cap = max(m, v->cap * 2);
+  v->cap = max(n, v->cap * 2);
   if (v->p == v->w) {
     v->p = xmalloc(v->cap * sizeof(si));
     memcpy(v->p, v->w, v->n * sizeof(si));
@@ -12,9 +12,9 @@ static void reserve(vec *v, si m) {
   v->p = xrealloc(v->p, v->cap * sizeof(si));
 }
 
-static void resize(vec *v, si m) {
-  reserve(v, m);
-  v->n = m;
+static void resize(vec *v, si n) {
+  reserve(v, n);
+  v->n = n;
 }
 
 void vpush(vec *v, si a) {
