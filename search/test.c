@@ -514,5 +514,20 @@ void test(void) {
   assert(mkrat(" -0B10000 ") == mkint(-16));
   assert(mkrat("0x100") == mkrat("256"));
   assert(mkrat("0x1/0x100") == mkrat("1/256"));
+
+  // vec
+  vec v;
+  vinit(&v);
+  assert(v.n == 0);
+  assert(v.n <= v.cap);
+  for (int i = 0; i < 100; i++) {
+    vpush(&v, i * 10);
+    assert(v.n == i + 1);
+    assert(v.n <= v.cap);
+    assert(v.p[0] == 0);
+    assert(v.p[v.n - 1] == i * 10);
+  }
+  vfree(&v);
+  assert(_CrtCheckMemory());
 }
 #endif
