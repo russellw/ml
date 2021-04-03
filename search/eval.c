@@ -1,11 +1,21 @@
 #include "main.h"
 
+static si apply(si f, si args) {
+  si env = hd(f);
+  f = tl(f);
+  si params = hd(f);
+  f = tl(f);
+  si body = hd(f);
+  env = cons(zip(params, args), env);
+  return eval(env, body);
+}
+
 si eval(si env, si a) {
   // symbols are names to be looked up
   if (tag(a) == t_sym) {
     si pair = get(env, a);
     if (pair == nil)
-      err("not found");
+      err("eval: symbol not found");
     return hd(tl(pair));
   }
 
@@ -16,8 +26,6 @@ si eval(si env, si a) {
   // lists are expressions to be evaluated based on the first element
   si op = hd(a);
   a = tl(a);
-  if (tag(op) != t_sym)
-    err("eval: op is not a symbol");
   switch (keyword(op)) {
   case w_and:
     for (; a != nil; a = tl(a))
@@ -41,5 +49,6 @@ si eval(si env, si a) {
   case w_quote:
     return hd(a);
   }
-  err("eval: operator not found");
+  si f = eval(env, op);
+  return apply(f, a);
 }

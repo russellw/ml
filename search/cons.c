@@ -90,4 +90,10 @@ si tl(si s) {
     err("tl: empty list");
   return consp(s)->tl;
 }
+
+si zip(si keys, si vals) {
+  if (keys == nil || vals == nil)
+    return nil;
+  return cons(list2(hd(keys), hd(vals)), zip(tl(keys), tl(vals)));
+}
 ///
