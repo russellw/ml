@@ -51,7 +51,7 @@ noret err(char *msg);
 size_t fnv(char *s, si n);
 void *mmalloc(si n);
 void *xcalloc(si n, si size);
+int xdigit(int c);
 void *xmalloc(si n);
 void *xrealloc(void *p, si n);
-int xdigit(int c);
 ///

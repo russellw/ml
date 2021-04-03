@@ -281,8 +281,8 @@ static void num(void) {
         s++;
       switch (*s) {
       case '.':
-      case 'p':
       case 'P':
+      case 'p':
         lexinexact();
         return;
       }

@@ -107,6 +107,16 @@ void *xcalloc(si n, si size) {
   return r;
 }
 
+int xdigit(int c) {
+  if (isdigit1(c))
+    return c - '0';
+  if ('a' <= c && c <= 'f')
+    return c - 'a' + 10;
+  if ('A' <= c && c <= 'F')
+    return c - 'A' + 10;
+  return -1;
+}
+
 void *xmalloc(si n) {
   void *r = malloc(n);
   if (!r) {
@@ -126,15 +136,5 @@ void *xrealloc(void *p, si n) {
     exit(1);
   }
   return r;
-}
-
-int xdigit(int c) {
-  if (isdigit1(c))
-    return c - '0';
-  if ('a' <= c && c <= 'f')
-    return c - 'a' + 10;
-  if ('A' <= c && c <= 'F')
-    return c - 'A' + 10;
-  return -1;
 }
 ///
