@@ -29,12 +29,10 @@ si eval(si env, si a) {
 
   // known operator
   switch (keyword(op)) {
-  case s_lambda:
-    return list3(env, hd(a), hd(tl(a)));
   case s_add:
     return add(eval(env, hd(a)), eval(env, hd(tl(a))));
-  case w_minus:
-    return minus(eval(env, hd(a)));
+  case s_lambda:
+    return list3(env, hd(a), hd(tl(a)));
   case w_and:
     for (; a != nil; a = tl(a))
       if (!istrue(eval(env, hd(a))))
@@ -47,6 +45,8 @@ si eval(si env, si a) {
       a = tl(a);
     return eval(env, hd(a));
   }
+  case w_minus:
+    return minus(eval(env, hd(a)));
   case w_not:
     return mkint(!istrue(eval(env, hd(a))));
   case w_or:
