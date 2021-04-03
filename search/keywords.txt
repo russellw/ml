@@ -8,6 +8,7 @@
 =,eq
 T
 V
+\,lambda
 and
 ceiling
 cnf
@@ -36,6 +37,7 @@ ite
 less
 lesseq
 lst
+minus
 not
 o
 or

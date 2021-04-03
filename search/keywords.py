@@ -49,5 +49,7 @@ with open("keywords.c", "w") as f:
         s1 = s.split(",")
         if len(s1) == 2:
             s = s1[0]
-        f.write("{" + str(len(s)) + ',"' + s + '"},\n')
+        n = len(s)
+        s = s.replace("\\", "\\\\")
+        f.write("{" + str(n) + ',"' + s + '"},\n')
     f.write("};\n")

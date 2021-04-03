@@ -30,6 +30,12 @@ si eval(si env, si a) {
   // known operator
   if (tag(op) == t_sym)
     switch (keyword(op)) {
+    case s_lambda:
+      return list3(env, hd(a), hd(tl(a)));
+    case s_add:
+      return add(eval(env, hd(a)), eval(env, hd(tl(a))));
+    case w_minus:
+      return minus(eval(env, hd(a)));
     case w_and:
       for (; a != nil; a = tl(a))
         if (!istrue(eval(env, hd(a))))

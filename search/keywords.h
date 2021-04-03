@@ -10,6 +10,7 @@ enum {
   s_eq,
   w_T,
   w_V,
+  s_lambda,
   w_and,
   w_ceiling,
   w_cnf,
@@ -38,6 +39,7 @@ enum {
   w_less,
   w_lesseq,
   w_lst,
+  w_minus,
   w_not,
   w_o,
   w_or,
@@ -72,4 +74,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[71];
+extern sym keywords[73];
