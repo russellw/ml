@@ -557,37 +557,57 @@ void test(void) {
     caught = 1;
   assert(caught);
 
-  txt = "123/456";
-  assert(parse() == list1(mkrat("123/456")));
+  if (!setjmp(jmpbuf)) {
+    txt = "123/456";
+    assert(parse() == list1(mkrat("123/456")));
 
-  txt = "-123/456";
-  assert(parse() == list1(mkrat("-123/456")));
+    txt = "-123/456";
+    assert(parse() == list1(mkrat("-123/456")));
 
-  txt = "0x100";
-  assert(parse() == list1(mkrat("256")));
+    txt = "0x100";
+    assert(parse() == list1(mkrat("256")));
 
-  txt = ".5";
-  assert(parse() == list1(mkfloat(.5)));
+    txt = "0x100/100";
+    assert(parse() == list1(mkrat("256/100")));
 
-  txt = "0.5";
-  assert(parse() == list1(mkfloat(.5)));
+    txt = "0x100/0x100";
+    assert(parse() == list1(mkrat("256/256")));
 
-  txt = "0.5e0";
-  assert(parse() == list1(mkfloat(.5)));
+    txt = "0b100";
+    assert(parse() == list1(mkrat("4")));
 
-  txt = "0.0005e3";
-  assert(parse() == list1(mkfloat(.5)));
+    txt = "0b100/100";
+    assert(parse() == list1(mkrat("4/100")));
 
-  txt = "0.0005E+3";
-  assert(parse() == list1(mkfloat(.5)));
+    txt = "0b100/0b100";
+    assert(parse() == list1(mkrat("4/4")));
 
-  txt = "0.0005e-3";
-  assert(parse() == list1(mkfloat(.0000005)));
+    txt = ".5";
+    assert(parse() == list1(mkfloat(.5)));
 
-  txt = "1.0 2.0";
-  assert(parse() == list2(mkfloat(1), mkfloat(2)));
+    txt = "0.5";
+    assert(parse() == list1(mkfloat(.5)));
 
-  txt = "0x100.1p5";
-  assert(parse() == list1(mkfloat(8194)));
+    txt = "0.5e0";
+    assert(parse() == list1(mkfloat(.5)));
+
+    txt = "0.0005e3";
+    assert(parse() == list1(mkfloat(.5)));
+
+    txt = "0.0005E+3";
+    assert(parse() == list1(mkfloat(.5)));
+
+    txt = "0.0005e-3";
+    assert(parse() == list1(mkfloat(.0000005)));
+
+    txt = "1.0 2.0";
+    assert(parse() == list2(mkfloat(1), mkfloat(2)));
+
+    txt = "0x100.1p5";
+    assert(parse() == list1(mkfloat(8194)));
+  } else {
+    puts(buf);
+    exit(1);
+  }
 }
 #endif
