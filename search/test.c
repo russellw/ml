@@ -631,6 +631,10 @@ void test(void) {
 
   if (!setjmp(jmpbuf)) {
     assert(eval(env, internz("a")) == mkint(4));
+
+    si f = list3(env, list1(internz("x")),
+                 list4(internz("if"), internz("x"), mkint(8), mkint(9)));
+    assert(apply(f, list1(mkint(1))) == mkint(8));
   } else {
     puts(buf);
     exit(1);

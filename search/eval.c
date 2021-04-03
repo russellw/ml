@@ -1,6 +1,6 @@
 #include "main.h"
 
-static si apply(si f, si args) {
+si apply(si f, si args) {
   si env = hd(f);
   f = tl(f);
   si params = hd(f);
@@ -26,29 +26,34 @@ si eval(si env, si a) {
   // lists are expressions to be evaluated based on the first element
   si op = hd(a);
   a = tl(a);
-  switch (keyword(op)) {
-  case w_and:
-    for (; a != nil; a = tl(a))
-      if (!istrue(eval(env, hd(a))))
-        return mkint(0);
-    return mkint(1);
-  case w_if: {
-    si test = eval(env, hd(a));
-    a = tl(a);
-    if (!istrue(test))
+
+  // known operator
+  if (tag(op) == t_sym)
+    switch (keyword(op)) {
+    case w_and:
+      for (; a != nil; a = tl(a))
+        if (!istrue(eval(env, hd(a))))
+          return mkint(0);
+      return mkint(1);
+    case w_if: {
+      si test = eval(env, hd(a));
       a = tl(a);
-    return eval(env, hd(a));
-  }
-  case w_not:
-    return mkint(!istrue(eval(env, hd(a))));
-  case w_or:
-    for (; a != nil; a = tl(a))
-      if (istrue(eval(env, hd(a))))
-        return mkint(1);
-    return mkint(0);
-  case w_quote:
-    return hd(a);
-  }
+      if (!istrue(test))
+        a = tl(a);
+      return eval(env, hd(a));
+    }
+    case w_not:
+      return mkint(!istrue(eval(env, hd(a))));
+    case w_or:
+      for (; a != nil; a = tl(a))
+        if (istrue(eval(env, hd(a))))
+          return mkint(1);
+      return mkint(0);
+    case w_quote:
+      return hd(a);
+    }
+
+  // apply a function
   si f = eval(env, op);
   return apply(f, a);
 }
