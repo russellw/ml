@@ -69,9 +69,9 @@ si get(si env, si key) {
 
 si hd(si s) {
   if (tag(s) != t_cons)
-    err("hd: not a list");
+    return s;
   if (s == nil)
-    err("hd: empty list");
+    return nil;
   return consp(s)->hd;
 }
 
@@ -85,9 +85,9 @@ si list4(si a, si b, si c, si d) { return cons(a, list3(b, c, d)); }
 
 si tl(si s) {
   if (tag(s) != t_cons)
-    err("tl: not a list");
+    return nil;
   if (s == nil)
-    err("tl: empty list");
+    return nil;
   return consp(s)->tl;
 }
 

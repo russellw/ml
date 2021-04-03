@@ -429,34 +429,6 @@ void test(void) {
          list4(internz("if"), mkint(1), mkint(2), mkint(3)));
 
   // lists
-  caught = 0;
-  if (!setjmp(jmpbuf))
-    hd(mkint(0));
-  else
-    caught = 1;
-  assert(caught);
-
-  caught = 0;
-  if (!setjmp(jmpbuf))
-    tl(mkint(0));
-  else
-    caught = 1;
-  assert(caught);
-
-  caught = 0;
-  if (!setjmp(jmpbuf))
-    hd(nil);
-  else
-    caught = 1;
-  assert(caught);
-
-  caught = 0;
-  if (!setjmp(jmpbuf))
-    tl(nil);
-  else
-    caught = 1;
-  assert(caught);
-
   assert(hd(cons(mkint(1), nil)) == mkint(1));
   assert(tl(cons(mkint(1), nil)) == nil);
 
@@ -642,6 +614,10 @@ void test(void) {
     assert(eval(env, list2(internz("minus"), mkint(100))) == mkint(-100));
 
     f = list3(internz("\\"), list1(internz("x")),
+              list2(internz("minus"), internz("x")));
+    assert(eval(env, list2(f, mkint(100))) == mkint(-100));
+
+    f = list3(internz("\\"), internz("x"),
               list2(internz("minus"), internz("x")));
     assert(eval(env, list2(f, mkint(100))) == mkint(-100));
   } else {

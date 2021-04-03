@@ -33,8 +33,9 @@ static void *ptr(si a) { return (void *)(a & ~(si)7); }
 // convert a term to a pointer of a specific type, checking that the tag is
 // correct for the type, and using subtraction rather than bit masking to make
 // the conversion slightly more efficient (in some cases, the subtraction can be
-// folded into the constant offset of a subsequent load/store instruction, so the
-// tag removal costs no work at runtime)
+// folded into the constant offset of a subsequent load/store instruction, so
+// the tag removal costs no work at runtime)
+
 // SORT
 static Cons *consp(si a) {
   assert(tag(a) == t_cons);
