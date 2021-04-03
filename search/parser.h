@@ -13,4 +13,5 @@ extern si tokterm;
 
 void readfile(void);
 void init_parser(void);
-si parse(void);
+void parse(vec *v);
+void parsefile(char *file0, vec *v);

@@ -10,6 +10,7 @@ si cons(si hd, si tl);
 si get(si env, si key);
 si hd(si s);
 si list1(si a);
+si list(vec *v);
 si list2(si a, si b);
 si list3(si a, si b, si c);
 si list4(si a, si b, si c, si d);

@@ -139,7 +139,9 @@ int main(int argc, char **argv) {
   assert(_CrtCheckMemory());
 #endif
 
-  file = "core.k";
-  readfile();
+  vec v;
+  vinit(&v);
+  parsefile("test.k", &v);
+  parsefile("core.k", &v);
   return 0;
 }

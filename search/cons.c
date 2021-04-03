@@ -39,6 +39,12 @@ static Cons *store(Cons *x) {
 
 void init_cons(void) { entries = xcalloc(cap, sizeof *entries); }
 
+static si listr(si *p, si *end) {
+  if (p == end)
+    return nil;
+  return cons(*p, listr(p + 1, end));
+}
+
 // SORT
 si cons(si hd, si tl) {
   if (tag(tl) != t_cons)
@@ -82,6 +88,12 @@ si list2(si a, si b) { return cons(a, list1(b)); }
 si list3(si a, si b, si c) { return cons(a, list2(b, c)); }
 
 si list4(si a, si b, si c, si d) { return cons(a, list3(b, c, d)); }
+
+si list(vec *v) {
+  si r = listr(v->p, v->p + v->n);
+  vfree(v);
+  return r;
+}
 
 si tl(si s) {
   if (tag(s) != t_cons)

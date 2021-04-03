@@ -115,18 +115,6 @@ void init_parser(void) {
   ///
 }
 
-static si listr(si *p, si *end) {
-  if (p == end)
-    return nil;
-  return cons(*p, listr(p + 1, end));
-}
-
-static si list(vec *v) {
-  si r = listr(v->p, v->p + v->n);
-  vfree(v);
-  return r;
-}
-
 static int xescape(char **sp, int n) {
   char *s = *sp;
   int c = 0;
@@ -455,12 +443,15 @@ static si expr(void) {
   err("expected expression");
 }
 
-si parse(void) {
+void parse(vec *v) {
   txtstart = txt;
   lex();
-  vec v;
-  vinit(&v);
   while (tok)
-    vpush(&v, expr());
-  return list(&v);
+    vpush(v, expr());
+}
+
+void parsefile(char *file0, vec *v) {
+  file = file0;
+  readfile();
+  parse(v);
 }
