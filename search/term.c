@@ -485,7 +485,7 @@ si inexact(si a) {
 int istrue(si a) {
   switch (tag(a)) {
   case t_float:
-    return floatp(a)->val != 0;
+    return floatp(a)->val ? 1 : 0;
   case t_int:
     return mpz_sgn(intp(a)->val);
   case t_rat:
