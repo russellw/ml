@@ -138,5 +138,8 @@ int main(int argc, char **argv) {
   test();
   assert(_CrtCheckMemory());
 #endif
+
+  file = "core.k";
+  readfile();
   return 0;
 }
