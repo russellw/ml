@@ -635,6 +635,7 @@ void test(void) {
     si f = list3(env, list1(internz("x")),
                  list4(internz("if"), internz("x"), mkint(8), mkint(9)));
     assert(apply(f, list1(mkint(1))) == mkint(8));
+    assert(apply(f, list1(mkint(0))) == mkint(9));
   } else {
     puts(buf);
     exit(1);
