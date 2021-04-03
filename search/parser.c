@@ -270,12 +270,8 @@ static void num(void) {
   // not a valid digit and therefore indicates a floating-point number
   if (*s == '0')
     switch (s[1]) {
-    case 'B':
-    case 'b':
-      lexexact(s, 0);
-      return;
     case 'X':
-    case 'x': {
+    case 'x':
       s += 2;
       while (isxdigit1(*s))
         s++;
@@ -286,18 +282,11 @@ static void num(void) {
         lexinexact();
         return;
       }
-      int c = *s;
-      *s = 0;
-      Rat r;
-      mpq_init(r.val);
-      int e = mpq_set_str(r.val, txt, 0);
-      *s = c;
-      if (e)
-        err("invalid number");
-      txt = s;
-      tokterm = irat(&r);
+      // fallthru
+    case 'B':
+    case 'b':
+      lexexact(s, 0);
       return;
-    }
     }
 
   // now the integer part contains only decimal digits
