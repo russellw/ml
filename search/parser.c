@@ -129,16 +129,6 @@ static si list(vec *v) {
   return r;
 }
 
-static void id(void) {
-  char *s = txt;
-  assert(isid[*s]);
-  do
-    s++;
-  while (isid[*s]);
-  txt = s;
-  tok = k_id;
-}
-
 static int xescape(char **sp, int n) {
   char *s = *sp;
   int c = 0;
@@ -325,6 +315,12 @@ loop:
     quote(&v);
     tokterm = list2(term(keywords + w_quote, t_sym), list(&v));
     return;
+  case '-':
+    if (isdigit1(s[1])) {
+      num();
+      return;
+    }
+    // fallthru
   case '*':
   case '+':
   case '/':
@@ -385,14 +381,12 @@ loop:
   case 'x':
   case 'y':
   case 'z':
-    id();
-    return;
-  case '-':
-    if (isdigit1(s[1])) {
-      num();
-      return;
-    }
-    id();
+    assert(isid[*s]);
+    do
+      s++;
+    while (isid[*s]);
+    txt = s;
+    tok = k_id;
     return;
   case '.':
     if (isdigit1(s[1])) {
