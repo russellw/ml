@@ -31,6 +31,8 @@ si eval(si env, si a) {
   switch (keyword(op)) {
   case s_add:
     return add(eval(env, hd(a)), eval(env, hd(tl(a))));
+  case s_div:
+    return div2(eval(env, hd(a)), eval(env, hd(tl(a))));
   case s_eq:
     return mkint(eval(env, hd(a)) == eval(env, hd(tl(a))));
   case s_lambda:
@@ -39,8 +41,12 @@ si eval(si env, si a) {
     return mkint(le(eval(env, hd(a)), eval(env, hd(tl(a)))));
   case s_lt:
     return mkint(lt(eval(env, hd(a)), eval(env, hd(tl(a)))));
+  case s_mul:
+    return mul(eval(env, hd(a)), eval(env, hd(tl(a))));
   case s_ne:
     return mkint(eval(env, hd(a)) != eval(env, hd(tl(a))));
+  case s_sub:
+    return sub(eval(env, hd(a)), eval(env, hd(tl(a))));
   case w_and:
     for (; a != nil; a = tl(a))
       if (!istrue(eval(env, hd(a))))
