@@ -139,16 +139,6 @@ static void id(void) {
   tok = k_id;
 }
 
-static int xdigit(int c) {
-  if (isdigit1(c))
-    return c - '0';
-  if ('a' <= c && c <= 'f')
-    return c - 'a' + 10;
-  if ('A' <= c && c <= 'F')
-    return c - 'A' + 10;
-  return -1;
-}
-
 static int xescape(char **sp, int n) {
   char *s = *sp;
   int c = 0;
@@ -237,7 +227,7 @@ static void quote(vec *v) {
   tok = k_term;
 }
 
-static void numbase(char *s, int base) {
+static void lexexact(char *s, int base) {
   while (isid[*s])
     s++;
   // mpq_set_str does not tolerate non-whitespace after the number, so it must
@@ -255,6 +245,19 @@ static void numbase(char *s, int base) {
   tokterm = irat(&r);
 }
 
+static void lexinexact(void) {
+  errno = 0;
+  char *end = 0;
+  // strtod does tolerate non-whitespace after the number, and will tell us
+  // where the number ended
+  double r = strtod(txt, &end);
+  if (errno || !end)
+    err(strerror(errno));
+  txt = end;
+  tokterm = ifloat(r);
+  return;
+}
+
 static void num(void) {
   char *s = txt;
   tok = k_term;
@@ -268,11 +271,33 @@ static void num(void) {
   if (*s == '0')
     switch (s[1]) {
     case 'B':
-    case 'X':
     case 'b':
-    case 'x':
-      numbase(s, 0);
+      lexexact(s, 0);
       return;
+    case 'X':
+    case 'x': {
+      s += 2;
+      while (isxdigit1(*s))
+        s++;
+      switch (*s) {
+      case '.':
+      case 'p':
+      case 'P':
+        lexinexact();
+        return;
+      }
+      int c = *s;
+      *s = 0;
+      Rat r;
+      mpq_init(r.val);
+      int e = mpq_set_str(r.val, txt, 0);
+      *s = c;
+      if (e)
+        err("invalid number");
+      txt = s;
+      tokterm = irat(&r);
+      return;
+    }
     }
 
   // now the integer part contains only decimal digits
@@ -284,22 +309,14 @@ static void num(void) {
   case '.':
   case 'E':
   case 'e':
-    char *end = 0;
-    errno = 0;
-    // strtod does tolerate non-whitespace after the number, and will tell us
-    // where the number ended
-    double r = strtod(txt, &end);
-    if (errno || !end)
-      err(strerror(errno));
-    txt = end;
-    tokterm = ifloat(r);
+    lexinexact();
     return;
   }
 
   // mpq_set_str would take leading 0 for octal, but that's not desirable in a
   // language that does not attempt to be compatible with C, so specify the base
   // as 10
-  numbase(s, 10);
+  lexexact(s, 10);
 }
 
 static void lex(void) {

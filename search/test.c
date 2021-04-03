@@ -586,5 +586,8 @@ void test(void) {
 
   txt = "1.0 2.0";
   assert(parse() == list2(mkfloat(1), mkfloat(2)));
+
+  txt = "0x100.1p5";
+  assert(parse() == list1(mkfloat(8194)));
 }
 #endif
