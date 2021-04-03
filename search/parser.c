@@ -93,9 +93,7 @@ void readfile(void) {
 
 // tokenizer
 enum {
-  k_id = 1,
-  k_sym,
-  k_term,
+  k_term = 1,
 };
 
 char isid[0x100];
@@ -385,8 +383,9 @@ loop:
     do
       s++;
     while (isid[*s]);
+    tok = k_term;
+    tokterm = intern(txt, s - txt);
     txt = s;
-    tok = k_id;
     return;
   case '.':
     if (isdigit1(s[1])) {

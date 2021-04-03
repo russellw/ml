@@ -605,6 +605,9 @@ void test(void) {
 
     txt = "0x100.1p5";
     assert(parse() == list1(mkfloat(8194)));
+
+    txt = "a";
+    assert(parse() == list1(internz("a")));
   } else {
     puts(buf);
     exit(1);
