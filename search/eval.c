@@ -28,36 +28,35 @@ si eval(si env, si a) {
   a = tl(a);
 
   // known operator
-  if (tag(op) == t_sym)
-    switch (keyword(op)) {
-    case s_lambda:
-      return list3(env, hd(a), hd(tl(a)));
-    case s_add:
-      return add(eval(env, hd(a)), eval(env, hd(tl(a))));
-    case w_minus:
-      return minus(eval(env, hd(a)));
-    case w_and:
-      for (; a != nil; a = tl(a))
-        if (!istrue(eval(env, hd(a))))
-          return mkint(0);
-      return mkint(1);
-    case w_if: {
-      si test = eval(env, hd(a));
+  switch (keyword(op)) {
+  case s_lambda:
+    return list3(env, hd(a), hd(tl(a)));
+  case s_add:
+    return add(eval(env, hd(a)), eval(env, hd(tl(a))));
+  case w_minus:
+    return minus(eval(env, hd(a)));
+  case w_and:
+    for (; a != nil; a = tl(a))
+      if (!istrue(eval(env, hd(a))))
+        return mkint(0);
+    return mkint(1);
+  case w_if: {
+    si test = eval(env, hd(a));
+    a = tl(a);
+    if (!istrue(test))
       a = tl(a);
-      if (!istrue(test))
-        a = tl(a);
-      return eval(env, hd(a));
-    }
-    case w_not:
-      return mkint(!istrue(eval(env, hd(a))));
-    case w_or:
-      for (; a != nil; a = tl(a))
-        if (istrue(eval(env, hd(a))))
-          return mkint(1);
-      return mkint(0);
-    case w_quote:
-      return hd(a);
-    }
+    return eval(env, hd(a));
+  }
+  case w_not:
+    return mkint(!istrue(eval(env, hd(a))));
+  case w_or:
+    for (; a != nil; a = tl(a))
+      if (istrue(eval(env, hd(a))))
+        return mkint(1);
+    return mkint(0);
+  case w_quote:
+    return hd(a);
+  }
 
   // apply a function
   si f = eval(env, op);

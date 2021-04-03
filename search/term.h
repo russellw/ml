@@ -27,6 +27,14 @@ static int tag(si a) {
   return t;
 }
 
+// convert a term to a generic pointer
+static void *ptr(si a) { return (void *)(a & ~(si)7); }
+
+// convert a term to a pointer of a specific type, checking that the tag is
+// correct for the type, and using subtraction rather than bit masking to make
+// the conversion slightly more efficient (in some cases, the subtraction can be
+// folded into the constant offset of a subsequent load/store instruction, so the
+// tag removal costs no work at runtime)
 // SORT
 static Cons *consp(si a) {
   assert(tag(a) == t_cons);
@@ -62,7 +70,11 @@ static si keyword(si a) {
   // it's okay if the symbol is not a keyword; that just means the resulting
   // number will not correspond to any keyword and will not match any case in a
   // switch statement
-  size_t i = (char *)symp(a) - (char *)keywords;
+
+  // it's even okay if the value is not a symbol; the pointer is extracted
+  // anyway with the generic pointer extraction function, and it will end up not
+  // corresponding to any keyword
+  size_t i = (char *)ptr(a) - (char *)keywords;
   return i / sizeof(sym);
 }
 
