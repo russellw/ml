@@ -679,12 +679,11 @@ void print(si a) {
   case t_cons: {
     putchar('(');
     int more = 0;
-    while (a != nil) {
+    for (; a != nil; a = tl(a)) {
       if (more)
         putchar(' ');
       more = 1;
       print(hd(a));
-      a = tl(a);
     }
     putchar(')');
     return;

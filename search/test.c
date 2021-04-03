@@ -612,5 +612,19 @@ void test(void) {
     puts(buf);
     exit(1);
   }
+
+  // environments
+  si frame = list3(list2(internz("a"), mkint(1)), list2(internz("b"), mkint(2)),
+                   list2(internz("c"), mkint(3)));
+  si env = list1(frame);
+  assert(get(env, internz("a")) == list2(internz("a"), mkint(1)));
+  assert(get(env, internz("b")) == list2(internz("b"), mkint(2)));
+  assert(get(env, internz("c")) == list2(internz("c"), mkint(3)));
+
+  frame = list1(list2(internz("a"), mkint(4)));
+  env = cons(frame, env);
+  assert(get(env, internz("a")) == list2(internz("a"), mkint(4)));
+  assert(get(env, internz("b")) == list2(internz("b"), mkint(2)));
+  assert(get(env, internz("c")) == list2(internz("c"), mkint(3)));
 }
 #endif

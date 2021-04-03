@@ -57,6 +57,16 @@ si cons(si hd, si tl) {
   return term(entries[i], t_cons);
 }
 
+si get(si env, si key) {
+  for (; env != nil; env = tl(env))
+    for (si frame = hd(env); frame != nil; frame = tl(frame)) {
+      si pair = hd(frame);
+      if (hd(pair) == key)
+        return pair;
+    }
+  return nil;
+}
+
 si hd(si s) {
   if (tag(s) != t_cons)
     err("hd: not a list");
