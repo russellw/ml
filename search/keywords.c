@@ -13,6 +13,8 @@ sym keywords[] = {
     {1, "V"},
     {1, "\\"},
     {3, "and"},
+    {6, "assert"},
+    {7, "assert="},
     {7, "ceiling"},
     {3, "cnf"},
     {10, "conjecture"},

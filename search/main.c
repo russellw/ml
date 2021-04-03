@@ -143,5 +143,26 @@ int main(int argc, char **argv) {
   vinit(&v);
   parsefile("test.k", &v);
   parsefile("core.k", &v);
+  for (si i = 0; i < v.n; i++) {
+    si a = v.p[i];
+    si op = hd(a);
+    si a1 = tl(a);
+    switch (keyword(op)) {
+    case s_asserteq:
+      if (eval(nil, hd(a1)) != eval(nil, hd(tl(a1)))) {
+        println(a);
+        puts("Assert failed");
+        return 1;
+      }
+      break;
+    case w_assert:
+      if (!istrue(eval(nil, hd(a1)))) {
+        println(a);
+        puts("Assert failed");
+        return 1;
+      }
+      break;
+    }
+  }
   return 0;
 }

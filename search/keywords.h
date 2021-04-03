@@ -12,6 +12,8 @@ enum {
   w_V,
   s_lambda,
   w_and,
+  w_assert,
+  s_asserteq,
   w_ceiling,
   w_cnf,
   w_conjecture,
@@ -74,4 +76,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[73];
+extern sym keywords[75];

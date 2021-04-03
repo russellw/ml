@@ -31,8 +31,16 @@ si eval(si env, si a) {
   switch (keyword(op)) {
   case s_add:
     return add(eval(env, hd(a)), eval(env, hd(tl(a))));
+  case s_eq:
+    return mkint(eval(env, hd(a)) == eval(env, hd(tl(a))));
   case s_lambda:
     return list3(env, hd(a), hd(tl(a)));
+  case s_le:
+    return mkint(le(eval(env, hd(a)), eval(env, hd(tl(a)))));
+  case s_lt:
+    return mkint(lt(eval(env, hd(a)), eval(env, hd(tl(a)))));
+  case s_ne:
+    return mkint(eval(env, hd(a)) != eval(env, hd(tl(a))));
   case w_and:
     for (; a != nil; a = tl(a))
       if (!istrue(eval(env, hd(a))))

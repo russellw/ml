@@ -10,6 +10,8 @@ T
 V
 \,lambda
 and
+assert
+assert=,asserteq
 ceiling
 cnf
 conjecture
