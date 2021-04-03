@@ -626,5 +626,12 @@ void test(void) {
   assert(get(env, internz("a")) == list2(internz("a"), mkint(4)));
   assert(get(env, internz("b")) == list2(internz("b"), mkint(2)));
   assert(get(env, internz("c")) == list2(internz("c"), mkint(3)));
+
+  if (!setjmp(jmpbuf)) {
+    assert(eval(env, internz("a")) == mkint(4));
+  } else {
+    puts(buf);
+    exit(1);
+  }
 }
 #endif

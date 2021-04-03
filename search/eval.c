@@ -1,8 +1,19 @@
 #include "main.h"
 
 si eval(si env, si a) {
+  // symbols are names to be looked up
+  if (tag(a) == t_sym) {
+    si pair = get(env, a);
+    if (pair == nil)
+      err("not found");
+    return hd(tl(pair));
+  }
+
+  // other atoms evaluate to themselves
   if (tag(a) != t_cons)
     return a;
+
+  // lists are expressions to be evaluated based on the first element
   si op = hd(a);
   a = tl(a);
   if (tag(op) != t_sym)
