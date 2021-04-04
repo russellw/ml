@@ -13,8 +13,8 @@
 char *file;
 
 // input text
-char *txt;
 char *txtstart;
+char *txt;
 
 // input token
 char *tokstart;
@@ -37,8 +37,8 @@ void readfile(void) {
     // check size of file
     n = st.st_size;
 
-    // allow space for extra newline if required, and null terminator
-    s = (char *)xmalloc(n + 2);
+    // allow space for null terminator
+    s = xmalloc(n + 1);
 
     // read all the data
     if (read(f, s, n) != n) {
@@ -59,10 +59,9 @@ void readfile(void) {
     // stdin doesn't tell us in advance how much data there will be, so keep
     // reading chunks until done
     for (;;) {
-      // expand buffer as necessary, allowing space for extra newline if
-      // required, and null terminator
-      if (n + chunk + 2 > cap) {
-        cap = max(n + chunk + 2, cap * 2);
+      // expand buffer as necessary, allowing space for null terminator
+      if (n + chunk + 1 > cap) {
+        cap = max(n + chunk + 1, cap * 2);
         s = xrealloc(s, cap);
       }
 
@@ -80,15 +79,11 @@ void readfile(void) {
     }
   }
 
-  // newline and null terminator
+  // null terminator
   s[n] = 0;
-  if (n && s[n - 1] != '\n') {
-    s[n] = '\n';
-    s[n + 1] = 0;
-  }
 
   // start at the beginning
-  txt = s;
+  txt = txtstart = s;
 }
 
 // tokenizer
@@ -193,9 +188,10 @@ static void quote(vec *v) {
         err("unknown escape character");
       }
       break;
-    case '\n': {
+    case '\n':
+    case '\r':
+    case 0:
       err("unclosed quote");
-    }
     }
     vpush(v, mkint(c));
   }
@@ -395,6 +391,8 @@ loop:
     return;
   case ';':
     txt = strchr(s, '\n');
+    if (!txt)
+      txt = "";
     goto loop;
   case '\'':
     quote(&v);
@@ -444,14 +442,7 @@ static si expr(void) {
 }
 
 void parse(vec *v) {
-  txtstart = txt;
   lex();
   while (tok)
     vpush(v, expr());
-}
-
-void parsefile(char *file0, vec *v) {
-  file = file0;
-  readfile();
-  parse(v);
 }

@@ -139,10 +139,19 @@ int main(int argc, char **argv) {
   assert(_CrtCheckMemory());
 #endif
 
+  // SORT
+  static char *corefiles[] = {
+      "core.k",
+      "test.k",
+  };
+  ///
   vec v;
   vinit(&v);
-  parsefile("test.k", &v);
-  parsefile("core.k", &v);
+  for (int i = 0; i < sizeof corefiles / sizeof *corefiles; i++) {
+    file = corefiles[i];
+    readfile();
+    parse(&v);
+  }
   for (si i = 0; i < v.n; i++) {
     si a = v.p[i];
     si op = hd(a);
