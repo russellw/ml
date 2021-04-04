@@ -1,0 +1,25 @@
+/L13"Aklo" Line Comment = ; File Extensions = K
+/Delimiters = ~!@%^&()|\/{}[]:;"' ,	.`
+/Indent Strings = "def"
+/Open Brace Strings =  "(" "[" "{"
+/Close Brace Strings = ")" "]" "}"
+/C1"blue"
+/C2"red"
+/C3"yellow"
+/C4"green"
+/C5"brown"
+!
+%
+&
+(
+)
+,
+:
+[
+]
+^
+`
+{
+|
+}
+~
