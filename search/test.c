@@ -520,77 +520,56 @@ void test(void) {
   assert(parse1() == list1(list2(internz("quote"),
                                  list3(mkint(65), mkint(66), mkint(67)))));
 
-  txt = "1 (2 3 ";
-  caught = 0;
-  if (!setjmp(jmpbuf))
-    parse1();
-  else
-    caught = 1;
-  assert(caught);
+  txt = "123/456";
+  assert(parse1() == list1(mkrat("123/456")));
 
-  txt = "\" ";
-  caught = 0;
-  if (!setjmp(jmpbuf))
-    parse1();
-  else
-    caught = 1;
-  assert(caught);
+  txt = "-123/456";
+  assert(parse1() == list1(mkrat("-123/456")));
 
-  if (!setjmp(jmpbuf)) {
-    txt = "123/456";
-    assert(parse1() == list1(mkrat("123/456")));
+  txt = "0x100";
+  assert(parse1() == list1(mkrat("256")));
 
-    txt = "-123/456";
-    assert(parse1() == list1(mkrat("-123/456")));
+  txt = "0x100/100";
+  assert(parse1() == list1(mkrat("256/100")));
 
-    txt = "0x100";
-    assert(parse1() == list1(mkrat("256")));
+  txt = "0x100/0x100";
+  assert(parse1() == list1(mkrat("256/256")));
 
-    txt = "0x100/100";
-    assert(parse1() == list1(mkrat("256/100")));
+  txt = "0b100";
+  assert(parse1() == list1(mkrat("4")));
 
-    txt = "0x100/0x100";
-    assert(parse1() == list1(mkrat("256/256")));
+  txt = "0b100/100";
+  assert(parse1() == list1(mkrat("4/100")));
 
-    txt = "0b100";
-    assert(parse1() == list1(mkrat("4")));
+  txt = "0b100/0b100";
+  assert(parse1() == list1(mkrat("4/4")));
 
-    txt = "0b100/100";
-    assert(parse1() == list1(mkrat("4/100")));
+  txt = ".5";
+  assert(parse1() == list1(mkfloat(.5)));
 
-    txt = "0b100/0b100";
-    assert(parse1() == list1(mkrat("4/4")));
+  txt = "0.5";
+  assert(parse1() == list1(mkfloat(.5)));
 
-    txt = ".5";
-    assert(parse1() == list1(mkfloat(.5)));
+  txt = "0.5e0";
+  assert(parse1() == list1(mkfloat(.5)));
 
-    txt = "0.5";
-    assert(parse1() == list1(mkfloat(.5)));
+  txt = "0.0005e3";
+  assert(parse1() == list1(mkfloat(.5)));
 
-    txt = "0.5e0";
-    assert(parse1() == list1(mkfloat(.5)));
+  txt = "0.0005E+3";
+  assert(parse1() == list1(mkfloat(.5)));
 
-    txt = "0.0005e3";
-    assert(parse1() == list1(mkfloat(.5)));
+  txt = "0.0005e-3";
+  assert(parse1() == list1(mkfloat(.0000005)));
 
-    txt = "0.0005E+3";
-    assert(parse1() == list1(mkfloat(.5)));
+  txt = "1.0 2.0";
+  assert(parse1() == list2(mkfloat(1), mkfloat(2)));
 
-    txt = "0.0005e-3";
-    assert(parse1() == list1(mkfloat(.0000005)));
+  txt = "0x100.1p5";
+  assert(parse1() == list1(mkfloat(8194)));
 
-    txt = "1.0 2.0";
-    assert(parse1() == list2(mkfloat(1), mkfloat(2)));
-
-    txt = "0x100.1p5";
-    assert(parse1() == list1(mkfloat(8194)));
-
-    txt = "a";
-    assert(parse1() == list1(internz("a")));
-  } else {
-    puts(buf);
-    exit(1);
-  }
+  txt = "a";
+  assert(parse1() == list1(internz("a")));
 
   // environments
   si frame = list3(list2(internz("a"), mkint(1)), list2(internz("b"), mkint(2)),

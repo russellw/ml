@@ -86,6 +86,33 @@ void readfile(void) {
   txt = txtstart = s;
 }
 
+noret ferr(const char *msg) {
+  // line number
+  si line = 1;
+  for (char *s = txtstart; s != tokstart; ++s)
+    if (*s == '\n')
+      ++line;
+
+  // start of line
+  char *linestart = tokstart;
+  while (!(linestart == txtstart || linestart[-1] == '\n'))
+    --linestart;
+
+  // print context
+  for (char *s = linestart; *s >= ' '; ++s)
+    fputc(*s, stderr);
+  fputc('\n', stderr);
+
+  // print caret
+  for (char *s = linestart; s != tokstart; ++s)
+    fputc(*s == '\t' ? '\t' : ' ', stderr);
+  fprintf(stderr, "^\n");
+
+  // print message and exit
+  fprintf(stderr, "%s:%zu: %s\n", file, line, msg);
+  exit(1);
+}
+
 // tokenizer
 enum {
   k_term = 1,
@@ -185,13 +212,13 @@ static void quote(vec *v) {
         c = xescape(&s, 2);
         break;
       default:
-        err("unknown escape character");
+        ferr("unknown escape character");
       }
       break;
     case '\n':
     case '\r':
     case 0:
-      err("unclosed quote");
+      ferr("unclosed quote");
     }
     vpush(v, mkint(c));
   }
@@ -212,7 +239,7 @@ static void lexexact(char *s, int base) {
   // and restore the byte we overwrote
   *s = c;
   if (e)
-    err("invalid number");
+    ferr("invalid number");
   txt = s;
   tokterm = irat(&r);
 }
@@ -224,7 +251,7 @@ static void lexinexact(void) {
   // where the number ended
   double r = strtod(txt, &end);
   if (errno || !end)
-    err(strerror(errno));
+    ferr(strerror(errno));
   txt = end;
   tokterm = ifloat(r);
   return;
@@ -397,7 +424,7 @@ loop:
   case '\'':
     quote(&v);
     if (v.n != 1)
-      err("expected one character");
+      ferr("expected one character");
     tokterm = *v.p;
     return;
   case 0:
@@ -438,7 +465,7 @@ static si expr(void) {
     return a;
   }
   }
-  err("expected expression");
+  ferr("expected expression");
 }
 
 void parse(vec *v) {

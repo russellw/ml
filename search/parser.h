@@ -11,6 +11,10 @@ extern int bufi;
 extern int tok;
 extern si tokterm;
 
+// functions reusable by any parser
 void readfile(void);
+noret ferr(const char *msg);
+
+// functions specific to this parser
 void init_parser(void);
 void parse(vec *v);
