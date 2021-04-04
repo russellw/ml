@@ -33,6 +33,14 @@ si eval(si env, si a) {
     return add(eval(env, hd(a)), eval(env, hd(tl(a))));
   case s_div:
     return div2(eval(env, hd(a)), eval(env, hd(tl(a))));
+  case s_div_c:
+    return div_c(eval(env, hd(a)), eval(env, hd(tl(a))));
+  case s_div_e:
+    return div_e(eval(env, hd(a)), eval(env, hd(tl(a))));
+  case s_div_f:
+    return div_f(eval(env, hd(a)), eval(env, hd(tl(a))));
+  case s_div_t:
+    return div_t2(eval(env, hd(a)), eval(env, hd(tl(a))));
   case s_eq:
     return mkint(eval(env, hd(a)) == eval(env, hd(tl(a))));
   case s_lambda:
@@ -45,13 +53,27 @@ si eval(si env, si a) {
     return mul(eval(env, hd(a)), eval(env, hd(tl(a))));
   case s_ne:
     return mkint(eval(env, hd(a)) != eval(env, hd(tl(a))));
+  case s_rem_c:
+    return rem_c(eval(env, hd(a)), eval(env, hd(tl(a))));
+  case s_rem_e:
+    return rem_e(eval(env, hd(a)), eval(env, hd(tl(a))));
+  case s_rem_f:
+    return rem_f(eval(env, hd(a)), eval(env, hd(tl(a))));
+  case s_rem_t:
+    return rem_t(eval(env, hd(a)), eval(env, hd(tl(a))));
   case s_sub:
     return sub(eval(env, hd(a)), eval(env, hd(tl(a))));
+  case w_abs:
+    return abs1(eval(env, hd(a)));
   case w_and:
     for (; a != nil; a = tl(a))
       if (!istrue(eval(env, hd(a))))
         return mkint(0);
     return mkint(1);
+  case w_ceil:
+    return ceil1(eval(env, hd(a)));
+  case w_floor:
+    return floor1(eval(env, hd(a)));
   case w_if: {
     si test = eval(env, hd(a));
     a = tl(a);
@@ -70,6 +92,10 @@ si eval(si env, si a) {
     return mkint(0);
   case w_quote:
     return hd(a);
+  case w_round:
+    return round1(eval(env, hd(a)));
+  case w_trunc:
+    return trunc1(eval(env, hd(a)));
   }
 
   // apply a function
