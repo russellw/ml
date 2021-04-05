@@ -52,6 +52,20 @@ si eval(si env, si a) {
     case s_eq:
       a = mkint(eval(env, hd(a)) == eval(env, hd(tl(a))));
       break;
+    case s_isexact:
+      switch (tag(eval(env, hd(a)))) {
+      case t_int:
+      case t_rat:
+        a = mkint(1);
+        break;
+      default:
+        a = mkint(0);
+        break;
+      }
+      break;
+    case s_isinexact:
+      a = mkint(tag(eval(env, hd(a))) == t_float);
+      break;
     case s_islist:
       a = mkint(tag(eval(env, hd(a))) == t_cons);
       break;

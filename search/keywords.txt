@@ -1,3 +1,4 @@
+
 *,mul
 +,add
 -,sub
@@ -12,6 +13,7 @@ V
 abs
 and
 assert
+assert-not,assert_not
 assert=,asserteq
 ceil
 ceiling
@@ -26,6 +28,7 @@ div-c,div_c
 div-e,div_e
 div-f,div_f
 div-t,div_t
+exact?,isexact
 false
 floor
 fof
@@ -37,6 +40,7 @@ help
 i
 if
 include
+inexact?,isinexact
 int
 is_int
 is_rat

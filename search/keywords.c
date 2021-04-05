@@ -1,6 +1,7 @@
 // AUTO GENERATED FILE - DO NOT MODIFY
 #include "main.h"
 sym keywords[] = {
+    {0, ""},
     {1, "*"},
     {1, "+"},
     {1, "-"},
@@ -15,6 +16,7 @@ sym keywords[] = {
     {3, "abs"},
     {3, "and"},
     {6, "assert"},
+    {10, "assert-not"},
     {7, "assert="},
     {4, "ceil"},
     {7, "ceiling"},
@@ -29,6 +31,7 @@ sym keywords[] = {
     {5, "div-e"},
     {5, "div-f"},
     {5, "div-t"},
+    {6, "exact?"},
     {5, "false"},
     {5, "floor"},
     {3, "fof"},
@@ -40,6 +43,7 @@ sym keywords[] = {
     {1, "i"},
     {2, "if"},
     {7, "include"},
+    {8, "inexact?"},
     {3, "int"},
     {6, "is_int"},
     {6, "is_rat"},

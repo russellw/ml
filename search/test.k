@@ -276,3 +276,11 @@
 
 ;classify
 (assert(list? ()))
+(assert(exact? 5))
+(assert(exact? 5/2))
+(assert-not(exact? 5.0))
+(assert-not(exact? #a))
+(assert-not(inexact? 5))
+(assert-not(inexact? 5/2))
+(assert(inexact? 5.0))
+(assert-not(inexact? #a))

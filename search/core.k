@@ -22,3 +22,16 @@
 (assert=(factorial 3)6)
 (assert=(factorial 4)24)
 (assert=(factorial 5)120)
+
+(def(atom? a)(not(list? a)))
+
+(assert(atom? 1))
+(assert(atom? #foo))
+(assert-not(atom? ()))
+
+(def (num? a)(or(exact? a)(inexact? a)))
+
+(assert(num?	1))
+(assert(num?	1/2))
+(assert(num?	1.2))
+(assert-not(num?	#a12))

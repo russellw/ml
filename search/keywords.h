@@ -1,5 +1,6 @@
 // AUTO GENERATED FILE - DO NOT MODIFY
 enum {
+  w_,
   s_mul,
   s_add,
   s_sub,
@@ -14,6 +15,7 @@ enum {
   w_abs,
   w_and,
   w_assert,
+  s_assert_not,
   s_asserteq,
   w_ceil,
   w_ceiling,
@@ -28,6 +30,7 @@ enum {
   s_div_e,
   s_div_f,
   s_div_t,
+  s_isexact,
   w_false,
   w_floor,
   w_fof,
@@ -39,6 +42,7 @@ enum {
   w_i,
   w_if,
   w_include,
+  s_isinexact,
   w_int,
   w_is_int,
   w_is_rat,
@@ -84,4 +88,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[83];
+extern sym keywords[87];

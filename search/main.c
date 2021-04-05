@@ -180,6 +180,11 @@ int main(int argc, char **argv) {
     si op = hd(a);
     a = tl(a);
     switch (keyword(op)) {
+    case s_assert_not:
+      if (!istrue(eval(env, hd(a))))
+        break;
+      print(stderr, a0);
+      err("assert-not: failed");
     case s_asserteq:
       if (eval(env, hd(a)) == eval(env, hd(tl(a))))
         break;
