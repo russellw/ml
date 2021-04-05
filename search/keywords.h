@@ -19,6 +19,7 @@ enum {
   w_ceiling,
   w_cnf,
   w_conjecture,
+  w_cons,
   w_def,
   w_difference,
   w_dimacs,
@@ -33,6 +34,7 @@ enum {
   w_greater,
   w_greatereq,
   w_h,
+  w_hd,
   w_help,
   w_i,
   w_if,
@@ -68,6 +70,7 @@ enum {
   w_t,
   w_tType,
   w_tff,
+  w_tl,
   w_to_int,
   w_to_rat,
   w_to_real,
@@ -80,4 +83,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[79];
+extern sym keywords[82];

@@ -26,6 +26,8 @@ si eval(si env, si a) {
   stack[stacki++] = a;
   switch (tag(a)) {
   case t_cons: {
+    if (a == nil)
+      break;
     si op = hd(a);
     a = tl(a);
     switch (keyword(op)) {
@@ -94,8 +96,14 @@ si eval(si env, si a) {
     case w_ceil:
       a = ceil1(eval(env, hd(a)));
       break;
+    case w_cons:
+      a = cons(eval(env, hd(a)), eval(env, hd(tl(a))));
+      break;
     case w_floor:
       a = floor1(eval(env, hd(a)));
+      break;
+    case w_hd:
+      a = hd(eval(env, hd(a)));
       break;
     case w_if: {
       si test = eval(env, hd(a));
@@ -124,6 +132,9 @@ si eval(si env, si a) {
       break;
     case w_round:
       a = round1(eval(env, hd(a)));
+      break;
+    case w_tl:
+      a = tl(eval(env, hd(a)));
       break;
     case w_trunc:
       a = trunc1(eval(env, hd(a)));
