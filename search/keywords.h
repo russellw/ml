@@ -19,6 +19,7 @@ enum {
   w_ceiling,
   w_cnf,
   w_conjecture,
+  w_def,
   w_difference,
   w_dimacs,
   w_distinct,
@@ -79,4 +80,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[78];
+extern sym keywords[79];

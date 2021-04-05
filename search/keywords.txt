@@ -17,6 +17,7 @@ ceil
 ceiling
 cnf
 conjecture
+def
 difference
 dimacs
 distinct

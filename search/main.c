@@ -152,6 +152,23 @@ int main(int argc, char **argv) {
     readfile();
     parse(&v);
   }
+
+  // definitions
+  vec keys, vals;
+  vinit(&keys);
+  vinit(&vals);
+  for (si i = 0; i < v.n; i++) {
+    si a = v.p[i];
+    si op = hd(a);
+    si a1 = tl(a);
+    if (op == term(keywords + w_def, t_sym)) {
+      si name = hd(a1);
+      a1 = tl(a1);
+    }
+  }
+  si env = list1(zip(list(&keys), list(&vals)));
+
+  // tests
   for (si i = 0; i < v.n; i++) {
     si a = v.p[i];
     si op = hd(a);
