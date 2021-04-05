@@ -23,7 +23,6 @@ sym keywords[] = {
     {3, "cnf"},
     {10, "conjecture"},
     {4, "cons"},
-    {3, "def"},
     {10, "difference"},
     {6, "dimacs"},
     {8, "distinct"},

@@ -22,7 +22,6 @@ enum {
   w_cnf,
   w_conjecture,
   w_cons,
-  w_def,
   w_difference,
   w_dimacs,
   w_distinct,
@@ -91,4 +90,4 @@ enum {
   w_val,
   w_version,
 };
-extern sym keywords[90];
+extern sym keywords[89];

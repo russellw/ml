@@ -20,7 +20,6 @@ ceiling
 cnf
 conjecture
 cons
-def
 difference
 dimacs
 distinct

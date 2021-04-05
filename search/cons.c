@@ -68,14 +68,6 @@ si get(si env, si key, int *found) {
     for (si frame = hd(env); frame != nil; frame = tl(frame)) {
       si entry = hd(frame);
       switch (keyword(hd(entry))) {
-      case w_val:
-        entry = tl(entry);
-        if (hd(entry) == key) {
-          *found = 1;
-          entry = tl(entry);
-          return hd(entry);
-        }
-        break;
       case w_fn:
         entry = tl(entry);
         if (hd(entry) == key) {
@@ -85,6 +77,14 @@ si get(si env, si key, int *found) {
           entry = tl(entry);
           si body = hd(entry);
           return list3(env, params, body);
+        }
+        break;
+      case w_val:
+        entry = tl(entry);
+        if (hd(entry) == key) {
+          *found = 1;
+          entry = tl(entry);
+          return hd(entry);
         }
         break;
       }

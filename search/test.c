@@ -539,17 +539,11 @@ void test(void) {
   assert(get(env, internz("c"), &found) == mkint(3));
 
   assert(eval(env, internz("a")) == mkint(4));
-
-  si f = list3(env, list1(internz("x")),
-               list4(internz("if"), internz("x"), mkint(8), mkint(9)));
-  assert(apply(f, list1(mkint(1))) == mkint(8));
-  assert(apply(f, list1(mkint(0))) == mkint(9));
-
   assert(eval(env, list3(internz("+"), mkint(100), mkint(200))) == mkint(300));
   assert(eval(env, list2(internz("minus"), mkint(100))) == mkint(-100));
 
-  f = list3(internz("\\"), list1(internz("x")),
-            list2(internz("minus"), internz("x")));
+  si f = list3(internz("\\"), list1(internz("x")),
+               list2(internz("minus"), internz("x")));
   assert(eval(env, list2(f, mkint(100))) == mkint(-100));
 
   f = list3(internz("\\"), internz("x"), list2(internz("minus"), internz("x")));

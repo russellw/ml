@@ -154,24 +154,32 @@ int main(int argc, char **argv) {
   }
 
   // definitions
-  vec keys, vals;
-  vinit(&keys);
-  vinit(&vals);
+  vec frame;
+  vinit(&frame);
   for (si i = 0; i < v.n; i++) {
     si a = v.p[i];
     si op = hd(a);
-    if (op == mkkeyword(w_def)) {
-      a = tl(a);
+    a = tl(a);
+    switch (keyword(op)) {
+    case w_fn: {
       si key = hd(a);
       a = tl(a);
-      si val = hd(a);
-      if (tag(key) != t_cons)
-        val = eval(nil, val);
-      vpush(&keys, key);
-      vpush(&vals, val);
+      si params = hd(a);
+      a = tl(a);
+      si body = hd(a);
+      vpush(&frame, list4(op, key, params, body));
+      break;
+    }
+    case w_val: {
+      si key = hd(a);
+      a = tl(a);
+      si val = eval(nil, hd(a));
+      vpush(&frame, list3(op, key, val));
+      break;
+    }
     }
   }
-  si env = list1(zip(list(&keys), list(&vals)));
+  si env = list1(list(&frame));
 
   // tests
   for (si i = 0; i < v.n; i++) {
