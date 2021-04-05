@@ -260,3 +260,12 @@
   (assert=(abs -0.1)  0.1)
   (assert=(abs -0.5)  0.5)
   (assert=(abs -0.9)  0.9)
+
+;quote
+(assert=`a a)
+
+;nil is self-evaluating
+(assert= () `())
+
+;lists
+(assert=`(a b c) (cons `a(cons `b(cons`c()))))

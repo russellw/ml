@@ -674,39 +674,39 @@ si mul(si a, si b) {
   return 0;
 }
 
-void print(si a) {
+void print(FILE *f, si a) {
   switch (tag(a)) {
   case t_cons: {
-    putchar('(');
+    fputc('(', f);
     int more = 0;
     for (; a != nil; a = tl(a)) {
       if (more)
-        putchar(' ');
+        fputc(' ', f);
       more = 1;
-      print(hd(a));
+      print(f, hd(a));
     }
-    putchar(')');
+    fputc(')', f);
     return;
   }
   case t_float:
-    printf("%f", floatp(a)->val);
+    fprintf(f, "%f", floatp(a)->val);
     return;
   case t_int:
-    mpz_out_str(stdout, 10, intp(a)->val);
+    mpz_out_str(f, 10, intp(a)->val);
     return;
   case t_rat:
-    mpq_out_str(stdout, 10, ratp(a)->val);
+    mpq_out_str(f, 10, ratp(a)->val);
     return;
   case t_sym:
-    fwrite(symp(a)->v, symp(a)->n, 1, stdout);
+    fwrite(symp(a)->v, symp(a)->n, 1, f);
     return;
   }
   unreachable;
 }
 
-void println(si a) {
-  print(a);
-  putchar('\n');
+void println(FILE *f, si a) {
+  print(f, a);
+  fputc('\n', f);
 }
 
 si rem_c(si a, si b) {

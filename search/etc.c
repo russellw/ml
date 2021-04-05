@@ -32,7 +32,7 @@ void stacktrace() {
 }
 
 si assertfail(char *file, si line, char *s) {
-  printf("%s:%zu: assert failed: %s\n", file, line, s);
+  fprintf(stderr, "%s:%zu: assert failed: %s\n", file, line, s);
   stacktrace();
   exit(1);
   // keep the compiler happy about the use of || in the assert macro

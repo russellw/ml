@@ -10,14 +10,17 @@ si apply(si f, si args) {
   return eval(env, body);
 }
 
-si eval(si env, si a) {
+si eval(si env, si a0) {
+  si a = a0;
+
   // symbols are names to be looked up
   if (tag(a) == t_sym) {
     int found;
     si val = get(env, a, &found);
-    if (!found)
-      err("eval: symbol not found");
-    return val;
+    if (found)
+      return val;
+    println(stderr, a0);
+    err("eval: symbol not found");
   }
 
   // other atoms evaluate to themselves
@@ -101,6 +104,10 @@ si eval(si env, si a) {
 
   // apply a function
   si f = eval(env, op);
+  if (tag(f) != t_cons) {
+    println(stderr, a0);
+    err("eval: not a function");
+  }
   si fenv = hd(f);
   f = tl(f);
   si params = hd(f);

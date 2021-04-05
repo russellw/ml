@@ -175,24 +175,21 @@ int main(int argc, char **argv) {
 
   // tests
   for (si i = 0; i < v.n; i++) {
-    si a = v.p[i];
+    si a0 = v.p[i];
+    si a = a0;
     si op = hd(a);
-    si a1 = tl(a);
+    a = tl(a);
     switch (keyword(op)) {
     case s_asserteq:
-      if (eval(env, hd(a1)) != eval(env, hd(tl(a1)))) {
-        println(a);
-        puts("Assert failed");
-        return 1;
-      }
-      break;
+      if (eval(env, hd(a)) == eval(env, hd(tl(a))))
+        break;
+      println(stderr, a0);
+      err("assert=: failed");
     case w_assert:
-      if (!istrue(eval(env, hd(a1)))) {
-        println(a);
-        puts("Assert failed");
-        return 1;
-      }
-      break;
+      if (istrue(eval(env, hd(a))))
+        break;
+      println(stderr, a0);
+      err("assert: failed");
     }
   }
   return 0;
