@@ -43,6 +43,7 @@ is_rat
 ite
 less
 lesseq
+list?,islist
 lst
 minus
 not

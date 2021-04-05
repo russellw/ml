@@ -52,6 +52,9 @@ si eval(si env, si a) {
     case s_eq:
       a = mkint(eval(env, hd(a)) == eval(env, hd(tl(a))));
       break;
+    case s_islist:
+      a = mkint(tag(eval(env, hd(a))) == t_cons);
+      break;
     case s_lambda:
       a = list3(env, hd(a), hd(tl(a)));
       break;

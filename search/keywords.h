@@ -45,6 +45,7 @@ enum {
   w_ite,
   w_less,
   w_lesseq,
+  s_islist,
   w_lst,
   w_minus,
   w_not,
@@ -83,4 +84,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[82];
+extern sym keywords[83];

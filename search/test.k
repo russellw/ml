@@ -273,3 +273,6 @@
 (assert=(tl#( 1 2 3))#(  2 3))
 (assert=(hd 5)5)
 (assert=(tl 5)())
+
+;classify
+(assert(list? ()))
