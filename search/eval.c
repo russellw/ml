@@ -101,5 +101,17 @@ si eval(si env, si a) {
 
   // apply a function
   si f = eval(env, op);
-  return apply(f, a);
+  si fenv = hd(f);
+  f = tl(f);
+  si params = hd(f);
+  f = tl(f);
+  si body = hd(f);
+  vec frame;
+  vinit(&frame);
+  while (params != nil) {
+    vpush(&frame, list2(hd(params), eval(env, hd(a))));
+    params = tl(params);
+    a = tl(a);
+  }
+  return eval(cons(list(&frame), fenv), body);
 }

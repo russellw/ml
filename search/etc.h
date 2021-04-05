@@ -13,6 +13,11 @@ si assertfail(char *file, si line, char *s);
 #define assert(a) (a) || assertfail(__FILE__, __LINE__, #a)
 #define unreachable assert(0)
 #define debug(a) printf("%s:%d: %s: %zx\n", __FILE__, __LINE__, #a, a);
+#define debugt(a)                                                              \
+  do {                                                                         \
+    printf("%s:%d: %s: ", __FILE__, __LINE__, #a);                             \
+    println(a);                                                                \
+  } while (0);
 
 #else
 
@@ -25,6 +30,7 @@ si assertfail(char *file, si line, char *s);
 #define unreachable __builtin_unreachable()
 #endif
 #define debug(a)
+#define debugt(a)
 
 #endif
 
