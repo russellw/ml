@@ -62,8 +62,8 @@ char *basename(char *file) {
 }
 
 noret err(char *msg) {
-  strcpy(buf, msg);
-  longjmp(jmpbuf, 1);
+  fprintf(stderr, "%s\n", msg);
+  exit(1);
 }
 
 size_t fnv(char *s, si n) {

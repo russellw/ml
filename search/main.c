@@ -160,10 +160,15 @@ int main(int argc, char **argv) {
   for (si i = 0; i < v.n; i++) {
     si a = v.p[i];
     si op = hd(a);
-    si a1 = tl(a);
     if (op == term(keywords + w_def, t_sym)) {
-      si name = hd(a1);
-      a1 = tl(a1);
+      a = tl(a);
+      si key = hd(a);
+      a = tl(a);
+      si val = hd(a);
+      if (tag(key) != t_cons)
+        val = eval(nil, val);
+      vpush(&keys, key);
+      vpush(&vals, val);
     }
   }
   si env = list1(zip(list(&keys), list(&vals)));
@@ -175,14 +180,14 @@ int main(int argc, char **argv) {
     si a1 = tl(a);
     switch (keyword(op)) {
     case s_asserteq:
-      if (eval(nil, hd(a1)) != eval(nil, hd(tl(a1)))) {
+      if (eval(env, hd(a1)) != eval(env, hd(tl(a1)))) {
         println(a);
         puts("Assert failed");
         return 1;
       }
       break;
     case w_assert:
-      if (!istrue(eval(nil, hd(a1)))) {
+      if (!istrue(eval(env, hd(a1)))) {
         println(a);
         puts("Assert failed");
         return 1;

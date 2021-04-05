@@ -50,13 +50,6 @@ void test(void) {
   assert(add(mkint(-1), mkrat("1/2")) == mkrat("-1/2"));
   assert(add(mkrat("1/2"), mkint(-1)) == mkrat("-1/2"));
 
-  si caught = 0;
-  if (!setjmp(jmpbuf))
-    add(internz("a"), mkint(1));
-  else
-    caught = 1;
-  assert(caught);
-
   assert(sub(mkfloat(0.5), mkfloat(0.5)) == mkfloat(0.0));
   assert(sub(mkfloat(1.0), mkfloat(2.0)) == mkfloat(-1.0));
   assert(sub(mkfloat(10.0), mkfloat(-0.5)) == mkfloat(10.5));
@@ -99,20 +92,6 @@ void test(void) {
   assert(div2(mkint(-1), mkrat("1/2")) == mkrat("-2"));
   assert(div2(mkrat("1/2"), mkint(-1)) == mkrat("-1/2"));
 
-  caught = 0;
-  if (!setjmp(jmpbuf))
-    div2(mkint(1), mkint(0));
-  else
-    caught = 1;
-  assert(caught);
-
-  caught = 0;
-  if (!setjmp(jmpbuf))
-    div2(mkrat("2/3"), mkint(0));
-  else
-    caught = 1;
-  assert(caught);
-
   // floor division
   assert(div_f(mkint(5), mkint(3)) == mkint(1));
   assert(div_f(mkint(-5), mkint(3)) == mkint(-2));
@@ -136,20 +115,6 @@ void test(void) {
   assert(rem_f(mkrat("-5/997"), mkrat("3/997")) == mkint(1 * 997));
   assert(rem_f(mkrat("5/997"), mkrat("-3/997")) == mkint(-1 * 997));
   assert(rem_f(mkrat("-5/997"), mkrat("-3/997")) == mkint(-2 * 997));
-
-  caught = 0;
-  if (!setjmp(jmpbuf))
-    div_f(mkrat("2/3"), mkint(0));
-  else
-    caught = 1;
-  assert(caught);
-
-  caught = 0;
-  if (!setjmp(jmpbuf))
-    div_f(mkrat("2/3"), mkfloat(1));
-  else
-    caught = 1;
-  assert(caught);
 
   // ceiling division
   assert(div_c(mkint(5), mkint(3)) == mkint(2));
@@ -422,13 +387,6 @@ void test(void) {
   // cons
   assert(tag(nil) == t_cons);
 
-  caught = 0;
-  if (!setjmp(jmpbuf))
-    cons(mkrat("2/3"), mkfloat(1));
-  else
-    caught = 1;
-  assert(caught);
-
   assert(cons(mkint(1), nil) == cons(mkint(1), nil));
   assert(cons(mkint(1), cons(mkint(2), nil)) ==
          cons(mkint(1), cons(mkint(2), nil)));
@@ -439,46 +397,39 @@ void test(void) {
   assert(hd(cons(mkint(1), nil)) == mkint(1));
   assert(tl(cons(mkint(1), nil)) == nil);
 
-  // eval
-  if (!setjmp(jmpbuf)) {
-    // constant
-    assert(eval(nil, mkint(5)) == mkint(5));
+  // constant
+  assert(eval(nil, mkint(5)) == mkint(5));
 
-    // if
-    assert(eval(nil, list4(internz("if"), mkint(1), mkint(2), mkint(3))) ==
-           mkint(2));
-    assert(eval(nil, list4(internz("if"), mkint(0), mkint(2), mkint(3))) ==
-           mkint(3));
+  // if
+  assert(eval(nil, list4(internz("if"), mkint(1), mkint(2), mkint(3))) ==
+         mkint(2));
+  assert(eval(nil, list4(internz("if"), mkint(0), mkint(2), mkint(3))) ==
+         mkint(3));
 
-    // quote
-    assert(eval(nil, list2(internz("quote"), internz("foo"))) ==
-           internz("foo"));
+  // quote
+  assert(eval(nil, list2(internz("quote"), internz("foo"))) == internz("foo"));
 
-    // not
-    assert(eval(nil, list2(internz("not"), mkint(2))) == mkint(0));
-    assert(eval(nil, list2(internz("not"), mkint(0))) == mkint(1));
+  // not
+  assert(eval(nil, list2(internz("not"), mkint(2))) == mkint(0));
+  assert(eval(nil, list2(internz("not"), mkint(0))) == mkint(1));
 
-    // and
-    assert(eval(nil, list1(internz("and"))) == mkint(1));
-    assert(eval(nil, list2(internz("and"), mkint(0))) == mkint(0));
-    assert(eval(nil, list2(internz("and"), mkint(1))) == mkint(1));
-    assert(eval(nil, list3(internz("and"), mkint(0), mkint(0))) == mkint(0));
-    assert(eval(nil, list3(internz("and"), mkint(0), mkint(1))) == mkint(0));
-    assert(eval(nil, list3(internz("and"), mkint(1), mkint(0))) == mkint(0));
-    assert(eval(nil, list3(internz("and"), mkint(1), mkint(1))) == mkint(1));
+  // and
+  assert(eval(nil, list1(internz("and"))) == mkint(1));
+  assert(eval(nil, list2(internz("and"), mkint(0))) == mkint(0));
+  assert(eval(nil, list2(internz("and"), mkint(1))) == mkint(1));
+  assert(eval(nil, list3(internz("and"), mkint(0), mkint(0))) == mkint(0));
+  assert(eval(nil, list3(internz("and"), mkint(0), mkint(1))) == mkint(0));
+  assert(eval(nil, list3(internz("and"), mkint(1), mkint(0))) == mkint(0));
+  assert(eval(nil, list3(internz("and"), mkint(1), mkint(1))) == mkint(1));
 
-    // or
-    assert(eval(nil, list1(internz("or"))) == mkint(0));
-    assert(eval(nil, list2(internz("or"), mkint(0))) == mkint(0));
-    assert(eval(nil, list2(internz("or"), mkint(1))) == mkint(1));
-    assert(eval(nil, list3(internz("or"), mkint(0), mkint(0))) == mkint(0));
-    assert(eval(nil, list3(internz("or"), mkint(0), mkint(1))) == mkint(1));
-    assert(eval(nil, list3(internz("or"), mkint(1), mkint(0))) == mkint(1));
-    assert(eval(nil, list3(internz("or"), mkint(1), mkint(1))) == mkint(1));
-  } else {
-    puts(buf);
-    exit(1);
-  }
+  // or
+  assert(eval(nil, list1(internz("or"))) == mkint(0));
+  assert(eval(nil, list2(internz("or"), mkint(0))) == mkint(0));
+  assert(eval(nil, list2(internz("or"), mkint(1))) == mkint(1));
+  assert(eval(nil, list3(internz("or"), mkint(0), mkint(0))) == mkint(0));
+  assert(eval(nil, list3(internz("or"), mkint(0), mkint(1))) == mkint(1));
+  assert(eval(nil, list3(internz("or"), mkint(1), mkint(0))) == mkint(1));
+  assert(eval(nil, list3(internz("or"), mkint(1), mkint(1))) == mkint(1));
 
   // parsing
   assert(mkrat("0b10000") == mkint(16));
@@ -587,28 +538,21 @@ void test(void) {
   assert(get(env, internz("b")) == list2(internz("b"), mkint(2)));
   assert(get(env, internz("c")) == list2(internz("c"), mkint(3)));
 
-  if (!setjmp(jmpbuf)) {
-    assert(eval(env, internz("a")) == mkint(4));
+  assert(eval(env, internz("a")) == mkint(4));
 
-    si f = list3(env, list1(internz("x")),
-                 list4(internz("if"), internz("x"), mkint(8), mkint(9)));
-    assert(apply(f, list1(mkint(1))) == mkint(8));
-    assert(apply(f, list1(mkint(0))) == mkint(9));
+  si f = list3(env, list1(internz("x")),
+               list4(internz("if"), internz("x"), mkint(8), mkint(9)));
+  assert(apply(f, list1(mkint(1))) == mkint(8));
+  assert(apply(f, list1(mkint(0))) == mkint(9));
 
-    assert(eval(env, list3(internz("+"), mkint(100), mkint(200))) ==
-           mkint(300));
-    assert(eval(env, list2(internz("minus"), mkint(100))) == mkint(-100));
+  assert(eval(env, list3(internz("+"), mkint(100), mkint(200))) == mkint(300));
+  assert(eval(env, list2(internz("minus"), mkint(100))) == mkint(-100));
 
-    f = list3(internz("\\"), list1(internz("x")),
-              list2(internz("minus"), internz("x")));
-    assert(eval(env, list2(f, mkint(100))) == mkint(-100));
+  f = list3(internz("\\"), list1(internz("x")),
+            list2(internz("minus"), internz("x")));
+  assert(eval(env, list2(f, mkint(100))) == mkint(-100));
 
-    f = list3(internz("\\"), internz("x"),
-              list2(internz("minus"), internz("x")));
-    assert(eval(env, list2(f, mkint(100))) == mkint(-100));
-  } else {
-    puts(buf);
-    exit(1);
-  }
+  f = list3(internz("\\"), internz("x"), list2(internz("minus"), internz("x")));
+  assert(eval(env, list2(f, mkint(100))) == mkint(-100));
 }
 #endif
