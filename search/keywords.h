@@ -86,8 +86,10 @@ enum {
   w_truncate,
   w_type,
   w_uminus,
+  w_unquote,
+  w_unquotes,
   w_v,
   w_val,
   w_version,
 };
-extern sym keywords[89];
+extern sym keywords[91];

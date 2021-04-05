@@ -87,6 +87,8 @@ sym keywords[] = {
     {8, "truncate"},
     {4, "type"},
     {6, "uminus"},
+    {7, "unquote"},
+    {8, "unquotes"},
     {1, "v"},
     {3, "val"},
     {7, "version"},

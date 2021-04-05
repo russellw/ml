@@ -63,7 +63,7 @@ static sym *symp(si a) {
 }
 ///
 
-static si mkkeyword(int k) { return term(keywords + k, t_sym); }
+static si mkeyword(int k) { return term(keywords + k, t_sym); }
 
 static si keyword(si a) {
   // turn a symbol into a keyword number by subtracting the base of the keyword

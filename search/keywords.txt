@@ -84,6 +84,8 @@ trunc
 truncate
 type
 uminus
+unquote
+unquotes
 v
 val
 version
