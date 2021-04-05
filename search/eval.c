@@ -13,10 +13,11 @@ si apply(si f, si args) {
 si eval(si env, si a) {
   // symbols are names to be looked up
   if (tag(a) == t_sym) {
-    si pair = get(env, a);
-    if (pair == nil)
+    int found;
+    si val = get(env, a, &found);
+    if (!found)
       err("eval: symbol not found");
-    return hd(tl(pair));
+    return val;
   }
 
   // other atoms evaluate to themselves

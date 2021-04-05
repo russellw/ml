@@ -7,7 +7,7 @@ void init_cons(void);
 
 // SORT
 si cons(si hd, si tl);
-si get(si env, si key);
+si get(si env, si key, int *found);
 si hd(si s);
 si list(vec *v);
 si list1(si a);

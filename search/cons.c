@@ -63,13 +63,21 @@ si cons(si hd, si tl) {
   return term(entries[i], t_cons);
 }
 
-si get(si env, si key) {
+si get(si env, si key, int *found) {
   for (; env != nil; env = tl(env))
     for (si frame = hd(env); frame != nil; frame = tl(frame)) {
       si pair = hd(frame);
-      if (hd(pair) == key)
-        return pair;
+      si key1 = hd(pair);
+      if (key1 == key) {
+        *found = 1;
+        return hd(tl(pair));
+      }
+      if (hd(key1) == key) {
+        *found = 1;
+        return list3(env, tl(key1), hd(tl(pair)));
+      }
     }
+  *found = 0;
   return nil;
 }
 
