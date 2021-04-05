@@ -322,7 +322,7 @@ loop:
     goto loop;
   case '"':
     quote(&v);
-    tokterm = list2(term(keywords + w_quote, t_sym), list(&v));
+    tokterm = list2(mkkeyword(w_quote), list(&v));
     return;
   case '-':
     if (isdigit1(s[1])) {
@@ -449,7 +449,7 @@ static si expr(void) {
   switch (tok) {
   case '#':
     lex();
-    return list2(term(keywords + w_quote, t_sym), expr());
+    return list2(mkkeyword(w_quote), expr());
   case '(':
     lex();
     vinit(&v);

@@ -31,6 +31,7 @@ div-t,div_t
 exact?,isexact
 false
 floor
+fn
 fof
 greater
 greatereq
@@ -85,4 +86,5 @@ truncate
 type
 uminus
 v
+val
 version

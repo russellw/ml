@@ -171,7 +171,7 @@ si eval(si env, si a) {
       vec frame;
       vinit(&frame);
       while (params != nil) {
-        vpush(&frame, list2(hd(params), eval(env, hd(a))));
+        vpush(&frame, list3(mkkeyword(w_val), hd(params), eval(env, hd(a))));
         params = tl(params);
         a = tl(a);
       }

@@ -34,6 +34,7 @@ sym keywords[] = {
     {6, "exact?"},
     {5, "false"},
     {5, "floor"},
+    {2, "fn"},
     {3, "fof"},
     {7, "greater"},
     {9, "greatereq"},
@@ -88,5 +89,6 @@ sym keywords[] = {
     {4, "type"},
     {6, "uminus"},
     {1, "v"},
+    {3, "val"},
     {7, "version"},
 };

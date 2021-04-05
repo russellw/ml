@@ -63,6 +63,8 @@ static sym *symp(si a) {
 }
 ///
 
+static si mkkeyword(int k) { return term(keywords + k, t_sym); }
+
 static si keyword(si a) {
   // turn a symbol into a keyword number by subtracting the base of the keyword
   // array and dividing by the declared size of a symbol structure (which is

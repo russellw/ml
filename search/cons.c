@@ -66,15 +66,27 @@ si cons(si hd, si tl) {
 si get(si env, si key, int *found) {
   for (; env != nil; env = tl(env))
     for (si frame = hd(env); frame != nil; frame = tl(frame)) {
-      si pair = hd(frame);
-      si key1 = hd(pair);
-      if (key1 == key) {
-        *found = 1;
-        return hd(tl(pair));
-      }
-      if (hd(key1) == key) {
-        *found = 1;
-        return list3(env, tl(key1), hd(tl(pair)));
+      si entry = hd(frame);
+      switch (keyword(hd(entry))) {
+      case w_val:
+        entry = tl(entry);
+        if (hd(entry) == key) {
+          *found = 1;
+          entry = tl(entry);
+          return hd(entry);
+        }
+        break;
+      case w_fn:
+        entry = tl(entry);
+        if (hd(entry) == key) {
+          *found = 1;
+          entry = tl(entry);
+          si params = hd(entry);
+          entry = tl(entry);
+          si body = hd(entry);
+          return list3(env, params, body);
+        }
+        break;
       }
     }
   *found = 0;

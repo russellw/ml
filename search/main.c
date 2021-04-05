@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
   for (si i = 0; i < v.n; i++) {
     si a = v.p[i];
     si op = hd(a);
-    if (op == term(keywords + w_def, t_sym)) {
+    if (op == mkkeyword(w_def)) {
       a = tl(a);
       si key = hd(a);
       a = tl(a);

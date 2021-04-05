@@ -523,17 +523,16 @@ void test(void) {
   assert(parse1() == list1(internz("a")));
 
   // environments
-  si frame = list3(list2(internz("a"), mkint(1)), list2(internz("b"), mkint(2)),
-                   list2(internz("c"), mkint(3)));
-  assert(frame == zip(list3(internz("a"), internz("b"), internz("c")),
-                      list4(mkint(1), mkint(2), mkint(3), mkint(4))));
+  si frame = list3(list3(internz("val"), internz("a"), mkint(1)),
+                   list3(internz("val"), internz("b"), mkint(2)),
+                   list3(internz("val"), internz("c"), mkint(3)));
   si env = list1(frame);
   int found;
   assert(get(env, internz("a"), &found) == mkint(1));
   assert(get(env, internz("b"), &found) == mkint(2));
   assert(get(env, internz("c"), &found) == mkint(3));
 
-  frame = list1(list2(internz("a"), mkint(4)));
+  frame = list1(list3(internz("val"), internz("a"), mkint(4)));
   env = cons(frame, env);
   assert(get(env, internz("a"), &found) == mkint(4));
   assert(get(env, internz("b"), &found) == mkint(2));
