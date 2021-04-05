@@ -10,6 +10,35 @@ noret err(char *msg) {
   exit(1);
 }
 
+static si quotes(si env,si s){
+	assert(tag(s)==t_cons);
+		vec v;
+		vinit(&v);
+	while(s!=nil){
+		si a=hd(s);
+		s=tl(s);
+		if(tag(a)!=t_cons){
+				vpush(v,a);
+				continue;
+			}
+		switch(keyword(hd(a))){
+			case w_unquotes:
+				a=eval(env,hd(tl(a)));
+				while(a!=nil){
+					vpush(v,hd(a));
+					a=tl(a);
+				}
+				continue;
+			case w_unquote:
+				a=eval(env,hd(tl(a)));
+				vpush(v,a);
+				continue;
+		}
+		vpush(v,quotes(env,a));
+	}
+	return list(v);
+}
+
 si eval(si env, si a) {
   if (stacki == sizeof stack / sizeof *stack)
     err("eval: stack overflow");
