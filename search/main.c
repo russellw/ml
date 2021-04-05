@@ -183,12 +183,12 @@ int main(int argc, char **argv) {
     case s_asserteq:
       if (eval(env, hd(a)) == eval(env, hd(tl(a))))
         break;
-      println(stderr, a0);
+      print(stderr, a0);
       err("assert=: failed");
     case w_assert:
       if (istrue(eval(env, hd(a))))
         break;
-      println(stderr, a0);
+      print(stderr, a0);
       err("assert: failed");
     }
   }

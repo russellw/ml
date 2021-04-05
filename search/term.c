@@ -675,6 +675,11 @@ si mul(si a, si b) {
 }
 
 void print(FILE *f, si a) {
+  printl(f, a);
+  fputc('\n', f);
+}
+
+void printl(FILE *f, si a) {
   switch (tag(a)) {
   case t_cons: {
     fputc('(', f);
@@ -683,7 +688,7 @@ void print(FILE *f, si a) {
       if (more)
         fputc(' ', f);
       more = 1;
-      print(f, hd(a));
+      printl(f, hd(a));
     }
     fputc(')', f);
     return;
@@ -702,11 +707,6 @@ void print(FILE *f, si a) {
     return;
   }
   unreachable;
-}
-
-void println(FILE *f, si a) {
-  print(f, a);
-  fputc('\n', f);
 }
 
 si rem_c(si a, si b) {

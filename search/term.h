@@ -98,7 +98,7 @@ int lt(si a, si b);
 si minus(si a);
 si mul(si a, si b);
 void print(FILE *f, si a);
-void println(FILE *f, si a);
+void printl(FILE *f, si a);
 si rem_c(si a, si b);
 si rem_e(si a, si b);
 si rem_f(si a, si b);

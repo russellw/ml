@@ -19,7 +19,7 @@ si eval(si env, si a0) {
     si val = get(env, a, &found);
     if (found)
       return val;
-    println(stderr, a0);
+    print(stderr, a0);
     err("eval: symbol not found");
   }
 
@@ -105,7 +105,7 @@ si eval(si env, si a0) {
   // apply a function
   si f = eval(env, op);
   if (tag(f) != t_cons) {
-    println(stderr, a0);
+    print(stderr, a0);
     err("eval: not a function");
   }
   si fenv = hd(f);

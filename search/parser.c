@@ -447,9 +447,6 @@ static int eat(int k) {
 static si expr(void) {
   vec v;
   switch (tok) {
-  case '`':
-    lex();
-    return list2(term(keywords + w_quote, t_sym), expr());
   case '(':
     lex();
     vinit(&v);
@@ -462,6 +459,9 @@ static si expr(void) {
     while (!eat(']'))
       vpush(&v, expr());
     return list(&v);
+  case '`':
+    lex();
+    return list2(term(keywords + w_quote, t_sym), expr());
   case k_term: {
     si a = tokterm;
     lex();

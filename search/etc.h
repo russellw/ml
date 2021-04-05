@@ -16,7 +16,7 @@ si assertfail(char *file, si line, char *s);
 #define debugt(a)                                                              \
   do {                                                                         \
     fprintf(stderr, "%s:%d: %s: ", __FILE__, __LINE__, #a);                    \
-    println(stderr, a);                                                        \
+    print(stderr, a);                                                          \
   } while (0);
 
 #else
