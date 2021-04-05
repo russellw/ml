@@ -10,33 +10,30 @@ noret err(char *msg) {
   exit(1);
 }
 
-static si quotes(si env,si s){
-	assert(tag(s)==t_cons);
-		vec v;
-		vinit(&v);
-	while(s!=nil){
-		si a=hd(s);
-		s=tl(s);
-		if(tag(a)!=t_cons){
-				vpush(v,a);
-				continue;
-			}
-		switch(keyword(hd(a))){
-			case w_unquotes:
-				a=eval(env,hd(tl(a)));
-				while(a!=nil){
-					vpush(v,hd(a));
-					a=tl(a);
-				}
-				continue;
-			case w_unquote:
-				a=eval(env,hd(tl(a)));
-				vpush(v,a);
-				continue;
-		}
-		vpush(v,quotes(env,a));
-	}
-	return list(v);
+static si quote(si env, si a) {
+  if (tag(a) != t_cons)
+    return a;
+  vec v;
+  vinit(&v);
+  while (a != nil) {
+    si b = hd(a);
+    a = tl(a);
+    switch (keyword(hd(b))) {
+    case w_unquote:
+      b = eval(env, hd(tl(b)));
+      vpush(&v, b);
+      continue;
+    case w_unquotes:
+      b = eval(env, hd(tl(b)));
+      while (b != nil) {
+        vpush(&v, hd(b));
+        b = tl(b);
+      }
+      continue;
+    }
+    vpush(&v, quote(env, b));
+  }
+  return list(&v);
 }
 
 si eval(si env, si a) {
@@ -167,7 +164,7 @@ si eval(si env, si a) {
       a = mkint(0);
       break;
     case w_quote:
-      a = hd(a);
+      a = quote(env, hd(a));
       break;
     case w_round:
       a = round1(eval(env, hd(a)));

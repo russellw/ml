@@ -264,6 +264,11 @@
 
 ;quote
 (assert=#a #a)
+(assert=#(1 ,(+ 1 1) 3)#(1 2 3))
+(assert=#(1 ,#(4 5 6) 3)#(1 (4 5 6) 3))
+(assert=#(1 @(+ 1 1) 3)#(1 2 3))
+(assert=#(1 @#(4 5 6) 3)#(1 4 5 6 3))
+
 
 ;nil is self-evaluating
 (assert= () #())
