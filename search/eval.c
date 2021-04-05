@@ -150,12 +150,13 @@ si eval(si env, si a) {
     }
     break;
   }
-  case t_sym:
+  case t_sym: {
     int found;
     a = get(env, a, &found);
     if (!found)
       err("eval: symbol not found");
     break;
+  }
   }
 end:
   stacki--;
