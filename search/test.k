@@ -262,14 +262,14 @@
   (assert=(abs -0.9)  0.9)
 
 ;quote
-(assert=`a `a)
+(assert=#a #a)
 
 ;nil is self-evaluating
-(assert= () `())
+(assert= () #())
 
 ;lists
-(assert=`(a b c) (cons `a(cons `b(cons`c()))))
-(assert=(hd`( 1 2 3))1)
-(assert=(tl`( 1 2 3))`(  2 3))
+(assert=#(a b c) (cons #a(cons #b(cons#c()))))
+(assert=(hd#( 1 2 3))1)
+(assert=(tl#( 1 2 3))#(  2 3))
 (assert=(hd 5)5)
 (assert=(tl 5)())
