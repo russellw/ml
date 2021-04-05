@@ -14,6 +14,7 @@
 
 (assert=(if 1 (quote a) (quote b))(quote a))
 (assert=(if 0 (quote a) (quote b))(quote b))
+(assert=(if () (quote a) (quote b))(quote b))
 
 ;comparison
 (assert(= 5 5))

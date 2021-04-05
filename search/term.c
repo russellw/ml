@@ -491,7 +491,7 @@ int istrue(si a) {
   case t_rat:
     return mpq_sgn(ratp(a)->val);
   }
-  return 1;
+  return a != nil;
 }
 
 int le(si a, si b) {
