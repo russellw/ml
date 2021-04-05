@@ -284,3 +284,5 @@
 (assert-not(inexact? 5/2))
 (assert(inexact? 5.0))
 (assert-not(inexact? #a))
+(assert(sym? #bar))
+(assert-not(sym? #(bar)))

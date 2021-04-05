@@ -73,6 +73,7 @@ sym keywords[] = {
     {11, "remainder_t"},
     {5, "round"},
     {3, "sum"},
+    {4, "sym?"},
     {1, "t"},
     {5, "tType"},
     {3, "tff"},

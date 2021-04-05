@@ -70,6 +70,7 @@ remainder_f
 remainder_t
 round
 sum
+sym?,issym
 t
 tType
 tff

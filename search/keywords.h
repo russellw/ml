@@ -72,6 +72,7 @@ enum {
   w_remainder_t,
   w_round,
   w_sum,
+  s_issym,
   w_t,
   w_tType,
   w_tff,
@@ -88,4 +89,4 @@ enum {
   w_v,
   w_version,
 };
-extern sym keywords[87];
+extern sym keywords[88];

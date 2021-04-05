@@ -69,6 +69,9 @@ si eval(si env, si a) {
     case s_islist:
       a = mkint(tag(eval(env, hd(a))) == t_cons);
       break;
+    case s_issym:
+      a = mkint(tag(eval(env, hd(a))) == t_sym);
+      break;
     case s_lambda:
       a = list3(env, hd(a), hd(tl(a)));
       break;
