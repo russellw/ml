@@ -10,16 +10,6 @@ noret err(char *msg) {
   exit(1);
 }
 
-si apply(si f, si args) {
-  si env = hd(f);
-  f = tl(f);
-  si params = hd(f);
-  f = tl(f);
-  si body = hd(f);
-  env = cons(zip(params, args), env);
-  return eval(env, body);
-}
-
 si eval(si env, si a) {
   if (stacki == sizeof stack / sizeof *stack)
     err("eval: stack overflow");

@@ -15,5 +15,4 @@ si list2(si a, si b);
 si list3(si a, si b, si c);
 si list4(si a, si b, si c, si d);
 si tl(si s);
-si zip(si keys, si vals);
 ///
