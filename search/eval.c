@@ -13,14 +13,6 @@ si apply(si f, si args) {
 si eval(si env, si a0) {
   si a = a0;
   switch (tag(a)) {
-  case t_sym:
-    int found;
-    a = get(env, a, &found);
-    if (!found) {
-      print(stderr, a0);
-      err("eval: symbol not found");
-    }
-    break;
   case t_cons: {
     si op = hd(a);
     a = tl(a);
@@ -146,7 +138,16 @@ si eval(si env, si a0) {
       break;
     }
     }
+    break;
   }
+  case t_sym:
+    int found;
+    a = get(env, a, &found);
+    if (!found) {
+      print(stderr, a0);
+      err("eval: symbol not found");
+    }
+    break;
   }
 end:
   return a;
