@@ -1,5 +1,15 @@
 #include "main.h"
 
+static si stack[1 << 20];
+static int stacki;
+
+noret err(char *msg) {
+  for (int i = 0; i < stacki; i++)
+    print(stderr, stack[i]);
+  fprintf(stderr, "%s\n", msg);
+  exit(1);
+}
+
 si apply(si f, si args) {
   si env = hd(f);
   f = tl(f);
@@ -10,8 +20,10 @@ si apply(si f, si args) {
   return eval(env, body);
 }
 
-si eval(si env, si a0) {
-  si a = a0;
+si eval(si env, si a) {
+  if (stacki == sizeof stack / sizeof *stack)
+    err("eval: stack overflow");
+  stack[stacki++] = a;
   switch (tag(a)) {
   case t_cons: {
     si op = hd(a);
@@ -118,10 +130,8 @@ si eval(si env, si a0) {
       break;
     default: {
       si f = eval(env, op);
-      if (tag(f) != t_cons) {
-        print(stderr, a0);
+      if (tag(f) != t_cons)
         err("eval: not a function");
-      }
       si fenv = hd(f);
       f = tl(f);
       si params = hd(f);
@@ -143,12 +153,11 @@ si eval(si env, si a0) {
   case t_sym:
     int found;
     a = get(env, a, &found);
-    if (!found) {
-      print(stderr, a0);
+    if (!found)
       err("eval: symbol not found");
-    }
     break;
   }
 end:
+  stacki--;
   return a;
 }

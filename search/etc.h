@@ -53,7 +53,6 @@ extern jmp_buf jmpbuf;
 
 // SORT
 char *basename(char *file);
-noret err(char *msg);
 size_t fnv(char *s, si n);
 void *mmalloc(si n);
 void *xcalloc(si n, si size);
