@@ -128,7 +128,6 @@ int main(int argc, char **argv) {
   // SORT
   init_cons();
   init_floats();
-  init_frames();
   init_ints();
   init_parser();
   init_rats();

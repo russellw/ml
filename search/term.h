@@ -2,7 +2,6 @@ enum {
   // SORT
   t_cons,
   t_float,
-  t_frame,
   t_int,
   t_rat,
   t_sym,
@@ -46,11 +45,6 @@ static Cons *consp(si a) {
 static Float *floatp(si a) {
   assert(tag(a) == t_float);
   return (Float *)(a - t_float);
-}
-
-static frame *framep(si a) {
-  assert(tag(a) == t_frame);
-  return (frame *)(a - t_frame);
 }
 
 static Int *intp(si a) {
