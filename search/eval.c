@@ -166,6 +166,9 @@ si eval(si env, si a) {
     case w_cons:
       a = cons(eval(env, hd(a)), eval(env, hd(tl(a))));
       break;
+    case w_do:
+      a = evals(env, a);
+      break;
     case w_floor:
       a = floor1(eval(env, hd(a)));
       break;
@@ -288,7 +291,7 @@ si evals(si env, si s0) {
     si key = hd(a);
     a = tl(a);
     si val = eval(env, hd(a));
-    env = cons(list3(mkeyword(w_var), key, val), env);
+    env = cons(list3(mkeyword(w_let), key, val), env);
   }
 
   // fns

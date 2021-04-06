@@ -30,6 +30,7 @@ sym keywords[] = {
     {5, "div-e"},
     {5, "div-f"},
     {5, "div-t"},
+    {2, "do"},
     {6, "exact?"},
     {5, "false"},
     {5, "floor"},

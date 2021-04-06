@@ -27,6 +27,7 @@ div-c,div_c
 div-e,div_e
 div-f,div_f
 div-t,div_t
+do
 exact?,isexact
 false
 floor

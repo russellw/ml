@@ -399,3 +399,27 @@
 	)
 	()
 )
+
+;do
+(assert=
+	(do
+		(+  1 2)
+	)
+	3
+)
+(assert=
+	(do
+		(var x 5)
+		(+  x 2)
+	)
+	7
+)
+(assert=
+	(do
+		(var x 5)
+		(fn f(y)(+ y 1))
+		(+  (f x) 2)
+		(assert= x 5)
+	)
+	8
+)
