@@ -176,3 +176,14 @@
 
 (assert (any num? #(a b 3)))
 (assert (any sym? #(a b 3)))
+(assert-not (any sym? #()))
+
+(fn every (f s)
+	(if s
+		(and(f(hd s))(every f(tl s)))
+		1))
+
+(assert-not (every num? #(a b 3)))
+(assert-not (every sym? #(a b 3)))
+(assert (every sym? #(a b c)))
+(assert (every sym? #()))

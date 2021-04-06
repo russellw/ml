@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
 
   // primitive functions
   typedef struct {
-    char k;
+    char key;
     char arity;
   } prim;
 
@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
   vec frame;
   vinit(&frame);
   for (int i = 0; i < sizeof prims / sizeof *prims; i++) {
-    si key = mkeyword(prims[i].k);
+    si key = mkeyword(prims[i].key);
     si params = pparams[prims[i].arity];
     si body = cons(key, params);
     vpush(&frame, list4(mkeyword(w_fn), key, params, body));
