@@ -169,3 +169,10 @@
 
   ; Fails. a and b do not match, so x can't be unified with both
     (assert-not (list?(unify(unify()# (var x) #a ) #b #(var x) )))
+
+(fn any (f s)
+	(if s
+		(or(f(hd s))(any f(tl s)))))
+
+(assert (any num? #(a b 3)))
+;(assert (any sym? #(a b 3)))
