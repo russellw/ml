@@ -157,15 +157,15 @@ int main(int argc, char **argv) {
   si pparams[2];
   pparams[1] = list1(internz("a"));
 
-  vec frame;
-  vinit(&frame);
+  vec fm;
+  vinit(&fm);
   for (int i = 0; i < sizeof prims / sizeof *prims; i++) {
     si key = mkeyword(prims[i].key);
     si params = pparams[prims[i].arity];
     si body = cons(key, params);
-    vpush(&frame, list4(mkeyword(w_fn), key, params, body));
+    vpush(&fm, list4(mkeyword(w_fn), key, params, body));
   }
-  si env = list1(list(&frame));
+  si env = list1(list(&fm));
 
   // SORT
   static char *corefiles[] = {
@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
   }
 
   // definitions
-  vinit(&frame);
+  vinit(&fm);
   for (si i = 0; i < v.n; i++) {
     si a = v.p[i];
     si op = hd(a);
@@ -194,19 +194,19 @@ int main(int argc, char **argv) {
       si params = hd(a);
       a = tl(a);
       si body = hd(a);
-      vpush(&frame, list4(op, key, params, body));
+      vpush(&fm, list4(op, key, params, body));
       break;
     }
     case w_val: {
       si key = hd(a);
       a = tl(a);
       si val = eval(env, hd(a));
-      vpush(&frame, list3(op, key, val));
+      vpush(&fm, list3(op, key, val));
       break;
     }
     }
   }
-  env = cons(list(&frame), env);
+  env = cons(list(&fm), env);
 
   // tests
   for (si i = 0; i < v.n; i++) {

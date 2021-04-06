@@ -10,7 +10,7 @@ noret err(char *msg) {
   exit(1);
 }
 
-static int match(si a, si b, vec *frame) {
+static int match(si a, si b, vec *fm) {
   if (tag(a) == t_cons && tag(b) == t_cons)
     while (a != nil) {
       si a1 = hd(a);
@@ -19,15 +19,15 @@ static int match(si a, si b, vec *frame) {
       case w_unquote:
         if (b == nil)
           return 0;
-        vpush(frame, list3(mkeyword(w_val), hd(tl(a1)), hd(b)));
+        vpush(fm, list3(mkeyword(w_val), hd(tl(a1)), hd(b)));
         b = tl(b);
         continue;
       case w_unquotes:
-        vpush(frame, list3(mkeyword(w_val), hd(tl(a1)), b));
+        vpush(fm, list3(mkeyword(w_val), hd(tl(a1)), b));
         b = nil;
         continue;
       }
-      if (!match(a1, hd(b), frame))
+      if (!match(a1, hd(b), fm))
         return 0;
       b = tl(b);
     }
@@ -194,20 +194,20 @@ si eval(si env, si a) {
     case w_match: {
       si val = eval(env, hd(a));
       a = tl(a);
-      vec frame;
-      vinit(&frame);
+      vec fm;
+      vinit(&fm);
       while (a != nil) {
         si pat = hd(a);
         a = tl(a);
         si r = hd(a);
         a = tl(a);
-        frame.n = 0;
-        if (match(pat, val, &frame)) {
-          a = eval(cons(list(&frame), env), r);
+        fm.n = 0;
+        if (match(pat, val, &fm)) {
+          a = eval(cons(list(&fm), env), r);
           goto end;
         }
       }
-      vfree(&frame);
+      vfree(&fm);
       a = nil;
       break;
     }
@@ -246,14 +246,14 @@ si eval(si env, si a) {
       si params = hd(f);
       f = tl(f);
       si body = hd(f);
-      vec frame;
-      vinit(&frame);
+      vec fm;
+      vinit(&fm);
       while (params != nil) {
-        vpush(&frame, list3(mkeyword(w_val), hd(params), eval(env, hd(a))));
+        vpush(&fm, list3(mkeyword(w_val), hd(params), eval(env, hd(a))));
         params = tl(params);
         a = tl(a);
       }
-      a = eval(cons(list(&frame), fenv), body);
+      a = eval(cons(list(&fm), fenv), body);
       break;
     }
     }

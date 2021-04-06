@@ -65,8 +65,8 @@ si cons(si hd, si tl) {
 
 si get(si env, si key, int *found) {
   for (; env != nil; env = tl(env))
-    for (si frame = hd(env); frame != nil; frame = tl(frame)) {
-      si entry = hd(frame);
+    for (si fm = hd(env); fm != nil; fm = tl(fm)) {
+      si entry = hd(fm);
       switch (keyword(hd(entry))) {
       case w_fn:
         entry = tl(entry);
