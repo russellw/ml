@@ -139,6 +139,34 @@ int main(int argc, char **argv) {
   assert(_CrtCheckMemory());
 #endif
 
+  // primitive functions
+  typedef struct {
+    char k;
+    char arity;
+  } prim;
+
+  // SORT
+  static prim prims[] = {
+      {s_issym, 1},
+      {s_isexact, 1},
+      {s_isinexact, 1},
+      {s_islist, 1},
+  };
+  ///
+
+  si pparams[2];
+  pparams[1] = list1(internz("a"));
+
+  vec frame;
+  vinit(&frame);
+  for (int i = 0; i < sizeof prims / sizeof *prims; i++) {
+    si key = mkeyword(prims[i].k);
+    si params = pparams[prims[i].arity];
+    si body = cons(key, params);
+    vpush(&frame, list4(mkeyword(w_fn), key, params, body));
+  }
+  si env = list1(list(&frame));
+
   // SORT
   static char *corefiles[] = {
       "core.k",
@@ -154,7 +182,6 @@ int main(int argc, char **argv) {
   }
 
   // definitions
-  vec frame;
   vinit(&frame);
   for (si i = 0; i < v.n; i++) {
     si a = v.p[i];
@@ -173,13 +200,13 @@ int main(int argc, char **argv) {
     case w_val: {
       si key = hd(a);
       a = tl(a);
-      si val = eval(nil, hd(a));
+      si val = eval(env, hd(a));
       vpush(&frame, list3(op, key, val));
       break;
     }
     }
   }
-  si env = list1(list(&frame));
+  env = cons(list(&frame), env);
 
   // tests
   for (si i = 0; i < v.n; i++) {

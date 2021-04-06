@@ -175,4 +175,4 @@
 		(or(f(hd s))(any f(tl s)))))
 
 (assert (any num? #(a b 3)))
-;(assert (any sym? #(a b 3)))
+(assert (any sym? #(a b 3)))
