@@ -292,20 +292,20 @@ si evals(si env, si s0) {
   }
 
   // fns
-  vec fm;
-  vinit(&fm);
+  vec record;
+  vinit(&record);
   for (si s = s0; s != nil; s = tl(s)) {
     si a = hd(s);
     if (hd(a) != mkeyword(w_fn))
       continue;
     a = tl(a);
-    vpush(&fm, hd(a));
+    vpush(&record, hd(a));
     a = tl(a);
-    vpush(&fm, hd(a));
+    vpush(&record, hd(a));
     a = tl(a);
-    vpush(&fm, hd(a));
+    vpush(&record, hd(a));
   }
-  env = cons(cons(mkeyword(w_letrec), list(&fm)), env);
+  env = cons(cons(mkeyword(w_letrec), list(&record)), env);
 
   // tests and result
   si r = nil;

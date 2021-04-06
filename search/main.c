@@ -157,16 +157,16 @@ int main(int argc, char **argv) {
   si pparams[2];
   pparams[1] = list1(internz("a"));
 
-  vec fm;
-  vinit(&fm);
+  vec record;
+  vinit(&record);
   for (int i = 0; i < sizeof prims / sizeof *prims; i++) {
     si key = mkeyword(prims[i].key);
     si params = pparams[prims[i].arity];
-    vpush(&fm, key);
-    vpush(&fm, params);
-    vpush(&fm, cons(key, params));
+    vpush(&record, key);
+    vpush(&record, params);
+    vpush(&record, cons(key, params));
   }
-  si env = list1(cons(mkeyword(w_letrec), list(&fm)));
+  si env = list1(cons(mkeyword(w_letrec), list(&record)));
 
   // SORT
   static char *corefiles[] = {
