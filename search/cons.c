@@ -67,6 +67,14 @@ si get(si env, si key, int *found) {
   for (; env != nil; env = tl(env)) {
     si record = hd(env);
     switch (keyword(hd(record))) {
+    case w_let:
+      record = tl(record);
+      if (hd(record) == key) {
+        *found = 1;
+        record = tl(record);
+        return hd(record);
+      }
+      break;
     case w_letrec:
       record = tl(record);
       while (record != nil) {
@@ -80,14 +88,6 @@ si get(si env, si key, int *found) {
           return list3(env, params, body);
         }
         record = tl(record);
-      }
-      break;
-    case w_let:
-      record = tl(record);
-      if (hd(record) == key) {
-        *found = 1;
-        record = tl(record);
-        return hd(record);
       }
       break;
     }
