@@ -192,6 +192,15 @@ si eval(si env, si a) {
         a = tl(a);
       }
       break;
+    case w_let: {
+      si key = hd(a);
+      a = tl(a);
+      si val = eval(env, hd(a));
+      a = tl(a);
+      si body = hd(a);
+      a = eval(cons(list3(mkeyword(w_let), key, val), env), body);
+      break;
+    }
     case w_match: {
       si val = eval(env, hd(a));
       a = tl(a);

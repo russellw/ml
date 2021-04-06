@@ -187,3 +187,20 @@
 (assert-not (every sym? #(a b 3)))
 (assert (every sym? #(a b c)))
 (assert (every sym? #()))
+
+(fn square(a)
+	(* a a))
+
+(assert=
+	(let x 3
+		(square x)
+	)
+	9
+)
+
+(assert=
+	(let x 5
+		(square x)
+	)
+	25
+)
