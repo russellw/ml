@@ -174,6 +174,7 @@ int main(int argc, char **argv) {
       "test.k",
   };
   ///
+
   vec v;
   vinit(&v);
   for (int i = 0; i < sizeof corefiles / sizeof *corefiles; i++) {
@@ -181,62 +182,6 @@ int main(int argc, char **argv) {
     readfile();
     parse(&v);
   }
-
-  // vars
-  for (si i = 0; i < v.n; i++) {
-    si a = v.p[i];
-    if (hd(a) != mkeyword(w_var))
-      continue;
-    a = tl(a);
-    si key = hd(a);
-    a = tl(a);
-    si val = eval(env, hd(a));
-    env = cons(list3(mkeyword(w_var), key, val), env);
-  }
-
-  // fns
-  vinit(&fm);
-  for (si i = 0; i < v.n; i++) {
-    si a = v.p[i];
-    if (hd(a) != mkeyword(w_fn))
-      continue;
-    a = tl(a);
-    vpush(&fm, hd(a));
-    a = tl(a);
-    vpush(&fm, hd(a));
-    a = tl(a);
-    vpush(&fm, hd(a));
-  }
-  env = cons(cons(mkeyword(w_letrec), list(&fm)), env);
-
-  // tests
-  for (si i = 0; i < v.n; i++) {
-    si a0 = v.p[i];
-    si a = a0;
-    si op = hd(a);
-    a = tl(a);
-    switch (keyword(op)) {
-    case s_assert_not:
-      if (!istrue(eval(env, hd(a))))
-        break;
-      print(stderr, a0);
-      err("assert-not: failed");
-    case s_asserteq: {
-      si x = eval(env, hd(a));
-      si y = eval(env, hd(tl(a)));
-      if (x == y)
-        break;
-      print(stderr, a0);
-      print(stderr, x);
-      print(stderr, y);
-      err("assert=: failed");
-    }
-    case w_assert:
-      if (istrue(eval(env, hd(a))))
-        break;
-      print(stderr, a0);
-      err("assert: failed");
-    }
-  }
+  evals(env, list(&v));
   return 0;
 }

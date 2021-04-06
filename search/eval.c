@@ -275,3 +275,72 @@ end:
   stacki--;
   return a;
 }
+
+si evals(si env, si s0) {
+  assert(tag(s0) == t_cons);
+
+  // vars
+  for (si s = s0; s != nil; s = tl(s)) {
+    si a = hd(s);
+    if (hd(a) != mkeyword(w_var))
+      continue;
+    a = tl(a);
+    si key = hd(a);
+    a = tl(a);
+    si val = eval(env, hd(a));
+    env = cons(list3(mkeyword(w_var), key, val), env);
+  }
+
+  // fns
+  vec fm;
+  vinit(&fm);
+  for (si s = s0; s != nil; s = tl(s)) {
+    si a = hd(s);
+    if (hd(a) != mkeyword(w_fn))
+      continue;
+    a = tl(a);
+    vpush(&fm, hd(a));
+    a = tl(a);
+    vpush(&fm, hd(a));
+    a = tl(a);
+    vpush(&fm, hd(a));
+  }
+  env = cons(cons(mkeyword(w_letrec), list(&fm)), env);
+
+  // tests and result
+  si r = nil;
+  for (si s = s0; s != nil; s = tl(s)) {
+    si a = hd(s);
+    si a0 = a;
+    switch (keyword(hd(a))) {
+    case s_assert_not:
+      a = tl(a);
+      if (!istrue(eval(env, hd(a))))
+        continue;
+      print(stderr, a0);
+      err("assert-not: failed");
+    case s_asserteq: {
+      a = tl(a);
+      si x = eval(env, hd(a));
+      si y = eval(env, hd(tl(a)));
+      if (x == y)
+        continue;
+      print(stderr, a0);
+      print(stderr, x);
+      print(stderr, y);
+      err("assert=: failed");
+    }
+    case w_assert:
+      a = tl(a);
+      if (istrue(eval(env, hd(a))))
+        continue;
+      print(stderr, a0);
+      err("assert: failed");
+    case w_fn:
+    case w_var:
+      continue;
+    }
+    r = eval(env, a);
+  }
+  return r;
+}
