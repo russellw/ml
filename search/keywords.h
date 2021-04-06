@@ -50,6 +50,8 @@ enum {
   w_ite,
   w_less,
   w_lesseq,
+  w_let,
+  w_letrec,
   s_islist,
   w_lst,
   w_match,
@@ -91,7 +93,7 @@ enum {
   w_unquote,
   w_unquotes,
   w_v,
-  w_val,
+  w_var,
   w_version,
 };
-extern sym keywords[93];
+extern sym keywords[95];

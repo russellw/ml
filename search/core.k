@@ -58,8 +58,8 @@
 (assert-not(occurs() #a #b))
 (assert(occurs() #a #( a b)))
 (assert-not(occurs() #c #( a b)))
-(assert-not(occurs#(((val c z))) #c #( a b)))
-(assert(occurs#(((val c b))) #c #( a b)))
+(assert-not(occurs#((let c z)) #c #( a b)))
+(assert(occurs#((let c b)) #c #( a b)))
 
 (fn var? (a)
 	(match a
@@ -77,7 +77,7 @@
 			(unify env a (get env b))
 		(occurs env a b)
 			0
-		(cons #((val ,a ,b)) env)))
+		(cons #(let ,a ,b) env)))
 
 (fn unify(env a b)
 	(if

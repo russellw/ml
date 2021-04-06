@@ -48,6 +48,8 @@ is_rat
 ite
 less
 lesseq
+let
+letrec
 list?,islist
 lst
 match
@@ -89,5 +91,5 @@ uminus
 unquote
 unquotes
 v
-val
+var
 version

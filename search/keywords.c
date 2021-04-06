@@ -51,6 +51,8 @@ sym keywords[] = {
     {3, "ite"},
     {4, "less"},
     {6, "lesseq"},
+    {3, "let"},
+    {6, "letrec"},
     {5, "list?"},
     {3, "lst"},
     {5, "match"},
@@ -92,6 +94,6 @@ sym keywords[] = {
     {7, "unquote"},
     {8, "unquotes"},
     {1, "v"},
-    {3, "val"},
+    {3, "var"},
     {7, "version"},
 };

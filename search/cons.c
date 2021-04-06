@@ -64,31 +64,34 @@ si cons(si hd, si tl) {
 }
 
 si get(si env, si key, int *found) {
-  for (; env != nil; env = tl(env))
-    for (si fm = hd(env); fm != nil; fm = tl(fm)) {
-      si entry = hd(fm);
-      switch (keyword(hd(entry))) {
-      case w_fn:
-        entry = tl(entry);
-        if (hd(entry) == key) {
+  for (; env != nil; env = tl(env)) {
+    si record = hd(env);
+    switch (keyword(hd(record))) {
+    case w_letrec:
+      record = tl(record);
+      while (record != nil) {
+        si key1 = hd(record);
+        record = tl(record);
+        si params = hd(record);
+        record = tl(record);
+        si body = hd(record);
+        if (key1 == key) {
           *found = 1;
-          entry = tl(entry);
-          si params = hd(entry);
-          entry = tl(entry);
-          si body = hd(entry);
           return list3(env, params, body);
         }
-        break;
-      case w_val:
-        entry = tl(entry);
-        if (hd(entry) == key) {
-          *found = 1;
-          entry = tl(entry);
-          return hd(entry);
-        }
-        break;
+        record = tl(record);
       }
+      break;
+    case w_let:
+      record = tl(record);
+      if (hd(record) == key) {
+        *found = 1;
+        record = tl(record);
+        return hd(record);
+      }
+      break;
     }
+  }
   *found = 0;
   return nil;
 }

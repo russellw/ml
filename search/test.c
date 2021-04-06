@@ -523,17 +523,15 @@ void test(void) {
   assert(parse1() == list1(internz("a")));
 
   // environments
-  si fm = list3(list3(internz("val"), internz("a"), mkint(1)),
-                list3(internz("val"), internz("b"), mkint(2)),
-                list3(internz("val"), internz("c"), mkint(3)));
-  si env = list1(fm);
+  si env = list3(list3(internz("let"), internz("a"), mkint(1)),
+                 list3(internz("let"), internz("b"), mkint(2)),
+                 list3(internz("let"), internz("c"), mkint(3)));
   int found;
   assert(get(env, internz("a"), &found) == mkint(1));
   assert(get(env, internz("b"), &found) == mkint(2));
   assert(get(env, internz("c"), &found) == mkint(3));
 
-  fm = list1(list3(internz("val"), internz("a"), mkint(4)));
-  env = cons(fm, env);
+  env = cons(list3(internz("let"), internz("a"), mkint(4)), env);
   assert(get(env, internz("a"), &found) == mkint(4));
   assert(get(env, internz("b"), &found) == mkint(2));
   assert(get(env, internz("c"), &found) == mkint(3));

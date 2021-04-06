@@ -7,31 +7,32 @@ noret err(char *msg) {
   for (int i = 0; i < stacki; i++)
     print(stderr, stack[i]);
   fprintf(stderr, "%s\n", msg);
+  stacktrace();
   exit(1);
 }
 
-static int match(si a, si b, vec *fm) {
+static si match(si env, si a, si b) {
   if (tag(a) == t_cons && tag(b) == t_cons)
-    while (a != nil) {
+    for (; a != nil; a = tl(a)) {
       si a1 = hd(a);
-      a = tl(a);
       switch (keyword(hd(a1))) {
       case w_unquote:
         if (b == nil)
           return 0;
-        vpush(fm, list3(mkeyword(w_val), hd(tl(a1)), hd(b)));
+        env = cons(list3(mkeyword(w_let), hd(tl(a1)), hd(b)), env);
         b = tl(b);
         continue;
       case w_unquotes:
-        vpush(fm, list3(mkeyword(w_val), hd(tl(a1)), b));
+        env = cons(list3(mkeyword(w_let), hd(tl(a1)), b), env);
         b = nil;
         continue;
       }
-      if (!match(a1, hd(b), fm))
+      env = match(env, a1, hd(b));
+      if (!env)
         return 0;
       b = tl(b);
     }
-  return a == b;
+  return a == b ? env : 0;
 }
 
 static si quote(si env, si a) {
@@ -194,20 +195,17 @@ si eval(si env, si a) {
     case w_match: {
       si val = eval(env, hd(a));
       a = tl(a);
-      vec fm;
-      vinit(&fm);
       while (a != nil) {
         si pat = hd(a);
         a = tl(a);
         si r = hd(a);
         a = tl(a);
-        fm.n = 0;
-        if (match(pat, val, &fm)) {
-          a = eval(cons(list(&fm), env), r);
+        si env1 = match(env, pat, val);
+        if (env1) {
+          a = eval(env1, r);
           goto end;
         }
       }
-      vfree(&fm);
       a = nil;
       break;
     }
@@ -246,14 +244,11 @@ si eval(si env, si a) {
       si params = hd(f);
       f = tl(f);
       si body = hd(f);
-      vec fm;
-      vinit(&fm);
-      while (params != nil) {
-        vpush(&fm, list3(mkeyword(w_val), hd(params), eval(env, hd(a))));
-        params = tl(params);
+      for (; params != nil; params = tl(params)) {
+        fenv = cons(list3(mkeyword(w_let), hd(params), eval(env, hd(a))), fenv);
         a = tl(a);
       }
-      a = eval(cons(list(&fm), fenv), body);
+      a = eval(fenv, body);
       break;
     }
     }
