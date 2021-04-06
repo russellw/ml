@@ -171,14 +171,21 @@ si eval(si env, si a) {
     case w_hd:
       a = hd(eval(env, hd(a)));
       break;
-    case w_if: {
-      si test = eval(env, hd(a));
-      a = tl(a);
-      if (!istrue(test))
+    case w_if:
+      while (a != nil) {
+        si x = eval(env, hd(a));
         a = tl(a);
-      a = eval(env, hd(a));
+        if (a == nil) {
+          a = x;
+          goto end;
+        }
+        if (istrue(x)) {
+          a = eval(env, hd(a));
+          goto end;
+        }
+        a = tl(a);
+      }
       break;
-    }
     case w_match: {
       si val = eval(env, hd(a));
       a = tl(a);
