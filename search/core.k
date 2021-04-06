@@ -204,3 +204,9 @@
 	)
 	25
 )
+
+(fn map(f s)
+	(if s
+		(cons(f(hd s))(map f(tl s)))))
+
+(assert= (map		square #(1  2  3))#(1 4 9))
