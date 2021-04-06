@@ -35,3 +35,8 @@
 (assert(num?	1/2))
 (assert(num?	1.2))
 (assert-not(num?	#a12))
+
+;(fn occurs (env a b)
+;	(if
+;		(= a b)1
+

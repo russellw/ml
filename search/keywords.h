@@ -16,6 +16,7 @@ enum {
   w_assert,
   s_assert_not,
   s_asserteq,
+  s_can_get,
   w_ceil,
   w_ceiling,
   w_cnf,
@@ -93,4 +94,4 @@ enum {
   w_val,
   w_version,
 };
-extern sym keywords[92];
+extern sym keywords[93];

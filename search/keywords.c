@@ -17,6 +17,7 @@ sym keywords[] = {
     {6, "assert"},
     {10, "assert-not"},
     {7, "assert="},
+    {7, "can-get"},
     {4, "ceil"},
     {7, "ceiling"},
     {3, "cnf"},

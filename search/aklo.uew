@@ -1,6 +1,6 @@
 /L13"Aklo" Line Comment = ; File Extensions = K
 /Delimiters = ~!@%^&()|\/{}[]:;"' ,	.#
-/Indent Strings = "def"
+/Indent Strings = "fn"
 /Open Brace Strings =  "(" "[" "{"
 /Close Brace Strings = ")" "]" "}"
 /C1"blue"

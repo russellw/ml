@@ -74,6 +74,12 @@ si eval(si env, si a) {
     case s_add:
       a = add(eval(env, hd(a)), eval(env, hd(tl(a))));
       break;
+    case s_can_get: {
+      int found;
+      get(eval(env, hd(a)), eval(env, hd(tl(a))), &found);
+      a = mkint(found);
+      break;
+    }
     case s_div:
       a = div2(eval(env, hd(a)), eval(env, hd(tl(a))));
       break;
@@ -165,7 +171,6 @@ si eval(si env, si a) {
     case w_get: {
       int found;
       a = get(eval(env, hd(a)), eval(env, hd(tl(a))), &found);
-      a = list2(a, mkint(found));
       break;
     }
     case w_hd:

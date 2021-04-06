@@ -14,6 +14,7 @@ and
 assert
 assert-not,assert_not
 assert=,asserteq
+can-get,can_get
 ceil
 ceiling
 cnf
