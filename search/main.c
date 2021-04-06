@@ -193,11 +193,16 @@ int main(int argc, char **argv) {
         break;
       print(stderr, a0);
       err("assert-not: failed");
-    case s_asserteq:
-      if (eval(env, hd(a)) == eval(env, hd(tl(a))))
+    case s_asserteq: {
+      si x = eval(env, hd(a));
+      si y = eval(env, hd(tl(a)));
+      if (x == y)
         break;
       print(stderr, a0);
+      print(stderr, x);
+      print(stderr, y);
       err("assert=: failed");
+    }
     case w_assert:
       if (istrue(eval(env, hd(a))))
         break;

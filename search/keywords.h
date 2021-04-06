@@ -33,6 +33,7 @@ enum {
   w_floor,
   w_fn,
   w_fof,
+  w_get,
   w_greater,
   w_greatereq,
   w_h,
@@ -92,4 +93,4 @@ enum {
   w_val,
   w_version,
 };
-extern sym keywords[91];
+extern sym keywords[92];

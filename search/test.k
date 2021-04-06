@@ -343,3 +343,26 @@
 	)
 	#(b c)
 )
+
+;environments
+(assert=
+	(get
+		#(((val a 5)(val b 6)))
+		#a
+	)
+	#(5 1)
+)
+(assert=
+	(get
+		#(((val a 5)(val b 6)))
+		#b
+	)
+	#(6 1)
+)
+(assert=
+	(get
+		#(((val a 5)(val b 6)))
+		#c
+	)
+	#(()0)
+)

@@ -34,6 +34,7 @@ sym keywords[] = {
     {5, "floor"},
     {2, "fn"},
     {3, "fof"},
+    {3, "get"},
     {7, "greater"},
     {9, "greatereq"},
     {1, "h"},

@@ -162,6 +162,12 @@ si eval(si env, si a) {
     case w_floor:
       a = floor1(eval(env, hd(a)));
       break;
+    case w_get: {
+      int found;
+      a = get(eval(env, hd(a)), eval(env, hd(tl(a))), &found);
+      a = list2(a, mkint(found));
+      break;
+    }
     case w_hd:
       a = hd(eval(env, hd(a)));
       break;
