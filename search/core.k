@@ -36,7 +36,27 @@
 (assert(num?	1.2))
 (assert-not(num?	#a12))
 
-;(fn occurs (env a b)
-;	(if
-;		(= a b)1
+(fn list1?(a)
+	(and(list? a)a))
 
+(assert-not(list1? 0))
+(assert-not(list1? 9))
+(assert-not(list1? ()))
+(assert(list1? #(0)))
+(assert(list1? #(9)))
+
+(fn occurs (env a b)
+	(if
+		(= a b)1
+		(can-get env a)(occurs env(get env a)b)
+		(list1? b)(or(occurs env a(hd b))(occurs env a(tl b)))
+	)
+)
+
+(assert(occurs() 3 3))
+(assert(occurs() #a #a))
+(assert-not(occurs() #a #b))
+(assert(occurs() #a #( a b)))
+(assert-not(occurs() #c #( a b)))
+(assert-not(occurs#(((val c z))) #c #( a b)))
+(assert(occurs#(((val c b))) #c #( a b)))
