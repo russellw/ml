@@ -26,6 +26,7 @@
 // data
 #include "cons.h"
 #include "float.h"
+#include "frame.h"
 #include "int.h"
 #include "rat.h"
 #include "sym.h"
