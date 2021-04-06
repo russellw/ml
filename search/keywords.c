@@ -1,7 +1,6 @@
 // AUTO GENERATED FILE - DO NOT MODIFY
 #include "main.h"
 sym keywords[] = {
-    {0, ""},
     {1, "*"},
     {1, "+"},
     {1, "-"},
@@ -52,6 +51,7 @@ sym keywords[] = {
     {6, "lesseq"},
     {5, "list?"},
     {3, "lst"},
+    {5, "match"},
     {5, "minus"},
     {3, "not"},
     {1, "o"},

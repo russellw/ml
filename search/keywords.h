@@ -1,6 +1,5 @@
 // AUTO GENERATED FILE - DO NOT MODIFY
 enum {
-  w_,
   s_mul,
   s_add,
   s_sub,
@@ -51,6 +50,7 @@ enum {
   w_lesseq,
   s_islist,
   w_lst,
+  w_match,
   w_minus,
   w_not,
   w_o,

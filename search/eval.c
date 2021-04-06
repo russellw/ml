@@ -10,6 +10,30 @@ noret err(char *msg) {
   exit(1);
 }
 
+static int match(si a, si b, vec *frame) {
+  if (tag(a) == t_cons && tag(b) == t_cons)
+    while (a != nil) {
+      si a1 = hd(a);
+      a = tl(a);
+      switch (keyword(hd(a1))) {
+      case w_unquote:
+        if (b == nil)
+          return 0;
+        vpush(frame, list3(mkeyword(w_val), hd(tl(a1)), hd(b)));
+        b = tl(b);
+        continue;
+      case w_unquotes:
+        vpush(frame, list3(mkeyword(w_val), hd(tl(a1)), b));
+        b = nil;
+        continue;
+      }
+      if (!match(a1, hd(b), frame))
+        return 0;
+      b = tl(b);
+    }
+  return a == b;
+}
+
 static si quote(si env, si a) {
   if (tag(a) != t_cons)
     return a;
@@ -147,6 +171,26 @@ si eval(si env, si a) {
       if (!istrue(test))
         a = tl(a);
       a = eval(env, hd(a));
+      break;
+    }
+    case w_match: {
+      si val = eval(env, hd(a));
+      a = tl(a);
+      vec frame;
+      vinit(&frame);
+      while (a != nil) {
+        si pat = hd(a);
+        a = tl(a);
+        si r = hd(a);
+        a = tl(a);
+        frame.n = 0;
+        if (match(pat, val, &frame)) {
+          a = eval(cons(list(&frame), env), r);
+          goto end;
+        }
+      }
+      vfree(&frame);
+      a = nil;
       break;
     }
     case w_minus:

@@ -292,3 +292,54 @@
 (assert-not(inexact? #a))
 (assert(sym? #bar))
 (assert-not(sym? #(bar)))
+
+;pattern matching
+(assert=
+	(match 1
+		1 #a
+		2 #b
+	)
+	#a
+)
+(assert=
+	(match 2
+		1 #a
+		2 #b
+	)
+	#b
+)
+(assert=
+	(match 3
+		1 #a
+		2 #b
+	)
+	()
+)
+(assert=
+	(match #a
+		a 1
+		b 2
+	)
+	1
+)
+(assert=
+	(match #b
+		a 1
+		b 2
+	)
+	2
+)
+(assert=
+	(match #(a b)
+		a 1
+		(a ,x) x
+	)
+	#b
+)
+(assert=
+	(match #(a b c)
+		a 1
+		(a @x) x
+	)
+	#(b c)
+)

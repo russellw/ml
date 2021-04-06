@@ -1,4 +1,3 @@
-
 *,mul
 +,add
 -,sub
@@ -49,6 +48,7 @@ less
 lesseq
 list?,islist
 lst
+match
 minus
 not
 o
