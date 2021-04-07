@@ -11,7 +11,21 @@ noret err(char *msg) {
   exit(1);
 }
 
-static si match(si env, si a, si b) {
+static int matched(si key, si val, vec *records) {
+  for (si i = 0; i < records->n; i++) {
+    si record = records->p[i];
+    assert(hd(record) == mkeyword(w_let));
+    record = tl(record);
+    if (hd(record) == key) {
+      record = tl(record);
+      return hd(record) == val;
+    }
+  }
+  vpush(records, list3(mkeyword(w_let), key, val));
+  return 1;
+}
+
+static int match(si a, si b, vec *records) {
   if (tag(a) == t_cons && tag(b) == t_cons)
     for (; a != nil; a = tl(a)) {
       si a1 = hd(a);
@@ -19,20 +33,23 @@ static si match(si env, si a, si b) {
       case w_unquote:
         if (b == nil)
           return 0;
-        env = cons(list3(mkeyword(w_let), hd(tl(a1)), hd(b)), env);
+        a1 = tl(a1);
+        if (!matched(hd(a1), hd(b), records))
+          return 0;
         b = tl(b);
         continue;
       case w_unquotes:
-        env = cons(list3(mkeyword(w_let), hd(tl(a1)), b), env);
+        a1 = tl(a1);
+        if (!matched(hd(a1), b, records))
+          return 0;
         b = nil;
         continue;
       }
-      env = match(env, a1, hd(b));
-      if (!env)
+      if (!match(a1, hd(b), records))
         return 0;
       b = tl(b);
     }
-  return a == b ? env : 0;
+  return a == b;
 }
 
 static si quote(si env, si a) {
@@ -231,21 +248,27 @@ si eval(si env, si a) {
     case w_match: {
       si val = eval(env, hd(a));
       a = tl(a);
+      vec records;
+      vinit(&records);
       for (;;) {
         si p = hd(a);
         a = tl(a);
         if (a == nil) {
           a = eval(env, p);
-          goto end;
+          break;
         }
         si r = hd(a);
         a = tl(a);
-        si env1 = match(env, p, val);
-        if (env1) {
-          a = eval(env1, r);
-          goto end;
+        records.n = 0;
+        if (match(p, val, &records)) {
+          for (si i = 0; i < records.n; i++)
+            env = cons(records.p[i], env);
+          a = eval(env, r);
+          break;
         }
       }
+      vfree(&records);
+      break;
     }
     case w_minus:
       a = minus(eval(env, hd(a)));
