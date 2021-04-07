@@ -427,6 +427,11 @@ loop:
       ferr("expected one character");
     tokterm = *v.p;
     return;
+  case '{':
+    txt = strchr(s, '}');
+    if (!txt)
+      ferr("unclosed '{'");
+    goto loop;
   case 0:
     tok = 0;
     return;

@@ -1,11 +1,15 @@
-/L13"Aklo" Line Comment = ; File Extensions = K
+/L13"Aklo" Line Comment = ; Block Comment On = { Block Comment Off = } File Extensions = K
 /Delimiters = ~!@%^&()|\/{}[]:;"' ,	.#
 /Indent Strings = "fn"
-/Open Brace Strings =  "(" "[" "{"
-/Close Brace Strings = ")" "]" "}"
+/Open Brace Strings =  "(" "["
+/Close Brace Strings = ")" "]"
 /C1"blue"
+fn
 /C2"red"
 /C3"yellow"
+assert
+assert-not
+assert=
 /C4"green"
 /C5"brown"
 !
@@ -20,7 +24,5 @@
 [
 ]
 ^
-{
 |
-}
 ~

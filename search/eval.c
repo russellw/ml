@@ -169,6 +169,9 @@ si eval(si env, si a) {
     case w_do:
       a = evals(env, a);
       break;
+    case w_eval:
+      a = eval(eval(env, hd(a)), eval(env, hd(tl(a))));
+      break;
     case w_floor:
       a = floor1(eval(env, hd(a)));
       break;

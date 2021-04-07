@@ -436,6 +436,15 @@
 	)
 	8
 )
+(assert=
+	(do
+		(fn f(x)
+			(var x(+ x 1))
+			x)
+		(f 3)
+	)
+	4
+)
 
 ;letrec
 (assert
@@ -445,3 +454,6 @@
 		odd (x)
 			(even(- x 1))
 		(odd 9			)))
+
+;eval
+(assert=(eval()#(+  1  2))3)

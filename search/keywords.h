@@ -30,6 +30,7 @@ enum {
   s_div_f,
   s_div_t,
   w_do,
+  w_eval,
   s_isexact,
   w_false,
   w_floor,
@@ -97,4 +98,4 @@ enum {
   w_var,
   w_version,
 };
-extern sym keywords[96];
+extern sym keywords[97];
