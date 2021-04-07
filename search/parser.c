@@ -91,12 +91,12 @@ noret ferr(const char *msg) {
   si line = 1;
   for (char *s = txtstart; s != tokstart; ++s)
     if (*s == '\n')
-      ++line;
+      line++;
 
   // start of line
   char *linestart = tokstart;
   while (!(linestart == txtstart || linestart[-1] == '\n'))
-    --linestart;
+    linestart--;
 
   // print context
   for (char *s = linestart; *s >= ' '; ++s)

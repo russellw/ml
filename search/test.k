@@ -457,3 +457,6 @@
 
 ;eval
 (assert=(eval()#(+  1  2))3)
+
+;lambda
+(assert= ((\ x(+ x 1)) 6)7)
