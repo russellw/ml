@@ -306,7 +306,7 @@ si evals(si env, si s0) {
     a = tl(a);
     vpush(&record, hd(a));
     a = tl(a);
-    vpush(&record, hd(a));
+    vpush(&record, cons(mkeyword(w_do), a));
   }
   env = cons(cons(mkeyword(w_letrec), list(&record)), env);
 

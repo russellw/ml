@@ -423,3 +423,16 @@
 	)
 	8
 )
+
+;implicit do
+(assert=
+	(do
+		(var x 5)
+		(fn f(y)
+			(assert(exact? y))
+			(+ y 1))
+		(+  (f x) 2)
+		(assert= x 5)
+	)
+	8
+)
