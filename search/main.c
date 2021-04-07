@@ -168,13 +168,11 @@ int main(int argc, char **argv) {
   }
   si env = list1(cons(mkeyword(w_letrec), list(&record)));
 
-  // SORT
   static char *corefiles[] = {
+      "test.k",
       "core.k",
       "simplify.k",
-      "test.k",
   };
-  ///
 
   vec v;
   vinit(&v);

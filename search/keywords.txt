@@ -60,6 +60,8 @@ minus
 not
 o
 or
+prin
+print
 product
 quote
 quotient

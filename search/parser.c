@@ -99,7 +99,7 @@ noret ferr(const char *msg) {
     linestart--;
 
   // print context
-  for (char *s = linestart; *s >= ' '||*s=='\t'; ++s)
+  for (char *s = linestart; *s >= ' ' || *s == '\t'; ++s)
     fputc(*s, stderr);
   fputc('\n', stderr);
 
@@ -123,7 +123,6 @@ char isid[0x100];
 void init_parser(void) {
   // SORT
   isid['*'] = 1;
-  isid['\\'] = 1;
   isid['+'] = 1;
   isid['-'] = 1;
   isid['/'] = 1;
@@ -131,6 +130,7 @@ void init_parser(void) {
   isid['='] = 1;
   isid['>'] = 1;
   isid['?'] = 1;
+  isid['\\'] = 1;
   isid['_'] = 1;
   memset(isid + '0', 1, 10);
   memset(isid + 'A', 1, 26);
@@ -352,7 +352,6 @@ loop:
   case 'L':
   case 'M':
   case 'N':
-  case '\\':
   case 'O':
   case 'P':
   case 'Q':
@@ -365,6 +364,7 @@ loop:
   case 'X':
   case 'Y':
   case 'Z':
+  case '\\':
   case '_':
   case 'a':
   case 'b':
@@ -433,7 +433,7 @@ loop:
     txt = strchr(s, '}');
     if (!txt)
       ferr("unclosed '{'");
-      txt++;
+    txt++;
     goto loop;
   case 0:
     tok = 0;

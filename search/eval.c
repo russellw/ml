@@ -231,19 +231,21 @@ si eval(si env, si a) {
     case w_match: {
       si val = eval(env, hd(a));
       a = tl(a);
-      while (a != nil) {
-        si pat = hd(a);
+      for (;;) {
+        si p = hd(a);
         a = tl(a);
+        if (a == nil) {
+          a = eval(env, p);
+          goto end;
+        }
         si r = hd(a);
         a = tl(a);
-        si env1 = match(env, pat, val);
+        si env1 = match(env, p, val);
         if (env1) {
           a = eval(env1, r);
           goto end;
         }
       }
-      a = nil;
-      break;
     }
     case w_minus:
       a = minus(eval(env, hd(a)));
@@ -334,7 +336,7 @@ si evals(si env, si s0) {
   }
   env = cons(cons(mkeyword(w_letrec), list(&record)), env);
 
-  // tests and result
+  // result
   si r = nil;
   for (si s = s0; s != nil; s = tl(s)) {
     si a = hd(s);
@@ -365,6 +367,14 @@ si evals(si env, si s0) {
       err("assert: failed");
     case w_fn:
     case w_var:
+      continue;
+    case w_prin:
+      a = tl(a);
+      prin(stdout, eval(env, hd(a)));
+      continue;
+    case w_print:
+      a = tl(a);
+      print(stdout, eval(env, hd(a)));
       continue;
     }
     r = eval(env, a);

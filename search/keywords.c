@@ -63,6 +63,8 @@ sym keywords[] = {
     {3, "not"},
     {1, "o"},
     {2, "or"},
+    {4, "prin"},
+    {5, "print"},
     {7, "product"},
     {5, "quote"},
     {8, "quotient"},
