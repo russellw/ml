@@ -56,6 +56,7 @@ sym keywords[] = {
     {6, "lesseq"},
     {3, "let"},
     {6, "letrec"},
+    {4, "list"},
     {5, "list?"},
     {3, "lst"},
     {5, "match"},

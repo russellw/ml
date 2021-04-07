@@ -55,6 +55,7 @@ enum {
   w_lesseq,
   w_let,
   w_letrec,
+  w_list,
   s_islist,
   w_lst,
   w_match,
@@ -101,4 +102,4 @@ enum {
   w_var,
   w_version,
 };
-extern sym keywords[100];
+extern sym keywords[101];

@@ -53,6 +53,7 @@ less
 lesseq
 let
 letrec
+list
 list?,islist
 lst
 match
