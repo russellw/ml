@@ -35,6 +35,7 @@
 (assert(num?	1/2))
 (assert(num?	1.2))
 (assert-not(num?	#a12))
+(assert(eval(here)#(num?  2)))
 
 (fn list1?(a)
 	(and(list? a)a))

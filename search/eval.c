@@ -183,6 +183,9 @@ si eval(si env, si a) {
     case w_hd:
       a = hd(eval(env, hd(a)));
       break;
+    case w_here:
+      a = env;
+      break;
     case w_if:
       while (a != nil) {
         si x = eval(env, hd(a));

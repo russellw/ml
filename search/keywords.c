@@ -43,6 +43,7 @@ sym keywords[] = {
     {1, "h"},
     {2, "hd"},
     {4, "help"},
+    {4, "here"},
     {1, "i"},
     {2, "if"},
     {7, "include"},
