@@ -436,3 +436,12 @@
 	)
 	8
 )
+
+;letrec
+(assert
+	(letrec
+		even (x)
+			(if x (odd(- x 1)) 1)
+		odd (x)
+			(even(- x 1))
+		(odd 9			)))

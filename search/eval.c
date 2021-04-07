@@ -204,6 +204,24 @@ si eval(si env, si a) {
       a = eval(cons(list3(mkeyword(w_let), key, val), env), body);
       break;
     }
+    case w_letrec: {
+      vec record;
+      vinit(&record);
+      si b;
+      for (;;) {
+        b = hd(a);
+        a = tl(a);
+        if (a == nil)
+          break;
+        vpush(&record, b);
+        vpush(&record, hd(a));
+        a = tl(a);
+        vpush(&record, hd(a));
+        a = tl(a);
+      }
+      a = eval(cons(cons(mkeyword(w_letrec), list(&record)), env), b);
+      break;
+    }
     case w_match: {
       si val = eval(env, hd(a));
       a = tl(a);
