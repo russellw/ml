@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
   // SORT
   static char *corefiles[] = {
       "core.k",
-//      "simplify.k",
+      "simplify.k",
       "test.k",
   };
   ///

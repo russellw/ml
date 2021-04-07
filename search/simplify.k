@@ -1,14 +1,19 @@
 (fn simplify(env a)
-	(var op(hd a))
-	(var args(map(\ x(simplify env x))(tl a)))
-	(var a(cons op args))
+	(var a
+		(if
+			(atom? a)
+				a
+			(cons(hd a)(map(\ x(simplify env x))(tl a)))))
+	(eval  env a)
+	{
 	(var a
 		(if (every num? args)
 			(eval env	a)
 			a))
-	(match a
+	;(match a
 		a
-	)
+	;)
+	}
 )
 
 (assert= (simplify (here)#(+ 1 2))3)

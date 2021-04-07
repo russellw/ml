@@ -460,3 +460,9 @@
 
 ;lambda
 (assert= ((\ x(+ x 1)) 6)7)
+
+;strings
+(assert='A'65)
+(assert="ABC"#(65 66 67))
+(assert="\r\n"#(13 10))
+(assert="\0"#(0))
