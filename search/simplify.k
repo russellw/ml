@@ -13,8 +13,17 @@
 			(eval env	a)
 			a))
 	(match a
+		(+ ,x 0)	x
+		(+ 0,x )	x
+		(* ,x 1)	x
+		(* 1,x )	x
+		(* ,x 0)	0
+		(* 0,x )	0
 		a
 	)
 )
 
 (assert= (simplify (here)#(+ 1 2))3)
+(assert= (simplify (here)#(+ x y))#(+ x y))
+(assert= (simplify (here)#(+ x 0))#x)
+(assert= (simplify (here)#(+ 0 x ))#x)
