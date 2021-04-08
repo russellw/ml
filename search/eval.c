@@ -130,9 +130,6 @@ si eval(si env, si a) {
     case s_issym:
       a = mkint(tag(eval(env, hd(a))) == t_sym);
       break;
-    case s_lambda:
-      a = list3(env, hd(a), hd(tl(a)));
-      break;
     case s_le:
       a = mkint(le(eval(env, hd(a)), eval(env, hd(tl(a)))));
       break;
@@ -217,6 +214,9 @@ si eval(si env, si a) {
         }
         a = tl(a);
       }
+      break;
+    case w_lambda:
+      a = list3(env, hd(a), hd(tl(a)));
       break;
     case w_let: {
       si key = hd(a);

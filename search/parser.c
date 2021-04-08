@@ -130,7 +130,6 @@ void init_parser(void) {
   isid['='] = 1;
   isid['>'] = 1;
   isid['?'] = 1;
-  isid['\\'] = 1;
   isid['_'] = 1;
   memset(isid + '0', 1, 10);
   memset(isid + 'A', 1, 26);
@@ -364,7 +363,6 @@ loop:
   case 'X':
   case 'Y':
   case 'Z':
-  case '\\':
   case '_':
   case 'a':
   case 'b':
@@ -476,6 +474,9 @@ static si expr(void) {
     while (!eat(']'))
       vpush(&v, expr());
     return list(&v);
+  case '\\':
+    lex();
+    return mkeyword(w_lambda);
   case k_term: {
     si a = tokterm;
     lex();

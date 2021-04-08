@@ -8,7 +8,6 @@
 =,eq
 T
 V
-\,lambda
 abs
 and
 assert
@@ -49,6 +48,7 @@ int
 is_int
 is_rat
 ite
+lambda
 less
 lesseq
 let

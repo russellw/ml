@@ -12,7 +12,8 @@ void stacktrace();
 si assertfail(char *file, si line, char *s);
 #define assert(a) (a) || assertfail(__FILE__, __LINE__, #a)
 #define unreachable assert(0)
-#define debug(a) fprintf(stderr, "%s:%d: %s: %zx\n", __FILE__, __LINE__, #a, a);
+#define debug(a)                                                               \
+  fprintf(stderr, "%s:%d: %s: %zx\n", __FILE__, __LINE__, #a, (si)(a));
 #define debugt(a)                                                              \
   do {                                                                         \
     fprintf(stderr, "%s:%d: %s: ", __FILE__, __LINE__, #a);                    \
