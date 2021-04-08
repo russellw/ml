@@ -359,21 +359,21 @@
 
 ;environments
 (assert=
-	(can-get
+	(has
 		#((let a 5)(let b 6))
 		#a
 	)
 	1
 )
 (assert=
-	(can-get
+	(has
 		#((let a 5)(let b 6))
 		#b
 	)
 	1
 )
 (assert=
-	(can-get
+	(has
 		#((let a 5)(let b 6))
 		#c
 	)

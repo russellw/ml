@@ -49,7 +49,7 @@
 (fn occurs (env a b)
 	(if
 		(= a b)1
-		(can-get env a)(occurs env(get env a)b)
+		(has env a)(occurs env(get env a)b)
 		(list1? b)(or(occurs env a(hd b))(occurs env a(tl b)))
 	)
 )
@@ -72,9 +72,9 @@
 
 (fn unify-var(env a b)
 	(if
-		(can-get env a)
+		(has env a)
 			(unify env (get env a) b)
-		(can-get env b)
+		(has env b)
 			(unify env a (get env b))
 		(occurs env a b)
 			0
