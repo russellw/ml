@@ -419,8 +419,8 @@
 	(do
 		(var x 5)
 		(fn f(y)(+ y 1))
-		(+  (f x) 2)
 		(assert= x 5)
+		(+  (f x) 2)
 	)
 	8
 )
@@ -432,8 +432,8 @@
 		(fn f(y)
 			(assert(exact? y))
 			(+ y 1))
-		(+  (f x) 2)
 		(assert= x 5)
+		(+  (f x) 2)
 	)
 	8
 )

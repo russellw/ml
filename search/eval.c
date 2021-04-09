@@ -92,6 +92,22 @@ si eval(si env, si a) {
     case s_add:
       a = add(eval(env, hd(a)), eval(env, hd(tl(a))));
       break;
+    case s_assert_not:
+      if (istrue(eval(env, hd(a))))
+        err("assert-not: failed");
+      a = nil;
+      break;
+    case s_asserteq: {
+      si x = eval(env, hd(a));
+      si y = eval(env, hd(tl(a)));
+      if (x != y) {
+        print(stderr, x);
+        print(stderr, y);
+        err("assert=: failed");
+      }
+      a = nil;
+      break;
+    }
     case s_div:
       a = div2(eval(env, hd(a)), eval(env, hd(tl(a))));
       break;
@@ -167,6 +183,11 @@ si eval(si env, si a) {
           goto end;
         }
       a = mkint(1);
+      break;
+    case w_assert:
+      if (!istrue(eval(env, hd(a))))
+        err("assert: failed");
+      a = nil;
       break;
     case w_ceil:
       a = ceil1(eval(env, hd(a)));
@@ -292,6 +313,14 @@ si eval(si env, si a) {
         }
       a = mkint(0);
       break;
+    case w_prin:
+      prin(stdout, eval(env, hd(a)));
+      a = nil;
+      break;
+    case w_print:
+      print(stdout, eval(env, hd(a)));
+      a = nil;
+      break;
     case w_quote:
       a = quote(env, hd(a));
       break;
@@ -371,41 +400,9 @@ si evals(si env, si s0) {
   si r = nil;
   for (si s = s0; s != nil; s = tl(s)) {
     si a = hd(s);
-    si a0 = a;
     switch (keyword(hd(a))) {
-    case s_assert_not:
-      a = tl(a);
-      if (!istrue(eval(env, hd(a))))
-        continue;
-      print(stderr, a0);
-      err("assert-not: failed");
-    case s_asserteq: {
-      a = tl(a);
-      si x = eval(env, hd(a));
-      si y = eval(env, hd(tl(a)));
-      if (x == y)
-        continue;
-      print(stderr, a0);
-      print(stderr, x);
-      print(stderr, y);
-      err("assert=: failed");
-    }
-    case w_assert:
-      a = tl(a);
-      if (istrue(eval(env, hd(a))))
-        continue;
-      print(stderr, a0);
-      err("assert: failed");
     case w_fn:
     case w_var:
-      continue;
-    case w_prin:
-      a = tl(a);
-      prin(stdout, eval(env, hd(a)));
-      continue;
-    case w_print:
-      a = tl(a);
-      print(stdout, eval(env, hd(a)));
       continue;
     }
     r = eval(env, a);
