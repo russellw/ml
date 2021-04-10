@@ -1,5 +1,5 @@
 'use strict'
-var unify = require('./unify')
+var logic = require('./logic')
 
 function help() {
 	console.log('Options:')
