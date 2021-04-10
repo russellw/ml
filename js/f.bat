@@ -1,1 +1,2 @@
-npx prettier --write .
+call npx prettier --write .
+git diff
