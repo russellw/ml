@@ -1,3 +1,2 @@
 'use strict'
-var x=3
-console.log(x)
+var unify = require('./unify')
