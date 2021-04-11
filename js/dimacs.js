@@ -11,5 +11,5 @@ var tok
 var tokstart
 
 function err(msg) {
-	etc.err(file,text,tokstart,msg)
+	etc.err(file, text, tokstart, msg)
 }

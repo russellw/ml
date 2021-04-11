@@ -31,6 +31,6 @@ for (var arg of process.argv.slice(2)) {
 			version()
 			continue
 	}
-	console.error(arg+': unknown option')
+	console.error(arg + ': unknown option')
 	process.exit(1)
 }
