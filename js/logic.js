@@ -27,9 +27,9 @@ function match(a, b, m = new Map()) {
 	assert(isTerm(b))
 	if (a === b) return m
 	if (a.op === 'variable') {
-	if (m.has(a)) return match(m.get(a), b, m)
-	m.set(a, b)
-	return m
+		if (m.has(a)) return match(m.get(a), b, m)
+		m.set(a, b)
+		return m
 	}
 	if (a.op !== b.op) return
 	if (!a.length) return eq(a, b) ? m : null
@@ -297,10 +297,10 @@ m = new Map()
 assert(unify(x, a, m))
 assert(!unify(b, x, m))
 
-    // Match is a subset of unify where only the first parameter is checked for variables
-    // Gives different results in several cases
-    // In particular, has no notion of an occurs check
-    // Assumes the inputs have disjoint variables
+// Match is a subset of unify where only the first parameter is checked for variables
+// Gives different results in several cases
+// In particular, has no notion of an occurs check
+// Assumes the inputs have disjoint variables
 
 // Succeeds. (tautology)
 m = new Map()
