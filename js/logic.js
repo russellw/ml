@@ -134,13 +134,12 @@ function eq(a, b) {
 	return true
 }
 
-function replace(a,m){
-	if(m.has(a))return replace(m.get(a),m)
-	if(!a.length)return a
-	var r=[]
-	Object.assign(r,a)
-	for(var i=0;i<r.length;i++)
-	r[i]=replace(r[i],m)
+function replace(a, m) {
+	if (m.has(a)) return replace(m.get(a), m)
+	if (!a.length) return a
+	var r = []
+	Object.assign(r, a)
+	for (var i = 0; i < r.length; i++) r[i] = replace(r[i], m)
 	return r
 }
 
@@ -190,96 +189,96 @@ assert(eq(call(f, [integer(1), integer(2)]), call(f, [integer(1), integer(2)])))
 assert(!eq(call(f, [integer(1), integer(2)]), call(g, [integer(1), integer(2)])))
 assert(!eq(call(f, [integer(1), integer(2)]), call(f, [integer(1), integer(3)])))
 
-    // https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
-    var m;
+// https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
+var m
 
-    // Succeeds. (tautology)
-    m = new Map();
-    assert(unify(a, a, m));
-    assert(m.size=== 0);
+// Succeeds. (tautology)
+m = new Map()
+assert(unify(a, a, m))
+assert(m.size === 0)
 
-    // a and b do not match
-    m = new Map();
-    assert(!unify(a, b, m));
+// a and b do not match
+m = new Map()
+assert(!unify(a, b, m))
 
-    // Succeeds. (tautology)
-    m = new Map();
-    assert(unify(x, x, m));
-    assert(m.size=== 0);
+// Succeeds. (tautology)
+m = new Map()
+assert(unify(x, x, m))
+assert(m.size === 0)
 
-    // x is unified with the constant a
-    m = new Map();
-    assert(unify(a, x, m));
-    assert(m.size=== 1);
-    assert(eq(replace(x,m), a))
+// x is unified with the constant a
+m = new Map()
+assert(unify(a, x, m))
+assert(m.size === 1)
+assert(eq(replace(x, m), a))
 
-    // x and y are aliased
-    m = new Map();
-    assert(unify(x, y, m));
-    assert(m.size=== 1);
-    assert(eq(replace(x,m), replace(y,m)))
+// x and y are aliased
+m = new Map()
+assert(unify(x, y, m))
+assert(m.size === 1)
+assert(eq(replace(x, m), replace(y, m)))
 
-    // function and constant symbols match, x is unified with the constant b
-    m = new Map();
-    assert(unify(call(f,[a, x]), call(f,[a, b]), m));
-    assert(m.size=== 1);
-    assert(eq(replace(x,m), b))
+// function and constant symbols match, x is unified with the constant b
+m = new Map()
+assert(unify(call(f, [a, x]), call(f, [a, b]), m))
+assert(m.size === 1)
+assert(eq(replace(x, m), b))
 
-    // f and g do not match
-    m = new Map();
-    assert(!unify(call(f,[a]), call(g,[a]), m));
+// f and g do not match
+m = new Map()
+assert(!unify(call(f, [a]), call(g, [a]), m))
 
-    // x and y are aliased
-    m = new Map();
-    assert(unify(call(f,[x]), call(f,[y]), m));
-    assert(m.size=== 1);
-    assert(eq(replace(x,m), replace(y,m)))
+// x and y are aliased
+m = new Map()
+assert(unify(call(f, [x]), call(f, [y]), m))
+assert(m.size === 1)
+assert(eq(replace(x, m), replace(y, m)))
 
-    // f and g do not match
-    m = new Map();
-    assert(!unify(call(f,[x]), call(g,[y]), m));
+// f and g do not match
+m = new Map()
+assert(!unify(call(f, [x]), call(g, [y]), m))
 
-    // Fails. The f function symbols have different arity
-    m = new Map();
-    assert(!unify(call(f,[x]), call(f,[y, z]), m));
+// Fails. The f function symbols have different arity
+m = new Map()
+assert(!unify(call(f, [x]), call(f, [y, z]), m))
 
-    // Unifies y with the term g(x)
-    m = new Map();
-    assert(unify(call(f,[call(g,[x])]), call(f,[y]), m));
-    assert(m.size=== 1);
-    assert(eq(replace(y,m), call(g,[x])))
+// Unifies y with the term g(x)
+m = new Map()
+assert(unify(call(f, [call(g, [x])]), call(f, [y]), m))
+assert(m.size === 1)
+assert(eq(replace(y, m), call(g, [x])))
 
-    // Unifies x with constant a, and y with the term g(a)
-    m = new Map();
-    assert(unify(call(f,[call(g,[x]), x]), call(f,[y, a]), m));
-    assert(m.size=== 2);
-    assert(eq(replace(x,m), a))
-    assert(eq(replace(y,m), call(g,[a])))
+// Unifies x with constant a, and y with the term g(a)
+m = new Map()
+assert(unify(call(f, [call(g, [x]), x]), call(f, [y, a]), m))
+assert(m.size === 2)
+assert(eq(replace(x, m), a))
+assert(eq(replace(y, m), call(g, [a])))
 
-    // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
-    m = new Map();
-    assert(!unify(x, call(f,[x]), m));
+// Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
+m = new Map()
+assert(!unify(x, call(f, [x]), m))
 
-    // Both x and y are unified with the constant a
-    m = new Map();
-    assert(unify(x, y, m));
-    assert(unify(y, a, m));
-    assert(m.size=== 2);
-    assert(eq(replace(x,m), a))
-    assert(eq(replace(y,m), a))
+// Both x and y are unified with the constant a
+m = new Map()
+assert(unify(x, y, m))
+assert(unify(y, a, m))
+assert(m.size === 2)
+assert(eq(replace(x, m), a))
+assert(eq(replace(y, m), a))
 
-    // As above (order of equations in set doesn't matter)
-    m = new Map();
-    assert(unify(a, y, m));
-    assert(unify(x, y, m));
-    assert(m.size=== 2);
-    assert(eq(replace(x,m), a))
-    assert(eq(replace(y,m), a))
+// As above (order of equations in set doesn't matter)
+m = new Map()
+assert(unify(a, y, m))
+assert(unify(x, y, m))
+assert(m.size === 2)
+assert(eq(replace(x, m), a))
+assert(eq(replace(y, m), a))
 
-    // Fails. a and b do not match, so x can't be unified with both
-    m = new Map();
-    assert(unify(x, a, m));
-    assert(!unify(b, x, m));
+// Fails. a and b do not match, so x can't be unified with both
+m = new Map()
+assert(unify(x, a, m))
+assert(!unify(b, x, m))
 
 //exports
 exports.occurs = occurs
