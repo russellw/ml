@@ -297,10 +297,10 @@ m = new Map()
 assert(unify(x, a, m))
 assert(!unify(b, x, m))
 
-// Match is a subset of unify where only the first parameter is checked for variables
-// Gives different results in several cases
-// In particular, has no notion of an occurs check
-// Assumes the inputs have disjoint variables
+// match is a subset of unify where only the first parameter is checked for variables
+// gives different results in several cases
+// in particular, has no notion of an occurs check
+// assumes the inputs have disjoint variables
 
 // Succeeds. (tautology)
 m = new Map()
@@ -317,7 +317,7 @@ assert(match(x, x, m))
 assert(m.size === 0)
 
 // x is unified with the constant a
-//Different result for match!
+//different result for match!
 m = new Map()
 assert(!match(a, x, m))
 
@@ -365,7 +365,7 @@ assert(eq(replace(x, m), a))
 assert(eq(replace(y, m), call(g, [a])))
 
 // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
-//Not valid for match!
+//not valid for match!
 
 // Both x and y are unified with the constant a
 m = new Map()
@@ -376,7 +376,7 @@ assert(eq(replace(x, m), a))
 assert(eq(replace(y, m), a))
 
 // As above (order of equations in set doesn't matter)
-//Different result for match!
+//different result for match!
 m = new Map()
 assert(!match(a, y, m))
 

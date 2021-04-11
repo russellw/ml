@@ -1,5 +1,6 @@
 'use strict'
 var logic = require('./logic')
+var dimacs = require('./dimacs')
 
 function help() {
 	console.log('Options:')
@@ -30,6 +31,6 @@ for (var arg of process.argv.slice(2)) {
 			version()
 			continue
 	}
-	console.log('%s: unknown option', arg)
+	console.error(arg+': unknown option')
 	process.exit(1)
 }
