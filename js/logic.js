@@ -1,5 +1,5 @@
 'use strict'
-var assert = require('assert')
+const assert = require('assert')
 
 function occurs(a, b, m) {
 	if (a === b) return true
@@ -49,7 +49,7 @@ function unifyVariable(a, b, m) {
 
 function bool(val) {
 	assert(typeof val === 'boolean')
-	var a = []
+	const a = []
 	a.op = 'bool'
 	a.val = val
 	return a
@@ -57,7 +57,7 @@ function bool(val) {
 
 function call(f, args) {
 	assert(!args.op)
-	var a = Array.from(args)
+	const a = Array.from(args)
 	a.op = 'call'
 	a.f = f
 	return a
@@ -65,14 +65,14 @@ function call(f, args) {
 
 function distinctObj(name) {
 	assert(typeof name === 'string')
-	var a = []
+	const a = []
 	a.name = name
 	a.op = 'distinctObj'
 	return a
 }
 
 function fn(name) {
-	var a = []
+	const a = []
 	a.name = name
 	a.op = 'fn'
 	return a
@@ -98,13 +98,13 @@ function term(op, ...args) {
 		default:
 			throw new Error(op)
 	}
-	var a = Array.from(args)
+	const a = Array.from(args)
 	a.op = op
 	return a
 }
 
 function variable(name) {
-	var a = []
+	const a = []
 	a.name = name
 	a.op = 'variable'
 	return a
@@ -117,7 +117,7 @@ function integer(val) {
 			val = BigInt(val)
 			break
 	}
-	var a = []
+	const a = []
 	a.op = 'integer'
 	a.val = val
 	return a
@@ -154,7 +154,7 @@ function eq(a, b) {
 function replace(a, m) {
 	if (m.has(a)) return replace(m.get(a), m)
 	if (!a.length) return a
-	var r = []
+	const r = []
 	Object.assign(r, a)
 	for (var i = 0; i < r.length; i++) r[i] = replace(r[i], m)
 	return r

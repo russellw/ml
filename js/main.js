@@ -1,6 +1,6 @@
 'use strict'
-var logic = require('./logic')
-var dimacs = require('./dimacs')
+const logic = require('./logic')
+const dimacs = require('./dimacs')
 
 function help() {
 	console.log('Options:')
@@ -13,7 +13,7 @@ function version() {
 	console.log('Version 0')
 }
 
-var files = []
+const files = []
 for (var arg of process.argv.slice(2)) {
 	var s = arg
 	if (!s.startsWith('-')) {
