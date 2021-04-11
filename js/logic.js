@@ -22,8 +22,7 @@ function unify(a, b, m = new Map()) {
 	}
 	if (!a.args) return m
 	if (a.args.length !== b.args.length) return null
-	for (var i = 0; i < a.args.length && m; i++)
-		m = unify(a.args[i], b.args[i], m)
+	for (var i = 0; i < a.args.length && m; i++) m = unify(a.args[i], b.args[i], m)
 	return m
 }
 
@@ -151,30 +150,10 @@ assert(!eq(bool(false), bool(true)))
 //integer
 assert(eq(integer(0), integer(0)))
 assert(!eq(integer(0), integer(1)))
-assert(
-	eq(
-		integer(1_000_000_000_000_000_000_000_000n),
-		integer(1_000_000_000_000n * 1_000_000_000_000n)
-	)
-)
-assert(
-	eq(
-		integer(1_000_000_000_000_000_000_000_000n),
-		integer('1000000000000000000000000')
-	)
-)
-assert(
-	eq(
-		integer(1_000_000_000_000_000_000_000_000n),
-		integer('+1000000000000000000000000')
-	)
-)
-assert(
-	eq(
-		integer(-1_000_000_000_000_000_000_000_000n),
-		integer('-1000000000000000000000000')
-	)
-)
+assert(eq(integer(1_000_000_000_000_000_000_000_000n), integer(1_000_000_000_000n * 1_000_000_000_000n)))
+assert(eq(integer(1_000_000_000_000_000_000_000_000n), integer('1000000000000000000000000')))
+assert(eq(integer(1_000_000_000_000_000_000_000_000n), integer('+1000000000000000000000000')))
+assert(eq(integer(-1_000_000_000_000_000_000_000_000n), integer('-1000000000000000000000000')))
 
 //distinct object
 assert(eq(distinctObj('a'), distinctObj('a')))
