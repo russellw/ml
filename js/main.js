@@ -33,4 +33,3 @@ for (var arg of process.argv.slice(2)) {
 	console.log('%s: unknown option', arg)
 	process.exit(1)
 }
-console.log(files)
