@@ -9,24 +9,20 @@ function occurs(a, b, m) {
 }
 
 function unify(a, b, m = new Map()) {
+	assert(isTerm(a))
+	assert(isTerm(b))
 	if (a === b) return m
-	if (a.op === 'var') return unifyVar(a, b, m)
-	if (b.op === 'var') return unifyVar(b, a, m)
-	if (a.op !== b.op) return null
-	switch (a.op) {
-		case 'call':
-			if (a.f !== b.f) return null
-			break
-		case 'const':
-			return a.val === b.val
-	}
-	if (!a.args) return m
-	if (a.args.length !== b.args.length) return null
-	for (var i = 0; i < a.args.length && m; i++) m = unify(a.args[i], b.args[i], m)
+	if (a.op === 'variable') return unifyVariable(a, b, m)
+	if (b.op === 'variable') return unifyVariable(b, a, m)
+	if (a.op !== b.op) return
+	if (!a.length) return eq(a, b) ? m : null
+	if (a.f !== b.f) return
+	if (a.length !== b.length) return
+	for (var i = 0; i < a.length && m; i++) m = unify(a[i], b[i], m)
 	return m
 }
 
-function unifyVar(a, b, m) {
+function unifyVariable(a, b, m) {
 	if (m.has(a)) return unify(m.get(a), b, m)
 	if (m.has(b)) return unify(a, m.get(b), m)
 	if (occurs(a, b, m)) return null
