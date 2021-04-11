@@ -4,8 +4,8 @@ var assert = require('assert')
 function occurs(a, b, m) {
 	if (a === b) return true
 	if (m.has(b)) return occurs(a, m.get(b), m)
-	if (!b.args) return false
-	for (var x of b.args) if (occurs(a, x, m)) return true
+	if (!b.length) return
+	for (var x of b) if (occurs(a, x, m)) return true
 }
 
 function unify(a, b, m = new Map()) {
@@ -134,18 +134,14 @@ function eq(a, b) {
 	return true
 }
 
-function transform(a,f){
+function replace(a,m){
+	if(m.has(a))return replace(m.get(a),m)
 	if(!a.length)return a
 	var r=[]
 	Object.assign(r,a)
 	for(var i=0;i<r.length;i++)
-	r[i]=transform(r[i],f)
+	r[i]=replace(r[i],m)
 	return r
-}
-
-function replace(a,m){
-	if(m.has(a))return replace(m.get(a),m)
-	return transform(a,b=>replace(b,m))
 }
 
 //bool
@@ -193,16 +189,6 @@ var g = fn('g')
 assert(eq(call(f, [integer(1), integer(2)]), call(f, [integer(1), integer(2)])))
 assert(!eq(call(f, [integer(1), integer(2)]), call(g, [integer(1), integer(2)])))
 assert(!eq(call(f, [integer(1), integer(2)]), call(f, [integer(1), integer(3)])))
-
-//transform
-function t1(a){
-	if(a.op=='integer')return integer(a.val+1)
-	return a
-}
-
-assert(eq(transform(a,t1), a))
-assert(eq(transform(term('&&', bool(true), bool(true)),t1), term('&&', bool(true), bool(true))))
-assert(eq(transform(call(f, [integer(1), integer(2)]),t1), call(f, [integer(2), integer(3)])))
 
     // https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
     var m;
