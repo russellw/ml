@@ -159,6 +159,23 @@ assert(eq(integer(-1_000_000_000_000_000_000_000_000n), integer('-10000000000000
 assert(eq(distinctObj('a'), distinctObj('a')))
 assert(!eq(distinctObj('a'), distinctObj('b')))
 
+//fn
+assert(!eq(fn('a'), fn('a')))
+var a = fn('a')
+var b = fn()
+assert(eq(a, a))
+assert(eq(b, b))
+assert(!eq(a, b))
+
+//variable
+assert(!eq(variable('x'), variable('x')))
+var x = variable('x')
+var y = variable()
+assert(eq(x, x))
+assert(eq(y, y))
+assert(!eq(x, y))
+
+//exports
 exports.occurs = occurs
 exports.distinctObj = distinctObj
 exports.unify = unify
