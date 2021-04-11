@@ -22,10 +22,27 @@ function unify(a, b, m = new Map()) {
 	return m
 }
 
+function match(a, b, m = new Map()) {
+	assert(isTerm(a))
+	assert(isTerm(b))
+	if (a === b) return m
+	if (a.op === 'variable') {
+	if (m.has(a)) return match(m.get(a), b, m)
+	m.set(a, b)
+	return m
+	}
+	if (a.op !== b.op) return
+	if (!a.length) return eq(a, b) ? m : null
+	if (a.f !== b.f) return
+	if (a.length !== b.length) return
+	for (var i = 0; i < a.length && m; i++) m = unify(a[i], b[i], m)
+	return m
+}
+
 function unifyVariable(a, b, m) {
 	if (m.has(a)) return unify(m.get(a), b, m)
 	if (m.has(b)) return unify(a, m.get(b), m)
-	if (occurs(a, b, m)) return null
+	if (occurs(a, b, m)) return
 	m.set(a, b)
 	return m
 }
@@ -279,6 +296,94 @@ assert(eq(replace(y, m), a))
 m = new Map()
 assert(unify(x, a, m))
 assert(!unify(b, x, m))
+
+    // Match is a subset of unify where only the first parameter is checked for variables
+    // Gives different results in several cases
+    // In particular, has no notion of an occurs check
+    // Assumes the inputs have disjoint variables
+
+// Succeeds. (tautology)
+m = new Map()
+assert(match(a, a, m))
+assert(m.size === 0)
+
+// a and b do not match
+m = new Map()
+assert(!match(a, b, m))
+
+// Succeeds. (tautology)
+m = new Map()
+assert(match(x, x, m))
+assert(m.size === 0)
+
+// x is unified with the constant a
+//Different result for match!
+m = new Map()
+assert(!match(a, x, m))
+
+// x and y are aliased
+m = new Map()
+assert(match(x, y, m))
+assert(m.size === 1)
+assert(eq(replace(x, m), replace(y, m)))
+
+// function and constant symbols match, x is unified with the constant b
+m = new Map()
+assert(match(call(f, [a, x]), call(f, [a, b]), m))
+assert(m.size === 1)
+assert(eq(replace(x, m), b))
+
+// f and g do not match
+m = new Map()
+assert(!match(call(f, [a]), call(g, [a]), m))
+
+// x and y are aliased
+m = new Map()
+assert(match(call(f, [x]), call(f, [y]), m))
+assert(m.size === 1)
+assert(eq(replace(x, m), replace(y, m)))
+
+// f and g do not match
+m = new Map()
+assert(!match(call(f, [x]), call(g, [y]), m))
+
+// Fails. The f function symbols have different arity
+m = new Map()
+assert(!match(call(f, [x]), call(f, [y, z]), m))
+
+// Unifies y with the term g(x)
+m = new Map()
+assert(match(call(f, [call(g, [x])]), call(f, [y]), m))
+assert(m.size === 1)
+assert(eq(replace(y, m), call(g, [x])))
+
+// Unifies x with constant a, and y with the term g(a)
+m = new Map()
+assert(match(call(f, [call(g, [x]), x]), call(f, [y, a]), m))
+assert(m.size === 2)
+assert(eq(replace(x, m), a))
+assert(eq(replace(y, m), call(g, [a])))
+
+// Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
+//Not valid for match!
+
+// Both x and y are unified with the constant a
+m = new Map()
+assert(match(x, y, m))
+assert(match(y, a, m))
+assert(m.size === 2)
+assert(eq(replace(x, m), a))
+assert(eq(replace(y, m), a))
+
+// As above (order of equations in set doesn't matter)
+//Different result for match!
+m = new Map()
+assert(!match(a, y, m))
+
+// Fails. a and b do not match, so x can't be unified with both
+m = new Map()
+assert(match(x, a, m))
+assert(!match(b, x, m))
 
 //exports
 exports.occurs = occurs
