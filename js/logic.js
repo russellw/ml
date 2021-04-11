@@ -67,23 +67,19 @@ function fn(name) {
 
 function term(op, ...args) {
 	switch (op) {
-		case '!=':
 		case '<':
 		case '<=':
 		case '<=>':
-		case '<~>':
-		case '=':
+		case '==':
 		case '=>':
 		case '>':
 		case '>=':
-		case '~&':
-		case '~|':
 			assert(args.length === 2)
 			break
-		case '&':
-		case '|':
+		case '&&':
+		case '||':
 			break
-		case '~':
+		case '!':
 			assert(args.length === 1)
 			break
 		default:
@@ -174,6 +170,18 @@ var y = variable()
 assert(eq(x, x))
 assert(eq(y, y))
 assert(!eq(x, y))
+
+//term
+assert(eq(term('&&', bool(true), bool(true)), term('&&', bool(true), bool(true))))
+assert(!eq(term('&&', bool(true), bool(true)), term('||', bool(true), bool(true))))
+assert(!eq(term('&&', bool(true), bool(true)), term('&&', bool(true), bool(false))))
+
+//call
+var f = fn('f')
+var g = fn('g')
+assert(eq(call(f, [integer(1), integer(2)]), call(f, [integer(1), integer(2)])))
+assert(!eq(call(f, [integer(1), integer(2)]), call(g, [integer(1), integer(2)])))
+assert(!eq(call(f, [integer(1), integer(2)]), call(f, [integer(1), integer(3)])))
 
 //exports
 exports.occurs = occurs
