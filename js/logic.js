@@ -25,7 +25,11 @@ function unify(a, b, m = new Map()) {
 function simplify(a, m = new Map()) {
 	assert(isTerm(a))
 	if (m.has(a)) return simplify(m.get(a), m)
-	return a
+	if (!a.length) return a
+	var r = []
+	Object.assign(r, a)
+	for (var i = 0; i < r.length; i++) r[i] = simplify(r[i], m)
+	return r
 }
 
 function match(a, b, m = new Map()) {
@@ -392,6 +396,7 @@ assert(eq(simplify(x), x))
 m = new Map()
 m.set(x, y)
 assert(eq(simplify(x, m), y))
+assert(eq(simplify(call(f, x, y), m), call(f, y, y)))
 
 //exports
 exports.occurs = occurs

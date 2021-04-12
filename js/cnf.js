@@ -34,6 +34,11 @@ function clause1(a) {
 	return clause(neg, pos)
 }
 
+function simplifyClause(c, m) {
+	;[neg, pos] = c
+	neg = neg.map((a) => logic.simplify(a, m))
+}
+
 var a = logic.fn('a')
 var b = logic.fn('b')
 assert(logic.eq(clause([a], [b]), clause([a], [b])))
