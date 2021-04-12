@@ -46,6 +46,8 @@ function parse(file, text) {
 		tok = eof
 	}
 
+	lex()
+
 	function eat(k) {
 		if (tok === k) {
 			lex()
@@ -54,15 +56,61 @@ function parse(file, text) {
 	}
 
 	// Parser
-	var atoms = new Map()
+	const atoms = new Map()
 
 	function atom() {
 		if (!('1' <= tok[0] && tok[0] <= '9')) err('Expected atom')
-		var name = tok
+		const name = tok
 		lex()
 		if (atoms.has(name)) return atoms.get(name)
-		var a = cnf.fun(name)
+		const a = logic.fn(name)
 		atoms.set(name, a)
 		return a
+	}
+
+	if (eat('p')) {
+		while (ti < text.length && /\s/.test(s[ti])) ti++
+		if (text.slice(ti, ti + 3) !== 'cnf') {
+			tokstart = ti
+			err("Expected 'cnf'")
+		}
+		ti += 3
+		lex()
+
+		if (!/^\d+$/.test(tok)) err('Expected count')
+		lex()
+
+		if (!/^\d+$/.test(tok)) err('Expected count')
+		lex()
+	}
+
+	var neg = []
+	var pos = []
+	const clauses = []
+
+	function clause() {
+		const c = [neg, pos]
+		c.file = file
+		clauses.push(c)
+		neg = []
+		pos = []
+	}
+
+	while (tok !== eof) {
+		switch (tok) {
+			case '0':
+				clause()
+				continue
+			case '-':
+				lex()
+				neg.push(atom())
+				continue
+		}
+		pos.push(atom())
+	}
+	if (neg.length || pos.length) clause()
+	return {
+		clauses: cs,
+		status,
 	}
 }
