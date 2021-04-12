@@ -22,10 +22,13 @@ function extension(file) {
 }
 
 function help() {
-	console.log('Options:')
+	console.log('General options:')
+	console.log('-h       Show help')
+	console.log('-v       Show version')
 	console.log()
-	console.log('-h  Show help')
-	console.log('-v  Show version')
+	console.log('Input:')
+	console.log('-dimacs  DIMACS format')
+	console.log('-tptp    TPTP   format')
 }
 
 function version() {
@@ -41,6 +44,10 @@ for (var arg of process.argv.slice(2)) {
 	}
 	while (s.startsWith('-')) s = s.slice(1)
 	switch (s) {
+		case 'dimacs':
+		case 'tptp':
+			lang = s
+			continue
 		case 'h':
 		case 'help':
 			help()
@@ -55,5 +62,12 @@ for (var arg of process.argv.slice(2)) {
 }
 for (var file of files) {
 	var text = fs.readFileSync(file, 'utf8')
-	dimacs.parse(file, text)
+	switch (language(file)) {
+		case 'dimacs':
+			dimacs.parse(file, text)
+			break
+		default:
+			console.error(file + ': unknown language')
+			process.exit(1)
+	}
 }
