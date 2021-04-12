@@ -1,6 +1,6 @@
 'use strict'
-const fs = require('fs')
-const dimacs = require('./dimacs')
+var fs = require('fs')
+var dimacs = require('./dimacs')
 
 var lang
 
@@ -16,7 +16,7 @@ function language(file) {
 }
 
 function extension(file) {
-	const a = file.split('.')
+	var a = file.split('.')
 	if (a.length < 2) return ''
 	return a.pop()
 }
@@ -32,7 +32,7 @@ function version() {
 	console.log('Version 0')
 }
 
-const files = []
+var files = []
 for (var arg of process.argv.slice(2)) {
 	var s = arg
 	if (!s.startsWith('-')) {
@@ -54,6 +54,6 @@ for (var arg of process.argv.slice(2)) {
 	process.exit(1)
 }
 for (var file of files) {
-	const text = fs.readFileSync(file, 'utf8')
+	var text = fs.readFileSync(file, 'utf8')
 	dimacs.parse(file, text)
 }

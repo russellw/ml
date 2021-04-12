@@ -1,8 +1,8 @@
 'use strict'
-const logic = require('./logic')
-const etc = require('./etc')
+var logic = require('./logic')
+var etc = require('./etc')
 
-const eof = ' '
+var eof = ' '
 
 function parse(file, text) {
 	var ti = 0
@@ -56,14 +56,14 @@ function parse(file, text) {
 	}
 
 	// Parser
-	const atoms = new Map()
+	var atoms = new Map()
 
 	function atom() {
 		if (!/[1-9]\d*/.test(tok)) err('Expected atom')
-		const name = tok
+		var name = tok
 		lex()
 		if (atoms.has(name)) return atoms.get(name)
-		const a = logic.fn(name)
+		var a = logic.fn(name)
 		atoms.set(name, a)
 		return a
 	}
@@ -86,10 +86,10 @@ function parse(file, text) {
 
 	var neg = []
 	var pos = []
-	const clauses = []
+	var clauses = []
 
 	function clause() {
-		const c = [neg, pos]
+		var c = [neg, pos]
 		c.file = file
 		clauses.push(c)
 		neg = []
