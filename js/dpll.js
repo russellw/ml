@@ -2,11 +2,9 @@
 var logic = require('./logic')
 var cnf = require('./cnf')
 
-function sat(clauses,m=new Map()) {
-	if (cnf.isFalse(clauses))
-		return
-	if (cnf.isTrue(clauses))
-		return m
+function sat(clauses, m = new Map()) {
+	if (cnf.isFalse(clauses)) return
+	if (cnf.isTrue(clauses)) return m
 
 	// Unit clauses
 	for (var clause of clauses)
@@ -32,8 +30,7 @@ function sat(clauses,m=new Map()) {
 			for (var literal of clause) {
 				var polarity = literal.op !== '~'
 				var atom = polarity ? literal : literal[0]
-				if (polarity === polarity1 && cnf.eq(atom, atom1))
-					return true
+				if (polarity === polarity1 && cnf.eq(atom, atom1)) return true
 			}
 	}
 
@@ -42,15 +39,13 @@ function sat(clauses,m=new Map()) {
 		for (var literal of clause) {
 			var polarity = literal.op !== '~'
 			var atom = polarity ? literal : literal[0]
-			if (!occurs(!polarity, atom))
-				return sat(cnf.evaluate(clauses, cnf.empty.add(atom, cnf.bool(polarity))))
+			if (!occurs(!polarity, atom)) return sat(cnf.evaluate(clauses, cnf.empty.add(atom, cnf.bool(polarity))))
 		}
 
 	// Guess
 	var atom = atoms[0]
-	var r=sat(cnf.evaluate(clauses, cnf.empty.add(atom, cnf.bool(false))))
-	if(r)
-		return r
+	var r = sat(cnf.evaluate(clauses, cnf.empty.add(atom, cnf.bool(false))))
+	if (r) return r
 	return sat(cnf.evaluate(clauses, cnf.empty.add(atom, cnf.bool(true))))
 }
 

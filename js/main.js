@@ -49,11 +49,11 @@ function parseArgs(args) {
 				case 'h':
 				case 'help':
 					help()
-					continue
+					process.exit(0)
 				case 'h':
 				case 'version':
 					version()
-					continue
+					process.exit(0)
 			}
 			console.error(arg + ': unknown option')
 			process.exit(1)
@@ -68,6 +68,10 @@ function parseArgs(args) {
 }
 
 parseArgs(process.argv.slice(2))
+if (!files.length) {
+	help()
+	process.exit(0)
+}
 for (var file of files) {
 	var text = fs.readFileSync(file, 'utf8')
 	switch (language(file)) {
