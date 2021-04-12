@@ -58,6 +58,11 @@ function parseArgs(args) {
 			console.error(arg + ': unknown option')
 			process.exit(1)
 		}
+		if (extension(s) == 'lst') {
+			var text = fs.readFileSync(s, 'utf8')
+			parseArgs(text.split(/\r?\n/))
+			continue
+		}
 		files.push(s)
 	}
 }

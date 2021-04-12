@@ -69,7 +69,7 @@ function parse(file, text) {
 	}
 
 	if (eat('p')) {
-		while (ti < text.length && /\s/.test(s[ti])) ti++
+		while (ti < text.length && /\s/.test(text[ti])) ti++
 		if (text.slice(ti, ti + 3) !== 'cnf') {
 			tokstart = ti
 			err("Expected 'cnf'")
