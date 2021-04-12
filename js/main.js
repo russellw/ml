@@ -2,6 +2,25 @@
 const fs = require('fs')
 const dimacs = require('./dimacs')
 
+var lang
+
+function language(file) {
+	if (lang) return lang
+	switch (extension(file)) {
+		case 'cnf':
+			return 'dimacs'
+		case 'p':
+		case 'ax':
+			return 'tptp'
+	}
+}
+
+function extension(file) {
+	const a = file.split('.')
+	if (a.length < 2) return ''
+	return a.pop()
+}
+
 function help() {
 	console.log('Options:')
 	console.log()
