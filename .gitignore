@@ -1,4 +1,5 @@
 *.csv
+*.cnf
 node_modules/
 *.asm
 *.dot
