@@ -3,6 +3,7 @@ var fs = require('fs')
 var dimacs = require('./dimacs')
 
 var lang
+var files = []
 
 function language(file) {
 	if (lang) return lang
@@ -35,31 +36,33 @@ function version() {
 	console.log('Version 0')
 }
 
-var files = []
-for (var arg of process.argv.slice(2)) {
-	var s = arg
-	if (!s.startsWith('-')) {
+function parseArgs(args) {
+	for (var arg of args) {
+		var s = arg
+		if (s.startsWith('-')) {
+			while (s.startsWith('-')) s = s.slice(1)
+			switch (s) {
+				case 'dimacs':
+				case 'tptp':
+					lang = s
+					continue
+				case 'h':
+				case 'help':
+					help()
+					continue
+				case 'h':
+				case 'version':
+					version()
+					continue
+			}
+			console.error(arg + ': unknown option')
+			process.exit(1)
+		}
 		files.push(s)
-		continue
 	}
-	while (s.startsWith('-')) s = s.slice(1)
-	switch (s) {
-		case 'dimacs':
-		case 'tptp':
-			lang = s
-			continue
-		case 'h':
-		case 'help':
-			help()
-			continue
-		case 'h':
-		case 'version':
-			version()
-			continue
-	}
-	console.error(arg + ': unknown option')
-	process.exit(1)
 }
+
+parseArgs(process.argv.slice(2))
 for (var file of files) {
 	var text = fs.readFileSync(file, 'utf8')
 	switch (language(file)) {
