@@ -68,7 +68,7 @@ function parse(file, text) {
 		return a
 	}
 
-	if (eat('p')) {
+	if (tok == 'p') {
 		while (ti < text.length && /\s/.test(text[ti])) ti++
 		if (text.slice(ti, ti + 3) !== 'cnf') {
 			tokstart = ti
@@ -99,6 +99,7 @@ function parse(file, text) {
 	while (tok !== eof) {
 		switch (tok) {
 			case '0':
+				lex()
 				clause()
 				continue
 			case '-':
@@ -110,7 +111,7 @@ function parse(file, text) {
 	}
 	if (neg.length || pos.length) clause()
 	return {
-		clauses: cs,
+		clauses,
 		status,
 	}
 }

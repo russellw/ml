@@ -392,5 +392,6 @@ exports.unify = unify
 exports.bool = bool
 exports.call = call
 exports.eq = eq
+exports.fn = fn
 exports.term = term
 exports.variable = variable
