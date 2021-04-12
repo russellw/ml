@@ -139,20 +139,21 @@ function eq(a, b) {
 	assert(isTerm(b))
 	if (a === b) return true
 	if (a.op !== b.op) return
-	if (a.length !== b.length) return
-	for (var i = 0; i < a.length; i++) if (!eq(a[i], b[i])) return
 	switch (a.op) {
 		case 'integer':
 		case 'bool':
 			return a.val === b.val
 		case 'call':
-			return a.f === b.f
+			if (a.f !== b.f) return
+			break
 		case 'distinctObj':
 			return a.name === b.name
 		case 'fn':
 		case 'variable':
 			return
 	}
+	if (a.length !== b.length) return
+	for (var i = 0; i < a.length; i++) if (!eq(a[i], b[i])) return
 	return true
 }
 
