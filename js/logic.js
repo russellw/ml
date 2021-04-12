@@ -94,14 +94,9 @@ function term(op, ...args) {
 		case '>=':
 			assert(args.length === 2)
 			break
-		case '&&':
-		case '||':
-			break
 		case '!':
 			assert(args.length === 1)
 			break
-		default:
-			throw new Error(op)
 	}
 	var a = Array.from(args)
 	a.op = op
@@ -408,3 +403,4 @@ exports.eq = eq
 exports.fn = fn
 exports.term = term
 exports.variable = variable
+exports.isTerm = isTerm

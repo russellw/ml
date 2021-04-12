@@ -3,20 +3,40 @@ var logic = require('./logic')
 var assert = require('assert')
 
 function clause(neg, pos) {
+	assert(!logic.isTerm(neg))
+	assert(!logic.isTerm(pos))
 	neg = logic.term('bag', ...neg)
-	neg.op = 'bag'
-
-	pos = pos.slice()
-	pos.op = 'bag'
-
+	pos = logic.term('bag', ...pos)
 	var c = [neg, pos]
 	c.op = 'clause'
 	return c
 }
 
 function clause1(a) {
-	assert(logic.isTerm(a))
+	var neg = []
+	var pos = []
+
+	function rec(a) {
+		assert(logic.isTerm(a))
+		assert(a.op != '&&')
+		switch (a.op) {
+			case '||':
+				for (var b of a) rec(b)
+				return
+			case '!':
+				neg.push(a[0])
+				return
+		}
+		pos.push(a)
+	}
+
+	rec(a)
+	return clause(neg, pos)
 }
 
+var a = logic.fn('a')
+var b = logic.fn('b')
+assert(logic.eq(clause([a], [b]), clause([a], [b])))
+assert(logic.eq(clause([a], [b]), clause1(logic.term('||', logic.term('!', a), b))))
+
 exports.clause = clause
-exports.clause1 = clause1
