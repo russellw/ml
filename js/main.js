@@ -72,10 +72,11 @@ for (var file of files) {
 	var text = fs.readFileSync(file, 'utf8')
 	switch (language(file)) {
 		case 'dimacs':
-			dimacs.parse(file, text)
+			var problem = dimacs.parse(file, text)
 			break
 		default:
 			console.error(file + ': unknown language')
 			process.exit(1)
 	}
+	console.trace(problem)
 }

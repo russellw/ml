@@ -8,17 +8,17 @@ function parse(file, text) {
 	var ti = 0
 	var status = ''
 	var tok
-	var tokstart
+	var toki
 
 	function err(msg) {
-		etc.err(file, text, tokstart, msg)
+		etc.err(file, text, toki, msg)
 	}
 
-	// Tokenizer
+	// tokenizer
 	function lex() {
 		while (ti < text.length) {
-			//Mark start of token for error reporting
-			tokstart = ti
+			//mark start of token for error reporting
+			toki = ti
 
 			//space
 			if (/\s/.test(text[ti])) {
@@ -35,7 +35,7 @@ function parse(file, text) {
 			//number
 			if (/\d/.test(text[ti])) {
 				while (/\d/.test(text[ti])) ti++
-				tok = text.slice(tokstart, ti)
+				tok = text.slice(toki, ti)
 				return
 			}
 
@@ -55,7 +55,7 @@ function parse(file, text) {
 		}
 	}
 
-	// Parser
+	// parser
 	var atoms = new Map()
 
 	function atom() {
@@ -71,7 +71,7 @@ function parse(file, text) {
 	if (tok == 'p') {
 		while (ti < text.length && /\s/.test(text[ti])) ti++
 		if (text.slice(ti, ti + 3) !== 'cnf') {
-			tokstart = ti
+			toki = ti
 			err("Expected 'cnf'")
 		}
 		ti += 3
