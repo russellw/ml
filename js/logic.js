@@ -61,8 +61,7 @@ function bool(val) {
 	return a
 }
 
-function call(f, args) {
-	assert(!args.op)
+function call(f, ...args) {
 	var a = Array.from(args)
 	a.op = 'call'
 	a.f = f
@@ -209,9 +208,9 @@ assert(!eq(term('&&', bool(true), bool(true)), term('&&', bool(true), bool(false
 //call
 var f = fn('f')
 var g = fn('g')
-assert(eq(call(f, [integer(1), integer(2)]), call(f, [integer(1), integer(2)])))
-assert(!eq(call(f, [integer(1), integer(2)]), call(g, [integer(1), integer(2)])))
-assert(!eq(call(f, [integer(1), integer(2)]), call(f, [integer(1), integer(3)])))
+assert(eq(call(f, integer(1), integer(2)), call(f, ...[integer(1), integer(2)])))
+assert(!eq(call(f, integer(1), integer(2)), call(g, integer(1), integer(2))))
+assert(!eq(call(f, integer(1), integer(2)), call(f, integer(1), integer(3))))
 
 // https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
 var m
@@ -244,44 +243,44 @@ assert(eq(replace(x, m), replace(y, m)))
 
 // function and constant symbols match, x is unified with the constant b
 m = new Map()
-assert(unify(call(f, [a, x]), call(f, [a, b]), m))
+assert(unify(call(f, a, x), call(f, a, b), m))
 assert(m.size === 1)
 assert(eq(replace(x, m), b))
 
 // f and g do not match
 m = new Map()
-assert(!unify(call(f, [a]), call(g, [a]), m))
+assert(!unify(call(f, a), call(g, a), m))
 
 // x and y are aliased
 m = new Map()
-assert(unify(call(f, [x]), call(f, [y]), m))
+assert(unify(call(f, x), call(f, y), m))
 assert(m.size === 1)
 assert(eq(replace(x, m), replace(y, m)))
 
 // f and g do not match
 m = new Map()
-assert(!unify(call(f, [x]), call(g, [y]), m))
+assert(!unify(call(f, x), call(g, y), m))
 
 // Fails. The f function symbols have different arity
 m = new Map()
-assert(!unify(call(f, [x]), call(f, [y, z]), m))
+assert(!unify(call(f, x), call(f, y, z), m))
 
 // Unifies y with the term g(x)
 m = new Map()
-assert(unify(call(f, [call(g, [x])]), call(f, [y]), m))
+assert(unify(call(f, call(g, x)), call(f, y), m))
 assert(m.size === 1)
-assert(eq(replace(y, m), call(g, [x])))
+assert(eq(replace(y, m), call(g, x)))
 
 // Unifies x with constant a, and y with the term g(a)
 m = new Map()
-assert(unify(call(f, [call(g, [x]), x]), call(f, [y, a]), m))
+assert(unify(call(f, call(g, x), x), call(f, y, a), m))
 assert(m.size === 2)
 assert(eq(replace(x, m), a))
-assert(eq(replace(y, m), call(g, [a])))
+assert(eq(replace(y, m), call(g, a)))
 
 // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
 m = new Map()
-assert(!unify(x, call(f, [x]), m))
+assert(!unify(x, call(f, x), m))
 
 // Both x and y are unified with the constant a
 m = new Map()
@@ -336,40 +335,40 @@ assert(eq(replace(x, m), replace(y, m)))
 
 // function and constant symbols match, x is unified with the constant b
 m = new Map()
-assert(match(call(f, [a, x]), call(f, [a, b]), m))
+assert(match(call(f, a, x), call(f, a, b), m))
 assert(m.size === 1)
 assert(eq(replace(x, m), b))
 
 // f and g do not match
 m = new Map()
-assert(!match(call(f, [a]), call(g, [a]), m))
+assert(!match(call(f, a), call(g, a), m))
 
 // x and y are aliased
 m = new Map()
-assert(match(call(f, [x]), call(f, [y]), m))
+assert(match(call(f, x), call(f, y), m))
 assert(m.size === 1)
 assert(eq(replace(x, m), replace(y, m)))
 
 // f and g do not match
 m = new Map()
-assert(!match(call(f, [x]), call(g, [y]), m))
+assert(!match(call(f, x), call(g, y), m))
 
 // Fails. The f function symbols have different arity
 m = new Map()
-assert(!match(call(f, [x]), call(f, [y, z]), m))
+assert(!match(call(f, x), call(f, y, z), m))
 
 // Unifies y with the term g(x)
 m = new Map()
-assert(match(call(f, [call(g, [x])]), call(f, [y]), m))
+assert(match(call(f, call(g, x)), call(f, y), m))
 assert(m.size === 1)
-assert(eq(replace(y, m), call(g, [x])))
+assert(eq(replace(y, m), call(g, x)))
 
 // Unifies x with constant a, and y with the term g(a)
 m = new Map()
-assert(match(call(f, [call(g, [x]), x]), call(f, [y, a]), m))
+assert(match(call(f, call(g, x), x), call(f, y, a), m))
 assert(m.size === 2)
 assert(eq(replace(x, m), a))
-assert(eq(replace(y, m), call(g, [a])))
+assert(eq(replace(y, m), call(g, a)))
 
 // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
 //not valid for match!
