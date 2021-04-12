@@ -1,5 +1,5 @@
 'use strict'
-const logic = require('./logic')
+const fs = require('fs')
 const dimacs = require('./dimacs')
 
 function help() {
@@ -33,4 +33,8 @@ for (var arg of process.argv.slice(2)) {
 	}
 	console.error(arg + ': unknown option')
 	process.exit(1)
+}
+for (var file of files) {
+	const text = fs.readFileSync(file, 'utf8')
+	dimacs.parse(file, text)
 }

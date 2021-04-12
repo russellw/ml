@@ -21,20 +21,20 @@ function parse(file, text) {
 			tokstart = ti
 
 			//space
-			if (etc.isspace(text[ti])) {
+			if (/\s/.test(text[ti])) {
 				ti++
 				continue
 			}
 
-			//comment
+			//line comment
 			if (text[ti] == 'c') {
 				while (text[ti] != '\n') ti++
 				continue
 			}
 
 			//number
-			if (etc.isdigit(text[ti])) {
-				while (etc.isdigit(text[ti])) ti++
+			if (/\d/.test(text[ti])) {
+				while (/\d/.test(text[ti])) ti++
 				tok = text.slice(tokstart, ti)
 				return
 			}
@@ -59,7 +59,7 @@ function parse(file, text) {
 	const atoms = new Map()
 
 	function atom() {
-		if (!('1' <= tok[0] && tok[0] <= '9')) err('Expected atom')
+		if (!/[1-9]\d*/.test(tok)) err('Expected atom')
 		const name = tok
 		lex()
 		if (atoms.has(name)) return atoms.get(name)
@@ -114,3 +114,5 @@ function parse(file, text) {
 		status,
 	}
 }
+
+exports.parse = parse
