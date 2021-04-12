@@ -3,6 +3,7 @@ var logic = require('./logic')
 var cnf = require('./cnf')
 
 function sat(clauses, m = new Map()) {
+	var cs=cnf.simplifyClauses(clauses)
 	if (cnf.isFalse(clauses)) return
 	if (cnf.isTrue(clauses)) return m
 
