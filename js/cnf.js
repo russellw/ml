@@ -2,19 +2,19 @@
 var logic = require('./logic')
 var assert = require('assert')
 
-function clause(neg,pos){
-	neg=logic.term('bag',...neg)
-	neg.op='bag'
+function clause(neg, pos) {
+	neg = logic.term('bag', ...neg)
+	neg.op = 'bag'
 
-	pos=pos.slice()
-	pos.op='bag'
+	pos = pos.slice()
+	pos.op = 'bag'
 
-	var c = [neg,pos]
+	var c = [neg, pos]
 	c.op = 'clause'
 	return c
 }
 
-function clause1(a){
+function clause1(a) {
 	assert(logic.isTerm(a))
 }
 

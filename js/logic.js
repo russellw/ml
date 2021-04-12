@@ -24,7 +24,7 @@ function unify(a, b, m = new Map()) {
 
 function simplify(a, m = new Map()) {
 	assert(isTerm(a))
-	if(m.has(a))return simplify(m.get(a),m)
+	if (m.has(a)) return simplify(m.get(a), m)
 	return a
 }
 
@@ -202,6 +202,7 @@ assert(!eq(x, y))
 
 //term
 assert(eq(term('&&', bool(true), bool(true)), term('&&', bool(true), bool(true))))
+assert(eq(term('&&', bool(true), bool(true)), term('&&', ...[bool(true), bool(true)])))
 assert(!eq(term('&&', bool(true), bool(true)), term('||', bool(true), bool(true))))
 assert(!eq(term('&&', bool(true), bool(true)), term('&&', bool(true), bool(false))))
 
@@ -392,10 +393,10 @@ assert(match(x, a, m))
 assert(!match(b, x, m))
 
 //simplify
-assert(eq(simplify(x),x))
+assert(eq(simplify(x), x))
 m = new Map()
-m.set(x,y)
-assert(eq(simplify(x,m),y))
+m.set(x, y)
+assert(eq(simplify(x, m), y))
 
 //exports
 exports.occurs = occurs
