@@ -59,14 +59,6 @@ function call(f, ...args) {
 	return a
 }
 
-function distinctObj(name) {
-	assert(typeof name === 'string')
-	var a = []
-	a.name = name
-	a.op = 'distinctObj'
-	return a
-}
-
 function fn(name) {
 	var a = []
 	a.name = name
@@ -109,8 +101,6 @@ function eq(a, b) {
 		case 'call':
 			if (a.f !== b.f) return
 			break
-		case 'distinctObj':
-			return a.name === b.name
 		case 'fn':
 		case 'variable':
 			return
@@ -137,10 +127,6 @@ assert(!eq(false, true))
 //integer
 assert(eq(0n, 0n))
 assert(!eq(1_000_000_000_000_000_000_000_000n, 1_000_000_000_000_000_000_000_001n))
-
-//distinct object
-assert(eq(distinctObj('a'), distinctObj('a')))
-assert(!eq(distinctObj('a'), distinctObj('b')))
 
 //fn
 assert(!eq(fn('a'), fn('a')))
@@ -360,7 +346,6 @@ assert(eq(simplify(call(f, x, y), m), call(f, y, y)))
 
 //exports
 exports.occurs = occurs
-exports.distinctObj = distinctObj
 exports.unify = unify
 exports.call = call
 exports.eq = eq
