@@ -13,7 +13,9 @@ function clause(neg, pos) {
 var falseClause = clause([], [])
 var trueClause = clause([], [logic.bool(true)])
 
-var falseClauses = function simplifyClause(c, m = new Map()) {
+//var falseClauses =
+
+function simplifyClause(c, m = new Map()) {
 	;[neg, pos] = c
 
 	//simplify
@@ -37,7 +39,6 @@ function clauseTerm(a) {
 	var pos = []
 
 	function rec(a) {
-		assert(logic.isTerm(a))
 		assert(a.op != '&&')
 		switch (a.op) {
 			case '||':

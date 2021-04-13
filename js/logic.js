@@ -9,8 +9,6 @@ function occurs(a, b, m) {
 }
 
 function unify(a, b, m = new Map()) {
-	assert(isTerm(a))
-	assert(isTerm(b))
 	if (a === b) return m
 	if (a.op === 'variable') return unifyVariable(a, b, m)
 	if (b.op === 'variable') return unifyVariable(b, a, m)
@@ -23,7 +21,6 @@ function unify(a, b, m = new Map()) {
 }
 
 function simplify(a, m = new Map()) {
-	assert(isTerm(a))
 	if (m.has(a)) return simplify(m.get(a), m)
 	if (!a.length) return a
 	var r = []
@@ -33,8 +30,6 @@ function simplify(a, m = new Map()) {
 }
 
 function match(a, b, m = new Map()) {
-	assert(isTerm(a))
-	assert(isTerm(b))
 	if (a === b) return m
 	if (a.op === 'variable') {
 		if (m.has(a)) return match(m.get(a), b, m)
@@ -127,14 +122,7 @@ function integer(val) {
 	return a
 }
 
-function isTerm(a) {
-	if (!Array.isArray(a)) return
-	return typeof a.op === 'string'
-}
-
 function eq(a, b) {
-	assert(isTerm(a))
-	assert(isTerm(b))
 	if (a === b) return true
 	if (a.op !== b.op) return
 	switch (a.op) {
@@ -407,4 +395,3 @@ exports.eq = eq
 exports.fn = fn
 exports.term = term
 exports.variable = variable
-exports.isTerm = isTerm
