@@ -96,15 +96,8 @@ function variable(name) {
 function eq(a, b) {
 	if (a === b) return true
 	if (a.op !== b.op) return
-	if (!a.op) return
-	switch (a.op) {
-		case 'call':
-			if (a.f !== b.f) return
-			break
-		case 'fn':
-		case 'variable':
-			return
-	}
+	if (!a.length) return
+	if (a.f !== b.f) return
 	if (a.length !== b.length) return
 	for (var i = 0; i < a.length; i++) if (!eq(a[i], b[i])) return
 	return true
