@@ -101,26 +101,11 @@ function variable(name) {
 	return a
 }
 
-function integer(val) {
-	switch (typeof val) {
-		case 'number':
-		case 'string':
-			val = BigInt(val)
-			break
-	}
-	var a = []
-	a.op = 'integer'
-	a.val = val
-	return a
-}
-
 function eq(a, b) {
 	if (a === b) return true
 	if (a.op !== b.op) return
 	if (!a.op) return
 	switch (a.op) {
-		case 'integer':
-			return a.val === b.val
 		case 'call':
 			if (a.f !== b.f) return
 			break
@@ -150,12 +135,8 @@ assert(eq(true, true))
 assert(!eq(false, true))
 
 //integer
-assert(eq(integer(0), integer(0)))
-assert(!eq(integer(0), integer(1)))
-assert(eq(integer(1_000_000_000_000_000_000_000_000n), integer(1_000_000_000_000n * 1_000_000_000_000n)))
-assert(eq(integer(1_000_000_000_000_000_000_000_000n), integer('1000000000000000000000000')))
-assert(eq(integer(1_000_000_000_000_000_000_000_000n), integer('+1000000000000000000000000')))
-assert(eq(integer(-1_000_000_000_000_000_000_000_000n), integer('-1000000000000000000000000')))
+assert(eq(0n, 0n))
+assert(!eq(1_000_000_000_000_000_000_000_000n, 1_000_000_000_000_000_000_000_001n))
 
 //distinct object
 assert(eq(distinctObj('a'), distinctObj('a')))
@@ -187,9 +168,9 @@ assert(!eq(term('&&', true, true), term('&&', true, false)))
 //call
 var f = fn('f')
 var g = fn('g')
-assert(eq(call(f, integer(1), integer(2)), call(f, ...[integer(1), integer(2)])))
-assert(!eq(call(f, integer(1), integer(2)), call(g, integer(1), integer(2))))
-assert(!eq(call(f, integer(1), integer(2)), call(f, integer(1), integer(3))))
+assert(eq(call(f, 1n, 2n), call(f, ...[1n, 2n])))
+assert(!eq(call(f, 1n, 2n), call(g, 1n, 2n)))
+assert(!eq(call(f, 1n, 2n), call(f, 1n, 3n)))
 
 // https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
 var m
