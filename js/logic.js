@@ -52,14 +52,6 @@ function unifyVariable(a, b, m) {
 	return m
 }
 
-function bool(val) {
-	assert(typeof val === 'boolean')
-	var a = []
-	a.op = 'bool'
-	a.val = val
-	return a
-}
-
 function call(f, ...args) {
 	var a = Array.from(args)
 	a.op = 'call'
@@ -125,9 +117,9 @@ function integer(val) {
 function eq(a, b) {
 	if (a === b) return true
 	if (a.op !== b.op) return
+	if (!a.op) return
 	switch (a.op) {
 		case 'integer':
-		case 'bool':
 			return a.val === b.val
 		case 'call':
 			if (a.f !== b.f) return
@@ -153,9 +145,9 @@ function replace(a, m) {
 }
 
 //bool
-assert(eq(bool(false), bool(false)))
-assert(eq(bool(true), bool(true)))
-assert(!eq(bool(false), bool(true)))
+assert(eq(false, false))
+assert(eq(true, true))
+assert(!eq(false, true))
 
 //integer
 assert(eq(integer(0), integer(0)))
@@ -187,10 +179,10 @@ assert(eq(y, y))
 assert(!eq(x, y))
 
 //term
-assert(eq(term('&&', bool(true), bool(true)), term('&&', bool(true), bool(true))))
-assert(eq(term('&&', bool(true), bool(true)), term('&&', ...[bool(true), bool(true)])))
-assert(!eq(term('&&', bool(true), bool(true)), term('||', bool(true), bool(true))))
-assert(!eq(term('&&', bool(true), bool(true)), term('&&', bool(true), bool(false))))
+assert(eq(term('&&', true, true), term('&&', true, true)))
+assert(eq(term('&&', true, true), term('&&', ...[true, true])))
+assert(!eq(term('&&', true, true), term('||', true, true)))
+assert(!eq(term('&&', true, true), term('&&', true, false)))
 
 //call
 var f = fn('f')
@@ -389,7 +381,6 @@ assert(eq(simplify(call(f, x, y), m), call(f, y, y)))
 exports.occurs = occurs
 exports.distinctObj = distinctObj
 exports.unify = unify
-exports.bool = bool
 exports.call = call
 exports.eq = eq
 exports.fn = fn
