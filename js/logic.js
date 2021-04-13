@@ -129,8 +129,7 @@ function integer(val) {
 
 function isTerm(a) {
 	if (!Array.isArray(a)) return
-	if (typeof a.op !== 'string') return
-	return true
+	return typeof a.op === 'string'
 }
 
 function eq(a, b) {

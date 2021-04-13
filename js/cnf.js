@@ -3,8 +3,6 @@ var logic = require('./logic')
 var assert = require('assert')
 
 function clause(neg, pos) {
-	assert(!logic.isTerm(neg))
-	assert(!logic.isTerm(pos))
 	neg = logic.term('bag', ...neg)
 	pos = logic.term('bag', ...pos)
 	var c = [neg, pos]
@@ -12,7 +10,29 @@ function clause(neg, pos) {
 	return c
 }
 
-function clause1(a) {
+var falseClause = clause([], [])
+var trueClause = clause([], [logic.bool(true)])
+
+var falseClauses = function simplifyClause(c, m = new Map()) {
+	;[neg, pos] = c
+
+	//simplify
+	neg = neg.map((a) => logic.simplify(a, m))
+	pos = pos.map((a) => logic.simplify(a, m))
+
+	//tautology?
+	for (var a in neg) if (a.val === false) return trueClause
+	for (var a in pos) if (a.val === true) return trueClause
+
+	//filter out redundancy
+	neg = neg.filter((a) => a.val !== true)
+	pos = pos.filter((a) => a.val !== false)
+
+	//make new clause
+	return clause(neg, pos)
+}
+
+function clauseTerm(a) {
 	var neg = []
 	var pos = []
 
@@ -34,14 +54,9 @@ function clause1(a) {
 	return clause(neg, pos)
 }
 
-function simplifyClause(c, m) {
-	;[neg, pos] = c
-	neg = neg.map((a) => logic.simplify(a, m))
-}
-
 var a = logic.fn('a')
 var b = logic.fn('b')
 assert(logic.eq(clause([a], [b]), clause([a], [b])))
-assert(logic.eq(clause([a], [b]), clause1(logic.term('||', logic.term('!', a), b))))
+assert(logic.eq(clause([a], [b]), clauseTerm(logic.term('||', logic.term('!', a), b))))
 
 exports.clause = clause
