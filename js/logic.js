@@ -395,3 +395,4 @@ exports.eq = eq
 exports.fn = fn
 exports.term = term
 exports.variable = variable
+exports.simplify = simplify

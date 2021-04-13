@@ -10,13 +10,13 @@ function clause(neg, pos) {
 	return c
 }
 
-var falseClause = clause([], [])
-var trueClause = clause([], [logic.bool(true)])
+var falseClause = [[], []]
+var trueClause = [[], [logic.bool(true)]]
 
 //var falseClauses =
 
 function simplifyClause(c, m = new Map()) {
-	;[neg, pos] = c
+	var [neg, pos] = c
 
 	//simplify
 	neg = neg.map((a) => logic.simplify(a, m))
@@ -59,5 +59,8 @@ var a = logic.fn('a')
 var b = logic.fn('b')
 assert(logic.eq(clause([a], [b]), clause([a], [b])))
 assert(logic.eq(clause([a], [b]), clauseTerm(logic.term('||', logic.term('!', a), b))))
+var t = logic.bool(true)
+var f = logic.bool(false)
+assert(logic.eq(simplifyClause(clause([a], [b])), clause([a], [b])))
 
 exports.clause = clause
