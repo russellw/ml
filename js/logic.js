@@ -10,8 +10,8 @@ function occurs(a, b, m) {
 
 function unify(a, b, m = new Map()) {
 	if (a === b) return m
-	if (a.op === 'variable') return unifyVariable(a, b, m)
-	if (b.op === 'variable') return unifyVariable(b, a, m)
+	if (a.op === 'var') return unifyVar(a, b, m)
+	if (b.op === 'var') return unifyVar(b, a, m)
 	if (a.op !== b.op) return
 	if (!a.length) return eq(a, b) ? m : null
 	if (a.length !== b.length) return
@@ -30,7 +30,7 @@ function simplify(a, m = new Map()) {
 
 function match(a, b, m = new Map()) {
 	if (a === b) return m
-	if (a.op === 'variable') {
+	if (a.op === 'var') {
 		if (m.has(a)) return match(m.get(a), b, m)
 		m.set(a, b)
 		return m
@@ -42,7 +42,7 @@ function match(a, b, m = new Map()) {
 	return m
 }
 
-function unifyVariable(a, b, m) {
+function unifyVar(a, b, m) {
 	if (m.has(a)) return unify(m.get(a), b, m)
 	if (m.has(b)) return unify(a, m.get(b), m)
 	if (occurs(a, b, m)) return
@@ -74,13 +74,6 @@ function term(op, ...args) {
 	}
 	var a = Array.from(args)
 	a.op = op
-	return a
-}
-
-function variable(name) {
-	var a = []
-	a.name = name
-	a.op = 'variable'
 	return a
 }
 
@@ -120,10 +113,9 @@ assert(eq(b, b))
 assert(!eq(a, b))
 
 //variable
-assert(!eq(variable('x'), variable('x')))
-var x = variable('x')
-var y = variable()
-var z = variable()
+var x = { op: 'var' }
+var y = { op: 'var' }
+var z = { op: 'var' }
 assert(eq(x, x))
 assert(eq(y, y))
 assert(!eq(x, y))
@@ -333,5 +325,4 @@ exports.unify = unify
 exports.eq = eq
 exports.fn = fn
 exports.term = term
-exports.variable = variable
 exports.simplify = simplify
