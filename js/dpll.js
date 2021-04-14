@@ -46,4 +46,9 @@ function sat(clauses, m = new Map()) {
 	}
 }
 
+m = sat([[[], []]])
+/*
+assert(!m)
+*/
+
 exports.sat = sat

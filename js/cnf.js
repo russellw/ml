@@ -54,5 +54,8 @@ assert(logic.eq(clause([a], [b]), clauseTerm(logic.term('||', logic.term('!', a)
 assert(logic.eq(clause([a], [false]), [[a], []]))
 assert(logic.eq(clause([a], [true]), trueClause))
 assert(logic.eq(clause([a], [a]), trueClause))
+assert(logic.eq(trueClause, trueClause))
+assert(!logic.eq(trueClause, falseClause))
+assert(logic.eq(falseClause, falseClause))
 
 exports.clause = clause

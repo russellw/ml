@@ -116,6 +116,11 @@ assert(eq(term('&&', true, true), term('&&', true, true)))
 assert(eq(term('&&', true, true), term('&&', ...[true, true])))
 assert(!eq(term('&&', true, true), term('||', true, true)))
 assert(!eq(term('&&', true, true), term('&&', true, false)))
+assert(!eq(term('&&', true, true), x))
+
+//arrays
+assert(!eq([true, true], x))
+assert(!eq([true, true], true))
 
 //call
 var f = { op: 'fn' }
