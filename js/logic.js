@@ -4,7 +4,7 @@ var assert = require('assert')
 function occurs(a, b, m) {
 	if (a === b) return true
 	if (m.has(b)) return occurs(a, m.get(b), m)
-	if (!b.length) return
+	if (!Array.isArray(b)) return null
 	for (var x of b) if (occurs(a, x, m)) return true
 }
 
@@ -12,8 +12,8 @@ function unify(a, b, m = new Map()) {
 	if (a === b) return m
 	if (a.op === 'var') return unifyVar(a, b, m)
 	if (b.op === 'var') return unifyVar(b, a, m)
+	if (!Array.isArray(a)) return null
 	if (a.op !== b.op) return
-	if (!a.length) return eq(a, b) ? m : null
 	if (a.length !== b.length) return
 	for (var i = 0; i < a.length && m; i++) m = unify(a[i], b[i], m)
 	return m
@@ -21,7 +21,7 @@ function unify(a, b, m = new Map()) {
 
 function simplify(a, m = new Map()) {
 	if (m.has(a)) return simplify(m.get(a), m)
-	if (!a.length) return a
+	if (!Array.isArray(a)) return a
 	var r = []
 	Object.assign(r, a)
 	for (var i = 0; i < r.length; i++) r[i] = simplify(r[i], m)
@@ -35,8 +35,8 @@ function match(a, b, m = new Map()) {
 		m.set(a, b)
 		return m
 	}
+	if (!Array.isArray(a)) return null
 	if (a.op !== b.op) return
-	if (!a.length) return eq(a, b) ? m : null
 	if (a.length !== b.length) return
 	for (var i = 0; i < a.length && m; i++) m = unify(a[i], b[i], m)
 	return m
@@ -72,8 +72,8 @@ function term(op, ...args) {
 
 function eq(a, b) {
 	if (a === b) return true
+	if (!Array.isArray(a)) return
 	if (a.op !== b.op) return
-	if (!a.length) return
 	if (a.length !== b.length) return
 	for (var i = 0; i < a.length; i++) if (!eq(a[i], b[i])) return
 	return true
@@ -81,7 +81,7 @@ function eq(a, b) {
 
 function replace(a, m) {
 	if (m.has(a)) return replace(m.get(a), m)
-	if (!a.length) return a
+	if (!Array.isArray(a)) return a
 	var r = []
 	Object.assign(r, a)
 	for (var i = 0; i < r.length; i++) r[i] = replace(r[i], m)
