@@ -26,6 +26,7 @@ function quote(s) {
 				break
 			case '"':
 			case "'":
+			case "/":
 				if (!q) {
 					q = s[i]
 					break
