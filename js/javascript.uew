@@ -1,0 +1,67 @@
+/L9"JavaScript" JSCRIPT_LANG Line Comment = // Block Comment On = /* Block Comment Off = */ Escape Char = \ String Chars = '" File Extensions = JS
+/Colors = 0,8421376,8421376,8421504,255,
+/Colors Back = 16777215,16777215,16777215,16777215,16777215,
+/Colors Auto Back = 1,1,1,1,1,
+/Font Style = 0,0,0,0,0,
+/Delimiters = ~!@%^&*()-+=|\/{}[]:;"'<> ,	.?
+/Function String = "%[ ^t]++function[ ^t]++^([a-zA-Z_][a-zA-Z_0-9]++[^t ]++(*)^)"
+/Function String 1 = "%[ ^t]++^(*^)=[ ^t]++function[ ^t]++(*)"
+/Function String 2 = "%[ ^t]++^(*^):[ ^t]++function[ ^t]++(*)"
+/Indent Strings = "{" "else"
+/Unindent Strings = "}"
+/Open Brace Strings =  "{" "(" "[" "<"
+/Close Brace Strings = "}" ")" "]" ">"
+/Open Fold Strings = "{"
+/Close Fold Strings = "}"
+/C1"Keywords" STYLE_KEYWORD Colors = 16711680 Colors Back = 16777215 Colors Auto Back = 1 Font Style = 0
+abstract
+break byte
+case catch char class const continue
+default delete do double
+else extends
+false final finally float for function
+goto
+if implements import in instanceof int interface
+long
+native null
+package private protected public
+reset return
+short static super switch synchronized
+this throw transient true try
+var void
+while with
+/C2"Objects" STYLE_OPERATOR Colors = 255 Colors Back = 16777215 Colors Auto Back = 1 Font Style = 0
+/C3"Methods and Properties" STYLE_METHOD Colors = 33023 Colors Back = 16777215 Colors Auto Back = 1 Font Style = 0
+/C4"Operators" STYLE_OPERATOR Colors = 32768 Colors Back = 16777215 Colors Auto Back = 1 Font Style = 0
+!
+$
+%
+&
+*
++
+-
+// /
+:
+<
+=
+>
+?
+[
+]
+^
+is
+new
+sizeof
+typeof
+unchecked
+|
+~
+/C5"Separs" STYLE_OPERATOR Colors = 4210816 Colors Back = 16777215 Colors Auto Back = 1 Font Style = 0
+(
+)
+,
+;
+{
+}
+/C6"UE/UES Script Commands" STYLE_FUNCTION Colors = 16711680 Colors Back = 16777215 Colors Auto Back = 1 Font Style = 0
+/C7"UE/UES Script Parameters" STYLE_ELEMENT Colors = 16711680 Colors Back = 16777215 Colors Auto Back = 1 Font Style = 0

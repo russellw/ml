@@ -365,9 +365,7 @@ function parse(file, text) {
 		status = ''
 		parse1(text, file)
 		return {
-			bytes,
 			conjecture,
-			files,
 			formulas,
 			status,
 		}
