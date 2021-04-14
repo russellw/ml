@@ -6,12 +6,12 @@ const cnf = require('./cnf')
 
 function sat(clauses, m = new Map()) {
 	var cs = clauses.map((c) => cnf.clause(c[0], c[1], m))
-	if (cs.some((c) => logic.eq(c, cnf.falseClause))) return
-	if (cs.every((c) => logic.eq(c, cnf.trueClause))) return m
+	for (var c in cs) if (logic.eq(c, cnf.falseClause)) return
+	cs = cs.filter((c) => !logic.eq(c, cnf.trueClause))
+	if (!cs.length) return m
 
 	// unit clauses
 	for (var c of cs) {
-		if (logic.eq(c, cnf.trueClause)) continue
 		var [neg, pos] = c
 		if (neg.length + pos.length == 1) {
 			if (neg.length) m.set(neg[0], false)
@@ -21,7 +21,7 @@ function sat(clauses, m = new Map()) {
 	}
 
 	// atoms
-	var atoms = new set()
+	var atoms = new Set()
 	etc.walk(cs, (a) => {
 		if (a.op == 'fn') atoms.add(a)
 	})
