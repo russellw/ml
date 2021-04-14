@@ -20,6 +20,7 @@ function eq(a, b) {
 function quote(s) {
 	var q = ''
 	for (var i = 0; i < s.length; i++) {
+		if (s.slice(i, i + 2) == '//' && !q) return '//'
 		switch (s[i]) {
 			case '\\':
 				i++
@@ -52,11 +53,11 @@ for (var file of fs.readdirSync('.')) {
 		var m = /^var (\w+ = require\('.+'\))$/.exec(lines[i])
 		if (m) lines[i] = 'const ' + m[1]
 
-		// === -> ===
+		// == -> ===
 		var m = /^(.*) == (.*)$/.exec(lines[i])
 		if (m && !quote(m[1])) lines[i] = m[1] + ' === ' + m[2]
 
-		// !== -> !==
+		// != -> !==
 		var m = /^(.*) != (.*)$/.exec(lines[i])
 		if (m && !quote(m[1])) lines[i] = m[1] + ' !== ' + m[2]
 	}
