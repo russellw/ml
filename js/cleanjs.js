@@ -31,6 +31,6 @@ for (var file of fs.readdirSync('.')) {
 		}
 	}
 	if (eq(lines, old)) continue
-	fs.writeFileSync(lines.join('\n') + '\n', 'utf8')
+	fs.writeFileSync(file, lines.join('\n') + '\n', 'utf8')
 	console.log(file)
 }
