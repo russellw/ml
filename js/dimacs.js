@@ -29,6 +29,7 @@ function parse(file, text) {
 			// line comment
 			if (text[ti] === 'c') {
 				while (text[ti] !== '\n') ti++
+				console.log(text.slice(toki, ti))
 				continue
 			}
 

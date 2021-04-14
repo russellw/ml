@@ -83,4 +83,15 @@ for (var file of files) {
 			process.exit(1)
 	}
 	var r = dpll.sat(problem.clauses)
+	if (r) {
+		console.log('sat')
+		var more
+		for (var [k, v] of r.entries()) {
+			if (more) process.stdout.write(' ')
+			more = true
+			if (!v) process.stdout.write('-')
+			process.stdout.write(k)
+		}
+	} else console.log('unsat')
+	console.log()
 }
