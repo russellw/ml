@@ -1,6 +1,6 @@
 'use strict'
-var logic = require('./logic')
-var assert = require('assert')
+const logic = require('./logic')
+const assert = require('assert')
 
 var falseClause = [[], []]
 var trueClause = [[], [true]]

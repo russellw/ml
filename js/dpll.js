@@ -1,8 +1,8 @@
 'use strict'
-var assert = require('assert')
-var logic = require('./logic')
-var etc = require('./etc')
-var cnf = require('./cnf')
+const assert = require('assert')
+const logic = require('./logic')
+const etc = require('./etc')
+const cnf = require('./cnf')
 
 function sat(clauses, m = new Map()) {
 	var cs = clauses.map((c) => cnf.clause(c[0], c[1], m))

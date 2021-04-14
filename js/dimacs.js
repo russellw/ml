@@ -1,6 +1,6 @@
 'use strict'
-var logic = require('./logic')
-var etc = require('./etc')
+const logic = require('./logic')
+const etc = require('./etc')
 
 var eof = ' '
 

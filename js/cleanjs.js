@@ -2,7 +2,7 @@
 //does not work on arbitrary javascript!
 //should be inspected carefully before being used in other projects
 'use strict'
-var fs = require('fs')
+const fs = require('fs')
 
 function extension(file) {
 	var a = file.split('.')
@@ -31,6 +31,6 @@ for (var file of fs.readdirSync('.')) {
 		}
 	}
 	if (eq(lines, old)) continue
-	fs.writeFileSync(file, lines.join('\n') + '\n', 'utf8')
+	fs.writeFileSync(file, lines.join('\n'), 'utf8')
 	console.log(file)
 }

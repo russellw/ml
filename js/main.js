@@ -1,7 +1,7 @@
 'use strict'
-var fs = require('fs')
-var dimacs = require('./dimacs')
-var dpll = require('./dpll')
+const fs = require('fs')
+const dimacs = require('./dimacs')
+const dpll = require('./dpll')
 
 var lang
 var files = []

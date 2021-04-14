@@ -1,5 +1,5 @@
 'use strict'
-var assert = require('assert')
+const assert = require('assert')
 
 function occurs(a, b, m) {
 	if (a === b) return true
