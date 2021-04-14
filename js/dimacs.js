@@ -27,7 +27,7 @@ function parse(file, text) {
 			}
 
 			//line comment
-			if (text[ti] == 'c') {
+			if (text[ti] === 'c') {
 				while (text[ti] != '\n') ti++
 				continue
 			}
@@ -71,7 +71,7 @@ function parse(file, text) {
 		return a
 	}
 
-	if (tok == 'p') {
+	if (tok === 'p') {
 		while (ti < text.length && /\s/.test(text[ti])) ti++
 		if (text.slice(ti, ti + 3) !== 'cnf') {
 			toki = ti

@@ -31,7 +31,7 @@ function quote(s) {
 					q = s[i]
 					break
 				}
-				if (q == s[i]) q = ''
+				if (q === s[i]) q = ''
 				break
 		}
 	}

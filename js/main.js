@@ -59,7 +59,7 @@ function parseArgs(args) {
 			console.error(arg + ': unknown option')
 			process.exit(1)
 		}
-		if (extension(s) == 'lst') {
+		if (extension(s) === 'lst') {
 			parseArgs(fs.readFileSync(s, 'utf8').split(/\r?\n/))
 			continue
 		}

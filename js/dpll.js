@@ -13,7 +13,7 @@ function sat(clauses, m = new Map()) {
 	// unit clauses
 	for (var c of cs) {
 		var [neg, pos] = c
-		if (neg.length + pos.length == 1) {
+		if (neg.length + pos.length === 1) {
 			if (neg.length) m.set(neg[0], false)
 			else m.set(pos[0], true)
 			return sat(clauses, m)
@@ -23,7 +23,7 @@ function sat(clauses, m = new Map()) {
 	// atoms
 	var atoms = new Set()
 	etc.walk(cs, (a) => {
-		if (a.op == 'fn') atoms.add(a)
+		if (a.op === 'fn') atoms.add(a)
 	})
 
 	// pure atoms
