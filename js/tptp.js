@@ -49,7 +49,7 @@ function parse(file, text) {
 			}
 
 			// quote
-			if (text[ti] == "'" || text[ti] === '"') {
+			if (text[ti] === "'" || text[ti] === '"') {
 				for (var q = text[ti++]; text[ti] !== q; ti++) {
 					if (text[ti] === '\\') ti++
 					if (ti === text.length) err('Unclosed quote')
@@ -60,8 +60,32 @@ function parse(file, text) {
 			}
 
 			// number
-			if (/\d/.test(text[ti])) {
+			if (/[\+\-]?\d/.test(text.slice(ti, ti + 2))) {
+				// sign
+				if (/[\+\-]/.test(text[ti])) ti++
+
+				// integer
 				while (/\d/.test(text[ti])) ti++
+
+				// fraction
+				if (text[ti] === '/') {
+					// denominator
+					ti++
+					while (/\d/.test(text[ti])) ti++
+				} else {
+					// decimal
+					if (text[ti] === '.') {
+						ti++
+						while (/\d/.test(text[ti])) ti++
+					}
+
+					// exponent
+					if (/[\+\-]?[Ee]/.test(text.slice(ti, ti + 2))) {
+						if (/[\+\-]/.test(text[ti])) ti++
+						if (/[Ee]/.test(text[ti])) ti++
+						while (/\d/.test(text[ti])) ti++
+					}
+				}
 				tok = text.slice(toki, ti)
 				return
 			}
@@ -87,91 +111,10 @@ function parse(file, text) {
 			return
 		}
 		tok = eof
-
-		for (;;) {
-			switch (text[i]) {
-				case '+':
-				case '-':
-					if (iop.isdigit(text[i + 1])) {
-						number()
-						return
-					}
-					break
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-				case '9':
-					number()
-					return
-			}
-		}
-	}
-
-	function number() {
-		var j = i
-
-		function digits() {
-			while (iop.isdigit(text[j])) j++
-		}
-
-		function sign() {
-			switch (text[j]) {
-				case '+':
-				case '-':
-					j++
-					break
-			}
-		}
-
-		sign()
-		digits()
-		switch (text[j]) {
-			case '.':
-				j++
-				digits()
-				switch (text[j]) {
-					case 'E':
-					case 'e':
-						j++
-						sign()
-						digits()
-						break
-				}
-				break
-			case '/':
-				j++
-				digits()
-				tok = text.slice(i, j)
-				i = j
-				value = cnf.rational(tok)
-				return
-			case 'E':
-			case 'e':
-				j++
-				sign()
-				digits()
-				break
-			default:
-				tok = text.slice(i, j)
-				i = j
-				value = cnf.integer(tok)
-				return
-		}
-		tok = text.slice(i, j)
-		i = j
-		value = cnf.real(tok)
 	}
 
 	// Parser
-	var bytes
 	var conjecture
-	var distinct_objs
 	var files
 	var formulas
 	var free
