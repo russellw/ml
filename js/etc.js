@@ -1,5 +1,10 @@
 'use strict'
 
+function walk(a, f) {
+	f(a)
+	if (Array.isArray(a)) for (var b of a) walk(b, f)
+}
+
 function err(file, text, toki, msg) {
 	// line number
 	var line = 1
@@ -23,3 +28,4 @@ function err(file, text, toki, msg) {
 }
 
 exports.err = err
+exports.walk = walk
