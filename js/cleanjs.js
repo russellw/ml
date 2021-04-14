@@ -26,7 +26,7 @@ function quote(s) {
 				break
 			case '"':
 			case "'":
-			case "/":
+			case '/':
 				if (!q) {
 					q = s[i]
 					break
@@ -51,6 +51,10 @@ for (var file of fs.readdirSync('.')) {
 		//== -> ===
 		var m = /^(.*) == (.*)$/.exec(lines[i])
 		if (m && !quote(m[1])) lines[i] = m[1] + ' === ' + m[2]
+
+		//!= -> !==
+		var m = /^(.*) != (.*)$/.exec(lines[i])
+		if (m && !quote(m[1])) lines[i] = m[1] + ' !== ' + m[2]
 	}
 	if (eq(lines, old)) continue
 	fs.writeFileSync(file, lines.join('\n'), 'utf8')
