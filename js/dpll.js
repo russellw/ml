@@ -39,7 +39,7 @@ function sat(clauses, m = new Map()) {
 
 	// guess
 	for (var a of atoms) {
-		var m1 = new map(m)
+		var m1 = new Map(m)
 		m1.set(a, false)
 		var r = sat(clauses, m1)
 		if (r) return r

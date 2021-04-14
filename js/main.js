@@ -82,5 +82,5 @@ for (var file of files) {
 			console.error(file + ': unknown language')
 			process.exit(1)
 	}
-	console.trace(problem)
+	var r = dpll.sat(problem.clauses)
 }
