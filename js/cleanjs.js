@@ -1,4 +1,5 @@
 //reduce entropy of javascript code
+//assumes prettier has already been run
 //does not work on arbitrary javascript!
 //should be inspected carefully before being used in other projects
 'use strict'
@@ -16,19 +17,39 @@ function eq(a, b) {
 	return true
 }
 
+function quote(s) {
+	var q = ''
+	for (var i = 0; i < s.length; i++) {
+		switch (s[i]) {
+			case '\\':
+				i++
+				break
+			case '"':
+			case "'":
+				if (!q) {
+					q = s[i]
+					break
+				}
+				if (q == s[i]) q = ''
+				break
+		}
+	}
+	return q
+}
+
 if (process.argv[2] !== '.') process.exit(1)
 for (var file of fs.readdirSync('.')) {
 	if (extension(file) !== 'js') continue
 	var lines = fs.readFileSync(file, 'utf8').split(/\r?\n/)
 	var old = lines.slice()
 	for (var i = 0; i < lines.length; i++) {
-		var m
+		//var ... require -> const
+		var m = /^var (\w+ = require\('.+'\))$/.exec(lines[i])
+		if (m) lines[i] = 'const ' + m[1]
 
-		m = /var (\w+ = require\('.+'\))/.exec(lines[i])
-		if (m) {
-			lines[i] = 'const ' + m[1]
-			console.log(lines[i])
-		}
+		//== -> ===
+		var m = /^(.*) == (.*)$/.exec(lines[i])
+		if (m && !quote(m[1])) lines[i] = m[1] + ' === ' + m[2]
 	}
 	if (eq(lines, old)) continue
 	fs.writeFileSync(file, lines.join('\n'), 'utf8')
