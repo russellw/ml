@@ -20,7 +20,7 @@ function eq(a, b) {
 function quote(s) {
 	var q = ''
 	for (var i = 0; i < s.length; i++) {
-		if (s.slice(i, i + 2) == '//' && !q) return '//'
+		if (s.slice(i, i + 2) === '//' && !q) return '//'
 		switch (s[i]) {
 			case '\\':
 				i++
