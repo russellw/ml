@@ -50,13 +50,6 @@ function unifyVar(a, b, m) {
 	return m
 }
 
-function fn(name) {
-	var a = []
-	a.name = name
-	a.op = 'fn'
-	return a
-}
-
 function term(op, ...args) {
 	switch (op) {
 		case '<':
@@ -105,11 +98,9 @@ assert(eq(0n, 0n))
 assert(!eq(1_000_000_000_000_000_000_000_000n, 1_000_000_000_000_000_000_000_001n))
 
 //fn
-assert(!eq(fn('a'), fn('a')))
-var a = fn('a')
-var b = fn()
+var a = { op: 'fn' }
+var b = { op: 'fn' }
 assert(eq(a, a))
-assert(eq(b, b))
 assert(!eq(a, b))
 
 //variable
@@ -127,8 +118,8 @@ assert(!eq(term('&&', true, true), term('||', true, true)))
 assert(!eq(term('&&', true, true), term('&&', true, false)))
 
 //call
-var f = fn('f')
-var g = fn('g')
+var f = { op: 'fn' }
+var g = { op: 'fn' }
 assert(eq(term('call', f, 1n, 2n), term('call', f, 1n, 2n)))
 assert(!eq(term('call', f, 1n, 2n), term('call', g, 1n, 2n)))
 assert(!eq(term('call', f, 1n, 2n), term('call', f, 1n, 3n)))
@@ -323,6 +314,5 @@ assert(eq(simplify(term('call', f, x, y), m), term('call', f, y, y)))
 exports.occurs = occurs
 exports.unify = unify
 exports.eq = eq
-exports.fn = fn
 exports.term = term
 exports.simplify = simplify

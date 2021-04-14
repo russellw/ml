@@ -63,7 +63,10 @@ function parse(file, text) {
 		var name = tok
 		lex()
 		if (atoms.has(name)) return atoms.get(name)
-		var a = logic.fn(name)
+		var a = {
+			op: 'fn',
+			name,
+		}
 		atoms.set(name, a)
 		return a
 	}
