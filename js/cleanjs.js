@@ -45,8 +45,8 @@ for (var file of fs.readdirSync('.')) {
 	var old = lines.slice()
 	for (var i = 0; i < lines.length; i++) {
 		//comments begin with spaces
-		var m = /^\/\/(\S.*)$/.exec(lines[i])
-		if (m) lines[i] = '// ' + m[1]
+		var m = /^(\s*)\/\/(\S.*)$/.exec(lines[i])
+		if (m) lines[i] = m[1] + '// ' + m[2]
 
 		//var ... require -> const
 		var m = /^var (\w+ = require\('.+'\))$/.exec(lines[i])
