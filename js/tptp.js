@@ -18,17 +18,59 @@ function parse(file, text) {
 
 	// tokenizer
 	function lex() {
-		tok = ''
+		while (ti < text.length) {
+			// mark start of token for error reporting
+			toki = ti
+
+			// space
+			if (/\s/.test(text[ti])) {
+				ti++
+				continue
+			}
+
+			// line comment
+			if (text[ti] === '%') {
+				while (text[ti] !== '\n') ti++
+				console.log(text.slice(toki, ti))
+				continue
+			}
+
+			// block comment
+			if (text.slice(ti, ti + 2) === '/*') {
+				for (ti += 2; text.slice(ti, ti + 2) !== '*/'; ti++) if (ti === text.length) err("Unclosed '/*'")
+				continue
+			}
+
+			// word
+			if (/[\w_\$]/.test(text[ti])) {
+				while (/[\w_\$]/.test(text[ti])) ti++
+				tok = text.slice(toki, ti)
+				return
+			}
+
+			// number
+			if (/\d/.test(text[ti])) {
+				while (/\d/.test(text[ti])) ti++
+				tok = text.slice(toki, ti)
+				return
+			}
+
+			// multichar punctuation
+			var punct = ['!=', '~&', '~|']
+			if (punct.includes(text.slice(ti, ti + 2))) {
+				ti += 2
+				tok = text.slice(toki, ti)
+				return
+			}
+
+			// other
+			tok = text[ti++]
+			return
+		}
+		tok = eof
+
 		for (;;) {
 			switch (text[i]) {
-				case '\t':
-				case '\n':
-				case '\v':
-				case '\f':
-				case '\r':
-				case ' ':
-					i++
-					continue
 				case '!':
 					switch (text[i + 1]) {
 						case '=':
@@ -56,85 +98,11 @@ function parse(file, text) {
 					tok = text.slice(i, j)
 					i = j
 					return
-				case '$':
-				case 'A':
-				case 'B':
-				case 'C':
-				case 'D':
-				case 'E':
-				case 'F':
-				case 'G':
-				case 'H':
-				case 'I':
-				case 'J':
-				case 'K':
-				case 'L':
-				case 'M':
-				case 'N':
-				case 'O':
-				case 'P':
-				case 'Q':
-				case 'R':
-				case 'S':
-				case 'T':
-				case 'U':
-				case 'V':
-				case 'W':
-				case 'X':
-				case 'Y':
-				case 'Z':
-				case 'a':
-				case 'b':
-				case 'c':
-				case 'd':
-				case 'e':
-				case 'f':
-				case 'g':
-				case 'h':
-				case 'i':
-				case 'j':
-				case 'k':
-				case 'l':
-				case 'm':
-				case 'n':
-				case 'o':
-				case 'p':
-				case 'q':
-				case 'r':
-				case 's':
-				case 't':
-				case 'u':
-				case 'v':
-				case 'w':
-				case 'x':
-				case 'y':
-				case 'z':
-					for (var j = i; iop.isalnum(text[j]) || text[j] === '$' || text[j] === '_'; j++);
-					tok = text.slice(i, j)
-					i = j
-					return
-				case '%':
-					for (var j = i; j < text.length && text[j] !== '\n'; j++);
-					if (!status) {
-						var match = /^%\s*Status\s*:\s*(\w+)\s*$/.exec(text.slice(i, j))
-						if (match) status = match[1]
-					}
-					i = j
-					continue
 				case '+':
 				case '-':
 					if (iop.isdigit(text[i + 1])) {
 						number()
 						return
-					}
-					break
-				case '/':
-					switch (text[i + 1]) {
-						case '*':
-							for (var j = i + 2; text.slice(j, j + 2) !== '*/'; j++)
-								if (j === text.length) throw new Error(err('Unclosed comment'))
-							i = j + 2
-							continue
 					}
 					break
 				case '0':
