@@ -53,6 +53,10 @@ for (var file of fs.readdirSync('.')) {
 		var m = /^var (\w+ = require\('.+'\))$/.exec(lines[i])
 		if (m) lines[i] = 'const ' + m[1]
 
+		// for ... in -> of
+		var m = /^(.*)for (.*) in (.*)$/.exec(lines[i])
+		if (m && !quote(m[1]) && !quote(m[2])) lines[i] = m[1] + 'for ' + m[2] + ' of ' + m[3]
+
 		// == -> ===
 		var m = /^(.*) == (.*)$/.exec(lines[i])
 		if (m && !quote(m[1])) lines[i] = m[1] + ' === ' + m[2]
