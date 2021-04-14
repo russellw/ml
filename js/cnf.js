@@ -5,7 +5,7 @@ const assert = require('assert')
 var falseClause = [[], []]
 var trueClause = [[], [true]]
 
-//var falseClauses =
+// var falseClauses =
 
 function clause(neg, pos, m = new Map()) {
 	//simplify

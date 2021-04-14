@@ -1,7 +1,7 @@
-//reduce entropy of javascript code
-//assumes prettier has already been run
-//does not work on arbitrary javascript!
-//should be inspected carefully before being used in other projects
+// reduce entropy of javascript code
+// assumes prettier has already been run
+// does not work on arbitrary javascript!
+// should be inspected carefully before being used in other projects
 'use strict'
 const fs = require('fs')
 

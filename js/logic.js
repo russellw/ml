@@ -88,22 +88,22 @@ function replace(a, m) {
 	return r
 }
 
-//bool
+// bool
 assert(eq(false, false))
 assert(eq(true, true))
 assert(!eq(false, true))
 
-//integer
+// integer
 assert(eq(0n, 0n))
 assert(!eq(1_000_000_000_000_000_000_000_000n, 1_000_000_000_000_000_000_000_001n))
 
-//fn
+// fn
 var a = { op: 'fn' }
 var b = { op: 'fn' }
 assert(eq(a, a))
 assert(!eq(a, b))
 
-//variable
+// variable
 var x = { op: 'var' }
 var y = { op: 'var' }
 var z = { op: 'var' }
@@ -111,18 +111,18 @@ assert(eq(x, x))
 assert(eq(y, y))
 assert(!eq(x, y))
 
-//term
+// term
 assert(eq(term('&&', true, true), term('&&', true, true)))
 assert(eq(term('&&', true, true), term('&&', ...[true, true])))
 assert(!eq(term('&&', true, true), term('||', true, true)))
 assert(!eq(term('&&', true, true), term('&&', true, false)))
 assert(!eq(term('&&', true, true), x))
 
-//arrays
+// arrays
 assert(!eq([true, true], x))
 assert(!eq([true, true], true))
 
-//call
+// call
 var f = { op: 'fn' }
 var g = { op: 'fn' }
 assert(eq(term('call', f, 1n, 2n), term('call', f, 1n, 2n)))
@@ -240,7 +240,7 @@ assert(match(x, x, m))
 assert(m.size === 0)
 
 // x is unified with the constant a
-//different result for match!
+// different result for match!
 m = new Map()
 assert(!match(a, x, m))
 
@@ -288,7 +288,7 @@ assert(eq(replace(x, m), a))
 assert(eq(replace(y, m), term('call', g, a)))
 
 // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
-//not valid for match!
+// not valid for match!
 
 // Both x and y are unified with the constant a
 m = new Map()
@@ -299,7 +299,7 @@ assert(eq(replace(x, m), a))
 assert(eq(replace(y, m), a))
 
 // As above (order of equations in set doesn't matter)
-//different result for match!
+// different result for match!
 m = new Map()
 assert(!match(a, y, m))
 
@@ -308,14 +308,14 @@ m = new Map()
 assert(match(x, a, m))
 assert(!match(b, x, m))
 
-//simplify
+// simplify
 assert(eq(simplify(x), x))
 m = new Map()
 m.set(x, y)
 assert(eq(simplify(x, m), y))
 assert(eq(simplify(term('call', f, x, y), m), term('call', f, y, y)))
 
-//exports
+// exports
 exports.occurs = occurs
 exports.unify = unify
 exports.eq = eq
