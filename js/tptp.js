@@ -113,6 +113,17 @@ function parse(file, text) {
 		tok = eof
 	}
 
+	function eat(k) {
+		if (tok === k) {
+			lex()
+			return true
+		}
+	}
+
+	function expect(k) {
+		if (!eat(k)) err("Expected '" + k + "'")
+	}
+
 	// Parser
 	var conjecture
 	var files
@@ -129,8 +140,8 @@ function parse(file, text) {
 		if (select(formula_name())) {
 			// Role
 			expect(',')
-			if (!tok) throw new Error(err('Expected role'))
-			if (!iop.islower(tok[0])) throw new Error(err('Expected role'))
+			if (!tok) err('Expected role')
+			if (!iop.islower(tok[0])) err('Expected role')
 			var role = tok
 			lex()
 
@@ -140,7 +151,7 @@ function parse(file, text) {
 			var a = formula(cnf.empty)
 			if (free.size) a = cnf.quant('!', Array.from(free.values()), a)
 			if (role === 'conjecture') {
-				if (conjecture) throw new Error(err('Multiple conjectures not supported'))
+				if (conjecture) err('Multiple conjectures not supported')
 				a = cnf.term('~', a)
 				conjecture = a
 			}
@@ -187,24 +198,13 @@ function parse(file, text) {
 			case '$uminus':
 				return defined_term_arity(bound, '-', 1)
 		}
-		throw new Error(err('Unknown term'))
+		err('Unknown term')
 	}
 
 	function defined_term_arity(bound, op, arity) {
 		var args = term_args(bound)
-		if (args.length !== arity) throw new Error(err('Expected ' + arity + ' arguments'))
+		if (args.length !== arity) err('Expected ' + arity + ' arguments')
 		return cnf.term(op, ...args)
-	}
-
-	function eat(k) {
-		if (tok === k) {
-			lex()
-			return true
-		}
-	}
-
-	function expect(k) {
-		if (!eat(k)) throw new Error(err("Expected '" + k + "'"))
 	}
 
 	function formula(bound) {
@@ -235,7 +235,7 @@ function parse(file, text) {
 	}
 
 	function formula_name() {
-		if (!tok) throw new Error(err('Expected formula name'))
+		if (!tok) err('Expected formula name')
 		switch (tok[0]) {
 			case "'":
 				var name = unquote(tok)
@@ -281,11 +281,11 @@ function parse(file, text) {
 				lex()
 				return name
 		}
-		throw new Error(err('Expected name'))
+		err('Expected name')
 	}
 
 	function ignore() {
-		if (!tok) throw new Error(err("Expected ')'"))
+		if (!tok) err("Expected ')'")
 		switch (tok) {
 			case '(':
 				lex()
@@ -294,7 +294,7 @@ function parse(file, text) {
 			case '[':
 				lex()
 				while (!eat(']')) {
-					if (!tok) throw new Error(err("Expected ']'"))
+					if (!tok) err("Expected ']'")
 					ignore()
 				}
 				return
@@ -307,7 +307,7 @@ function parse(file, text) {
 
 		// File
 		expect('(')
-		if (!tok.startsWith("'")) throw new Error(err('Expected file'))
+		if (!tok.startsWith("'")) err('Expected file')
 		var name = unquote(tok)
 		lex()
 
@@ -337,7 +337,7 @@ function parse(file, text) {
 
 		// Relative
 		var tptp = process.env.TPTP
-		if (!tptp) throw new Error(err('TPTP environment variable not defined'))
+		if (!tptp) err('TPTP environment variable not defined')
 		var file1 = tptp + '/' + name
 		var text1 = fs.readFileSync(file1, 'utf8')
 		parse1(text1, file1, selection1)
@@ -403,8 +403,8 @@ function parse(file, text) {
 					include()
 					break
 				default:
-					if (iop.islower(tok[0])) throw new Error(err('Unknown language'))
-					throw new Error(err('Expected input'))
+					if (iop.islower(tok[0])) err('Unknown language')
+					err('Expected input')
 			}
 
 		// Restore
@@ -434,7 +434,7 @@ function parse(file, text) {
 	}
 
 	function term(bound) {
-		if (!tok) throw new Error(err('Expected term'))
+		if (!tok) err('Expected term')
 		switch (tok[0]) {
 			case '"':
 				var name = unquote(tok)
@@ -527,7 +527,7 @@ function parse(file, text) {
 			case 'z':
 				return plain_term(bound, tok)
 		}
-		throw new Error(err('Expected term'))
+		err('Expected term')
 	}
 
 	function term_args(bound) {
