@@ -48,6 +48,17 @@ function parse(file, text) {
 				return
 			}
 
+			// quote
+			if (text[ti] == "'" || text[ti] === '"') {
+				for (var q = text[ti++]; text[ti] !== q; ti++) {
+					if (text[ti] === '\\') ti++
+					if (ti === text.length) err('Unclosed quote')
+				}
+				ti++
+				tok = text.slice(toki, ti)
+				return
+			}
+
 			// number
 			if (/\d/.test(text[ti])) {
 				while (/\d/.test(text[ti])) ti++
@@ -55,8 +66,16 @@ function parse(file, text) {
 				return
 			}
 
-			// multichar punctuation
-			var punct = ['!=', '~&', '~|']
+			// 3-char punctuation
+			var punct = ['<=>', '<~>']
+			if (punct.includes(text.slice(ti, ti + 3))) {
+				ti += 3
+				tok = text.slice(toki, ti)
+				return
+			}
+
+			// 2-char punctuation
+			var punct = ['!=', '=>', '<=', '~|', '~&']
 			if (punct.includes(text.slice(ti, ti + 2))) {
 				ti += 2
 				tok = text.slice(toki, ti)
@@ -71,33 +90,6 @@ function parse(file, text) {
 
 		for (;;) {
 			switch (text[i]) {
-				case '!':
-					switch (text[i + 1]) {
-						case '=':
-							tok = text.slice(i, i + 2)
-							i += 2
-							return
-					}
-					break
-				case '"':
-				case "'":
-					var q = text[i]
-					for (var j = i + 1; text[j] !== q; j++) {
-						if (j === text.length || text[j] < ' ') throw new Error(err('Unclosed quote'))
-						if (text[j] === '\\')
-							switch (text[j + 1]) {
-								case '\\':
-								case q:
-									j++
-									break
-								default:
-									throw new Error(err('Unknown escape sequence'))
-							}
-					}
-					j++
-					tok = text.slice(i, j)
-					i = j
-					return
 				case '+':
 				case '-':
 					if (iop.isdigit(text[i + 1])) {
@@ -117,48 +109,7 @@ function parse(file, text) {
 				case '9':
 					number()
 					return
-				case '<':
-					switch (text[i + 1]) {
-						case '=':
-							switch (text[i + 2]) {
-								case '>':
-									tok = text.slice(i, i + 3)
-									i += 3
-									return
-							}
-							tok = text.slice(i, i + 2)
-							i += 2
-							return
-						case '~':
-							switch (text[i + 2]) {
-								case '>':
-									tok = text.slice(i, i + 3)
-									i += 3
-									return
-							}
-							break
-					}
-					break
-				case '=':
-					switch (text[i + 1]) {
-						case '>':
-							tok = text.slice(i, i + 2)
-							i += 2
-							return
-					}
-					break
-				case '~':
-					switch (text[i + 1]) {
-						case '&':
-						case '|':
-							tok = text.slice(i, i + 2)
-							i += 2
-							return
-					}
-					break
 			}
-			tok = text[i++]
-			return
 		}
 	}
 
