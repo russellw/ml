@@ -44,19 +44,19 @@ for (var file of fs.readdirSync('.')) {
 	var lines = fs.readFileSync(file, 'utf8').split(/\r?\n/)
 	var old = lines.slice()
 	for (var i = 0; i < lines.length; i++) {
-		//comments begin with spaces
+		// comments begin with spaces
 		var m = /^(\s*)\/\/(\S.*)$/.exec(lines[i])
 		if (m) lines[i] = m[1] + '// ' + m[2]
 
-		//var ... require -> const
+		// var ... require -> const
 		var m = /^var (\w+ = require\('.+'\))$/.exec(lines[i])
 		if (m) lines[i] = 'const ' + m[1]
 
-		//== -> ===
+		// === -> ===
 		var m = /^(.*) == (.*)$/.exec(lines[i])
 		if (m && !quote(m[1])) lines[i] = m[1] + ' === ' + m[2]
 
-		//!= -> !==
+		// !== -> !==
 		var m = /^(.*) != (.*)$/.exec(lines[i])
 		if (m && !quote(m[1])) lines[i] = m[1] + ' !== ' + m[2]
 	}

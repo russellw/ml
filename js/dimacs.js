@@ -17,29 +17,29 @@ function parse(file, text) {
 	// tokenizer
 	function lex() {
 		while (ti < text.length) {
-			//mark start of token for error reporting
+			// mark start of token for error reporting
 			toki = ti
 
-			//space
+			// space
 			if (/\s/.test(text[ti])) {
 				ti++
 				continue
 			}
 
-			//line comment
+			// line comment
 			if (text[ti] === 'c') {
 				while (text[ti] !== '\n') ti++
 				continue
 			}
 
-			//number
+			// number
 			if (/\d/.test(text[ti])) {
 				while (/\d/.test(text[ti])) ti++
 				tok = text.slice(toki, ti)
 				return
 			}
 
-			//other
+			// other
 			tok = text[ti++]
 			return
 		}

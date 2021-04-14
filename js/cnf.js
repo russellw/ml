@@ -8,20 +8,20 @@ var trueClause = [[], [true]]
 // var falseClauses =
 
 function clause(neg, pos, m = new Map()) {
-	//simplify
+	// simplify
 	neg = neg.map((a) => logic.simplify(a, m))
 	pos = pos.map((a) => logic.simplify(a, m))
 
-	//filter out redundancy
+	// filter out redundancy
 	neg = neg.filter((a) => a !== true)
 	pos = pos.filter((a) => a !== false)
 
-	//tautology?
+	// tautology?
 	for (var a of neg) if (a === false) return trueClause
 	for (var a of pos) if (a === true) return trueClause
 	for (var a of neg) for (var b of pos) if (logic.eq(a, b)) return trueClause
 
-	//make new clause
+	// make new clause
 	return [neg, pos]
 }
 
