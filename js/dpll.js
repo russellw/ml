@@ -1,4 +1,5 @@
 'use strict'
+var assert = require('assert')
 var logic = require('./logic')
 var etc = require('./etc')
 var cnf = require('./cnf')
@@ -46,9 +47,7 @@ function sat(clauses, m = new Map()) {
 	}
 }
 
-m = sat([[[], []]])
-/*
+var m = sat([[[], []]])
 assert(!m)
-*/
 
 exports.sat = sat

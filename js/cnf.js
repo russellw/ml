@@ -59,3 +59,5 @@ assert(!logic.eq(trueClause, falseClause))
 assert(logic.eq(falseClause, falseClause))
 
 exports.clause = clause
+exports.falseClause = falseClause
+exports.trueClause = trueClause
