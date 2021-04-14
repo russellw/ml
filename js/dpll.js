@@ -11,6 +11,7 @@ function sat(clauses, m = new Map()) {
 
 	// unit clauses
 	for (var c of cs) {
+		if (logic.eq(c, cnf.trueClause)) continue
 		var [neg, pos] = c
 		if (neg.length + pos.length == 1) {
 			if (neg.length) m.set(neg[0], false)
@@ -48,6 +49,37 @@ function sat(clauses, m = new Map()) {
 }
 
 var m = sat([[[], []]])
+assert(!m)
+
+var a = { op: 'fn' }
+m = sat([[[], [a]]])
+assert(m)
+assert(m.size === 1)
+assert(m.get(a) === true)
+
+var b = { op: 'fn' }
+m = sat([
+	[[], [a]],
+	[[], [b]],
+])
+assert(m)
+assert(m.size === 2)
+assert(m.get(a) === true)
+assert(m.get(b) === true)
+
+m = sat([
+	[[a], []],
+	[[b], []],
+])
+assert(m)
+assert(m.size === 2)
+assert(m.get(a) === false)
+assert(m.get(b) === false)
+
+m = sat([
+	[[a], []],
+	[[], [a]],
+])
 assert(!m)
 
 exports.sat = sat
