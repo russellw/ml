@@ -12,8 +12,8 @@ function extension(file) {
 }
 
 function eq(a, b) {
-	if (a.length != b.length) return
-	for (var i = 0; i < a.length; i++) if (a[i] != b[i]) return
+	if (a.length !== b.length) return
+	for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return
 	return true
 }
 

@@ -19,7 +19,7 @@ function err(file, text, toki, msg) {
 	console.error(text.slice(linestart, i))
 
 	// print caret
-	for (var i = linestart; i != toki; i++) process.stderr.write(text[i] === '\t' ? '\t' : ' ')
+	for (var i = linestart; i < toki; i++) process.stderr.write(text[i] === '\t' ? '\t' : ' ')
 	console.error('^')
 
 	// print message and exit

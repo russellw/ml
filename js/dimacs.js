@@ -28,7 +28,7 @@ function parse(file, text) {
 
 			//line comment
 			if (text[ti] === 'c') {
-				while (text[ti] != '\n') ti++
+				while (text[ti] !== '\n') ti++
 				continue
 			}
 

@@ -30,7 +30,7 @@ function clauseTerm(a) {
 	var pos = []
 
 	function rec(a) {
-		assert(a.op != '&&')
+		assert(a.op !== '&&')
 		switch (a.op) {
 			case '||':
 				for (var b of a) rec(b)
