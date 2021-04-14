@@ -6,9 +6,18 @@ const fs = require('fs')
 
 var eof = ' '
 
-function parse(file, text) {
+function unquote(s) {
+	s = s.slice(1, s.length - 1)
+	var r = []
+	for (var i = 0; i < s.length; i++) {
+		if (s[i] === '\\') i++
+		r.push(s[i])
+	}
+	return r.join('')
+}
+
+function parse1(file, text, selection, problem) {
 	var ti = 0
-	var status = ''
 	var tok
 	var toki
 
@@ -113,6 +122,8 @@ function parse(file, text) {
 		tok = eof
 	}
 
+	lex()
+
 	function eat(k) {
 		if (tok === k) {
 			lex()
@@ -125,12 +136,7 @@ function parse(file, text) {
 	}
 
 	// Parser
-	var conjecture
-	var files
-	var formulas
 	var free
-	var funs
-	var selection
 
 	function annotated_formula() {
 		lex()
@@ -355,65 +361,6 @@ function parse(file, text) {
 		return a
 	}
 
-	function parse(text, file) {
-		bytes = 0
-		conjecture = null
-		distinct_objs = new Map()
-		files = []
-		formulas = cnf.term('&')
-		funs = new Map()
-		status = ''
-		parse1(text, file)
-		return {
-			conjecture,
-			formulas,
-			status,
-		}
-	}
-
-	function parse1(text1, file1, selection1) {
-		bytes += text1.length
-		files.push(file1)
-
-		// Save
-		var file0 = file
-		var i0 = i
-		var selection0 = selection
-		var text0 = text
-		var tok0 = tok
-		var value0 = value
-
-		// Load
-		file = file1
-		i = 0
-		selection = selection1
-		text = text1
-
-		// Parse
-		lex()
-		while (tok)
-			switch (tok) {
-				case 'cnf':
-				case 'fof':
-					annotated_formula()
-					break
-				case 'include':
-					include()
-					break
-				default:
-					if (iop.islower(tok[0])) err('Unknown language')
-					err('Expected input')
-			}
-
-		// Restore
-		file = file0
-		i = i0
-		selection = selection0
-		text = text0
-		tok = tok0
-		value = value0
-	}
-
 	function plain_term(bound, name) {
 		lex()
 		var f = funs.get(name)
@@ -564,15 +511,28 @@ function parse(file, text) {
 		return infix_unary(bound)
 	}
 
-	function unquote(s) {
-		s = s.slice(1, s.length - 1)
-		var r = []
-		for (var i = 0; i < s.length; i++) {
-			if (s[i] === '\\') i++
-			r.push(s[i])
+	while (tok)
+		switch (tok) {
+			case 'cnf':
+			case 'fof':
+				annotated_formula()
+				break
+			case 'include':
+				include()
+				break
+			default:
+				if (iop.islower(tok[0])) err('Unknown language')
+				err('Expected input')
 		}
-		return r.join('')
+}
+
+function parse(file, text) {
+	var problem = {
+		fns: new Map(),
+		formulas: [],
 	}
+	parse1(file, text, null, problem)
+	return problem
 }
 
 exports.parse = parse
