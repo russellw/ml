@@ -4,7 +4,7 @@ const etc = require('./etc')
 const cnf = require('./cnf')
 const fs = require('fs')
 
-var eof = ' '
+var eof = ''
 
 function unquote(s) {
 	s = s.slice(1, s.length - 1)
@@ -134,6 +134,48 @@ function parse1(file, text, selection, problem) {
 	function expect(k) {
 		if (!eat(k)) err("Expected '" + k + "'")
 	}
+
+	// types
+	function atomicType() {
+		switch (tok) {
+			case '!':
+			case '[':
+				throw 'Inappropriate'
+			case '(':
+				lex()
+				var t = atomicType()
+				expect(')')
+				return t
+			case '$i':
+				lex()
+				return 'individual'
+			case '$o':
+				lex()
+				return 'bool'
+			case '$int':
+				lex()
+				return 'integer'
+			case '$rat':
+				lex()
+				return 'rational'
+			case '$real':
+				lex()
+				return 'real'
+		}
+		if (/^[\w_]+/.test(tok)) {
+			var t = tok
+			lex()
+			return t
+		}
+		if (tok[0] === "'") {
+			var t = tok
+			lex()
+			return unquote(t)
+		}
+		err('Expected type')
+	}
+
+	// //////////////////
 
 	// Parser
 	var free

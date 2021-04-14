@@ -2,7 +2,7 @@
 const logic = require('./logic')
 const etc = require('./etc')
 
-var eof = ' '
+var eof = ''
 
 function parse(file, text) {
 	var ti = 0
