@@ -474,7 +474,7 @@ function parse1(file, text, selection, problem) {
 						if (tok === '>') throw 'Inappropriate'
 					} else {
 						var a = etc.getor(problem.fns, name, () => {
-							name
+							return { name }
 						})
 						var toki1 = toki
 						var type = topleveltype()
