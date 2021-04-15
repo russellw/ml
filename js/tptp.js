@@ -271,6 +271,12 @@ function parse1(file, text, selection, problem) {
 
 		// variable
 		if (/^[A-Z]/.test(tok)) {
+			var name = tok
+			lex()
+			if (bound.has(name)) return bound.get(name)
+			return etc.getor(types, name, () => {
+				return {}
+			})
 		}
 
 		// number
@@ -485,68 +491,6 @@ function parse1(file, text, selection, problem) {
 				var a = value
 				lex()
 				return a
-			case 'A':
-			case 'B':
-			case 'C':
-			case 'D':
-			case 'E':
-			case 'F':
-			case 'G':
-			case 'H':
-			case 'I':
-			case 'J':
-			case 'K':
-			case 'L':
-			case 'M':
-			case 'N':
-			case 'O':
-			case 'P':
-			case 'Q':
-			case 'R':
-			case 'S':
-			case 'T':
-			case 'U':
-			case 'V':
-			case 'W':
-			case 'X':
-			case 'Y':
-			case 'Z':
-				var name = tok
-				lex()
-				var a = bound.get(name)
-				if (a) return a
-				a = free.get(name)
-				if (a) return a
-				a = cnf.variable(name)
-				free.set(name, a)
-				return a
-			case 'a':
-			case 'b':
-			case 'c':
-			case 'd':
-			case 'e':
-			case 'f':
-			case 'g':
-			case 'h':
-			case 'i':
-			case 'j':
-			case 'k':
-			case 'l':
-			case 'm':
-			case 'n':
-			case 'o':
-			case 'p':
-			case 'q':
-			case 'r':
-			case 's':
-			case 't':
-			case 'u':
-			case 'v':
-			case 'w':
-			case 'x':
-			case 'y':
-			case 'z':
-				return plain_term(bound, tok)
 		}
 		err('Expected term')
 	}
