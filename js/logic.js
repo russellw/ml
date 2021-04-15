@@ -10,8 +10,8 @@ function occurs(a, b, m) {
 
 function unify(a, b, m = new Map()) {
 	if (a === b) return m
-	if (a.op === 'var') return unifyVar(a, b, m)
-	if (b.op === 'var') return unifyVar(b, a, m)
+	if (a.op === 'var') return unifyvar(a, b, m)
+	if (b.op === 'var') return unifyvar(b, a, m)
 	if (!Array.isArray(a)) return null
 	if (a.op !== b.op) return
 	if (a.length !== b.length) return
@@ -42,7 +42,7 @@ function match(a, b, m = new Map()) {
 	return m
 }
 
-function unifyVar(a, b, m) {
+function unifyvar(a, b, m) {
 	if (m.has(a)) return unify(m.get(a), b, m)
 	if (m.has(b)) return unify(a, m.get(b), m)
 	if (occurs(a, b, m)) return

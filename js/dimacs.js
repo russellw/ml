@@ -61,14 +61,13 @@ function parse(file, text) {
 
 	function atom() {
 		if (!/[1-9]\d*/.test(tok)) err('Expected atom')
-		var name = tok
+		var a = etc.getor(atoms, tok, () => {
+			return {
+				op: 'fn',
+				name: tok,
+			}
+		})
 		lex()
-		if (atoms.has(name)) return atoms.get(name)
-		var a = {
-			op: 'fn',
-			name,
-		}
-		atoms.set(name, a)
 		return a
 	}
 

@@ -1,4 +1,12 @@
 'use strict'
+const assert = require('assert')
+
+function getor(m, k, f) {
+	if (m.has(k)) return m.get(k)
+	var v = f()
+	m.set(k, v)
+	return v
+}
 
 function walk(a, f) {
 	f(a)
@@ -27,5 +35,21 @@ function err(file, text, toki, msg) {
 	process.exit(1)
 }
 
+var m = new Map()
+
+assert(getor(m, 'a', () => 5) === 5)
+assert(m.size === 1)
+assert(m.get('a') === 5)
+
+assert(getor(m, 'a', () => 5) === 5)
+assert(m.size === 1)
+assert(m.get('a') === 5)
+
+assert(getor(m, 'b', () => 6) === 6)
+assert(m.size === 2)
+assert(m.get('a') === 5)
+assert(m.get('b') === 6)
+
 exports.err = err
 exports.walk = walk
+exports.getor = getor
