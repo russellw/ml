@@ -35,6 +35,16 @@ function err(file, text, toki, msg) {
 	process.exit(1)
 }
 
+// default param
+function f(a = []) {
+	a.push(1)
+	return a
+}
+
+assert(f().length === 1)
+assert(f().length === 1)
+
+// getor
 var m = new Map()
 
 assert(getor(m, 'a', () => 5) === 5)
@@ -50,6 +60,7 @@ assert(m.size === 2)
 assert(m.get('a') === 5)
 assert(m.get('b') === 6)
 
+// exports
 exports.err = err
 exports.walk = walk
 exports.getor = getor
