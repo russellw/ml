@@ -275,7 +275,7 @@ function parse1(file, text, selection, problem) {
 			lex()
 			if (bound.has(name)) return bound.get(name)
 			return etc.getor(types, name, () => {
-				return {}
+				return { op: 'var', type: 'individual' }
 			})
 		}
 
@@ -289,6 +289,86 @@ function parse1(file, text, selection, problem) {
 
 		// other
 		err('Expected term')
+	}
+
+	// formulas
+	function infix_unary(bound) {
+		var a = term(bound)
+		switch (tok) {
+			case '!=':
+				lex()
+				var b = term()
+				return cnf.term('!=', a, b)
+			case '=':
+				lex()
+				var b = term()
+				return cnf.term('==', a, b)
+		}
+		return a
+	}
+
+	function quant(bound) {
+		lex()
+		expect('[')
+		bound = new Map(bound)
+		var v = []
+		do {
+			var name = tok
+			lex()
+			var type = 'individual'
+			if (eat(':')) type = atomictype()
+			var x = { op: 'var', type }
+			bound.set(name, x)
+			v.push(x)
+		} while (eat(','))
+		expect(']')
+		expect(':')
+		return logic.term(op, v, unitary_formula(bound))
+	}
+
+	function unitary_formula(bound) {
+		switch (tok) {
+			case '!':
+				return quant('all')
+			case '?':
+				return quant('exists')
+			case '(':
+				lex()
+				var a = formula(bound)
+				expect(')')
+				return a
+			case '~':
+				lex()
+				return cnf.term('!', unitary_formula(bound))
+		}
+		return infix_unary(bound)
+	}
+
+	function formula(bound) {
+		var a = [unitary_formula(bound)]
+		var op = tok
+		switch (tok) {
+			case '&':
+			case '|':
+				while (eat(op)) a.push(unitary_formula(bound))
+				break
+			case '<=':
+				lex()
+				a.unshift(unitary_formula(bound))
+				op = '=>'
+				break
+			case '<=>':
+			case '<~>':
+			case '=>':
+			case '~&':
+			case '~|':
+				lex()
+				a.push(unitary_formula(bound))
+				break
+			default:
+				return a[0]
+		}
+		return cnf.term(op, ...a)
 	}
 
 	function annotated_formula() {
@@ -323,33 +403,6 @@ function parse1(file, text, selection, problem) {
 		// End
 		expect(')')
 		expect('.')
-	}
-
-	function formula(bound) {
-		var a = [unitary_formula(bound)]
-		var op = tok
-		switch (tok) {
-			case '&':
-			case '|':
-				while (eat(op)) a.push(unitary_formula(bound))
-				break
-			case '<=':
-				lex()
-				a.unshift(unitary_formula(bound))
-				op = '=>'
-				break
-			case '<=>':
-			case '<~>':
-			case '=>':
-			case '~&':
-			case '~|':
-				lex()
-				a.push(unitary_formula(bound))
-				break
-			default:
-				return a[0]
-		}
-		return cnf.term(op, ...a)
 	}
 
 	function formula_name() {
@@ -461,49 +514,9 @@ function parse1(file, text, selection, problem) {
 		parse1(text1, file1, selection1)
 	}
 
-	function infix_unary(bound) {
-		var a = term(bound)
-		switch (tok) {
-			case '!=':
-			case '=':
-				var op = tok
-				lex()
-				return cnf.term(op, a, term(bound))
-		}
-		return a
-	}
-
 	function select(name) {
 		if (!selection) return true
 		return selection.has(name)
-	}
-
-	function unitary_formula(bound) {
-		switch (tok) {
-			case '!':
-			case '?':
-				var op = tok
-				lex()
-				expect('[')
-				var variables = []
-				do {
-					var a = cnf.variable(tok)
-					bound = bound.add(tok, a)
-					lex()
-				} while (eat(','))
-				expect(']')
-				expect(':')
-				return cnf.quant(op, variables, unitary_formula(bound))
-			case '(':
-				lex()
-				var a = formula(bound)
-				expect(')')
-				return a
-			case '~':
-				lex()
-				return cnf.term('~', unitary_formula(bound))
-		}
-		return infix_unary(bound)
 	}
 
 	while (tok)
@@ -516,8 +529,7 @@ function parse1(file, text, selection, problem) {
 				include()
 				break
 			default:
-				if (iop.islower(tok[0])) err('Unknown language')
-				err('Expected input')
+				err('Syntax error')
 		}
 }
 
