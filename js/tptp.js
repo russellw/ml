@@ -371,40 +371,7 @@ function parse1(file, text, selection, problem) {
 		return cnf.term(op, ...a)
 	}
 
-	function annotated_formula() {
-		lex()
-
-		// Name
-		expect('(')
-		if (select(formula_name())) {
-			// Role
-			expect(',')
-			if (!tok) err('Expected role')
-			if (!iop.islower(tok[0])) err('Expected role')
-			var role = tok
-			lex()
-
-			// Formula
-			expect(',')
-			free = new Map()
-			var a = formula(cnf.empty)
-			if (free.size) a = cnf.quant('!', Array.from(free.values()), a)
-			if (role === 'conjecture') {
-				if (conjecture) err('Multiple conjectures not supported')
-				a = cnf.term('~', a)
-				conjecture = a
-			}
-			formulas.push(a)
-		}
-
-		// Annotations
-		if (eat(',')) while (tok !== ')') ignore()
-
-		// End
-		expect(')')
-		expect('.')
-	}
-
+	// top level
 	function formula_name() {
 		if (!tok) err('Expected formula name')
 		switch (tok[0]) {
@@ -455,6 +422,11 @@ function parse1(file, text, selection, problem) {
 		err('Expected name')
 	}
 
+	function select(name) {
+		if (!selection) return true
+		return selection.has(name)
+	}
+
 	function ignore() {
 		if (!tok) err("Expected ')'")
 		switch (tok) {
@@ -473,60 +445,82 @@ function parse1(file, text, selection, problem) {
 		lex()
 	}
 
-	function include() {
-		lex()
-
-		// File
-		expect('(')
-		if (!tok.startsWith("'")) err('Expected file')
-		var name = unquote(tok)
-		lex()
-
-		// Selection
-		var selection1 = selection
-		if (eat(',')) {
-			expect('[')
-			selection1 = new Set()
-			do {
-				var s = formula_name()
-				if (select(s)) selection1.add(s)
-			} while (eat(','))
-			expect(']')
-		}
-
-		// End
-		expect(')')
-		expect('.')
-
-		// Absolute
-		if (path.isAbsolute(name)) {
-			var file1 = name
-			var text1 = fs.readFileSync(file1, 'utf8')
-			parse1(text1, file1, selection1)
-			return
-		}
-
-		// Relative
-		var tptp = process.env.TPTP
-		if (!tptp) err('TPTP environment variable not defined')
-		var file1 = tptp + '/' + name
-		var text1 = fs.readFileSync(file1, 'utf8')
-		parse1(text1, file1, selection1)
-	}
-
-	function select(name) {
-		if (!selection) return true
-		return selection.has(name)
-	}
-
 	while (tok)
 		switch (tok) {
 			case 'cnf':
 			case 'fof':
-				annotated_formula()
+			case 'tff':
+				lex()
+
+				// Name
+				expect('(')
+				if (select(formula_name())) {
+					// Role
+					expect(',')
+					if (!tok) err('Expected role')
+					if (!iop.islower(tok[0])) err('Expected role')
+					var role = tok
+					lex()
+
+					// Formula
+					expect(',')
+					free = new Map()
+					var a = formula(cnf.empty)
+					if (free.size) a = cnf.quant('!', Array.from(free.values()), a)
+					if (role === 'conjecture') {
+						if (conjecture) err('Multiple conjectures not supported')
+						a = cnf.term('~', a)
+						conjecture = a
+					}
+					formulas.push(a)
+				}
+
+				// Annotations
+				if (eat(',')) while (tok !== ')') ignore()
+
+				// End
+				expect(')')
+				expect('.')
 				break
 			case 'include':
-				include()
+				lex()
+
+				// File
+				expect('(')
+				if (!tok.startsWith("'")) err('Expected file')
+				var name = unquote(tok)
+				lex()
+
+				// Selection
+				var selection1 = selection
+				if (eat(',')) {
+					expect('[')
+					selection1 = new Set()
+					do {
+						var s = formula_name()
+						if (select(s)) selection1.add(s)
+					} while (eat(','))
+					expect(']')
+				}
+
+				// End
+				expect(')')
+				expect('.')
+
+				// Absolute
+				if (path.isAbsolute(name)) {
+					var file1 = name
+					var text1 = fs.readFileSync(file1, 'utf8')
+					parse1(text1, file1, selection1)
+					return
+				}
+
+				// Relative
+				var tptp = process.env.TPTP
+				if (!tptp) err('TPTP environment variable not defined')
+				var file1 = tptp + '/' + name
+				var text1 = fs.readFileSync(file1, 'utf8')
+				parse1(text1, file1, selection1)
 				break
 			default:
 				err('Syntax error')
