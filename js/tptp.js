@@ -478,17 +478,24 @@ function parse1(file, text, selection, problem) {
 				lex()
 				expect(',')
 
-				// formula
-				free = null
-				var a = formula(new Map())
-				if (role === 'conjecture') {
-					if (problem.conjecture) err('Multiple conjectures not supported')
-					problem.conjecture = a
-					a = logic.term('!', a)
-				}
+				if (role === 'type') {
+					// type declaration
+					var parens = 0
+					while (eat('(')) parens++
+					while (parens--) expect(')')
+				} else {
+					// formula
+					free = null
+					var a = formula(new Map())
+					if (role === 'conjecture') {
+						if (problem.conjecture) err('Multiple conjectures not supported')
+						problem.conjecture = a
+						a = logic.term('!', a)
+					}
 
-				// select
-				if (select(name)) problem.formulas.push(a)
+					// select
+					if (select(name)) problem.formulas.push(a)
+				}
 
 				// annotations
 				if (eat(',')) while (tok !== ')') ignore()
