@@ -168,14 +168,14 @@ function parse1(file, text, selection, problem) {
 		if (/^[\w_]+/.test(tok)) {
 			var name = tok
 			lex()
-			return etc.getor(types, tok, () => {
+			return etc.getor(types, name, () => {
 				return { name }
 			})
 		}
 		if (tok[0] === "'") {
 			var name = unquote(tok)
 			lex()
-			return etc.getor(types, tok, () => {
+			return etc.getor(types, name, () => {
 				return { name }
 			})
 		}
@@ -184,13 +184,13 @@ function parse1(file, text, selection, problem) {
 
 	function topleveltype() {
 		if (eat(')')) {
-			var r = []
-			do r.push(atomictype())
+			var t = []
+			do t.push(atomictype())
 			while (eat('*'))
 			expect(')')
 			expect('>')
-			r.splice(0, 0, atomictype())
-			return r
+			t.splice(0, 0, atomictype())
+			return t
 		}
 		var t = atomictype()
 		if (eat('>')) return [atomictype(), t]
@@ -200,10 +200,82 @@ function parse1(file, text, selection, problem) {
 	// terms
 	var free = new Map()
 
-	function defined_term_arity(bound, op, arity) {
-		var args = term_args(bound)
-		if (args.length !== arity) err('Expected ' + arity + ' arguments')
-		return cnf.term(op, ...args)
+	function term_args(bound, a = []) {
+		expect('(')
+		do a.push(term(bound))
+		while (eat(','))
+		expect(')')
+		return a
+	}
+
+	function definedfunctor(bound, op, arity) {
+		var a = term_args(bound)
+		if (a.length !== arity) err('Expected ' + arity + ' arguments')
+		return cnf.term(op, ...a)
+	}
+
+	function plain_term(bound, name) {
+		lex()
+		var a = etc.getor(fns, name, () => {
+			return { name }
+		})
+		if (tok !== '(') return a
+		var a = term_args(bound)
+		return cnf.call(f, a)
+	}
+
+	function term(bound) {
+		switch (tok) {
+			case '$difference':
+				return definedfunctor(bound, '-', 2)
+			case '$distinct':
+				var a = term_args(bound)
+				var clauses = cnf.term('&')
+				for (var i = 0; i < a.length; i++) for (var j = 0; j < i; j++) clauses.push(cnf.term('!=', a[i], a[j]))
+				return clauses
+			case '$false':
+				lex()
+				return false
+			case '$greater':
+				return definedfunctor(bound, '>', 2)
+			case '$greatereq':
+				return definedfunctor(bound, '>=', 2)
+			case '$less':
+				return definedfunctor(bound, '<', 2)
+			case '$lesseq':
+				return definedfunctor(bound, '<=', 2)
+			case '$product':
+				return definedfunctor(bound, '*', 2)
+			case '$quotient':
+				return definedfunctor(bound, '/', 2)
+			case '$sum':
+				return definedfunctor(bound, '+', 2)
+			case '$true':
+				lex()
+				return true
+			case '$uminus':
+				return definedfunctor(bound, '-', 1)
+		}
+		switch (tok[0]) {
+			case '"':
+				var s = unquote(tok)
+				lex()
+				return s
+			case "'":
+				return plain_term(unquote(tok))
+		}
+
+		// word
+		if (/^[a-z_]/.test(tok)) return plain_term(tok)
+
+		// variable
+		if (/^[A-Z]/.test(tok)) {
+		}
+
+		// number
+
+		// other
+		err('Expected term')
 	}
 
 	function annotated_formula() {
@@ -240,52 +312,17 @@ function parse1(file, text, selection, problem) {
 		expect('.')
 	}
 
-	function defined_term(bound) {
-		switch (tok) {
-			case '$difference':
-				return defined_term_arity(bound, '-', 2)
-			case '$distinct':
-				var args = term_args(bound)
-				var clauses = cnf.term('&')
-				for (var i = 0; i < args.length; i++) for (var j = 0; j < i; j++) clauses.push(cnf.term('!=', args[i], args[j]))
-				return clauses
-			case '$false':
-				lex()
-				return cnf.bool(false)
-			case '$greater':
-				return defined_term_arity(bound, '>', 2)
-			case '$greatereq':
-				return defined_term_arity(bound, '>=', 2)
-			case '$less':
-				return defined_term_arity(bound, '<', 2)
-			case '$lesseq':
-				return defined_term_arity(bound, '<=', 2)
-			case '$product':
-				return defined_term_arity(bound, '*', 2)
-			case '$quotient':
-				return defined_term_arity(bound, '/', 2)
-			case '$sum':
-				return defined_term_arity(bound, '+', 2)
-			case '$true':
-				lex()
-				return cnf.bool(true)
-			case '$uminus':
-				return defined_term_arity(bound, '-', 1)
-		}
-		err('Unknown term')
-	}
-
 	function formula(bound) {
-		var args = [unitary_formula(bound)]
+		var a = [unitary_formula(bound)]
 		var op = tok
 		switch (tok) {
 			case '&':
 			case '|':
-				while (eat(op)) args.push(unitary_formula(bound))
+				while (eat(op)) a.push(unitary_formula(bound))
 				break
 			case '<=':
 				lex()
-				args.unshift(unitary_formula(bound))
+				a.unshift(unitary_formula(bound))
 				op = '=>'
 				break
 			case '<=>':
@@ -294,12 +331,12 @@ function parse1(file, text, selection, problem) {
 			case '~&':
 			case '~|':
 				lex()
-				args.push(unitary_formula(bound))
+				a.push(unitary_formula(bound))
 				break
 			default:
-				return args[0]
+				return a[0]
 		}
-		return cnf.term(op, ...args)
+		return cnf.term(op, ...a)
 	}
 
 	function formula_name() {
@@ -423,18 +460,6 @@ function parse1(file, text, selection, problem) {
 		return a
 	}
 
-	function plain_term(bound, name) {
-		lex()
-		var f = funs.get(name)
-		if (!f) {
-			f = cnf.fun(name)
-			funs.set(name, f)
-		}
-		if (tok !== '(') return f
-		var args = term_args(bound)
-		return cnf.call(f, args)
-	}
-
 	function select(name) {
 		if (!selection) return true
 		return selection.has(name)
@@ -443,18 +468,6 @@ function parse1(file, text, selection, problem) {
 	function term(bound) {
 		if (!tok) err('Expected term')
 		switch (tok[0]) {
-			case '"':
-				var name = unquote(tok)
-				lex()
-				a = distinct_objs.get(name)
-				if (a) return a
-				a = cnf.distinct_obj(name)
-				distinct_objs.set(name, a)
-				return a
-			case '$':
-				return defined_term(bound)
-			case "'":
-				return plain_term(bound, unquote(tok))
 			case '+':
 			case '-':
 				if (!iop.isdigit(tok[1])) break
@@ -535,14 +548,6 @@ function parse1(file, text, selection, problem) {
 				return plain_term(bound, tok)
 		}
 		err('Expected term')
-	}
-
-	function term_args(bound) {
-		expect('(')
-		var a = [term(bound)]
-		while (eat(',')) a.push(term(bound))
-		expect(')')
-		return a
 	}
 
 	function unitary_formula(bound) {
