@@ -203,6 +203,7 @@ function parse1(file, text, selection, problem) {
 	var free = new Map()
 
 	function args(bound, a = []) {
+		assert(bound instanceof Map)
 		expect('(')
 		do a.push(term(bound))
 		while (eat(','))
@@ -211,29 +212,31 @@ function parse1(file, text, selection, problem) {
 	}
 
 	function defined(bound, op, arity) {
+		assert(bound instanceof Map)
 		var a = args(bound)
 		if (a.length !== arity) err('Expected ' + arity + ' arguments')
-		return cnf.term(op, ...a)
+		return logic.term(op, ...a)
 	}
 
 	function plain(bound, name) {
+		assert(bound instanceof Map)
 		lex()
 		var a = etc.getor(problem.fns, name, () => {
 			return { name }
 		})
 		if (tok !== '(') return a
-		var a = args(bound)
-		return cnf.call(f, a)
+		return args(bound, logic.term('call', a))
 	}
 
 	function term(bound) {
+		assert(bound instanceof Map)
 		switch (tok) {
 			case '$difference':
 				return defined(bound, '-', 2)
 			case '$distinct':
 				var a = args(bound)
-				var clauses = cnf.term('&')
-				for (var i = 0; i < a.length; i++) for (var j = 0; j < i; j++) clauses.push(cnf.term('!=', a[i], a[j]))
+				var clauses = logic.term('&')
+				for (var i = 0; i < a.length; i++) for (var j = 0; j < i; j++) clauses.push(logic.term('!=', a[i], a[j]))
 				return clauses
 			case '$false':
 				lex()
@@ -264,11 +267,11 @@ function parse1(file, text, selection, problem) {
 				lex()
 				return s
 			case "'":
-				return plain(unquote(tok))
+				return plain(bound, unquote(tok))
 		}
 
 		// word
-		if (/^[a-z_]/.test(tok)) return plain(tok)
+		if (/^[a-z_]/.test(tok)) return plain(bound, tok)
 
 		// variable
 		if (/^[A-Z]/.test(tok)) {
@@ -295,21 +298,23 @@ function parse1(file, text, selection, problem) {
 
 	// formulas
 	function infix_unary(bound) {
+		assert(bound instanceof Map)
 		var a = term(bound)
 		switch (tok) {
 			case '!=':
 				lex()
-				var b = term()
-				return cnf.term('!=', a, b)
+				var b = term(bound)
+				return logic.term('!=', a, b)
 			case '=':
 				lex()
-				var b = term()
-				return cnf.term('==', a, b)
+				var b = term(bound)
+				return logic.term('==', a, b)
 		}
 		return a
 	}
 
-	function quant(bound) {
+	function quant(bound, op) {
+		assert(bound instanceof Map)
 		lex()
 		expect('[')
 		bound = new Map(bound)
@@ -329,11 +334,12 @@ function parse1(file, text, selection, problem) {
 	}
 
 	function unitary_formula(bound) {
+		assert(bound instanceof Map)
 		switch (tok) {
 			case '!':
-				return quant('all')
+				return quant(bound, 'all')
 			case '?':
-				return quant('exists')
+				return quant(bound, 'exists')
 			case '(':
 				lex()
 				var a = formula(bound)
@@ -341,12 +347,13 @@ function parse1(file, text, selection, problem) {
 				return a
 			case '~':
 				lex()
-				return cnf.term('!', unitary_formula(bound))
+				return logic.term('!', unitary_formula(bound))
 		}
 		return infix_unary(bound)
 	}
 
 	function formula(bound) {
+		assert(bound instanceof Map)
 		var a = unitary_formula(bound)
 		switch (tok) {
 			case '&':
@@ -456,7 +463,7 @@ function parse1(file, text, selection, problem) {
 				if (role === 'conjecture') {
 					if (problem.conjecture) err('Multiple conjectures not supported')
 					problem.conjecture = a
-					a = cnf.term('!', a)
+					a = logic.term('!', a)
 				}
 				if (select(name)) problem.formulas.push(a)
 
@@ -499,7 +506,7 @@ function parse1(file, text, selection, problem) {
 					name = tptp + '/' + name
 				}
 				var text1 = fs.readFileSync(name, 'utf8')
-				parse1(name, text1, selection1)
+				parse1(name, text1, selection1, problem)
 				break
 			default:
 				err('Syntax error')
