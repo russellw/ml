@@ -74,15 +74,20 @@ if (!files.length) {
 	process.exit(0)
 }
 for (var file of files) {
+	console.log(file)
 	var text = fs.readFileSync(file, 'utf8')
 	switch (language(file)) {
 		case 'dimacs':
 			var problem = dimacs.parse(file, text)
 			break
+		case 'tptp':
+			var problem = tptp.parse(file, text)
+			break
 		default:
 			console.error(file + ': unknown language')
 			process.exit(1)
 	}
+	continue
 	var r = dpll.sat(problem.clauses)
 	if (r) {
 		console.log('sat')

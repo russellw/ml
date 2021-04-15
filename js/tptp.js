@@ -1,4 +1,5 @@
 'use strict'
+const path = require('path')
 const assert = require('assert')
 const logic = require('./logic')
 const etc = require('./etc')
@@ -42,7 +43,7 @@ function parse1(file, text, selection, problem) {
 			// line comment
 			if (text[ti] === '%') {
 				while (text[ti] !== '\n') ti++
-				console.log(text.slice(toki, ti))
+				// console.log(text.slice(toki, ti))
 				continue
 			}
 
