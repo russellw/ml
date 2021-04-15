@@ -280,6 +280,12 @@ function parse1(file, text, selection, problem) {
 		}
 
 		// number
+		if (/^[\+\-]?\d+$/.test(tok)) {
+			var a = BigInt(tok)
+			lex()
+			return a
+		}
+		if (/^[\+\-]?\d/.test(tok)) throw 'Inappropriate'
 
 		// other
 		err('Expected term')
@@ -470,29 +476,6 @@ function parse1(file, text, selection, problem) {
 	function select(name) {
 		if (!selection) return true
 		return selection.has(name)
-	}
-
-	function term(bound) {
-		if (!tok) err('Expected term')
-		switch (tok[0]) {
-			case '+':
-			case '-':
-				if (!iop.isdigit(tok[1])) break
-			case '0':
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			case '9':
-				var a = value
-				lex()
-				return a
-		}
-		err('Expected term')
 	}
 
 	function unitary_formula(bound) {
