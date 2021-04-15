@@ -98,8 +98,8 @@ assert(eq(0n, 0n))
 assert(!eq(1_000_000_000_000_000_000_000_000n, 1_000_000_000_000_000_000_000_001n))
 
 // fn
-var a = { op: 'fn' }
-var b = { op: 'fn' }
+var a = {}
+var b = {}
 assert(eq(a, a))
 assert(!eq(a, b))
 
@@ -123,8 +123,8 @@ assert(!eq([true, true], x))
 assert(!eq([true, true], true))
 
 // call
-var f = { op: 'fn' }
-var g = { op: 'fn' }
+var f = {}
+var g = {}
 assert(eq(term('call', f, 1n, 2n), term('call', f, 1n, 2n)))
 assert(!eq(term('call', f, 1n, 2n), term('call', g, 1n, 2n)))
 assert(!eq(term('call', f, 1n, 2n), term('call', f, 1n, 3n)))

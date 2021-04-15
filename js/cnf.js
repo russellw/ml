@@ -46,8 +46,8 @@ function clauseTerm(a) {
 	return clause(neg, pos)
 }
 
-var a = { op: 'fn' }
-var b = { op: 'fn' }
+var a = {}
+var b = {}
 assert(logic.eq(clause([a], [b]), clause([a], [b])))
 assert(logic.eq(clause([a], [b]), [[a], [b]]))
 assert(logic.eq(clause([a], [b]), clauseTerm(logic.term('||', logic.term('!', a), b))))

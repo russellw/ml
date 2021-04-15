@@ -49,13 +49,13 @@ function sat(clauses, m = new Map()) {
 var m = sat([[[], []]])
 assert(!m)
 
-var a = { op: 'fn' }
+var a = {}
 m = sat([[[], [a]]])
 assert(m)
 assert(m.size === 1)
 assert(m.get(a) === true)
 
-var b = { op: 'fn' }
+var b = {}
 m = sat([
 	[[], [a]],
 	[[], [b]],

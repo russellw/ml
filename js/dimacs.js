@@ -64,10 +64,7 @@ function parse(file, text) {
 		var name = tok
 		lex()
 		return etc.getor(atoms, tok, () => {
-			return {
-				op: 'fn',
-				name,
-			}
+			return { name }
 		})
 	}
 

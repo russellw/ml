@@ -169,18 +169,14 @@ function parse1(file, text, selection, problem) {
 			var name = tok
 			lex()
 			return etc.getor(types, tok, () => {
-				return {
-					name,
-				}
+				return { name }
 			})
 		}
 		if (tok[0] === "'") {
 			var name = unquote(tok)
 			lex()
 			return etc.getor(types, tok, () => {
-				return {
-					name,
-				}
+				return { name }
 			})
 		}
 		err('Expected type')
