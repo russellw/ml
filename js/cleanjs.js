@@ -4,6 +4,7 @@
 // should be inspected carefully before being used in other projects
 'use strict'
 const fs = require('fs')
+const os = require('os')
 
 function extension(file) {
 	var a = file.split('.')
@@ -66,6 +67,7 @@ for (var file of fs.readdirSync('.')) {
 		if (m && !quote(m[1])) lines[i] = m[1] + ' !== ' + m[2]
 	}
 	if (eq(lines, old)) continue
+	fs.renameSync(file, os.tmpdir() + '/' + file)
 	fs.writeFileSync(file, lines.join('\n'), 'utf8')
 	console.log(file)
 }
