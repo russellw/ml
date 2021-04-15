@@ -22,9 +22,7 @@ function sat(clauses, m = new Map()) {
 
 	// atoms
 	var atoms = new Set()
-	etc.walk(cs, (a) => {
-		if (a.op === 'fn') atoms.add(a)
-	})
+	for (var c of cs) for (var o of c) for (var a of o) atoms.add(a)
 
 	// pure atoms
 	function occurs(pol, a) {
