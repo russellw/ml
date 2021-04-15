@@ -201,7 +201,7 @@ function parse1(file, text, selection, problem) {
 	// terms
 	var free = new Map()
 
-	function term_args(bound, a = []) {
+	function args(bound, a = []) {
 		expect('(')
 		do a.push(term(bound))
 		while (eat(','))
@@ -209,28 +209,28 @@ function parse1(file, text, selection, problem) {
 		return a
 	}
 
-	function definedfunctor(bound, op, arity) {
-		var a = term_args(bound)
+	function defined(bound, op, arity) {
+		var a = args(bound)
 		if (a.length !== arity) err('Expected ' + arity + ' arguments')
 		return cnf.term(op, ...a)
 	}
 
-	function plain_term(bound, name) {
+	function plain(bound, name) {
 		lex()
-		var a = etc.getor(fns, name, () => {
+		var a = etc.getor(problem.fns, name, () => {
 			return { name }
 		})
 		if (tok !== '(') return a
-		var a = term_args(bound)
+		var a = args(bound)
 		return cnf.call(f, a)
 	}
 
 	function term(bound) {
 		switch (tok) {
 			case '$difference':
-				return definedfunctor(bound, '-', 2)
+				return defined(bound, '-', 2)
 			case '$distinct':
-				var a = term_args(bound)
+				var a = args(bound)
 				var clauses = cnf.term('&')
 				for (var i = 0; i < a.length; i++) for (var j = 0; j < i; j++) clauses.push(cnf.term('!=', a[i], a[j]))
 				return clauses
@@ -238,24 +238,24 @@ function parse1(file, text, selection, problem) {
 				lex()
 				return false
 			case '$greater':
-				return definedfunctor(bound, '>', 2)
+				return defined(bound, '>', 2)
 			case '$greatereq':
-				return definedfunctor(bound, '>=', 2)
+				return defined(bound, '>=', 2)
 			case '$less':
-				return definedfunctor(bound, '<', 2)
+				return defined(bound, '<', 2)
 			case '$lesseq':
-				return definedfunctor(bound, '<=', 2)
+				return defined(bound, '<=', 2)
 			case '$product':
-				return definedfunctor(bound, '*', 2)
+				return defined(bound, '*', 2)
 			case '$quotient':
-				return definedfunctor(bound, '/', 2)
+				return defined(bound, '/', 2)
 			case '$sum':
-				return definedfunctor(bound, '+', 2)
+				return defined(bound, '+', 2)
 			case '$true':
 				lex()
 				return true
 			case '$uminus':
-				return definedfunctor(bound, 'unary-', 1)
+				return defined(bound, 'unary-', 1)
 		}
 		switch (tok[0]) {
 			case '"':
@@ -263,11 +263,11 @@ function parse1(file, text, selection, problem) {
 				lex()
 				return s
 			case "'":
-				return plain_term(unquote(tok))
+				return plain(unquote(tok))
 		}
 
 		// word
-		if (/^[a-z_]/.test(tok)) return plain_term(tok)
+		if (/^[a-z_]/.test(tok)) return plain(tok)
 
 		// variable
 		if (/^[A-Z]/.test(tok)) {
@@ -453,11 +453,11 @@ function parse1(file, text, selection, problem) {
 				free = null
 				var a = formula(new Map())
 				if (role === 'conjecture') {
-					if (conjecture) err('Multiple conjectures not supported')
-					a = cnf.term('~', a)
-					conjecture = a
+					if (problem.conjecture) err('Multiple conjectures not supported')
+					problem.conjecture = a
+					a = cnf.term('!', a)
 				}
-				if (select(name)) formulas.push(a)
+				if (select(name)) problem.formulas.push(a)
 
 				// annotations
 				if (eat(',')) while (tok !== ')') ignore()
@@ -509,6 +509,7 @@ function parse(file, text) {
 	var problem = {
 		fns: new Map(),
 		formulas: [],
+		clauses: [],
 	}
 	parse1(file, text, null, problem)
 	return problem
