@@ -71,7 +71,7 @@ function parse1(file, text, selection, problem) {
 			}
 
 			// number
-			if (/[\+\-]?\d/.test(text.slice(ti, ti + 2))) {
+			if (/^[\+\-]?\d/.test(text.slice(ti, ti + 2))) {
 				// sign
 				if (/[\+\-]/.test(text[ti])) ti++
 
@@ -91,7 +91,7 @@ function parse1(file, text, selection, problem) {
 					}
 
 					// exponent
-					if (/[\+\-]?[Ee]/.test(text.slice(ti, ti + 2))) {
+					if (/^[\+\-]?[Ee]/.test(text.slice(ti, ti + 2))) {
 						if (/[\+\-]/.test(text[ti])) ti++
 						if (/[Ee]/.test(text[ti])) ti++
 						while (/\d/.test(text[ti])) ti++
@@ -255,7 +255,7 @@ function parse1(file, text, selection, problem) {
 				lex()
 				return true
 			case '$uminus':
-				return definedfunctor(bound, '-', 1)
+				return definedfunctor(bound, 'unary-', 1)
 		}
 		switch (tok[0]) {
 			case '"':
@@ -602,6 +602,14 @@ function parse(file, text) {
 	parse1(file, text, null, problem)
 	return problem
 }
+
+assert(/^[\+\-]?\d/.test('9'))
+assert(/^[\+\-]?\d/.test('99'))
+assert(/^[\+\-]?\d/.test('9x'))
+assert(/^[\+\-]?\d/.test('+9'))
+assert(/^[\+\-]?\d/.test('-9'))
+assert(!/^[\+\-]?\d/.test('x'))
+assert(!/^[\+\-]?\d/.test('x9'))
 
 assert(BigInt('3') === 3n)
 assert(BigInt('+3') === 3n)
