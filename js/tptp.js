@@ -377,51 +377,15 @@ function parse1(file, text, selection, problem) {
 
 	// top level
 	function formula_name() {
-		if (!tok) err('Expected formula name')
-		switch (tok[0]) {
-			case "'":
-				var name = unquote(tok)
-				lex()
-				return name
-			case '0':
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			case '9':
-			case 'a':
-			case 'b':
-			case 'c':
-			case 'd':
-			case 'e':
-			case 'f':
-			case 'g':
-			case 'h':
-			case 'i':
-			case 'j':
-			case 'k':
-			case 'l':
-			case 'm':
-			case 'n':
-			case 'o':
-			case 'p':
-			case 'q':
-			case 'r':
-			case 's':
-			case 't':
-			case 'u':
-			case 'v':
-			case 'w':
-			case 'x':
-			case 'y':
-			case 'z':
-				var name = tok
-				lex()
-				return name
+		if (/^\w/.test(tok)) {
+			var name = tok
+			lex()
+			return name
+		}
+		if (tok[0] === "'") {
+			var name = unquote(tok)
+			lex()
+			return name
 		}
 		err('Expected name')
 	}
