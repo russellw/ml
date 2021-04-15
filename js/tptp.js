@@ -53,24 +53,6 @@ function parse1(file, text, selection, problem) {
 				continue
 			}
 
-			// word
-			if (/[\w_\$]/.test(text[ti])) {
-				while (/[\w_\$]/.test(text[ti])) ti++
-				tok = text.slice(toki, ti)
-				return
-			}
-
-			// quote
-			if (text[ti] === "'" || text[ti] === '"') {
-				for (var q = text[ti++]; text[ti] !== q; ti++) {
-					if (text[ti] === '\\') ti++
-					if (ti === text.length) err('Unclosed quote')
-				}
-				ti++
-				tok = text.slice(toki, ti)
-				return
-			}
-
 			// number
 			if (/^[\+\-]?\d/.test(text.slice(ti, ti + 2))) {
 				// sign
@@ -98,6 +80,24 @@ function parse1(file, text, selection, problem) {
 						while (/\d/.test(text[ti])) ti++
 					}
 				}
+				tok = text.slice(toki, ti)
+				return
+			}
+
+			// word
+			if (/[\w_\$]/.test(text[ti])) {
+				while (/[\w_\$]/.test(text[ti])) ti++
+				tok = text.slice(toki, ti)
+				return
+			}
+
+			// quote
+			if (text[ti] === "'" || text[ti] === '"') {
+				for (var q = text[ti++]; text[ti] !== q; ti++) {
+					if (text[ti] === '\\') ti++
+					if (ti === text.length) err('Unclosed quote')
+				}
+				ti++
 				tok = text.slice(toki, ti)
 				return
 			}
@@ -258,15 +258,15 @@ function parse1(file, text, selection, problem) {
 				return defined(bound, 'unary-', 1)
 		}
 
-		// word
-		if (/^[a-z_]/.test(tok) || tok[0] === "'") {
-			var name = id()
-			var a = etc.getor(problem.fns, name, () => {
-				return { name }
-			})
-			if (tok !== '(') return a
-			return args(bound, logic.term('call', a))
+		// integer
+		if (/^[\+\-]?\d+$/.test(tok)) {
+			var a = BigInt(tok)
+			lex()
+			return a
 		}
+
+		// rational or real
+		if (/^[\+\-]?\d/.test(tok)) throw 'Inappropriate'
 
 		// variable
 		if (/^[A-Z]/.test(tok)) {
@@ -279,22 +279,22 @@ function parse1(file, text, selection, problem) {
 			})
 		}
 
+		// word
+		if (/^[\w_]/.test(tok) || tok[0] === "'") {
+			var name = id()
+			var a = etc.getor(problem.fns, name, () => {
+				return { name }
+			})
+			if (tok !== '(') return a
+			return args(bound, logic.term('call', a))
+		}
+
 		// distinct object
 		if (tok[0] === '"') {
 			var s = unquote(tok)
 			lex()
 			return s
 		}
-
-		// integer
-		if (/^[\+\-]?\d+$/.test(tok)) {
-			var a = BigInt(tok)
-			lex()
-			return a
-		}
-
-		// rational or real
-		if (/^[\+\-]?\d/.test(tok)) throw 'Inappropriate'
 
 		// other
 		err('Expected term')
