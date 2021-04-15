@@ -81,7 +81,16 @@ for (var file of files) {
 			var problem = dimacs.parse(file, text)
 			break
 		case 'tptp':
-			var problem = tptp.parse(file, text)
+			try {
+				var problem = tptp.parse(file, text)
+			} catch (e) {
+				if (e === 'Inappropriate') {
+					console.log('%% SZS status Inappropriate for ' + file)
+					console.log()
+					continue
+				}
+				throw e
+			}
 			break
 		default:
 			console.error(file + ': unknown language')
