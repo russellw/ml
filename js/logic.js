@@ -51,20 +51,6 @@ function unifyvar(a, b, m) {
 }
 
 function term(op, ...args) {
-	switch (op) {
-		case '<':
-		case '<=':
-		case '<=>':
-		case '==':
-		case '=>':
-		case '>':
-		case '>=':
-			assert(args.length === 2)
-			break
-		case '!':
-			assert(args.length === 1)
-			break
-	}
 	var a = Array.from(args)
 	a.op = op
 	return a

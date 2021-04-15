@@ -297,7 +297,7 @@ function parse1(file, text, selection, problem) {
 	}
 
 	// formulas
-	function infix_unary(bound) {
+	function eq(bound) {
 		assert(bound instanceof Map)
 		var a = term(bound)
 		switch (tok) {
@@ -330,10 +330,10 @@ function parse1(file, text, selection, problem) {
 		} while (eat(','))
 		expect(']')
 		expect(':')
-		return logic.term(op, v, unitary_formula(bound))
+		return logic.term(op, v, unitary(bound))
 	}
 
-	function unitary_formula(bound) {
+	function unitary(bound) {
 		assert(bound instanceof Map)
 		switch (tok) {
 			case '!':
@@ -347,45 +347,45 @@ function parse1(file, text, selection, problem) {
 				return a
 			case '~':
 				lex()
-				return logic.term('!', unitary_formula(bound))
+				return logic.term('!', unitary(bound))
 		}
-		return infix_unary(bound)
+		return eq(bound)
 	}
 
 	function formula(bound) {
 		assert(bound instanceof Map)
-		var a = unitary_formula(bound)
+		var a = unitary(bound)
 		switch (tok) {
 			case '&':
 			case '|':
 				var k = tok
 				a = logic.term(k + k, a)
-				while (eat(k)) a.push(unitary_formula(bound))
+				while (eat(k)) a.push(unitary(bound))
 				break
 			case '<=':
 				lex()
-				return logic.term('=>', unitary_formula(bound), a)
+				return logic.term('=>', unitary(bound), a)
 			case '<=>':
 				lex()
-				return logic.term('<=>', a, unitary_formula(bound))
+				return logic.term('<=>', a, unitary(bound))
 			case '<~>':
 				lex()
-				return logic.term('!', logic.term('<=>', a, unitary_formula(bound)))
+				return logic.term('!', logic.term('<=>', a, unitary(bound)))
 			case '=>':
 				lex()
-				return logic.term('=>', a, unitary_formula(bound))
+				return logic.term('=>', a, unitary(bound))
 			case '~&':
 				lex()
-				return logic.term('!', logic.term('&&', a, unitary_formula(bound)))
+				return logic.term('!', logic.term('&&', a, unitary(bound)))
 			case '~|':
 				lex()
-				return logic.term('!', logic.term('||', a, unitary_formula(bound)))
+				return logic.term('!', logic.term('||', a, unitary(bound)))
 		}
 		return a
 	}
 
 	// top level
-	function formula_name() {
+	function fmname() {
 		if (/^\w/.test(tok)) {
 			var name = tok
 			lex()
@@ -423,7 +423,7 @@ function parse1(file, text, selection, problem) {
 				expect('(')
 
 				// name
-				var name = formula_name()
+				var name = fmname()
 				expect(',')
 
 				// role
@@ -448,7 +448,7 @@ function parse1(file, text, selection, problem) {
 				expect('(')
 
 				// name
-				var name = formula_name()
+				var name = fmname()
 				expect(',')
 
 				// role
@@ -489,7 +489,7 @@ function parse1(file, text, selection, problem) {
 					expect('[')
 					selection1 = new Set()
 					do {
-						var s = formula_name()
+						var s = fmname()
 						if (select(s)) selection1.add(s)
 					} while (eat(','))
 					expect(']')
