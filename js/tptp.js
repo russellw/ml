@@ -345,30 +345,34 @@ function parse1(file, text, selection, problem) {
 	}
 
 	function formula(bound) {
-		var a = [unitary_formula(bound)]
-		var op = tok
+		var a = unitary_formula(bound)
 		switch (tok) {
 			case '&':
 			case '|':
-				while (eat(op)) a.push(unitary_formula(bound))
+				var k = tok
+				a = logic.term(k + k, a)
+				while (eat(k)) a.push(unitary_formula(bound))
 				break
 			case '<=':
 				lex()
-				a.unshift(unitary_formula(bound))
-				op = '=>'
-				break
+				return logic.term('=>', unitary_formula(bound), a)
 			case '<=>':
+				lex()
+				return logic.term('<=>', a, unitary_formula(bound))
 			case '<~>':
+				lex()
+				return logic.term('!', logic.term('<=>', a, unitary_formula(bound)))
 			case '=>':
+				lex()
+				return logic.term('=>', a, unitary_formula(bound))
 			case '~&':
+				lex()
+				return logic.term('!', logic.term('&&', a, unitary_formula(bound)))
 			case '~|':
 				lex()
-				a.push(unitary_formula(bound))
-				break
-			default:
-				return a[0]
+				return logic.term('!', logic.term('||', a, unitary_formula(bound)))
 		}
-		return cnf.term(op, ...a)
+		return a
 	}
 
 	// top level
