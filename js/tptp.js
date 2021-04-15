@@ -190,7 +190,7 @@ function parse1(file, text, selection, problem) {
 			while (eat('*'))
 			expect(')')
 			expect('>')
-			t.splice(0, 0, atomictype())
+			t.unshift(atomictype())
 			return t
 		}
 		var t = atomictype()
@@ -274,7 +274,8 @@ function parse1(file, text, selection, problem) {
 			var name = tok
 			lex()
 			if (bound.has(name)) return bound.get(name)
-			return etc.getor(types, name, () => {
+			if (!free) err('Unbound variable')
+			return etc.getor(free, name, () => {
 				return { op: 'var', type: 'individual' }
 			})
 		}
@@ -396,19 +397,13 @@ function parse1(file, text, selection, problem) {
 	}
 
 	function ignore() {
-		if (!tok) err("Expected ')'")
 		switch (tok) {
 			case '(':
 				lex()
 				while (!eat(')')) ignore()
 				return
-			case '[':
-				lex()
-				while (!eat(']')) {
-					if (!tok) err("Expected ']'")
-					ignore()
-				}
-				return
+			case eof:
+				err("Expected ')'")
 		}
 		lex()
 	}
@@ -416,50 +411,71 @@ function parse1(file, text, selection, problem) {
 	while (tok)
 		switch (tok) {
 			case 'cnf':
+				lex()
+				expect('(')
+
+				// name
+				var name = formula_name()
+				expect(',')
+
+				// role
+				if (!/^[a-z]/.test(tok)) err('Expected role')
+				var role = tok
+				lex()
+				expect(',')
+
+				// literals
+				free = new Map()
+
+				// annotations
+				if (eat(',')) while (tok !== ')') ignore()
+
+				// end
+				expect(')')
+				expect('.')
+				break
 			case 'fof':
 			case 'tff':
 				lex()
-
-				// Name
 				expect('(')
-				if (select(formula_name())) {
-					// Role
-					expect(',')
-					if (!tok) err('Expected role')
-					if (!iop.islower(tok[0])) err('Expected role')
-					var role = tok
-					lex()
 
-					// Formula
-					expect(',')
-					free = new Map()
-					var a = formula(cnf.empty)
-					if (free.size) a = cnf.quant('!', Array.from(free.values()), a)
-					if (role === 'conjecture') {
-						if (conjecture) err('Multiple conjectures not supported')
-						a = cnf.term('~', a)
-						conjecture = a
-					}
-					formulas.push(a)
+				// name
+				var name = formula_name()
+				expect(',')
+
+				// role
+				if (!/^[a-z]/.test(tok)) err('Expected role')
+				var role = tok
+				lex()
+				expect(',')
+
+				// formula
+				free = null
+				var a = formula(new Map())
+				if (role === 'conjecture') {
+					if (conjecture) err('Multiple conjectures not supported')
+					a = cnf.term('~', a)
+					conjecture = a
 				}
+				if (select(name)) formulas.push(a)
 
-				// Annotations
+				// annotations
 				if (eat(',')) while (tok !== ')') ignore()
 
-				// End
+				// end
 				expect(')')
 				expect('.')
 				break
 			case 'include':
 				lex()
-
-				// File
 				expect('(')
-				if (!tok.startsWith("'")) err('Expected file')
+
+				// file
+				if (tok[0] !== "'") err('Expected file')
 				var name = unquote(tok)
 				lex()
 
-				// Selection
+				// selection
 				var selection1 = selection
 				if (eat(',')) {
 					expect('[')
@@ -471,24 +487,18 @@ function parse1(file, text, selection, problem) {
 					expect(']')
 				}
 
-				// End
+				// end
 				expect(')')
 				expect('.')
 
-				// Absolute
-				if (path.isAbsolute(name)) {
-					var file1 = name
-					var text1 = fs.readFileSync(file1, 'utf8')
-					parse1(text1, file1, selection1)
-					return
+				// include
+				if (!path.isAbsolute(name)) {
+					var tptp = process.env.TPTP
+					if (!tptp) err('TPTP environment variable not defined')
+					name = tptp + '/' + name
 				}
-
-				// Relative
-				var tptp = process.env.TPTP
-				if (!tptp) err('TPTP environment variable not defined')
-				var file1 = tptp + '/' + name
-				var text1 = fs.readFileSync(file1, 'utf8')
-				parse1(text1, file1, selection1)
+				var text1 = fs.readFileSync(name, 'utf8')
+				parse1(name, text1, selection1)
 				break
 			default:
 				err('Syntax error')
