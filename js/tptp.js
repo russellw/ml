@@ -7,6 +7,7 @@ const fs = require('fs')
 var eof = ''
 
 function unquote(s) {
+	assert(s[0] === s[s.length - 1])
 	s = s.slice(1, s.length - 1)
 	var r = []
 	for (var i = 0; i < s.length; i++) {
@@ -138,14 +139,14 @@ function parse1(file, text, selection, problem) {
 	// types
 	var types = new Map()
 
-	function atomicType() {
+	function atomictype() {
 		switch (tok) {
 			case '!':
 			case '[':
 				throw 'Inappropriate'
 			case '(':
 				lex()
-				var t = atomicType()
+				var t = atomictype()
 				expect(')')
 				return t
 			case '$i':
@@ -169,7 +170,6 @@ function parse1(file, text, selection, problem) {
 			lex()
 			return etc.getor(types, tok, () => {
 				return {
-					op: 'fn',
 					name,
 				}
 			})
@@ -179,7 +179,6 @@ function parse1(file, text, selection, problem) {
 			lex()
 			return etc.getor(types, tok, () => {
 				return {
-					op: 'fn',
 					name,
 				}
 			})
@@ -187,10 +186,29 @@ function parse1(file, text, selection, problem) {
 		err('Expected type')
 	}
 
-	// //////////////////
+	function topleveltype() {
+		if (eat(')')) {
+			var r = []
+			do r.push(atomictype())
+			while (eat('*'))
+			expect(')')
+			expect('>')
+			r.splice(0, 0, atomictype())
+			return r
+		}
+		var t = atomictype()
+		if (eat('>')) return [atomictype(), t]
+		return t
+	}
 
-	// Parser
-	var free
+	// terms
+	var free = new Map()
+
+	function defined_term_arity(bound, op, arity) {
+		var args = term_args(bound)
+		if (args.length !== arity) err('Expected ' + arity + ' arguments')
+		return cnf.term(op, ...args)
+	}
 
 	function annotated_formula() {
 		lex()
@@ -259,12 +277,6 @@ function parse1(file, text, selection, problem) {
 				return defined_term_arity(bound, '-', 1)
 		}
 		err('Unknown term')
-	}
-
-	function defined_term_arity(bound, op, arity) {
-		var args = term_args(bound)
-		if (args.length !== arity) err('Expected ' + arity + ' arguments')
-		return cnf.term(op, ...args)
 	}
 
 	function formula(bound) {
