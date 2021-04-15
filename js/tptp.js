@@ -136,6 +136,8 @@ function parse1(file, text, selection, problem) {
 	}
 
 	// types
+	var types = new Map()
+
 	function atomicType() {
 		switch (tok) {
 			case '!':
@@ -163,14 +165,24 @@ function parse1(file, text, selection, problem) {
 				return 'real'
 		}
 		if (/^[\w_]+/.test(tok)) {
-			var t = tok
+			var name = tok
 			lex()
-			return t
+			return etc.getor(types, tok, () => {
+				return {
+					op: 'fn',
+					name,
+				}
+			})
 		}
 		if (tok[0] === "'") {
-			var t = tok
+			var name = unquote(tok)
 			lex()
-			return unquote(t)
+			return etc.getor(types, tok, () => {
+				return {
+					op: 'fn',
+					name,
+				}
+			})
 		}
 		err('Expected type')
 	}
