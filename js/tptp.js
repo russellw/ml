@@ -213,6 +213,7 @@ function parse1(file, text, selection, problem) {
 
 	function defined(bound, op, arity) {
 		assert(bound instanceof Map)
+		lex()
 		var a = args(bound)
 		if (a.length !== arity) err('Expected ' + arity + ' arguments')
 		return logic.term(op, ...a)
@@ -433,7 +434,27 @@ function parse1(file, text, selection, problem) {
 				expect(',')
 
 				// literals
+				var parens = eat('(')
 				free = new Map()
+				var neg = []
+				var pos = []
+				do {
+					var no = eat('~')
+					var a = eq(new Map())
+					if (a.op === '!') {
+						no = !no
+						a = a[0]
+					}
+					;(no ? neg : pos).push(a)
+				} while (eat('|'))
+				if (parens) expect(')')
+
+				// select
+				if (select(name)) {
+					var c = [neg, pos]
+					c.file = file
+					problem.clauses.push(c)
+				}
 
 				// annotations
 				if (eat(',')) while (tok !== ')') ignore()
@@ -465,6 +486,8 @@ function parse1(file, text, selection, problem) {
 					problem.conjecture = a
 					a = logic.term('!', a)
 				}
+
+				// select
 				if (select(name)) problem.formulas.push(a)
 
 				// annotations
