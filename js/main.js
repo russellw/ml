@@ -1,6 +1,7 @@
 'use strict'
 const fs = require('fs')
 const dimacs = require('./dimacs')
+const tptp = require('./tptp')
 const dpll = require('./dpll')
 
 var lang

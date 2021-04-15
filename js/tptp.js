@@ -1,4 +1,5 @@
 'use strict'
+const assert = require('assert')
 const logic = require('./logic')
 const etc = require('./etc')
 const cnf = require('./cnf')
@@ -601,5 +602,9 @@ function parse(file, text) {
 	parse1(file, text, null, problem)
 	return problem
 }
+
+assert(BigInt('3') === 3n)
+assert(BigInt('+3') === 3n)
+assert(BigInt('-3') === -3n)
 
 exports.parse = parse
