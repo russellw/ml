@@ -138,6 +138,20 @@ function parse1(file, text, selection, problem) {
 		if (!eat(k)) err("Expected '" + k + "'")
 	}
 
+	function id() {
+		if (/^[a-z_]/.test(tok)) {
+			var name = tok
+			lex()
+			return name
+		}
+		if (tok[0] === "'") {
+			var name = unquote(tok)
+			lex()
+			return name
+		}
+		err('Expected name')
+	}
+
 	// types
 	var types = new Map()
 
@@ -167,25 +181,14 @@ function parse1(file, text, selection, problem) {
 				lex()
 				return 'real'
 		}
-		if (/^[\w_]+/.test(tok)) {
-			var name = tok
-			lex()
-			return etc.getor(types, name, () => {
-				return { name }
-			})
-		}
-		if (tok[0] === "'") {
-			var name = unquote(tok)
-			lex()
-			return etc.getor(types, name, () => {
-				return { name }
-			})
-		}
-		err('Expected type')
+		var name = id()
+		return etc.getor(types, name, () => {
+			return { name }
+		})
 	}
 
 	function topleveltype() {
-		if (eat(')')) {
+		if (eat('(')) {
 			var t = []
 			do t.push(atomictype())
 			while (eat('*'))
@@ -219,18 +222,10 @@ function parse1(file, text, selection, problem) {
 		return logic.term(op, ...a)
 	}
 
-	function plain(bound, name) {
-		assert(bound instanceof Map)
-		lex()
-		var a = etc.getor(problem.fns, name, () => {
-			return { name }
-		})
-		if (tok !== '(') return a
-		return args(bound, logic.term('call', a))
-	}
-
 	function term(bound) {
 		assert(bound instanceof Map)
+
+		// defined functor
 		switch (tok) {
 			case '$difference':
 				return defined(bound, '-', 2)
@@ -262,17 +257,16 @@ function parse1(file, text, selection, problem) {
 			case '$uminus':
 				return defined(bound, 'unary-', 1)
 		}
-		switch (tok[0]) {
-			case '"':
-				var s = unquote(tok)
-				lex()
-				return s
-			case "'":
-				return plain(bound, unquote(tok))
-		}
 
 		// word
-		if (/^[a-z_]/.test(tok)) return plain(bound, tok)
+		if (/^[a-z_]/.test(tok) || tok[0] === "'") {
+			var name = id()
+			var a = etc.getor(problem.fns, name, () => {
+				return { name }
+			})
+			if (tok !== '(') return a
+			return args(bound, logic.term('call', a))
+		}
 
 		// variable
 		if (/^[A-Z]/.test(tok)) {
@@ -285,12 +279,21 @@ function parse1(file, text, selection, problem) {
 			})
 		}
 
-		// number
+		// distinct object
+		if (tok[0] === '"') {
+			var s = unquote(tok)
+			lex()
+			return s
+		}
+
+		// integer
 		if (/^[\+\-]?\d+$/.test(tok)) {
 			var a = BigInt(tok)
 			lex()
 			return a
 		}
+
+		// rational or real
 		if (/^[\+\-]?\d/.test(tok)) throw 'Inappropriate'
 
 		// other
@@ -386,20 +389,6 @@ function parse1(file, text, selection, problem) {
 	}
 
 	// top level
-	function fmname() {
-		if (/^\w/.test(tok)) {
-			var name = tok
-			lex()
-			return name
-		}
-		if (tok[0] === "'") {
-			var name = unquote(tok)
-			lex()
-			return name
-		}
-		err('Expected name')
-	}
-
 	function select(name) {
 		if (!selection) return true
 		return selection.has(name)
@@ -424,13 +413,11 @@ function parse1(file, text, selection, problem) {
 				expect('(')
 
 				// name
-				var name = fmname()
+				var name = id()
 				expect(',')
 
 				// role
-				if (!/^[a-z]/.test(tok)) err('Expected role')
-				var role = tok
-				lex()
+				id()
 				expect(',')
 
 				// literals
@@ -457,7 +444,7 @@ function parse1(file, text, selection, problem) {
 				}
 
 				// annotations
-				if (eat(',')) while (tok !== ')') ignore()
+				if (tok === ',') while (tok !== ')') ignore()
 
 				// end
 				expect(')')
@@ -469,19 +456,35 @@ function parse1(file, text, selection, problem) {
 				expect('(')
 
 				// name
-				var name = fmname()
+				var name = id()
 				expect(',')
 
 				// role
-				if (!/^[a-z]/.test(tok)) err('Expected role')
-				var role = tok
-				lex()
+				var role = id()
 				expect(',')
 
 				if (role === 'type') {
 					// type declaration
 					var parens = 0
 					while (eat('(')) parens++
+
+					var name = id()
+					expect(':')
+					if (eat('$tType')) {
+						if (tok === '>') throw 'Inappropriate'
+					} else {
+						var a = etc.getor(problem.fns, name, () => {
+							name
+						})
+						var toki1 = toki
+						var type = topleveltype()
+						if (!a.type) a.type = type
+						else if (!logic.eq(a.type, type)) {
+							toki = toki1
+							err('Type mismatch')
+						}
+					}
+
 					while (parens--) expect(')')
 				} else {
 					// formula
@@ -498,7 +501,7 @@ function parse1(file, text, selection, problem) {
 				}
 
 				// annotations
-				if (eat(',')) while (tok !== ')') ignore()
+				if (tok === ',') while (tok !== ')') ignore()
 
 				// end
 				expect(')')
@@ -509,9 +512,7 @@ function parse1(file, text, selection, problem) {
 				expect('(')
 
 				// file
-				if (tok[0] !== "'") err('Expected file')
-				var name = unquote(tok)
-				lex()
+				var name = id()
 
 				// selection
 				var selection1 = selection
@@ -519,7 +520,7 @@ function parse1(file, text, selection, problem) {
 					expect('[')
 					selection1 = new Set()
 					do {
-						var s = fmname()
+						var s = id()
 						if (select(s)) selection1.add(s)
 					} while (eat(','))
 					expect(']')
