@@ -23,9 +23,28 @@ function clause(neg, pos, m = new Map()) {
 function convert(c, clauses) {
 	assert(c.o === 'fof')
 
-	function all1(all, exists, pol, a) {}
+	function all(bound, pol, a) {
+		bound = new Map(bound)
+		for (var x of a[0]) bound.set(x, { o: 'var' })
+		return nnf(bound, pol, a[1])
+	}
 
-	function nnf(all, exists, pol, a) {
+	function exists(bound, pol, a) {
+		var params = []
+		for (var x of logic.freevars(a[1])) {
+			assert(bound.has(x))
+			if (bound.get(x).o === 'var') params.push(bound.get(x))
+		}
+		bound = new Map(bound)
+		for (var x of a[0]) {
+			var sk = {}
+			if (params.length) sk = logic.term('call', ...[sk].concat(params))
+			bound.set(x, sk)
+		}
+		return nnf(bound, pol, a[1])
+	}
+
+	function nnf(bound, pol, a) {
 		switch (a) {
 			case false:
 				return !pol
@@ -33,19 +52,23 @@ function convert(c, clauses) {
 				return pol
 		}
 		switch (a.o) {
+			case 'all':
+				return (pol ? all : exists)(bound, pol, a)
+			case 'exists':
+				return (pol ? exists : all)(bound, pol, a)
 			case '!':
-				return nnf(all, exists, !pol, a)
+				return nnf(bound, !pol, a)
 			case '=>':
-				return nnf(all, exists, pol, logic.term('||', logic.term('!', a[0]), a[1]))
+				return nnf(bound, pol, logic.term('||', logic.term('!', a[0]), a[1]))
 			case '&&':
-				return logic.term(pol ? '&&' : '||', ...(b) => nnf(all, exists, pol, b))
+				return logic.term(pol ? '&&' : '||', ...(b) => nnf(bound, pol, b))
 			case '||':
-				return logic.term(pol ? '||' : '&&', ...(b) => nnf(all, exists, pol, b))
+				return logic.term(pol ? '||' : '&&', ...(b) => nnf(bound, pol, b))
 		}
 	}
 
 	var a = c[0]
-	a = nnf(new Map(), new Map(), true, a)
+	a = nnf(new Map(), true, a)
 }
 
 function clauseTerm(a) {

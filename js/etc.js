@@ -60,6 +60,15 @@ assert(m.size === 2)
 assert(m.get('a') === 5)
 assert(m.get('b') === 6)
 
+// concat
+function g(...s) {
+	return s
+}
+
+assert(g(1, 2).length === 2)
+assert(g(...[1, 2]).length === 2)
+assert(g(...[1, 2].concat([3, 4])).length === 4)
+
 // exports
 exports.err = err
 exports.walk = walk
