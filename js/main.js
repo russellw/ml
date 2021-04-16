@@ -94,12 +94,11 @@ for (var file of files) {
 			console.log()
 			continue
 		}
-		if (e.code === 'ERR_STRING_TOO_LONG') {
+		if (e.code === 'ERR_STRING_TOO_LONG' || e.message === 'Array buffer allocation failed') {
 			console.log('%% SZS status ResourceOut for ' + file)
 			console.log()
 			continue
 		}
-		console.trace(Object.keys(e))
 		throw e
 	}
 	continue
