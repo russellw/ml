@@ -21,11 +21,7 @@ function unify(a, b, m = new Map()) {
 
 function simplify(a, m = new Map()) {
 	if (m.has(a)) return simplify(m.get(a), m)
-	if (!Array.isArray(a)) return a
-	var r = []
-	Object.assign(r, a)
-	for (var i = 0; i < r.length; i++) r[i] = simplify(r[i], m)
-	return r
+	return map(a, (b) => simplify(b, m))
 }
 
 function match(a, b, m = new Map()) {
@@ -67,12 +63,24 @@ function eq(a, b) {
 
 function replace(a, m) {
 	if (m.has(a)) return replace(m.get(a), m)
+	return map(a, (b) => replace(b, m))
+}
+
+function map(a, f) {
 	if (!Array.isArray(a)) return a
 	var r = []
 	Object.assign(r, a)
-	for (var i = 0; i < r.length; i++) r[i] = replace(r[i], m)
+	for (var i = 0; i < r.length; i++) r[i] = f(r[i])
 	return r
 }
+
+// map
+assert(
+	eq(
+		map(term('+', 1, 2), (a) => a + 10),
+		term('+', 11, 12)
+	)
+)
 
 // bool
 assert(eq(false, false))
