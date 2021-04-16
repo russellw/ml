@@ -159,6 +159,7 @@ function parse1(file, text, selection, problem) {
 		switch (tok) {
 			case '!':
 			case '[':
+			case '$tType':
 				throw 'Inappropriate'
 			case '(':
 				lex()

@@ -75,31 +75,31 @@ if (!files.length) {
 }
 for (var file of files) {
 	console.log(file)
-	var text = fs.readFileSync(file, 'utf8')
-	switch (language(file)) {
-		case 'dimacs':
-			var problem = dimacs.parse(file, text)
-			break
-		case 'tptp':
-			try {
+	try {
+		var text = fs.readFileSync(file, 'utf8')
+		switch (language(file)) {
+			case 'dimacs':
+				var problem = dimacs.parse(file, text)
+				break
+			case 'tptp':
 				var problem = tptp.parse(file, text)
-			} catch (e) {
-				if (e === 'Inappropriate') {
-					console.log('%% SZS status Inappropriate for ' + file)
-					console.log()
-					continue
-				}
-				if (e.code === 'ERR_STRING_TOO_LONG') {
-					console.log('%% SZS status ResourceOut for ' + file)
-					console.log()
-					continue
-				}
-				throw e
-			}
-			break
-		default:
-			console.error(file + ': unknown language')
-			process.exit(1)
+				break
+			default:
+				console.error(file + ': unknown language')
+				process.exit(1)
+		}
+	} catch (e) {
+		if (e === 'Inappropriate') {
+			console.log('%% SZS status Inappropriate for ' + file)
+			console.log()
+			continue
+		}
+		if (e.code === 'ERR_STRING_TOO_LONG') {
+			console.log('%% SZS status ResourceOut for ' + file)
+			console.log()
+			continue
+		}
+		throw e
 	}
 	continue
 	var r = dpll.sat(problem.clauses)
