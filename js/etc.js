@@ -1,6 +1,31 @@
 'use strict'
 const assert = require('assert')
 
+function eq(a, b) {
+	if (a.length !== b.length) return
+	for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return
+	return true
+}
+
+function cartproduct(qs) {
+	var js = []
+	for (var q of qs) js.push(0)
+	var rs = []
+
+	function rec(i) {
+		if (i === js.length) {
+			var ys = []
+			for (i = 0; i < js.length; i++) ys.push(qs[i][js[i]])
+			rs.push(ys)
+			return
+		}
+		for (js[i] = 0; js[i] < qs[i].length; js[i]++) rec(i + 1)
+	}
+
+	rec(0)
+	return rs
+}
+
 function getor(m, k, f) {
 	if (m.has(k)) return m.get(k)
 	var v = f()
@@ -68,6 +93,51 @@ function g(...s) {
 assert(g(1, 2).length === 2)
 assert(g(...[1, 2]).length === 2)
 assert(g(...[1, 2].concat([3, 4])).length === 4)
+
+// cartesian product
+var qs = []
+var q
+q = []
+q.push('a0')
+q.push('a1')
+qs.push(q)
+q = []
+q.push('b0')
+q.push('b1')
+q.push('b2')
+qs.push(q)
+q = []
+q.push('c0')
+q.push('c1')
+q.push('c2')
+q.push('c3')
+qs.push(q)
+var rs = cartproduct(qs)
+var i = 0
+assert(eq(rs[i++], ['a0', 'b0', 'c0']))
+assert(eq(rs[i++], ['a0', 'b0', 'c1']))
+assert(eq(rs[i++], ['a0', 'b0', 'c2']))
+assert(eq(rs[i++], ['a0', 'b0', 'c3']))
+assert(eq(rs[i++], ['a0', 'b1', 'c0']))
+assert(eq(rs[i++], ['a0', 'b1', 'c1']))
+assert(eq(rs[i++], ['a0', 'b1', 'c2']))
+assert(eq(rs[i++], ['a0', 'b1', 'c3']))
+assert(eq(rs[i++], ['a0', 'b2', 'c0']))
+assert(eq(rs[i++], ['a0', 'b2', 'c1']))
+assert(eq(rs[i++], ['a0', 'b2', 'c2']))
+assert(eq(rs[i++], ['a0', 'b2', 'c3']))
+assert(eq(rs[i++], ['a1', 'b0', 'c0']))
+assert(eq(rs[i++], ['a1', 'b0', 'c1']))
+assert(eq(rs[i++], ['a1', 'b0', 'c2']))
+assert(eq(rs[i++], ['a1', 'b0', 'c3']))
+assert(eq(rs[i++], ['a1', 'b1', 'c0']))
+assert(eq(rs[i++], ['a1', 'b1', 'c1']))
+assert(eq(rs[i++], ['a1', 'b1', 'c2']))
+assert(eq(rs[i++], ['a1', 'b1', 'c3']))
+assert(eq(rs[i++], ['a1', 'b2', 'c0']))
+assert(eq(rs[i++], ['a1', 'b2', 'c1']))
+assert(eq(rs[i++], ['a1', 'b2', 'c2']))
+assert(eq(rs[i++], ['a1', 'b2', 'c3']))
 
 // exports
 exports.err = err
