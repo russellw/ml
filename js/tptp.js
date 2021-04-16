@@ -153,8 +153,6 @@ function parse1(file, text, selection, problem) {
 	}
 
 	// types
-	var types = new Map()
-
 	function atomictype() {
 		switch (tok) {
 			case '!':
@@ -183,7 +181,7 @@ function parse1(file, text, selection, problem) {
 				return 'real'
 		}
 		var name = id()
-		return etc.getor(types, name, () => {
+		return etc.getor(problem.types, name, () => {
 			return { name }
 		})
 	}
@@ -577,6 +575,7 @@ function parse1(file, text, selection, problem) {
 
 function parse(file, text) {
 	var problem = {
+		types: new Map(),
 		fns: new Map(),
 		formulas: [],
 		clauses: [],
