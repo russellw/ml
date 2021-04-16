@@ -256,6 +256,36 @@ function parse1(file, text, selection, problem) {
 				return true
 			case '$uminus':
 				return defined(bound, 'unary-', 1)
+			case '$quotient_e':
+				return defined(bound, 'dive', 2)
+			case '$quotient_f':
+				return defined(bound, 'divf', 2)
+			case '$quotient_t':
+				return defined(bound, 'divt', 2)
+			case '$remainder_e':
+				return defined(bound, 'reme', 2)
+			case '$remainder_f':
+				return defined(bound, 'remf', 2)
+			case '$remainder_t':
+				return defined(bound, 'remt', 2)
+			case '$is_int':
+				return defined(bound, 'isinteger', 1)
+			case '$is_rat':
+				return defined(bound, 'isrational', 1)
+			case '$to_int':
+				return defined(bound, 'tointeger', 1)
+			case '$to_rat':
+				return defined(bound, 'torational', 1)
+			case '$to_real':
+				return defined(bound, 'toreal', 1)
+			case '$ceiling':
+				return defined(bound, 'ceil', 1)
+			case '$floor':
+				return defined(bound, 'floor', 1)
+			case '$round':
+				return defined(bound, 'round', 1)
+			case '$truncate':
+				return defined(bound, 'trunc', 1)
 		}
 
 		// integer

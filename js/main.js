@@ -89,6 +89,11 @@ for (var file of files) {
 					console.log()
 					continue
 				}
+				if (e.code === 'ERR_STRING_TOO_LONG') {
+					console.log('%% SZS status ResourceOut for ' + file)
+					console.log()
+					continue
+				}
 				throw e
 			}
 			break
