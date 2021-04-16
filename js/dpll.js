@@ -22,7 +22,7 @@ function sat(clauses, m = new Map()) {
 
 	// atoms
 	var atoms = new Set()
-	for (var c of cs) for (var o of c) for (var a of o) atoms.add(a)
+	for (var c of cs) for (var p of c) for (var a of p) atoms.add(a)
 
 	// pure atoms
 	function occurs(pol, a) {

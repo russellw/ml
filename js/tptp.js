@@ -522,17 +522,17 @@ function parse1(file, text, selection, problem) {
 					// formula
 					free = null
 					var a = formula(new Map())
-					var o = logic.term('fof', a)
+					var c = logic.term('fof', a)
 					if (role === 'conjecture') {
 						if (problem.conjecture) err('Multiple conjectures not supported')
-						problem.conjecture = o
+						problem.conjecture = c
 						a = logic.term('!', a)
-						o = logic.term('fof', a)
-						o.from = problem.conjecture
+						c = logic.term('fof', a)
+						c.from = problem.conjecture
 					}
 
 					// select
-					if (select(name)) problem.formulas.push(o)
+					if (select(name)) problem.formulas.push(c)
 				}
 
 				// annotations
