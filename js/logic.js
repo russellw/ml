@@ -10,10 +10,10 @@ function occurs(a, b, m) {
 
 function unify(a, b, m = new Map()) {
 	if (a === b) return m
-	if (a.op === 'var') return unifyvar(a, b, m)
-	if (b.op === 'var') return unifyvar(b, a, m)
+	if (a.o === 'var') return unifyvar(a, b, m)
+	if (b.o === 'var') return unifyvar(b, a, m)
 	if (!Array.isArray(a)) return null
-	if (a.op !== b.op) return
+	if (a.o !== b.o) return
 	if (a.length !== b.length) return
 	for (var i = 0; i < a.length && m; i++) m = unify(a[i], b[i], m)
 	return m
@@ -26,13 +26,13 @@ function simplify(a, m = new Map()) {
 
 function match(a, b, m = new Map()) {
 	if (a === b) return m
-	if (a.op === 'var') {
+	if (a.o === 'var') {
 		if (m.has(a)) return match(m.get(a), b, m)
 		m.set(a, b)
 		return m
 	}
 	if (!Array.isArray(a)) return null
-	if (a.op !== b.op) return
+	if (a.o !== b.o) return
 	if (a.length !== b.length) return
 	for (var i = 0; i < a.length && m; i++) m = unify(a[i], b[i], m)
 	return m
@@ -46,16 +46,16 @@ function unifyvar(a, b, m) {
 	return m
 }
 
-function term(op, ...args) {
+function term(o, ...args) {
 	var a = Array.from(args)
-	a.op = op
+	a.o = o
 	return a
 }
 
 function eq(a, b) {
 	if (a === b) return true
 	if (!Array.isArray(a)) return
-	if (a.op !== b.op) return
+	if (a.o !== b.o) return
 	if (a.length !== b.length) return
 	for (var i = 0; i < a.length; i++) if (!eq(a[i], b[i])) return
 	return true
@@ -98,9 +98,9 @@ assert(eq(a, a))
 assert(!eq(a, b))
 
 // variable
-var x = { op: 'var' }
-var y = { op: 'var' }
-var z = { op: 'var' }
+var x = { o: 'var' }
+var y = { o: 'var' }
+var z = { o: 'var' }
 assert(eq(x, x))
 assert(eq(y, y))
 assert(!eq(x, y))

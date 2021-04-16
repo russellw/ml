@@ -21,7 +21,7 @@ function clause(neg, pos, m = new Map()) {
 }
 
 function convert(c, clauses) {
-	assert(c.op === 'fof')
+	assert(c.o === 'fof')
 
 	function nnf(all, exists, pol, a) {
 		switch (a) {
@@ -30,7 +30,7 @@ function convert(c, clauses) {
 			case true:
 				return pol
 		}
-		switch (a.op) {
+		switch (a.o) {
 			case '!':
 				return nnf(all, exists, !pol, a)
 			case '=>':
@@ -47,8 +47,8 @@ function clauseTerm(a) {
 	var pos = []
 
 	function rec(a) {
-		assert(a.op !== '&&')
-		switch (a.op) {
+		assert(a.o !== '&&')
+		switch (a.o) {
 			case '||':
 				for (var b of a) rec(b)
 				return

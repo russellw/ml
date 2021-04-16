@@ -214,12 +214,12 @@ function parse1(file, text, selection, problem) {
 		return a
 	}
 
-	function defined(bound, op, arity) {
+	function defined(bound, o, arity) {
 		assert(bound instanceof Map)
 		lex()
 		var a = args(bound)
 		if (a.length !== arity) err('Expected ' + arity + ' arguments')
-		return logic.term(op, ...a)
+		return logic.term(o, ...a)
 	}
 
 	function term(bound) {
@@ -305,7 +305,7 @@ function parse1(file, text, selection, problem) {
 			if (bound.has(name)) return bound.get(name)
 			if (!free) err('Unbound variable')
 			return etc.getor(free, name, () => {
-				return { op: 'var', type: 'individual' }
+				return { o: 'var', type: 'individual' }
 			})
 		}
 
@@ -347,7 +347,7 @@ function parse1(file, text, selection, problem) {
 		return a
 	}
 
-	function quant(bound, op) {
+	function quant(bound, o) {
 		assert(bound instanceof Map)
 		lex()
 		expect('[')
@@ -358,13 +358,13 @@ function parse1(file, text, selection, problem) {
 			lex()
 			var type = 'individual'
 			if (eat(':')) type = atomictype()
-			var x = { op: 'var', type }
+			var x = { o: 'var', type }
 			bound.set(name, x)
 			v.push(x)
 		} while (eat(','))
 		expect(']')
 		expect(':')
-		return logic.term(op, v, unitary(bound))
+		return logic.term(o, v, unitary(bound))
 	}
 
 	function unitary(bound) {
@@ -458,7 +458,7 @@ function parse1(file, text, selection, problem) {
 				do {
 					var no = eat('~')
 					var a = eq(new Map())
-					if (a.op === '!') {
+					if (a.o === '!') {
 						no = !no
 						a = a[0]
 					}
