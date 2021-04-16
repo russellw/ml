@@ -6,8 +6,8 @@ const cnf = require('./cnf')
 
 function sat(clauses, m = new Map()) {
 	var cs = clauses.map((c) => cnf.clause(c[0], c[1], m))
-	for (var c of cs) if (logic.eq(c, cnf.falseClause)) return
-	cs = cs.filter((c) => !logic.eq(c, cnf.trueClause))
+	for (var c of cs) if (logic.eq(c, [[], []])) return
+	cs = cs.filter((c) => !logic.eq(c, [[], [true]]))
 	if (!cs.length) return m
 
 	// unit clauses

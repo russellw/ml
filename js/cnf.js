@@ -2,11 +2,6 @@
 const logic = require('./logic')
 const assert = require('assert')
 
-var falseClause = [[], []]
-var trueClause = [[], [true]]
-
-// var falseClauses =
-
 function clause(neg, pos, m = new Map()) {
 	// simplify
 	neg = neg.map((a) => logic.simplify(a, m))
@@ -17,9 +12,9 @@ function clause(neg, pos, m = new Map()) {
 	pos = pos.filter((a) => a !== false)
 
 	// tautology?
-	for (var a of neg) if (a === false) return trueClause
-	for (var a of pos) if (a === true) return trueClause
-	for (var a of neg) for (var b of pos) if (logic.eq(a, b)) return trueClause
+	for (var a of neg) if (a === false) return [[], [true]]
+	for (var a of pos) if (a === true) return [[], [true]]
+	for (var a of neg) for (var b of pos) if (logic.eq(a, b)) return [[], [true]]
 
 	// make new clause
 	return [neg, pos]
@@ -52,12 +47,10 @@ assert(logic.eq(clause([a], [b]), clause([a], [b])))
 assert(logic.eq(clause([a], [b]), [[a], [b]]))
 assert(logic.eq(clause([a], [b]), clauseTerm(logic.term('||', logic.term('!', a), b))))
 assert(logic.eq(clause([a], [false]), [[a], []]))
-assert(logic.eq(clause([a], [true]), trueClause))
-assert(logic.eq(clause([a], [a]), trueClause))
-assert(logic.eq(trueClause, trueClause))
-assert(!logic.eq(trueClause, falseClause))
-assert(logic.eq(falseClause, falseClause))
+assert(logic.eq(clause([a], [true]), [[], [true]]))
+assert(logic.eq(clause([a], [a]), [[], [true]]))
+assert(logic.eq([[], [true]], [[], [true]]))
+assert(!logic.eq([[], [true]], [[], []]))
+assert(logic.eq([[], []], [[], []]))
 
 exports.clause = clause
-exports.falseClause = falseClause
-exports.trueClause = trueClause
