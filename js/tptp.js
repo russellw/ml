@@ -50,6 +50,7 @@ function parse1(file, text, selection, problem) {
 			// block comment
 			if (text.slice(ti, ti + 2) === '/*') {
 				for (ti += 2; text.slice(ti, ti + 2) !== '*/'; ti++) if (ti === text.length) err("Unclosed '/*'")
+				ti += 2
 				continue
 			}
 
