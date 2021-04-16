@@ -89,7 +89,7 @@ function parse(file, text) {
 	var clauses = []
 
 	function clause() {
-		var c = [neg, pos]
+		var c = cnf.clause(neg, pos)
 		c.file = file
 		clauses.push(c)
 		neg = []
@@ -111,6 +111,7 @@ function parse(file, text) {
 	}
 	if (neg.length || pos.length) clause()
 	return {
+		formulas: [],
 		clauses,
 		status,
 	}

@@ -99,6 +99,7 @@ for (var file of files) {
 			console.log()
 			continue
 		}
+		console.trace(e)
 		throw e
 	}
 	continue

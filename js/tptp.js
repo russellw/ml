@@ -467,7 +467,7 @@ function parse1(file, text, selection, problem) {
 
 				// select
 				if (select(name)) {
-					var c = [neg, pos]
+					var c = cnf.clause(neg, pos)
 					c.file = file
 					problem.clauses.push(c)
 				}
