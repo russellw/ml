@@ -232,6 +232,7 @@ function parse1(file, text, selection, problem) {
 			case '$difference':
 				return defined(bound, '-', 2)
 			case '$distinct':
+				lex()
 				var a = args(bound)
 				var clauses = logic.term('&')
 				for (var i = 0; i < a.length; i++) for (var j = 0; j < i; j++) clauses.push(logic.term('!=', a[i], a[j]))
