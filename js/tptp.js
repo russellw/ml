@@ -480,6 +480,8 @@ function parse1(file, text, selection, problem) {
 				expect(')')
 				expect('.')
 				break
+			case 'thf':
+				throw 'Inappropriate'
 			case 'fof':
 			case 'tff':
 				lex()
@@ -520,14 +522,17 @@ function parse1(file, text, selection, problem) {
 					// formula
 					free = null
 					var a = formula(new Map())
+					var o = logic.term('fof', a)
 					if (role === 'conjecture') {
 						if (problem.conjecture) err('Multiple conjectures not supported')
-						problem.conjecture = a
+						problem.conjecture = o
 						a = logic.term('!', a)
+						o = logic.term('fof', a)
+						o.from = problem.conjecture
 					}
 
 					// select
-					if (select(name)) problem.formulas.push(a)
+					if (select(name)) problem.formulas.push(o)
 				}
 
 				// annotations

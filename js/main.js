@@ -99,7 +99,7 @@ for (var file of files) {
 			console.log()
 			continue
 		}
-		console.trace(e)
+		console.trace(Object.keys(e))
 		throw e
 	}
 	continue
