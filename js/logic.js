@@ -74,6 +74,29 @@ function map(a, f) {
 	return r
 }
 
+function freevars(a) {
+	var free = new Set()
+
+	function rec(bound, a) {
+		switch (a.o) {
+			case 'var':
+				if (!bound.has(a)) free.add(a)
+				return
+			case 'all':
+			case 'exists':
+				bound = new Set(bound)
+				for (var x of a[0]) bound.add(x)
+				rec(bound, a[1])
+				return
+		}
+		if (!Array.isArray(a)) return
+		for (var b of a) rec(bound, b)
+	}
+
+	rec(new Set(), a)
+	return free
+}
+
 // map
 assert(
 	eq(
@@ -308,6 +331,16 @@ m = new Map()
 m.set(x, y)
 assert(eq(simplify(x, m), y))
 assert(eq(simplify(term('call', f, x, y), m), term('call', f, y, y)))
+
+// freevars
+var s = freevars(term('call', f, x, y))
+assert(s.size === 2)
+assert(s.has(x))
+assert(s.has(y))
+
+var s = freevars(term('all', [x], term('call', f, x, y)))
+assert(s.size === 1)
+assert(s.has(y))
 
 // exports
 exports.occurs = occurs
