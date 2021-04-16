@@ -140,7 +140,7 @@ function parse1(file, text, selection, problem) {
 	}
 
 	function id() {
-		if (/^[a-z_]/.test(tok)) {
+		if (/^[\w_]/.test(tok)) {
 			var name = tok
 			lex()
 			return name

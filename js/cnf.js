@@ -20,6 +20,22 @@ function clause(neg, pos, m = new Map()) {
 	return [neg, pos]
 }
 
+function convert(o, clauses) {
+	assert(o.op === 'fof')
+
+	function nnf(all, exists, pol, a) {
+		switch (a.op) {
+			case '!':
+				return nnf(all, exists, -pol, a)
+			case '=>':
+				return nnf(all, exists, pol, logic.term('||', logic.term('!', a[0]), a[1]))
+		}
+	}
+
+	var a = o[0]
+	a = nnf(new Map(), new Map(), 1, a)
+}
+
 function clauseTerm(a) {
 	var neg = []
 	var pos = []
