@@ -227,6 +227,8 @@ function parse1(file, text, selection, problem) {
 
 		// defined functor
 		switch (tok) {
+			case '!':
+				throw 'Inappropriate'
 			case '$difference':
 				return defined(bound, '-', 2)
 			case '$distinct':

@@ -23,6 +23,8 @@ function clause(neg, pos, m = new Map()) {
 function convert(c, clauses) {
 	assert(c.o === 'fof')
 
+	function all1(all, exists, pol, a) {}
+
 	function nnf(all, exists, pol, a) {
 		switch (a) {
 			case false:
@@ -35,6 +37,10 @@ function convert(c, clauses) {
 				return nnf(all, exists, !pol, a)
 			case '=>':
 				return nnf(all, exists, pol, logic.term('||', logic.term('!', a[0]), a[1]))
+			case '&&':
+				return logic.term(pol ? '&&' : '||', ...(b) => nnf(all, exists, pol, b))
+			case '||':
+				return logic.term(pol ? '||' : '&&', ...(b) => nnf(all, exists, pol, b))
 		}
 	}
 

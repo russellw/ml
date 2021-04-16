@@ -41,6 +41,7 @@ function version() {
 function parseArgs(args) {
 	for (var arg of args) {
 		var s = arg
+		if (!s) continue
 		if (s.startsWith('-')) {
 			while (s.startsWith('-')) s = s.slice(1)
 			switch (s) {
