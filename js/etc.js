@@ -1,6 +1,12 @@
 'use strict'
 const assert = require('assert')
 
+function extension(file) {
+	var a = file.split('.')
+	if (a.length < 2) return ''
+	return a.pop()
+}
+
 function eq(a, b) {
 	if (a === b) return true
 	if (!Array.isArray(a)) return
@@ -184,3 +190,4 @@ exports.map = map
 exports.mk = mk
 exports.replace = replace
 exports.cartproduct = cartproduct
+exports.extension = extension

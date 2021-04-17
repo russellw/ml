@@ -5,12 +5,7 @@
 'use strict'
 const fs = require('fs')
 const os = require('os')
-
-function extension(file) {
-	var a = file.split('.')
-	if (a.length < 2) return ''
-	return a.pop()
-}
+const etc = require('./etc')
 
 function eq(a, b) {
 	if (a.length !== b.length) return
@@ -42,7 +37,7 @@ function quote(s) {
 
 if (process.argv[2] !== '.') process.exit(1)
 for (var file of fs.readdirSync('.')) {
-	if (extension(file) !== 'js') continue
+	if (etc.extension(file) !== 'js') continue
 	var lines = fs.readFileSync(file, 'utf8').split(/\r?\n/)
 	var old = lines.slice()
 	for (var i = 0; i < lines.length; i++) {

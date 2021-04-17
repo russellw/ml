@@ -3,6 +3,7 @@ const fs = require('fs')
 const dimacs = require('./dimacs')
 const tptp = require('./tptp')
 const dpll = require('./dpll')
+const etc = require('./etc')
 
 var lang
 var files = []
@@ -16,12 +17,6 @@ function language(file) {
 		case 'ax':
 			return 'tptp'
 	}
-}
-
-function extension(file) {
-	var a = file.split('.')
-	if (a.length < 2) return ''
-	return a.pop()
 }
 
 function help() {
