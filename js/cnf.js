@@ -45,6 +45,7 @@ function convert(c, clauses) {
 		return nnf(bound, pol, a[1])
 	}
 
+	// most of the work is done in conversion to negation normal form
 	function nnf(bound, pol, a) {
 		switch (a) {
 			case false:
@@ -68,20 +69,30 @@ function convert(c, clauses) {
 		}
 	}
 
+	// make AND rise to the top
 	function rise(a) {
-				a = logic.map(a, rise)
-				if(a.o!='||')
-		return a
-		var ands=[]
-		flatten('&&',a,ands)
-		a=etc.cartproduct(ands)
-		for(var b of a)b.o='||'
-		a.o='&&'
+		a = logic.map(a, rise)
+		if (a.o !== '||') return a
+
+		// now we know this term is an OR
+		// its arguments can be taken without loss of generality as ANDs
+		var ands = []
+		for (var b of a) {
+			var and = []
+			flatten('&&', b, and)
+			ands.push(and)
+		}
+
+		// OR distributes over AND by Cartesian product
+		a = etc.cartproduct(ands)
+		for (var b of a) b.o = '||'
+		a.o = '&&'
 		return a
 	}
 
 	var a = c[0]
 	a = nnf(new Map(), true, a)
+	a = rise(a)
 }
 
 function flatten(o, a, r) {
