@@ -31,7 +31,7 @@ function convert(c, clauses) {
 	function exists(bound, pol, a) {
 		var free = logic.freevars(a[1])
 		var params = []
-		for (var [k, v] of bound.entries()) if (free.has(k) && v.o === 'var') params.push(v)
+		for (var [k, v] of bound.entries()) if (v.o === 'var' && free.has(k)) params.push(v)
 		bound = new Map(bound)
 		for (var x of a[0]) {
 			var sk = {}
