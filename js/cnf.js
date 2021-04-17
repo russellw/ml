@@ -66,7 +66,12 @@ function convert(c, clauses) {
 				return logic.term(pol ? '&&' : '||', ...(b) => nnf(bound, pol, b))
 			case '||':
 				return logic.term(pol ? '||' : '&&', ...(b) => nnf(bound, pol, b))
+			case 'var':
+				assert(bound.has(a))
+				return bound.get(a)
 		}
+		a = logic.map(a, (b) => nnf(bound, pol, b))
+		return pol ? a : logic.term('!', a)
 	}
 
 	// make AND rise to the top
