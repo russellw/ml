@@ -93,6 +93,17 @@ function convert(c, clauses) {
 	var a = c[0]
 	a = nnf(new Map(), true, a)
 	a = rise(a)
+
+	// now we have a term in CNF
+	// need to convert it to actual clauses
+	var ors = []
+	flatten('&&', a, ors)
+	for (var b of ors) {
+		var d = cterm(b)
+		if (etc.eq(d, [[][true]])) continue
+		d.from = [c]
+		clauses.push(d)
+	}
 }
 
 function flatten(o, a, r) {
@@ -124,7 +135,7 @@ function cterm(a) {
 	return clause(neg, pos)
 }
 
-// tests
+// clause
 var a = {}
 var b = {}
 assert(logic.eq(clause([a], [b]), clause([a], [b])))
@@ -137,6 +148,7 @@ assert(logic.eq([[], [true]], [[], [true]]))
 assert(!logic.eq([[], [true]], [[], []]))
 assert(logic.eq([[], []], [[], []]))
 
+// flatten
 var r = []
 flatten('+', logic.term('+', logic.term('+', 1, 2), 3), r)
 assert(etc.eq(r, [1, 2, 3]))
@@ -144,6 +156,12 @@ assert(etc.eq(r, [1, 2, 3]))
 var r = []
 flatten('+', 4, r)
 assert(etc.eq(r, [4]))
+
+// convert
+var cs = []
+var c = logic.term('fof', true)
+convert(c, cs)
+assert(cs.length === 0)
 
 // exports
 exports.clause = clause

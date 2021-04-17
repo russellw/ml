@@ -354,3 +354,4 @@ exports.unify = unify
 exports.eq = eq
 exports.term = term
 exports.simplify = simplify
+exports.map = map
