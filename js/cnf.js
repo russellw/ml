@@ -180,5 +180,11 @@ convert(c, cs)
 assert(cs.length === 1)
 assert(etc.eq(cs[0], [[], [a]]))
 
+var cs = []
+var c = etc.mk('fof', etc.mk('!', a))
+convert(c, cs)
+assert(cs.length === 1)
+assert(etc.eq(cs[0], [[a], []]))
+
 // exports
 exports.clause = clause

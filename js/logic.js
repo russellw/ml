@@ -299,6 +299,7 @@ assert(s.size === 1)
 assert(s.has(y))
 
 // exports
-exports.occurs = occurs
 exports.unify = unify
+exports.match = match
 exports.simplify = simplify
+exports.freevars = freevars
