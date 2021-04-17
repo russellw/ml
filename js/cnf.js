@@ -203,11 +203,30 @@ assert(etc.eq(cs[1], [[], [b]]))
 
 var a1 = {}
 var b1 = {}
+var a2 = {}
+var b2 = {}
 
 var cs = []
 convert([etc.mk('||', a, b, a1, b1)], cs)
 assert(cs.length === 1)
 assert(etc.eq(cs[0], [[], [a, b, a1, b1]]))
+
+var cs = []
+convert([etc.mk('||', etc.mk('||', a1, b1), etc.mk('||', a2, b2))], cs)
+assert(cs.length === 1)
+assert(etc.eq(cs[0], [[], [a1, b1, a2, b2]]))
+
+var cs = []
+convert([etc.mk('&&', etc.mk('||', a1, b1), etc.mk('||', a2, b2))], cs)
+assert(cs.length === 2)
+assert(etc.eq(cs[0], [[], [a1, b1]]))
+assert(etc.eq(cs[1], [[], [a2, b2]]))
+
+var cs = []
+convert([etc.mk('||', a, etc.mk('&&', b1, b2))], cs)
+assert(cs.length === 2)
+assert(etc.eq(cs[0], [[], [a, b1]]))
+assert(etc.eq(cs[1], [[], [a, b2]]))
 
 var x = { o: 'var' }
 var y = { o: 'var' }
@@ -237,3 +256,4 @@ assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
 
 // exports
 exports.clause = clause
+exports.convert = convert
