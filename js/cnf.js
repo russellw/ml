@@ -29,11 +29,9 @@ function convert(c, clauses) {
 	}
 
 	function exists(bound, pol, a) {
+		var free = logic.freevars(a[1])
 		var params = []
-		for (var x of logic.freevars(a[1])) {
-			assert(bound.has(x))
-			if (bound.get(x).o === 'var') params.push(bound.get(x))
-		}
+		for (var [k, v] of bound.entries()) if (free.has(k) && v.o === 'var') params.push(v)
 		bound = new Map(bound)
 		for (var x of a[0]) {
 			var sk = {}
@@ -257,7 +255,7 @@ assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
 var cs = []
 convert([etc.mk('exists', [x], etc.mk('call', a, x))], cs)
 assert(cs.length === 1)
-var m = match([etc.mk('call', a, x)], cs[0])
+var m = logic.match([etc.mk('call', a, x)], cs[0])
 assert(m)
 assert(m.size === 1)
 assert(!Array.isArray(m.get(x)))
