@@ -65,6 +65,10 @@ function convert(c, clauses) {
 			case 'var':
 				assert(bound.has(a))
 				return bound.get(a)
+			case '<=>':
+				var x = a[0]
+				var y = a[1]
+				return nnf(bound, pol, etc.mk('&&', etc.mk('=>', x, y), etc.mk('=>', y, x)))
 		}
 		a = etc.map(a, (b) => nnf(bound, pol, b))
 		return pol ? a : etc.mk('!', a)
@@ -281,6 +285,12 @@ assert(m)
 assert(m.size === 1)
 assert(!Array.isArray(m.get(y)))
 assert(!m.get(y).o)
+
+var cs = []
+convert([etc.mk('<=>', a, b)], cs)
+assert(cs.length === 2)
+assert(etc.eq(cs[0], [[a], [b]]))
+assert(etc.eq(cs[1], [[b], [a]]))
 
 // exports
 exports.clause = clause
