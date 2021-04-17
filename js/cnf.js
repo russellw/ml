@@ -152,6 +152,9 @@ assert(etc.eq(clause([a], [a]), [[], [true]]))
 assert(etc.eq([[], [true]], [[], [true]]))
 assert(!etc.eq([[], [true]], [[], []]))
 assert(etc.eq([[], []], [[], []]))
+var m = new Map()
+m.set(b, false)
+assert(etc.eq(clause([a], [b], m), clause([a], [])))
 
 // flatten
 var r = []
@@ -294,7 +297,7 @@ assert(etc.eq(cs[1], [[b], [a]]))
 
 function sat(clauses) {
 	var atoms = new Set()
-	for (var c of cs) for (var p of c) for (var a of p) atoms.add(a)
+	for (var c of clauses) for (var p of c) for (var a of p) atoms.add(a)
 	atoms = Array.from(atoms)
 
 	function rec(i, m) {
@@ -344,9 +347,9 @@ thm(etc.mk('&&', true, true, true))
 thm(etc.mk('||', false, false, true))
 thm(etc.mk('<=>', a, a))
 
-var p1 = {}
-var p2 = {}
-var p3 = {}
+var p1 = { name: 'p1' }
+var p2 = { name: 'p2' }
+var p3 = { name: 'p3' }
 
 thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p1, p2))))
 thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p3, etc.mk('<=>', p1, etc.mk('<=>', p2, p3))))))
