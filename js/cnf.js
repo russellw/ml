@@ -255,11 +255,32 @@ assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
 var cs = []
 convert([etc.mk('exists', [x], etc.mk('call', a, x))], cs)
 assert(cs.length === 1)
-var m = logic.match([etc.mk('call', a, x)], cs[0])
+var m = logic.match([etc.mk('call', a, x)], cs[0][1])
 assert(m)
 assert(m.size === 1)
 assert(!Array.isArray(m.get(x)))
 assert(!m.get(x).o)
+
+var cs = []
+convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', a, x, y)))], cs)
+assert(cs.length === 1)
+var m = logic.match([etc.mk('call', a, x, y)], cs[0][1])
+assert(m)
+assert(m.size === 2)
+assert(!Array.isArray(m.get(x)))
+assert(m.get(x).o === 'var')
+assert(Array.isArray(m.get(y)))
+assert(m.get(y).o === 'call')
+assert(m.get(y).length === 2)
+
+var cs = []
+convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', a, y)))], cs)
+assert(cs.length === 1)
+var m = logic.match([etc.mk('call', a, y)], cs[0][1])
+assert(m)
+assert(m.size === 1)
+assert(!Array.isArray(m.get(y)))
+assert(!m.get(y).o)
 
 // exports
 exports.clause = clause
