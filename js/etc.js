@@ -10,6 +10,14 @@ function eq(a, b) {
 	return true
 }
 
+function map(a, f) {
+	if (!Array.isArray(a)) return a
+	var r = []
+	Object.assign(r, a)
+	for (var i = 0; i < r.length; i++) r[i] = f(r[i])
+	return r
+}
+
 function cartproduct(qs) {
 	var js = []
 	for (var q of qs) js.push(0)
@@ -27,6 +35,17 @@ function cartproduct(qs) {
 
 	rec(0)
 	return rs
+}
+
+function mk(o, ...args) {
+	var a = Array.from(args)
+	a.o = o
+	return a
+}
+
+function replace(a, m) {
+	if (m.has(a)) return replace(m.get(a), m)
+	return map(a, (b) => replace(b, m))
 }
 
 function getor(m, k, f) {
@@ -142,8 +161,25 @@ assert(eq(rs[i++], ['a1', 'b2', 'c1']))
 assert(eq(rs[i++], ['a1', 'b2', 'c2']))
 assert(eq(rs[i++], ['a1', 'b2', 'c3']))
 
+// map
+assert(
+	!eq(
+		mk('+', 1, 2).map((a) => a + 10),
+		mk('+', 11, 12)
+	)
+)
+assert(
+	eq(
+		map(mk('+', 1, 2), (a) => a + 10),
+		mk('+', 11, 12)
+	)
+)
+
 // exports
 exports.err = err
 exports.walk = walk
 exports.getor = getor
 exports.eq = eq
+exports.map = map
+exports.mk = mk
+exports.replace = replace

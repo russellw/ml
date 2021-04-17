@@ -39,7 +39,7 @@ function convert(c, clauses) {
 		bound = new Map(bound)
 		for (var x of a[0]) {
 			var sk = {}
-			if (params.length) sk = logic.term('call', ...[sk].concat(params))
+			if (params.length) sk = etc.mk('call', ...[sk].concat(params))
 			bound.set(x, sk)
 		}
 		return nnf(bound, pol, a[1])
@@ -61,22 +61,22 @@ function convert(c, clauses) {
 			case '!':
 				return nnf(bound, !pol, a)
 			case '=>':
-				return nnf(bound, pol, logic.term('||', logic.term('!', a[0]), a[1]))
+				return nnf(bound, pol, etc.mk('||', etc.mk('!', a[0]), a[1]))
 			case '&&':
-				return logic.term(pol ? '&&' : '||', ...(b) => nnf(bound, pol, b))
+				return etc.mk(pol ? '&&' : '||', ...(b) => nnf(bound, pol, b))
 			case '||':
-				return logic.term(pol ? '||' : '&&', ...(b) => nnf(bound, pol, b))
+				return etc.mk(pol ? '||' : '&&', ...(b) => nnf(bound, pol, b))
 			case 'var':
 				assert(bound.has(a))
 				return bound.get(a)
 		}
-		a = logic.map(a, (b) => nnf(bound, pol, b))
-		return pol ? a : logic.term('!', a)
+		a = etc.map(a, (b) => nnf(bound, pol, b))
+		return pol ? a : etc.mk('!', a)
 	}
 
 	// make AND rise to the top
 	function rise(a) {
-		a = logic.map(a, rise)
+		a = etc.map(a, rise)
 		if (a.o !== '||') return a
 
 		// now we know this term is an OR
@@ -145,7 +145,7 @@ var a = {}
 var b = {}
 assert(etc.eq(clause([a], [b]), clause([a], [b])))
 assert(etc.eq(clause([a], [b]), [[a], [b]]))
-assert(etc.eq(clause([a], [b]), cterm(logic.term('||', logic.term('!', a), b))))
+assert(etc.eq(clause([a], [b]), cterm(etc.mk('||', etc.mk('!', a), b))))
 assert(etc.eq(clause([a], [false]), [[a], []]))
 assert(etc.eq(clause([a], [true]), [[], [true]]))
 assert(etc.eq(clause([a], [a]), [[], [true]]))
@@ -155,7 +155,7 @@ assert(etc.eq([[], []], [[], []]))
 
 // flatten
 var r = []
-flatten('+', logic.term('+', logic.term('+', 1, 2), 3), r)
+flatten('+', etc.mk('+', etc.mk('+', 1, 2), 3), r)
 assert(etc.eq(r, [1, 2, 3]))
 
 var r = []
@@ -164,18 +164,18 @@ assert(etc.eq(r, [4]))
 
 // convert
 var cs = []
-var c = logic.term('fof', true)
+var c = etc.mk('fof', true)
 convert(c, cs)
 assert(cs.length === 0)
 
 var cs = []
-var c = logic.term('fof', false)
+var c = etc.mk('fof', false)
 convert(c, cs)
 assert(cs.length === 1)
 assert(etc.eq(cs[0], [[], []]))
 
 var cs = []
-var c = logic.term('fof', a)
+var c = etc.mk('fof', a)
 convert(c, cs)
 assert(cs.length === 1)
 assert(etc.eq(cs[0], [[], [a]]))

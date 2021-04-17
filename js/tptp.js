@@ -219,7 +219,7 @@ function parse1(file, text, selection, problem) {
 		lex()
 		var a = args(bound)
 		if (a.length !== arity) err('Expected ' + arity + ' arguments')
-		return logic.term(o, ...a)
+		return etc.mk(o, ...a)
 	}
 
 	function term(bound) {
@@ -235,8 +235,8 @@ function parse1(file, text, selection, problem) {
 			case '$distinct':
 				lex()
 				var a = args(bound)
-				var clauses = logic.term('&')
-				for (var i = 0; i < a.length; i++) for (var j = 0; j < i; j++) clauses.push(logic.term('!=', a[i], a[j]))
+				var clauses = etc.mk('&')
+				for (var i = 0; i < a.length; i++) for (var j = 0; j < i; j++) clauses.push(etc.mk('!=', a[i], a[j]))
 				return clauses
 			case '$false':
 				lex()
@@ -320,7 +320,7 @@ function parse1(file, text, selection, problem) {
 				return { name }
 			})
 			if (tok !== '(') return a
-			return args(bound, logic.term('call', a))
+			return args(bound, etc.mk('call', a))
 		}
 
 		// distinct object
@@ -342,11 +342,11 @@ function parse1(file, text, selection, problem) {
 			case '!=':
 				lex()
 				var b = term(bound)
-				return logic.term('!=', a, b)
+				return etc.mk('!=', a, b)
 			case '=':
 				lex()
 				var b = term(bound)
-				return logic.term('==', a, b)
+				return etc.mk('==', a, b)
 		}
 		return a
 	}
@@ -368,7 +368,7 @@ function parse1(file, text, selection, problem) {
 		} while (eat(','))
 		expect(']')
 		expect(':')
-		return logic.term(o, v, unitary(bound))
+		return etc.mk(o, v, unitary(bound))
 	}
 
 	function unitary(bound) {
@@ -385,7 +385,7 @@ function parse1(file, text, selection, problem) {
 				return a
 			case '~':
 				lex()
-				return logic.term('!', unitary(bound))
+				return etc.mk('!', unitary(bound))
 		}
 		return eq(bound)
 	}
@@ -397,27 +397,27 @@ function parse1(file, text, selection, problem) {
 			case '&':
 			case '|':
 				var k = tok
-				a = logic.term(k + k, a)
+				a = etc.mk(k + k, a)
 				while (eat(k)) a.push(unitary(bound))
 				break
 			case '<=':
 				lex()
-				return logic.term('=>', unitary(bound), a)
+				return etc.mk('=>', unitary(bound), a)
 			case '<=>':
 				lex()
-				return logic.term('<=>', a, unitary(bound))
+				return etc.mk('<=>', a, unitary(bound))
 			case '<~>':
 				lex()
-				return logic.term('!', logic.term('<=>', a, unitary(bound)))
+				return etc.mk('!', etc.mk('<=>', a, unitary(bound)))
 			case '=>':
 				lex()
-				return logic.term('=>', a, unitary(bound))
+				return etc.mk('=>', a, unitary(bound))
 			case '~&':
 				lex()
-				return logic.term('!', logic.term('&&', a, unitary(bound)))
+				return etc.mk('!', etc.mk('&&', a, unitary(bound)))
 			case '~|':
 				lex()
-				return logic.term('!', logic.term('||', a, unitary(bound)))
+				return etc.mk('!', etc.mk('||', a, unitary(bound)))
 		}
 		return a
 	}
@@ -526,12 +526,12 @@ function parse1(file, text, selection, problem) {
 					// formula
 					free = null
 					var a = formula(new Map())
-					var c = logic.term('fof', a)
+					var c = etc.mk('fof', a)
 					if (role === 'conjecture') {
 						if (problem.conjecture) err('Multiple conjectures not supported')
 						problem.conjecture = c
-						a = logic.term('!', a)
-						c = logic.term('fof', a)
+						a = etc.mk('!', a)
+						c = etc.mk('fof', a)
 						c.from = problem.conjecture
 					}
 
