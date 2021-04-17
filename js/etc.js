@@ -4,6 +4,7 @@ const assert = require('assert')
 function eq(a, b) {
 	if (a === b) return true
 	if (!Array.isArray(a)) return
+	if (a.o !== b.o) return
 	if (a.length !== b.length) return
 	for (var i = 0; i < a.length; i++) if (!eq(a[i], b[i])) return
 	return true

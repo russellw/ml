@@ -15,7 +15,7 @@ function clause(neg, pos, m = new Map()) {
 	// tautology?
 	for (var a of neg) if (a === false) return [[], [true]]
 	for (var a of pos) if (a === true) return [[], [true]]
-	for (var a of neg) for (var b of pos) if (logic.eq(a, b)) return [[], [true]]
+	for (var a of neg) for (var b of pos) if (etc.eq(a, b)) return [[], [true]]
 
 	// make new clause
 	return [neg, pos]
@@ -143,15 +143,15 @@ function cterm(a) {
 // clause
 var a = {}
 var b = {}
-assert(logic.eq(clause([a], [b]), clause([a], [b])))
-assert(logic.eq(clause([a], [b]), [[a], [b]]))
-assert(logic.eq(clause([a], [b]), cterm(logic.term('||', logic.term('!', a), b))))
-assert(logic.eq(clause([a], [false]), [[a], []]))
-assert(logic.eq(clause([a], [true]), [[], [true]]))
-assert(logic.eq(clause([a], [a]), [[], [true]]))
-assert(logic.eq([[], [true]], [[], [true]]))
-assert(!logic.eq([[], [true]], [[], []]))
-assert(logic.eq([[], []], [[], []]))
+assert(etc.eq(clause([a], [b]), clause([a], [b])))
+assert(etc.eq(clause([a], [b]), [[a], [b]]))
+assert(etc.eq(clause([a], [b]), cterm(logic.term('||', logic.term('!', a), b))))
+assert(etc.eq(clause([a], [false]), [[a], []]))
+assert(etc.eq(clause([a], [true]), [[], [true]]))
+assert(etc.eq(clause([a], [a]), [[], [true]]))
+assert(etc.eq([[], [true]], [[], [true]]))
+assert(!etc.eq([[], [true]], [[], []]))
+assert(etc.eq([[], []], [[], []]))
 
 // flatten
 var r = []

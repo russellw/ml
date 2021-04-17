@@ -515,7 +515,7 @@ function parse1(file, text, selection, problem) {
 						var toki1 = toki
 						var type = topleveltype()
 						if (!a.type) a.type = type
-						else if (!logic.eq(a.type, type)) {
+						else if (!etc.eq(a.type, type)) {
 							toki = toki1
 							err('Type mismatch')
 						}
