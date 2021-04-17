@@ -254,6 +254,15 @@ convert([etc.mk('all', [x], etc.mk('all', [y], etc.mk('call', a, x, y)))], cs)
 assert(cs.length === 1)
 assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
 
+var cs = []
+convert([etc.mk('exists', [x], etc.mk('call', a, x))], cs)
+assert(cs.length === 1)
+var m = match([etc.mk('call', a, x)], cs[0])
+assert(m)
+assert(m.size === 1)
+assert(!Array.isArray(m.get(x)))
+assert(!m.get(x).o)
+
 // exports
 exports.clause = clause
 exports.convert = convert
