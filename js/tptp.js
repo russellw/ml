@@ -526,12 +526,12 @@ function parse1(file, text, selection, problem) {
 					// formula
 					free = null
 					var a = formula(new Map())
-					var c = etc.mk('fof', a)
+					var c = [a]
 					if (role === 'conjecture') {
 						if (problem.conjecture) err('Multiple conjectures not supported')
 						problem.conjecture = c
 						a = etc.mk('!', a)
-						c = etc.mk('fof', a)
+						c = [a]
 						c.from = problem.conjecture
 					}
 

@@ -22,8 +22,6 @@ function clause(neg, pos, m = new Map()) {
 }
 
 function convert(c, clauses) {
-	assert(c.o === 'fof')
-
 	function all(bound, pol, a) {
 		bound = new Map(bound)
 		for (var x of a[0]) bound.set(x, { o: 'var' })
@@ -59,13 +57,13 @@ function convert(c, clauses) {
 			case 'exists':
 				return (pol ? exists : all)(bound, pol, a)
 			case '!':
-				return nnf(bound, !pol, a)
+				return nnf(bound, !pol, a[0])
 			case '=>':
 				return nnf(bound, pol, etc.mk('||', etc.mk('!', a[0]), a[1]))
 			case '&&':
-				return etc.mk(pol ? '&&' : '||', ...(b) => nnf(bound, pol, b))
+				return etc.mk(pol ? '&&' : '||', ...a.map((b) => nnf(bound, pol, b)))
 			case '||':
-				return etc.mk(pol ? '||' : '&&', ...(b) => nnf(bound, pol, b))
+				return etc.mk(pol ? '||' : '&&', ...a.map((b) => nnf(bound, pol, b)))
 			case 'var':
 				assert(bound.has(a))
 				return bound.get(a)
@@ -164,27 +162,46 @@ assert(etc.eq(r, [4]))
 
 // convert
 var cs = []
-var c = etc.mk('fof', true)
-convert(c, cs)
+convert([true], cs)
 assert(cs.length === 0)
 
 var cs = []
-var c = etc.mk('fof', false)
-convert(c, cs)
+convert([false], cs)
 assert(cs.length === 1)
 assert(etc.eq(cs[0], [[], []]))
 
 var cs = []
-var c = etc.mk('fof', a)
-convert(c, cs)
+convert([a], cs)
 assert(cs.length === 1)
 assert(etc.eq(cs[0], [[], [a]]))
 
 var cs = []
-var c = etc.mk('fof', etc.mk('!', a))
-convert(c, cs)
+convert([etc.mk('!', a)], cs)
 assert(cs.length === 1)
 assert(etc.eq(cs[0], [[a], []]))
+
+var cs = []
+convert([etc.mk('!', etc.mk('!', a))], cs)
+assert(cs.length === 1)
+assert(etc.eq(cs[0], [[], [a]]))
+
+var cs = []
+convert([etc.mk('=>', a, b)], cs)
+assert(cs.length === 1)
+assert(etc.eq(cs[0], [[a], [b]]))
+
+var cs = []
+convert([etc.mk('||', a, b)], cs)
+assert(cs.length === 1)
+assert(etc.eq(cs[0], [[], [a, b]]))
+
+var a1 = {}
+var b1 = {}
+
+var cs = []
+convert([etc.mk('||', a, b, a1, b1)], cs)
+assert(cs.length === 1)
+assert(etc.eq(cs[0], [[], [a, b, a1, b1]]))
 
 // exports
 exports.clause = clause

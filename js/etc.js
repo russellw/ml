@@ -183,3 +183,4 @@ exports.eq = eq
 exports.map = map
 exports.mk = mk
 exports.replace = replace
+exports.cartproduct = cartproduct
