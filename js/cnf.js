@@ -100,7 +100,7 @@ function convert(c, clauses) {
 	flatten('&&', a, ors)
 	for (var b of ors) {
 		var d = cterm(b)
-		if (etc.eq(d, [[][true]])) continue
+		if (etc.eq(d, [[], [true]])) continue
 		d.from = [c]
 		clauses.push(d)
 	}
@@ -162,6 +162,18 @@ var cs = []
 var c = logic.term('fof', true)
 convert(c, cs)
 assert(cs.length === 0)
+
+var cs = []
+var c = logic.term('fof', false)
+convert(c, cs)
+assert(cs.length === 1)
+assert(etc.eq(cs[0], [[], []]))
+
+var cs = []
+var c = logic.term('fof', a)
+convert(c, cs)
+assert(cs.length === 1)
+assert(etc.eq(cs[0], [[], [a]]))
 
 // exports
 exports.clause = clause
