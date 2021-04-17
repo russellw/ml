@@ -292,6 +292,65 @@ assert(cs.length === 2)
 assert(etc.eq(cs[0], [[a], [b]]))
 assert(etc.eq(cs[1], [[b], [a]]))
 
+function sat(clauses) {
+	var atoms = new Set()
+	for (var c of cs) for (var p of c) for (var a of p) atoms.add(a)
+	atoms = Array.from(atoms)
+
+	function rec(i, m) {
+		var cs = clauses.map((c) => clause(c[0], c[1], m))
+		for (var c of cs) if (etc.eq(c, [[], []])) return
+		cs = cs.filter((c) => !etc.eq(c, [[], [true]]))
+		if (!cs.length) return m
+
+		assert(i < atoms.length)
+		var a = atoms[i++]
+		var m1 = new Map(m)
+		m1.set(a, false)
+		if (rec(i, m1)) return true
+		m.set(a, true)
+		return rec(i, m)
+	}
+
+	return rec(0, new Map())
+}
+
+var cs = []
+convert([etc.mk('&&', a, b)], cs)
+assert(sat(cs))
+
+var cs = []
+convert([etc.mk('&&', a, a)], cs)
+assert(sat(cs))
+
+var cs = []
+convert([etc.mk('&&', a, etc.mk('!', a))], cs)
+assert(!sat(cs))
+
+function thm(a) {
+	var cs = []
+	convert([a], cs)
+	assert(sat(cs))
+
+	var cs = []
+	convert([etc.mk('!', a)], cs)
+	assert(!sat(cs))
+}
+
+thm(true)
+thm(etc.mk('=>', false, a))
+thm(etc.mk('=>', a, a))
+thm(etc.mk('&&', true, true, true))
+thm(etc.mk('||', false, false, true))
+thm(etc.mk('<=>', a, a))
+
+var p1 = {}
+var p2 = {}
+var p3 = {}
+
+thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p1, p2))))
+thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p3, etc.mk('<=>', p1, etc.mk('<=>', p2, p3))))))
+
 // exports
 exports.clause = clause
 exports.convert = convert
