@@ -99,6 +99,12 @@ function freevars(a) {
 
 // map
 assert(
+	!eq(
+		term('+', 1, 2).map((a) => a + 10),
+		term('+', 11, 12)
+	)
+)
+assert(
 	eq(
 		map(term('+', 1, 2), (a) => a + 10),
 		term('+', 11, 12)

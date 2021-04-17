@@ -68,6 +68,18 @@ function convert(c, clauses) {
 		}
 	}
 
+	function rise(a) {
+				a = logic.map(a, rise)
+				if(a.o!='||')
+		return a
+		var ands=[]
+		flatten('&&',a,ands)
+		a=etc.cartproduct(ands)
+		for(var b of a)b.o='||'
+		a.o='&&'
+		return a
+	}
+
 	var a = c[0]
 	a = nnf(new Map(), true, a)
 }
