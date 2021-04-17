@@ -35,7 +35,7 @@ function match(a, b, m = new Map()) {
 	if (!Array.isArray(a)) return null
 	if (a.o !== b.o) return
 	if (a.length !== b.length) return
-	for (var i = 0; i < a.length && m; i++) m = unify(a[i], b[i], m)
+	for (var i = 0; i < a.length && m; i++) m = match(a[i], b[i], m)
 	return m
 }
 
@@ -248,17 +248,14 @@ m = new Map()
 assert(!match(etc.mk('call', f, x), etc.mk('call', f, y, z), m))
 
 // Unifies y with the term g(x)
+// different result for match!
 m = new Map()
-assert(match(etc.mk('call', f, etc.mk('call', g, x)), etc.mk('call', f, y), m))
-assert(m.size === 1)
-assert(etc.eq(etc.replace(y, m), etc.mk('call', g, x)))
+assert(!match(etc.mk('call', f, etc.mk('call', g, x)), etc.mk('call', f, y), m))
 
 // Unifies x with constant a, and y with the term g(a)
+// different result for match!
 m = new Map()
-assert(match(etc.mk('call', f, etc.mk('call', g, x), x), etc.mk('call', f, y, a), m))
-assert(m.size === 2)
-assert(etc.eq(etc.replace(x, m), a))
-assert(etc.eq(etc.replace(y, m), etc.mk('call', g, a)))
+assert(!match(etc.mk('call', f, etc.mk('call', g, x), x), etc.mk('call', f, y, a), m))
 
 // Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
 // not valid for match!

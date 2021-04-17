@@ -203,5 +203,21 @@ convert([etc.mk('||', a, b, a1, b1)], cs)
 assert(cs.length === 1)
 assert(etc.eq(cs[0], [[], [a, b, a1, b1]]))
 
+var x = { o: 'var' }
+var y = { o: 'var' }
+var z = { o: 'var' }
+
+assert(logic.match(etc.mk('call', a, x), etc.mk('call', a, 1)))
+assert(!logic.match(etc.mk('call', a, 1), etc.mk('call', a, x)))
+
+function isomorphic(a, b) {
+	return logic.match(a, b) && logic.match(b, a)
+}
+
+var cs = []
+convert([etc.mk('all', [x], etc.mk('call', a, x))], cs)
+assert(cs.length === 1)
+assert(isomorphic(cs[0], [[], [etc.mk('call', a, x)]]))
+
 // exports
 exports.clause = clause
