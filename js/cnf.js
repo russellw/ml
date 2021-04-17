@@ -1,5 +1,6 @@
 'use strict'
 const logic = require('./logic')
+const etc = require('./etc')
 const assert = require('assert')
 
 function clause(neg, pos, m = new Map()) {
@@ -71,7 +72,15 @@ function convert(c, clauses) {
 	a = nnf(new Map(), true, a)
 }
 
-function clauseTerm(a) {
+function flatten(o, a, r) {
+	if (a.o === o) {
+		for (var b of a) flatten(o, b, r)
+		return
+	}
+	r.push(a)
+}
+
+function cterm(a) {
 	var neg = []
 	var pos = []
 
@@ -92,11 +101,12 @@ function clauseTerm(a) {
 	return clause(neg, pos)
 }
 
+// tests
 var a = {}
 var b = {}
 assert(logic.eq(clause([a], [b]), clause([a], [b])))
 assert(logic.eq(clause([a], [b]), [[a], [b]]))
-assert(logic.eq(clause([a], [b]), clauseTerm(logic.term('||', logic.term('!', a), b))))
+assert(logic.eq(clause([a], [b]), cterm(logic.term('||', logic.term('!', a), b))))
 assert(logic.eq(clause([a], [false]), [[a], []]))
 assert(logic.eq(clause([a], [true]), [[], [true]]))
 assert(logic.eq(clause([a], [a]), [[], [true]]))
@@ -104,4 +114,13 @@ assert(logic.eq([[], [true]], [[], [true]]))
 assert(!logic.eq([[], [true]], [[], []]))
 assert(logic.eq([[], []], [[], []]))
 
+var r = []
+flatten('+', logic.term('+', logic.term('+', 1, 2), 3), r)
+assert(etc.eq(r, [1, 2, 3]))
+
+var r = []
+flatten('+', 4, r)
+assert(etc.eq(r, [4]))
+
+// exports
 exports.clause = clause

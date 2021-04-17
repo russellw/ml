@@ -143,3 +143,4 @@ assert(eq(rs[i++], ['a1', 'b2', 'c3']))
 exports.err = err
 exports.walk = walk
 exports.getor = getor
+exports.eq = eq
