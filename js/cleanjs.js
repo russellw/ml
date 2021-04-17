@@ -7,12 +7,6 @@ const fs = require('fs')
 const os = require('os')
 const etc = require('./etc')
 
-function eq(a, b) {
-	if (a.length !== b.length) return
-	for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return
-	return true
-}
-
 function quote(s) {
 	var q = ''
 	for (var i = 0; i < s.length; i++) {
@@ -61,7 +55,7 @@ for (var file of fs.readdirSync('.')) {
 		var m = /^(.*) != (.*)$/.exec(lines[i])
 		if (m && !quote(m[1])) lines[i] = m[1] + ' !== ' + m[2]
 	}
-	if (eq(lines, old)) continue
+	if (etc.eq(lines, old)) continue
 	fs.renameSync(file, os.tmpdir() + '/' + file)
 	fs.writeFileSync(file, lines.join('\n'), 'utf8')
 	console.log(file)
