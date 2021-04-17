@@ -195,6 +195,12 @@ convert([etc.mk('||', a, b)], cs)
 assert(cs.length === 1)
 assert(etc.eq(cs[0], [[], [a, b]]))
 
+var cs = []
+convert([etc.mk('&&', a, b)], cs)
+assert(cs.length === 2)
+assert(etc.eq(cs[0], [[], [a]]))
+assert(etc.eq(cs[1], [[], [b]]))
+
 var a1 = {}
 var b1 = {}
 
@@ -218,6 +224,16 @@ var cs = []
 convert([etc.mk('all', [x], etc.mk('call', a, x))], cs)
 assert(cs.length === 1)
 assert(isomorphic(cs[0], [[], [etc.mk('call', a, x)]]))
+
+var cs = []
+convert([etc.mk('all', [x, y], etc.mk('call', a, x, y))], cs)
+assert(cs.length === 1)
+assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
+
+var cs = []
+convert([etc.mk('all', [x], etc.mk('all', [y], etc.mk('call', a, x, y)))], cs)
+assert(cs.length === 1)
+assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
 
 // exports
 exports.clause = clause
