@@ -474,6 +474,7 @@ function parse1(file, text, selection, problem) {
 				if (select(name)) {
 					var c = cnf.clause(neg, pos)
 					c.file = file
+					c.name = name
 					problem.clauses.push(c)
 				}
 
@@ -496,6 +497,7 @@ function parse1(file, text, selection, problem) {
 				expect(',')
 
 				// role
+				if (tok === 'conjecture' && problem.conjecture) err('Multiple conjectures not supported')
 				var role = id()
 				expect(',')
 
@@ -527,8 +529,11 @@ function parse1(file, text, selection, problem) {
 					free = null
 					var a = formula(new Map())
 					var c = [a]
+					c.file = file
+					c.name = name
+
+					// negate conjecture
 					if (role === 'conjecture') {
-						if (problem.conjecture) err('Multiple conjectures not supported')
 						problem.conjecture = c
 						a = etc.mk('!', a)
 						c = [a]
