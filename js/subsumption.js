@@ -68,7 +68,7 @@ function subsumes(c, d) {
 	assert(d.length === 2)
 
 	// clauses are assumed to have distinct variable names
-	for (x of logic.freevars(c)) assert(!logic.freevars(d).has(x))
+	for (var x of logic.freevars(c)) assert(!logic.freevars(d).has(x))
 
 	// negative and positive sides need to be matched separately
 	// though of course with shared variable assignments
@@ -105,106 +105,94 @@ var y = { o: 'var', name: 'y', type: 'individual' }
 var c, d
 
 // false <= false
-assert(x.name !== y.name)
 c = [[], []]
 d = [[], []]
 assert(subsumes(c, d))
 assert(subsumes(d, c))
 
 // false <= p
-assert(x.name !== y.name)
 c = [[], []]
 d = [[], [p]]
 assert(subsumes(c, d))
 assert(!subsumes(d, c))
 
 // p <= p
-assert(x.name !== y.name)
 c = [[], [p]]
 d = [[], [p]]
 assert(subsumes(c, d))
 assert(subsumes(d, c))
 
 // !p <= !p
-assert(x.name !== y.name)
 c = [[p], []]
 d = [[p], []]
 assert(subsumes(c, d))
 assert(subsumes(d, c))
 
 // p <= p | p
-assert(x.name !== y.name)
 c = [[], [p]]
 d = [[], [p, p]]
 assert(subsumes(c, d))
 assert(!subsumes(d, c))
 
 // p !<= !p
-assert(x.name !== y.name)
 c = [[], [p]]
 d = [[p], []]
 assert(!subsumes(c, d))
 assert(!subsumes(d, c))
 
 // p | q <= q | p
-assert(x.name !== y.name)
 c = [[], [p, q]]
 d = [[], [q, p]]
 assert(subsumes(c, d))
 assert(subsumes(d, c))
 
 // p | q <= p | q | p
-assert(x.name !== y.name)
 c = [[], [p, q]]
 d = [[], [p, q, p]]
 assert(subsumes(c, d))
 assert(!subsumes(d, c))
 
 // p(a) | p(b) | q(a) | q(b) | <= p(a) | q(a) | p(b) | q(b)
-assert(x.name !== y.name)
 c = [[], [etc.mk('call', p, a), etc.mk('call', p, b), etc.mk('call', q, a), etc.mk('call', q, b)]]
 d = [[], [etc.mk('call', p, a), etc.mk('call', q, a), etc.mk('call', p, b), etc.mk('call', q, b)]]
 assert(subsumes(c, d))
 assert(subsumes(d, c))
 
 // p(x,y) <= p(a,b)
-assert(x.name !== y.name)
 c = [[], [etc.mk('call', p2, x, y)]]
 d = [[], [etc.mk('call', p2, a, b)]]
-assert(x.name !== y.name)
 assert(subsumes(c, d))
-assert(x.name !== y.name)
 assert(!subsumes(d, c))
 
 // p(x,x) !<= p(a,b)
-assert(x.name !== y.name)
 c = [[], [etc.mk('call', p2, x, x)]]
 d = [[], [etc.mk('call', p2, a, b)]]
 assert(!subsumes(c, d))
 assert(!subsumes(d, c))
 
 // p(x) <= p(y)
-console.dir(x)
-console.dir(y)
-assert(x.name !== y.name)
 c = [[], [etc.mk('call', p1, x)]]
 d = [[], [etc.mk('call', p1, y)]]
 assert(subsumes(c, d))
 assert(subsumes(d, c))
 
 // p(x) | p(a(x)) | p(a(a(x))) <= p(y) | p(a(y)) | p(a(a(y)))
-negative.clear()
-positive.clear()
-positive.add(List.of(p1, x))
-positive.add(List.of(p1, List.of(a1, x)))
-positive.add(List.of(p1, List.of(a1, List.of(a1, x))))
-c = new Clause(negative, positive, Inference.AXIOM)
-negative.clear()
-positive.clear()
-positive.add(List.of(p1, y))
-positive.add(List.of(p1, List.of(a1, y)))
-positive.add(List.of(p1, List.of(a1, List.of(a1, y))))
-d = new Clause(negative, positive, Inference.AXIOM)
+c = [
+	[],
+	[
+		etc.mk('call', p1, x),
+		etc.mk('call', p1, etc.mk('call', a1, x)),
+		etc.mk('call', p1, etc.mk('call', a1, etc.mk('call', a1, x))),
+	],
+]
+d = [
+	[],
+	[
+		etc.mk('call', p1, y),
+		etc.mk('call', p1, etc.mk('call', a1, y)),
+		etc.mk('call', p1, etc.mk('call', a1, etc.mk('call', a1, y))),
+	],
+]
 assert(subsumes(c, d))
 assert(subsumes(d, c))
 
