@@ -69,9 +69,7 @@ function parseargs(args) {
 
 function test() {
 	function sat(cs) {
-		var problem = { clauses: cs }
-		dpll.solve(problem)
-		return problem.solution
+		return dpll.solve(cs).sat
 	}
 
 	function thm(a) {

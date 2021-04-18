@@ -46,9 +46,12 @@ function sat(clauses, m = new Map()) {
 	}
 }
 
-function solve(problem) {
-	problem.solution = sat(problem.clauses)
-	problem.result = problem.solution ? 'Satisfiable' : 'Unsatisfiable'
+function solve(clauses) {
+	var solution = sat(clauses)
+	return {
+		sat: !!solution,
+		solution,
+	}
 }
 
 function test() {

@@ -12,7 +12,9 @@ function size(a) {
 	return n
 }
 
-function sat(clauses) {
+function solve(clauses) {
+	var complete = true
+
 	var passive = priorityq.mk(size)
 	for (var c of clauses) priorityq.push(passive, c)
 	var active = []
@@ -25,8 +27,10 @@ function sat(clauses) {
 
 	for (;;) {
 		var g = priorityq.pop(passive)
-		if (!g) return true
+		if (!g) break
 	}
+	if (complete) return { sat: true }
+	return { szs: 'GaveUp' }
 }
 
 function test() {
@@ -36,4 +40,4 @@ function test() {
 
 test()
 
-exports.sat = sat
+exports.solve = solve
