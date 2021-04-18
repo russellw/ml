@@ -88,100 +88,103 @@ function err(file, text, toki, msg) {
 	process.exit(1)
 }
 
-// default param
-function f(a = []) {
-	a.push(1)
-	return a
+function test() {
+	// default param
+	function f(a = []) {
+		a.push(1)
+		return a
+	}
+
+	assert(f().length === 1)
+	assert(f().length === 1)
+
+	// getor
+	var m = new Map()
+
+	assert(getor(m, 'a', () => 5) === 5)
+	assert(m.size === 1)
+	assert(m.get('a') === 5)
+
+	assert(getor(m, 'a', () => 5) === 5)
+	assert(m.size === 1)
+	assert(m.get('a') === 5)
+
+	assert(getor(m, 'b', () => 6) === 6)
+	assert(m.size === 2)
+	assert(m.get('a') === 5)
+	assert(m.get('b') === 6)
+
+	// concat
+	function g(...s) {
+		return s
+	}
+
+	assert(g(1, 2).length === 2)
+	assert(g(...[1, 2]).length === 2)
+	assert(g(...[1, 2].concat([3, 4])).length === 4)
+
+	// cartesian product
+	var qs = []
+	var q
+	q = []
+	q.push('a0')
+	q.push('a1')
+	qs.push(q)
+	q = []
+	q.push('b0')
+	q.push('b1')
+	q.push('b2')
+	qs.push(q)
+	q = []
+	q.push('c0')
+	q.push('c1')
+	q.push('c2')
+	q.push('c3')
+	qs.push(q)
+	var rs = cartproduct(qs)
+	var i = 0
+	assert(eq(rs[i++], ['a0', 'b0', 'c0']))
+	assert(eq(rs[i++], ['a0', 'b0', 'c1']))
+	assert(eq(rs[i++], ['a0', 'b0', 'c2']))
+	assert(eq(rs[i++], ['a0', 'b0', 'c3']))
+	assert(eq(rs[i++], ['a0', 'b1', 'c0']))
+	assert(eq(rs[i++], ['a0', 'b1', 'c1']))
+	assert(eq(rs[i++], ['a0', 'b1', 'c2']))
+	assert(eq(rs[i++], ['a0', 'b1', 'c3']))
+	assert(eq(rs[i++], ['a0', 'b2', 'c0']))
+	assert(eq(rs[i++], ['a0', 'b2', 'c1']))
+	assert(eq(rs[i++], ['a0', 'b2', 'c2']))
+	assert(eq(rs[i++], ['a0', 'b2', 'c3']))
+	assert(eq(rs[i++], ['a1', 'b0', 'c0']))
+	assert(eq(rs[i++], ['a1', 'b0', 'c1']))
+	assert(eq(rs[i++], ['a1', 'b0', 'c2']))
+	assert(eq(rs[i++], ['a1', 'b0', 'c3']))
+	assert(eq(rs[i++], ['a1', 'b1', 'c0']))
+	assert(eq(rs[i++], ['a1', 'b1', 'c1']))
+	assert(eq(rs[i++], ['a1', 'b1', 'c2']))
+	assert(eq(rs[i++], ['a1', 'b1', 'c3']))
+	assert(eq(rs[i++], ['a1', 'b2', 'c0']))
+	assert(eq(rs[i++], ['a1', 'b2', 'c1']))
+	assert(eq(rs[i++], ['a1', 'b2', 'c2']))
+	assert(eq(rs[i++], ['a1', 'b2', 'c3']))
+
+	// map
+	assert(
+		!eq(
+			mk('+', 1, 2).map((a) => a + 10),
+			mk('+', 11, 12)
+		)
+	)
+	assert(
+		eq(
+			map(mk('+', 1, 2), (a) => a + 10),
+			mk('+', 11, 12)
+		)
+	)
 }
 
-assert(f().length === 1)
-assert(f().length === 1)
+test()
 
-// getor
-var m = new Map()
-
-assert(getor(m, 'a', () => 5) === 5)
-assert(m.size === 1)
-assert(m.get('a') === 5)
-
-assert(getor(m, 'a', () => 5) === 5)
-assert(m.size === 1)
-assert(m.get('a') === 5)
-
-assert(getor(m, 'b', () => 6) === 6)
-assert(m.size === 2)
-assert(m.get('a') === 5)
-assert(m.get('b') === 6)
-
-// concat
-function g(...s) {
-	return s
-}
-
-assert(g(1, 2).length === 2)
-assert(g(...[1, 2]).length === 2)
-assert(g(...[1, 2].concat([3, 4])).length === 4)
-
-// cartesian product
-var qs = []
-var q
-q = []
-q.push('a0')
-q.push('a1')
-qs.push(q)
-q = []
-q.push('b0')
-q.push('b1')
-q.push('b2')
-qs.push(q)
-q = []
-q.push('c0')
-q.push('c1')
-q.push('c2')
-q.push('c3')
-qs.push(q)
-var rs = cartproduct(qs)
-var i = 0
-assert(eq(rs[i++], ['a0', 'b0', 'c0']))
-assert(eq(rs[i++], ['a0', 'b0', 'c1']))
-assert(eq(rs[i++], ['a0', 'b0', 'c2']))
-assert(eq(rs[i++], ['a0', 'b0', 'c3']))
-assert(eq(rs[i++], ['a0', 'b1', 'c0']))
-assert(eq(rs[i++], ['a0', 'b1', 'c1']))
-assert(eq(rs[i++], ['a0', 'b1', 'c2']))
-assert(eq(rs[i++], ['a0', 'b1', 'c3']))
-assert(eq(rs[i++], ['a0', 'b2', 'c0']))
-assert(eq(rs[i++], ['a0', 'b2', 'c1']))
-assert(eq(rs[i++], ['a0', 'b2', 'c2']))
-assert(eq(rs[i++], ['a0', 'b2', 'c3']))
-assert(eq(rs[i++], ['a1', 'b0', 'c0']))
-assert(eq(rs[i++], ['a1', 'b0', 'c1']))
-assert(eq(rs[i++], ['a1', 'b0', 'c2']))
-assert(eq(rs[i++], ['a1', 'b0', 'c3']))
-assert(eq(rs[i++], ['a1', 'b1', 'c0']))
-assert(eq(rs[i++], ['a1', 'b1', 'c1']))
-assert(eq(rs[i++], ['a1', 'b1', 'c2']))
-assert(eq(rs[i++], ['a1', 'b1', 'c3']))
-assert(eq(rs[i++], ['a1', 'b2', 'c0']))
-assert(eq(rs[i++], ['a1', 'b2', 'c1']))
-assert(eq(rs[i++], ['a1', 'b2', 'c2']))
-assert(eq(rs[i++], ['a1', 'b2', 'c3']))
-
-// map
-assert(
-	!eq(
-		mk('+', 1, 2).map((a) => a + 10),
-		mk('+', 11, 12)
-	)
-)
-assert(
-	eq(
-		map(mk('+', 1, 2), (a) => a + 10),
-		mk('+', 11, 12)
-	)
-)
-
-// exports
 exports.err = err
 exports.walk = walk
 exports.getor = getor
