@@ -4,7 +4,36 @@ const dimacs = require('./dimacs')
 const tptp = require('./tptp')
 const dpll = require('./dpll')
 const etc = require('./etc')
+const cnf = require('./cnf')
+const assert = require('assert')
 
+// test
+function thm(a) {
+	var cs = []
+	cnf.convert([a], cs)
+	assert(dpll.sat(cs))
+
+	var cs = []
+	cnf.convert([etc.mk('!', a)], cs)
+	assert(!dpll.sat(cs))
+}
+
+var a = { type: 'bool' }
+
+thm(true)
+thm(etc.mk('=>', false, a))
+thm(etc.mk('=>', a, a))
+thm(etc.mk('&&', true, true, true))
+thm(etc.mk('||', false, false, true))
+thm(etc.mk('<=>', a, a))
+
+var p1 = { name: 'p1' }
+var p2 = { name: 'p2' }
+var p3 = { name: 'p3' }
+
+thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p1, p2))))
+
+// main
 var lang
 var files = []
 
