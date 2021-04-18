@@ -46,38 +46,42 @@ function sat(clauses, m = new Map()) {
 	}
 }
 
-var m = sat([[[], []]])
-assert(!m)
+function test() {
+	var m = sat([[[], []]])
+	assert(!m)
 
-var a = {}
-m = sat([[[], [a]]])
-assert(m)
-assert(m.size === 1)
-assert(m.get(a) === true)
+	var a = {}
+	m = sat([[[], [a]]])
+	assert(m)
+	assert(m.size === 1)
+	assert(m.get(a) === true)
 
-var b = {}
-m = sat([
-	[[], [a]],
-	[[], [b]],
-])
-assert(m)
-assert(m.size === 2)
-assert(m.get(a) === true)
-assert(m.get(b) === true)
+	var b = {}
+	m = sat([
+		[[], [a]],
+		[[], [b]],
+	])
+	assert(m)
+	assert(m.size === 2)
+	assert(m.get(a) === true)
+	assert(m.get(b) === true)
 
-m = sat([
-	[[a], []],
-	[[b], []],
-])
-assert(m)
-assert(m.size === 2)
-assert(m.get(a) === false)
-assert(m.get(b) === false)
+	m = sat([
+		[[a], []],
+		[[b], []],
+	])
+	assert(m)
+	assert(m.size === 2)
+	assert(m.get(a) === false)
+	assert(m.get(b) === false)
 
-m = sat([
-	[[a], []],
-	[[], [a]],
-])
-assert(!m)
+	m = sat([
+		[[a], []],
+		[[], [a]],
+	])
+	assert(!m)
+}
+
+test()
 
 exports.sat = sat
