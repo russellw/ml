@@ -85,9 +85,16 @@ assert(!etc.eq(a, b))
 var x = { o: 'var' }
 var y = { o: 'var' }
 var z = { o: 'var' }
+assert(!Array.isArray(x))
 assert(etc.eq(x, x))
 assert(etc.eq(y, y))
 assert(!etc.eq(x, y))
+assert(x===x)
+assert(x!==y)
+var xs=new Set()
+xs.add(x)
+assert(xs.has(x))
+assert(!xs.has(y))
 
 // term
 assert(etc.eq(etc.mk('&&', true, true), etc.mk('&&', true, true)))
@@ -311,3 +318,4 @@ exports.unify = unify
 exports.match = match
 exports.simplify = simplify
 exports.freevars = freevars
+exports.eqn = eqn
