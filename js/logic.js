@@ -75,255 +75,258 @@ function freevars(a) {
 	return free
 }
 
-// fn
-var a = {}
-var b = {}
-assert(etc.eq(a, a))
-assert(!etc.eq(a, b))
+function test() {
+	// fn
+	var a = {}
+	var b = {}
+	assert(etc.eq(a, a))
+	assert(!etc.eq(a, b))
 
-// variable
-var x = { o: 'var' }
-var y = { o: 'var' }
-var z = { o: 'var' }
-assert(!Array.isArray(x))
-assert(etc.eq(x, x))
-assert(etc.eq(y, y))
-assert(!etc.eq(x, y))
-assert(x === x)
-assert(x !== y)
-var xs = new Set()
-xs.add(x)
-assert(xs.has(x))
-assert(!xs.has(y))
+	// variable
+	var x = { o: 'var' }
+	var y = { o: 'var' }
+	var z = { o: 'var' }
+	assert(!Array.isArray(x))
+	assert(etc.eq(x, x))
+	assert(etc.eq(y, y))
+	assert(!etc.eq(x, y))
+	assert(x === x)
+	assert(x !== y)
+	var xs = new Set()
+	xs.add(x)
+	assert(xs.has(x))
+	assert(!xs.has(y))
 
-// term
-assert(etc.eq(etc.mk('&&', true, true), etc.mk('&&', true, true)))
-assert(etc.eq(etc.mk('&&', true, true), etc.mk('&&', ...[true, true])))
-assert(!etc.eq(etc.mk('&&', true, true), etc.mk('||', true, true)))
-assert(!etc.eq(etc.mk('&&', true, true), etc.mk('&&', true, false)))
-assert(!etc.eq(etc.mk('&&', true, true), x))
+	// term
+	assert(etc.eq(etc.mk('&&', true, true), etc.mk('&&', true, true)))
+	assert(etc.eq(etc.mk('&&', true, true), etc.mk('&&', ...[true, true])))
+	assert(!etc.eq(etc.mk('&&', true, true), etc.mk('||', true, true)))
+	assert(!etc.eq(etc.mk('&&', true, true), etc.mk('&&', true, false)))
+	assert(!etc.eq(etc.mk('&&', true, true), x))
 
-// arrays
-assert(!etc.eq([true, true], x))
-assert(!etc.eq([true, true], true))
+	// arrays
+	assert(!etc.eq([true, true], x))
+	assert(!etc.eq([true, true], true))
 
-// call
-var f = {}
-var g = {}
-assert(etc.eq(etc.mk('call', f, 1n, 2n), etc.mk('call', f, 1n, 2n)))
-assert(!etc.eq(etc.mk('call', f, 1n, 2n), etc.mk('call', g, 1n, 2n)))
-assert(!etc.eq(etc.mk('call', f, 1n, 2n), etc.mk('call', f, 1n, 3n)))
+	// call
+	var f = {}
+	var g = {}
+	assert(etc.eq(etc.mk('call', f, 1n, 2n), etc.mk('call', f, 1n, 2n)))
+	assert(!etc.eq(etc.mk('call', f, 1n, 2n), etc.mk('call', g, 1n, 2n)))
+	assert(!etc.eq(etc.mk('call', f, 1n, 2n), etc.mk('call', f, 1n, 3n)))
 
-// https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
-var m
+	// https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
+	var m
 
-// Succeeds. (tautology)
-m = new Map()
-assert(unify(a, a, m))
-assert(m.size === 0)
+	// Succeeds. (tautology)
+	m = new Map()
+	assert(unify(a, a, m))
+	assert(m.size === 0)
 
-// a and b do not match
-m = new Map()
-assert(!unify(a, b, m))
+	// a and b do not match
+	m = new Map()
+	assert(!unify(a, b, m))
 
-// Succeeds. (tautology)
-m = new Map()
-assert(unify(x, x, m))
-assert(m.size === 0)
+	// Succeeds. (tautology)
+	m = new Map()
+	assert(unify(x, x, m))
+	assert(m.size === 0)
 
-// x is unified with the constant a
-m = new Map()
-assert(unify(a, x, m))
-assert(m.size === 1)
-assert(etc.eq(etc.replace(x, m), a))
+	// x is unified with the constant a
+	m = new Map()
+	assert(unify(a, x, m))
+	assert(m.size === 1)
+	assert(etc.eq(etc.replace(x, m), a))
 
-// x and y are aliased
-m = new Map()
-assert(unify(x, y, m))
-assert(m.size === 1)
-assert(etc.eq(etc.replace(x, m), etc.replace(y, m)))
+	// x and y are aliased
+	m = new Map()
+	assert(unify(x, y, m))
+	assert(m.size === 1)
+	assert(etc.eq(etc.replace(x, m), etc.replace(y, m)))
 
-// function and constant symbols match, x is unified with the constant b
-m = new Map()
-assert(unify(etc.mk('call', f, a, x), etc.mk('call', f, a, b), m))
-assert(m.size === 1)
-assert(etc.eq(etc.replace(x, m), b))
+	// function and constant symbols match, x is unified with the constant b
+	m = new Map()
+	assert(unify(etc.mk('call', f, a, x), etc.mk('call', f, a, b), m))
+	assert(m.size === 1)
+	assert(etc.eq(etc.replace(x, m), b))
 
-// f and g do not match
-m = new Map()
-assert(!unify(etc.mk('call', f, a), etc.mk('call', g, a), m))
+	// f and g do not match
+	m = new Map()
+	assert(!unify(etc.mk('call', f, a), etc.mk('call', g, a), m))
 
-// x and y are aliased
-m = new Map()
-assert(unify(etc.mk('call', f, x), etc.mk('call', f, y), m))
-assert(m.size === 1)
-assert(etc.eq(etc.replace(x, m), etc.replace(y, m)))
+	// x and y are aliased
+	m = new Map()
+	assert(unify(etc.mk('call', f, x), etc.mk('call', f, y), m))
+	assert(m.size === 1)
+	assert(etc.eq(etc.replace(x, m), etc.replace(y, m)))
 
-// f and g do not match
-m = new Map()
-assert(!unify(etc.mk('call', f, x), etc.mk('call', g, y), m))
+	// f and g do not match
+	m = new Map()
+	assert(!unify(etc.mk('call', f, x), etc.mk('call', g, y), m))
 
-// Fails. The f function symbols have different arity
-m = new Map()
-assert(!unify(etc.mk('call', f, x), etc.mk('call', f, y, z), m))
+	// Fails. The f function symbols have different arity
+	m = new Map()
+	assert(!unify(etc.mk('call', f, x), etc.mk('call', f, y, z), m))
 
-// Unifies y with the term g(x)
-m = new Map()
-assert(unify(etc.mk('call', f, etc.mk('call', g, x)), etc.mk('call', f, y), m))
-assert(m.size === 1)
-assert(etc.eq(etc.replace(y, m), etc.mk('call', g, x)))
+	// Unifies y with the term g(x)
+	m = new Map()
+	assert(unify(etc.mk('call', f, etc.mk('call', g, x)), etc.mk('call', f, y), m))
+	assert(m.size === 1)
+	assert(etc.eq(etc.replace(y, m), etc.mk('call', g, x)))
 
-// Unifies x with constant a, and y with the term g(a)
-m = new Map()
-assert(unify(etc.mk('call', f, etc.mk('call', g, x), x), etc.mk('call', f, y, a), m))
-assert(m.size === 2)
-assert(etc.eq(etc.replace(x, m), a))
-assert(etc.eq(etc.replace(y, m), etc.mk('call', g, a)))
+	// Unifies x with constant a, and y with the term g(a)
+	m = new Map()
+	assert(unify(etc.mk('call', f, etc.mk('call', g, x), x), etc.mk('call', f, y, a), m))
+	assert(m.size === 2)
+	assert(etc.eq(etc.replace(x, m), a))
+	assert(etc.eq(etc.replace(y, m), etc.mk('call', g, a)))
 
-// Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
-m = new Map()
-assert(!unify(x, etc.mk('call', f, x), m))
+	// Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
+	m = new Map()
+	assert(!unify(x, etc.mk('call', f, x), m))
 
-// Both x and y are unified with the constant a
-m = new Map()
-assert(unify(x, y, m))
-assert(unify(y, a, m))
-assert(m.size === 2)
-assert(etc.eq(etc.replace(x, m), a))
-assert(etc.eq(etc.replace(y, m), a))
+	// Both x and y are unified with the constant a
+	m = new Map()
+	assert(unify(x, y, m))
+	assert(unify(y, a, m))
+	assert(m.size === 2)
+	assert(etc.eq(etc.replace(x, m), a))
+	assert(etc.eq(etc.replace(y, m), a))
 
-// As above (order of equations in set doesn't matter)
-m = new Map()
-assert(unify(a, y, m))
-assert(unify(x, y, m))
-assert(m.size === 2)
-assert(etc.eq(etc.replace(x, m), a))
-assert(etc.eq(etc.replace(y, m), a))
+	// As above (order of equations in set doesn't matter)
+	m = new Map()
+	assert(unify(a, y, m))
+	assert(unify(x, y, m))
+	assert(m.size === 2)
+	assert(etc.eq(etc.replace(x, m), a))
+	assert(etc.eq(etc.replace(y, m), a))
 
-// Fails. a and b do not match, so x can't be unified with both
-m = new Map()
-assert(unify(x, a, m))
-assert(!unify(b, x, m))
+	// Fails. a and b do not match, so x can't be unified with both
+	m = new Map()
+	assert(unify(x, a, m))
+	assert(!unify(b, x, m))
 
-// match is a subset of unify where only the first parameter is checked for variables
-// gives different results in several cases
-// in particular, has no notion of an occurs check
-// assumes the inputs have disjoint variables
+	// match is a subset of unify where only the first parameter is checked for variables
+	// gives different results in several cases
+	// in particular, has no notion of an occurs check
+	// assumes the inputs have disjoint variables
 
-// Succeeds. (tautology)
-m = new Map()
-assert(match(a, a, m))
-assert(m.size === 0)
+	// Succeeds. (tautology)
+	m = new Map()
+	assert(match(a, a, m))
+	assert(m.size === 0)
 
-// a and b do not match
-m = new Map()
-assert(!match(a, b, m))
+	// a and b do not match
+	m = new Map()
+	assert(!match(a, b, m))
 
-// Succeeds. (tautology)
-m = new Map()
-assert(match(x, x, m))
-assert(m.size === 0)
+	// Succeeds. (tautology)
+	m = new Map()
+	assert(match(x, x, m))
+	assert(m.size === 0)
 
-// x is unified with the constant a
-// different result for match!
-m = new Map()
-assert(!match(a, x, m))
+	// x is unified with the constant a
+	// different result for match!
+	m = new Map()
+	assert(!match(a, x, m))
 
-// x and y are aliased
-m = new Map()
-assert(match(x, y, m))
-assert(m.size === 1)
-assert(etc.eq(etc.replace(x, m), etc.replace(y, m)))
+	// x and y are aliased
+	m = new Map()
+	assert(match(x, y, m))
+	assert(m.size === 1)
+	assert(etc.eq(etc.replace(x, m), etc.replace(y, m)))
 
-// function and constant symbols match, x is unified with the constant b
-m = new Map()
-assert(match(etc.mk('call', f, a, x), etc.mk('call', f, a, b), m))
-assert(m.size === 1)
-assert(etc.eq(etc.replace(x, m), b))
+	// function and constant symbols match, x is unified with the constant b
+	m = new Map()
+	assert(match(etc.mk('call', f, a, x), etc.mk('call', f, a, b), m))
+	assert(m.size === 1)
+	assert(etc.eq(etc.replace(x, m), b))
 
-// f and g do not match
-m = new Map()
-assert(!match(etc.mk('call', f, a), etc.mk('call', g, a), m))
+	// f and g do not match
+	m = new Map()
+	assert(!match(etc.mk('call', f, a), etc.mk('call', g, a), m))
 
-// x and y are aliased
-m = new Map()
-assert(match(etc.mk('call', f, x), etc.mk('call', f, y), m))
-assert(m.size === 1)
-assert(etc.eq(etc.replace(x, m), etc.replace(y, m)))
+	// x and y are aliased
+	m = new Map()
+	assert(match(etc.mk('call', f, x), etc.mk('call', f, y), m))
+	assert(m.size === 1)
+	assert(etc.eq(etc.replace(x, m), etc.replace(y, m)))
 
-// f and g do not match
-m = new Map()
-assert(!match(etc.mk('call', f, x), etc.mk('call', g, y), m))
+	// f and g do not match
+	m = new Map()
+	assert(!match(etc.mk('call', f, x), etc.mk('call', g, y), m))
 
-// Fails. The f function symbols have different arity
-m = new Map()
-assert(!match(etc.mk('call', f, x), etc.mk('call', f, y, z), m))
+	// Fails. The f function symbols have different arity
+	m = new Map()
+	assert(!match(etc.mk('call', f, x), etc.mk('call', f, y, z), m))
 
-// Unifies y with the term g(x)
-// different result for match!
-m = new Map()
-assert(!match(etc.mk('call', f, etc.mk('call', g, x)), etc.mk('call', f, y), m))
+	// Unifies y with the term g(x)
+	// different result for match!
+	m = new Map()
+	assert(!match(etc.mk('call', f, etc.mk('call', g, x)), etc.mk('call', f, y), m))
 
-// Unifies x with constant a, and y with the term g(a)
-// different result for match!
-m = new Map()
-assert(!match(etc.mk('call', f, etc.mk('call', g, x), x), etc.mk('call', f, y, a), m))
+	// Unifies x with constant a, and y with the term g(a)
+	// different result for match!
+	m = new Map()
+	assert(!match(etc.mk('call', f, etc.mk('call', g, x), x), etc.mk('call', f, y, a), m))
 
-// Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
-// not valid for match!
+	// Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
+	// not valid for match!
 
-// Both x and y are unified with the constant a
-m = new Map()
-assert(match(x, y, m))
-assert(match(y, a, m))
-assert(m.size === 2)
-assert(etc.eq(etc.replace(x, m), a))
-assert(etc.eq(etc.replace(y, m), a))
+	// Both x and y are unified with the constant a
+	m = new Map()
+	assert(match(x, y, m))
+	assert(match(y, a, m))
+	assert(m.size === 2)
+	assert(etc.eq(etc.replace(x, m), a))
+	assert(etc.eq(etc.replace(y, m), a))
 
-// As above (order of equations in set doesn't matter)
-// different result for match!
-m = new Map()
-assert(!match(a, y, m))
+	// As above (order of equations in set doesn't matter)
+	// different result for match!
+	m = new Map()
+	assert(!match(a, y, m))
 
-// Fails. a and b do not match, so x can't be unified with both
-m = new Map()
-assert(match(x, a, m))
-assert(!match(b, x, m))
+	// Fails. a and b do not match, so x can't be unified with both
+	m = new Map()
+	assert(match(x, a, m))
+	assert(!match(b, x, m))
 
-// simplify
-assert(etc.eq(simplify(x), x))
-m = new Map()
-m.set(x, y)
-assert(etc.eq(simplify(x, m), y))
-assert(etc.eq(simplify(etc.mk('call', f, x, y), m), etc.mk('call', f, y, y)))
+	// simplify
+	assert(etc.eq(simplify(x), x))
+	m = new Map()
+	m.set(x, y)
+	assert(etc.eq(simplify(x, m), y))
+	assert(etc.eq(simplify(etc.mk('call', f, x, y), m), etc.mk('call', f, y, y)))
 
-// freevars
-var s = freevars(etc.mk('call', f, x, y))
-assert(s.size === 2)
-assert(s.has(x))
-assert(s.has(y))
+	// freevars
+	var s = freevars(etc.mk('call', f, x, y))
+	assert(s.size === 2)
+	assert(s.has(x))
+	assert(s.has(y))
 
-var s = freevars(etc.mk('all', [x], etc.mk('call', f, x, y)))
-assert(s.size === 1)
-assert(s.has(y))
+	var s = freevars(etc.mk('all', [x], etc.mk('call', f, x, y)))
+	assert(s.size === 1)
+	assert(s.has(y))
 
-// eqn
-assert(etc.eq(eqn(a), etc.mk('==', a, true)))
-assert(etc.eq(eqn(true), etc.mk('==', true, true)))
-assert(etc.eq(eqn(etc.mk('call', f, x, y)), etc.mk('==', etc.mk('call', f, x, y), true)))
-assert(etc.eq(eqn(etc.mk('==', x, y)), etc.mk('==', x, y)))
+	// eqn
+	assert(etc.eq(eqn(a), etc.mk('==', a, true)))
+	assert(etc.eq(eqn(true), etc.mk('==', true, true)))
+	assert(etc.eq(eqn(etc.mk('call', f, x, y)), etc.mk('==', etc.mk('call', f, x, y), true)))
+	assert(etc.eq(eqn(etc.mk('==', x, y)), etc.mk('==', x, y)))
 
-// check match only reads data
-var p2 = { type: ['bool', 'individual', 'individual'] }
-var x = { o: 'var', name: 'x', type: 'individual' }
-var y = { o: 'var', name: 'y', type: 'individual' }
-assert(x.name !== y.name)
-assert(match(etc.mk('call', p2, x, y), etc.mk('call', p2, a, b)))
-assert(x.name !== y.name)
-assert(match(eqn(etc.mk('call', p2, x, y)), eqn(etc.mk('call', p2, a, b))))
-assert(x.name !== y.name)
+	// check match only reads data
+	var p2 = { type: ['bool', 'individual', 'individual'] }
+	var x = { o: 'var', name: 'x', type: 'individual' }
+	var y = { o: 'var', name: 'y', type: 'individual' }
+	assert(x.name !== y.name)
+	assert(match(etc.mk('call', p2, x, y), etc.mk('call', p2, a, b)))
+	assert(x.name !== y.name)
+	assert(match(eqn(etc.mk('call', p2, x, y)), eqn(etc.mk('call', p2, a, b))))
+	assert(x.name !== y.name)
+}
 
-// exports
+test()
+
 exports.unify = unify
 exports.match = match
 exports.simplify = simplify
