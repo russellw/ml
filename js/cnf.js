@@ -140,220 +140,223 @@ function cterm(a) {
 	return clause(neg, pos)
 }
 
-// clause
-var a = {}
-var b = {}
-assert(etc.eq(clause([a], [b]), clause([a], [b])))
-assert(etc.eq(clause([a], [b]), [[a], [b]]))
-assert(etc.eq(clause([a], [b]), cterm(etc.mk('||', etc.mk('!', a), b))))
-assert(etc.eq(clause([a], [false]), [[a], []]))
-assert(etc.eq(clause([a], [true]), [[], [true]]))
-assert(etc.eq(clause([a], [a]), [[], [true]]))
-assert(etc.eq([[], [true]], [[], [true]]))
-assert(!etc.eq([[], [true]], [[], []]))
-assert(etc.eq([[], []], [[], []]))
-var m = new Map()
-m.set(b, false)
-assert(etc.eq(clause([a], [b], m), clause([a], [])))
+function test() {
+	// clause
+	var a = {}
+	var b = {}
+	assert(etc.eq(clause([a], [b]), clause([a], [b])))
+	assert(etc.eq(clause([a], [b]), [[a], [b]]))
+	assert(etc.eq(clause([a], [b]), cterm(etc.mk('||', etc.mk('!', a), b))))
+	assert(etc.eq(clause([a], [false]), [[a], []]))
+	assert(etc.eq(clause([a], [true]), [[], [true]]))
+	assert(etc.eq(clause([a], [a]), [[], [true]]))
+	assert(etc.eq([[], [true]], [[], [true]]))
+	assert(!etc.eq([[], [true]], [[], []]))
+	assert(etc.eq([[], []], [[], []]))
+	var m = new Map()
+	m.set(b, false)
+	assert(etc.eq(clause([a], [b], m), clause([a], [])))
 
-// flatten
-var r = []
-flatten('+', etc.mk('+', etc.mk('+', 1, 2), 3), r)
-assert(etc.eq(r, [1, 2, 3]))
+	// flatten
+	var r = []
+	flatten('+', etc.mk('+', etc.mk('+', 1, 2), 3), r)
+	assert(etc.eq(r, [1, 2, 3]))
 
-var r = []
-flatten('+', 4, r)
-assert(etc.eq(r, [4]))
+	var r = []
+	flatten('+', 4, r)
+	assert(etc.eq(r, [4]))
 
-// convert
-var cs = []
-convert([true], cs)
-assert(cs.length === 0)
+	// convert
+	var cs = []
+	convert([true], cs)
+	assert(cs.length === 0)
 
-var cs = []
-convert([false], cs)
-assert(cs.length === 1)
-assert(etc.eq(cs[0], [[], []]))
+	var cs = []
+	convert([false], cs)
+	assert(cs.length === 1)
+	assert(etc.eq(cs[0], [[], []]))
 
-var cs = []
-convert([a], cs)
-assert(cs.length === 1)
-assert(etc.eq(cs[0], [[], [a]]))
-
-var cs = []
-convert([etc.mk('!', a)], cs)
-assert(cs.length === 1)
-assert(etc.eq(cs[0], [[a], []]))
-
-var cs = []
-convert([etc.mk('!', etc.mk('!', a))], cs)
-assert(cs.length === 1)
-assert(etc.eq(cs[0], [[], [a]]))
-
-var cs = []
-convert([etc.mk('=>', a, b)], cs)
-assert(cs.length === 1)
-assert(etc.eq(cs[0], [[a], [b]]))
-
-var cs = []
-convert([etc.mk('||', a, b)], cs)
-assert(cs.length === 1)
-assert(etc.eq(cs[0], [[], [a, b]]))
-
-var cs = []
-convert([etc.mk('&&', a, b)], cs)
-assert(cs.length === 2)
-assert(etc.eq(cs[0], [[], [a]]))
-assert(etc.eq(cs[1], [[], [b]]))
-
-var a1 = {}
-var b1 = {}
-var a2 = {}
-var b2 = {}
-
-var cs = []
-convert([etc.mk('||', a, b, a1, b1)], cs)
-assert(cs.length === 1)
-assert(etc.eq(cs[0], [[], [a, b, a1, b1]]))
-
-var cs = []
-convert([etc.mk('||', etc.mk('||', a1, b1), etc.mk('||', a2, b2))], cs)
-assert(cs.length === 1)
-assert(etc.eq(cs[0], [[], [a1, b1, a2, b2]]))
-
-var cs = []
-convert([etc.mk('&&', etc.mk('||', a1, b1), etc.mk('||', a2, b2))], cs)
-assert(cs.length === 2)
-assert(etc.eq(cs[0], [[], [a1, b1]]))
-assert(etc.eq(cs[1], [[], [a2, b2]]))
-
-var cs = []
-convert([etc.mk('||', a, etc.mk('&&', b1, b2))], cs)
-assert(cs.length === 2)
-assert(etc.eq(cs[0], [[], [a, b1]]))
-assert(etc.eq(cs[1], [[], [a, b2]]))
-
-var x = { o: 'var' }
-var y = { o: 'var' }
-var z = { o: 'var' }
-
-assert(logic.match(etc.mk('call', a, x), etc.mk('call', a, 1)))
-assert(!logic.match(etc.mk('call', a, 1), etc.mk('call', a, x)))
-
-function isomorphic(a, b) {
-	return logic.match(a, b) && logic.match(b, a)
-}
-
-var cs = []
-convert([etc.mk('all', [x], etc.mk('call', a, x))], cs)
-assert(cs.length === 1)
-assert(isomorphic(cs[0], [[], [etc.mk('call', a, x)]]))
-
-var cs = []
-convert([etc.mk('all', [x, y], etc.mk('call', a, x, y))], cs)
-assert(cs.length === 1)
-assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
-
-var cs = []
-convert([etc.mk('all', [x], etc.mk('all', [y], etc.mk('call', a, x, y)))], cs)
-assert(cs.length === 1)
-assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
-
-var cs = []
-convert([etc.mk('exists', [x], etc.mk('call', a, x))], cs)
-assert(cs.length === 1)
-var m = logic.match([etc.mk('call', a, x)], cs[0][1])
-assert(m)
-assert(m.size === 1)
-assert(!Array.isArray(m.get(x)))
-assert(!m.get(x).o)
-
-var cs = []
-convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', a, x, y)))], cs)
-assert(cs.length === 1)
-var m = logic.match([etc.mk('call', a, x, y)], cs[0][1])
-assert(m)
-assert(m.size === 2)
-assert(!Array.isArray(m.get(x)))
-assert(m.get(x).o === 'var')
-assert(Array.isArray(m.get(y)))
-assert(m.get(y).o === 'call')
-assert(m.get(y).length === 2)
-
-var cs = []
-convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', a, y)))], cs)
-assert(cs.length === 1)
-var m = logic.match([etc.mk('call', a, y)], cs[0][1])
-assert(m)
-assert(m.size === 1)
-assert(!Array.isArray(m.get(y)))
-assert(!m.get(y).o)
-
-var cs = []
-convert([etc.mk('<=>', a, b)], cs)
-assert(cs.length === 2)
-assert(etc.eq(cs[0], [[a], [b]]))
-assert(etc.eq(cs[1], [[b], [a]]))
-
-function sat(clauses) {
-	var atoms = new Set()
-	for (var c of clauses) for (var p of c) for (var a of p) atoms.add(a)
-	atoms = Array.from(atoms)
-
-	function rec(i, m) {
-		var cs = clauses.map((c) => clause(c[0], c[1], m))
-		for (var c of cs) if (etc.eq(c, [[], []])) return
-		cs = cs.filter((c) => !etc.eq(c, [[], [true]]))
-		if (!cs.length) return m
-
-		assert(i < atoms.length)
-		var a = atoms[i++]
-		var m1 = new Map(m)
-		m1.set(a, false)
-		if (rec(i, m1)) return true
-		m.set(a, true)
-		return rec(i, m)
-	}
-
-	return rec(0, new Map())
-}
-
-var cs = []
-convert([etc.mk('&&', a, b)], cs)
-assert(sat(cs))
-
-var cs = []
-convert([etc.mk('&&', a, a)], cs)
-assert(sat(cs))
-
-var cs = []
-convert([etc.mk('&&', a, etc.mk('!', a))], cs)
-assert(!sat(cs))
-
-function thm(a) {
 	var cs = []
 	convert([a], cs)
-	assert(sat(cs))
+	assert(cs.length === 1)
+	assert(etc.eq(cs[0], [[], [a]]))
 
 	var cs = []
 	convert([etc.mk('!', a)], cs)
+	assert(cs.length === 1)
+	assert(etc.eq(cs[0], [[a], []]))
+
+	var cs = []
+	convert([etc.mk('!', etc.mk('!', a))], cs)
+	assert(cs.length === 1)
+	assert(etc.eq(cs[0], [[], [a]]))
+
+	var cs = []
+	convert([etc.mk('=>', a, b)], cs)
+	assert(cs.length === 1)
+	assert(etc.eq(cs[0], [[a], [b]]))
+
+	var cs = []
+	convert([etc.mk('||', a, b)], cs)
+	assert(cs.length === 1)
+	assert(etc.eq(cs[0], [[], [a, b]]))
+
+	var cs = []
+	convert([etc.mk('&&', a, b)], cs)
+	assert(cs.length === 2)
+	assert(etc.eq(cs[0], [[], [a]]))
+	assert(etc.eq(cs[1], [[], [b]]))
+
+	var a1 = {}
+	var b1 = {}
+	var a2 = {}
+	var b2 = {}
+
+	var cs = []
+	convert([etc.mk('||', a, b, a1, b1)], cs)
+	assert(cs.length === 1)
+	assert(etc.eq(cs[0], [[], [a, b, a1, b1]]))
+
+	var cs = []
+	convert([etc.mk('||', etc.mk('||', a1, b1), etc.mk('||', a2, b2))], cs)
+	assert(cs.length === 1)
+	assert(etc.eq(cs[0], [[], [a1, b1, a2, b2]]))
+
+	var cs = []
+	convert([etc.mk('&&', etc.mk('||', a1, b1), etc.mk('||', a2, b2))], cs)
+	assert(cs.length === 2)
+	assert(etc.eq(cs[0], [[], [a1, b1]]))
+	assert(etc.eq(cs[1], [[], [a2, b2]]))
+
+	var cs = []
+	convert([etc.mk('||', a, etc.mk('&&', b1, b2))], cs)
+	assert(cs.length === 2)
+	assert(etc.eq(cs[0], [[], [a, b1]]))
+	assert(etc.eq(cs[1], [[], [a, b2]]))
+
+	var x = { o: 'var' }
+	var y = { o: 'var' }
+	var z = { o: 'var' }
+
+	assert(logic.match(etc.mk('call', a, x), etc.mk('call', a, 1)))
+	assert(!logic.match(etc.mk('call', a, 1), etc.mk('call', a, x)))
+
+	function isomorphic(a, b) {
+		return logic.match(a, b) && logic.match(b, a)
+	}
+
+	var cs = []
+	convert([etc.mk('all', [x], etc.mk('call', a, x))], cs)
+	assert(cs.length === 1)
+	assert(isomorphic(cs[0], [[], [etc.mk('call', a, x)]]))
+
+	var cs = []
+	convert([etc.mk('all', [x, y], etc.mk('call', a, x, y))], cs)
+	assert(cs.length === 1)
+	assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
+
+	var cs = []
+	convert([etc.mk('all', [x], etc.mk('all', [y], etc.mk('call', a, x, y)))], cs)
+	assert(cs.length === 1)
+	assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
+
+	var cs = []
+	convert([etc.mk('exists', [x], etc.mk('call', a, x))], cs)
+	assert(cs.length === 1)
+	var m = logic.match([etc.mk('call', a, x)], cs[0][1])
+	assert(m)
+	assert(m.size === 1)
+	assert(!Array.isArray(m.get(x)))
+	assert(!m.get(x).o)
+
+	var cs = []
+	convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', a, x, y)))], cs)
+	assert(cs.length === 1)
+	var m = logic.match([etc.mk('call', a, x, y)], cs[0][1])
+	assert(m)
+	assert(m.size === 2)
+	assert(!Array.isArray(m.get(x)))
+	assert(m.get(x).o === 'var')
+	assert(Array.isArray(m.get(y)))
+	assert(m.get(y).o === 'call')
+	assert(m.get(y).length === 2)
+
+	var cs = []
+	convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', a, y)))], cs)
+	assert(cs.length === 1)
+	var m = logic.match([etc.mk('call', a, y)], cs[0][1])
+	assert(m)
+	assert(m.size === 1)
+	assert(!Array.isArray(m.get(y)))
+	assert(!m.get(y).o)
+
+	var cs = []
+	convert([etc.mk('<=>', a, b)], cs)
+	assert(cs.length === 2)
+	assert(etc.eq(cs[0], [[a], [b]]))
+	assert(etc.eq(cs[1], [[b], [a]]))
+
+	function sat(clauses) {
+		var atoms = new Set()
+		for (var c of clauses) for (var p of c) for (var a of p) atoms.add(a)
+		atoms = Array.from(atoms)
+
+		function rec(i, m) {
+			var cs = clauses.map((c) => clause(c[0], c[1], m))
+			for (var c of cs) if (etc.eq(c, [[], []])) return
+			cs = cs.filter((c) => !etc.eq(c, [[], [true]]))
+			if (!cs.length) return m
+
+			assert(i < atoms.length)
+			var a = atoms[i++]
+			var m1 = new Map(m)
+			m1.set(a, false)
+			if (rec(i, m1)) return true
+			m.set(a, true)
+			return rec(i, m)
+		}
+
+		return rec(0, new Map())
+	}
+
+	var cs = []
+	convert([etc.mk('&&', a, b)], cs)
+	assert(sat(cs))
+
+	var cs = []
+	convert([etc.mk('&&', a, a)], cs)
+	assert(sat(cs))
+
+	var cs = []
+	convert([etc.mk('&&', a, etc.mk('!', a))], cs)
 	assert(!sat(cs))
+
+	function thm(a) {
+		var cs = []
+		convert([a], cs)
+		assert(sat(cs))
+
+		var cs = []
+		convert([etc.mk('!', a)], cs)
+		assert(!sat(cs))
+	}
+
+	thm(true)
+	thm(etc.mk('=>', false, a))
+	thm(etc.mk('=>', a, a))
+	thm(etc.mk('&&', true, true, true))
+	thm(etc.mk('||', false, false, true))
+	thm(etc.mk('<=>', a, a))
+
+	var p1 = { name: 'p1' }
+	var p2 = { name: 'p2' }
+	var p3 = { name: 'p3' }
+
+	thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p1, p2))))
+	thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p3, etc.mk('<=>', p1, etc.mk('<=>', p2, p3))))))
 }
 
-thm(true)
-thm(etc.mk('=>', false, a))
-thm(etc.mk('=>', a, a))
-thm(etc.mk('&&', true, true, true))
-thm(etc.mk('||', false, false, true))
-thm(etc.mk('<=>', a, a))
+test()
 
-var p1 = { name: 'p1' }
-var p2 = { name: 'p2' }
-var p3 = { name: 'p3' }
-
-thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p1, p2))))
-thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p3, etc.mk('<=>', p1, etc.mk('<=>', p2, p3))))))
-
-// exports
 exports.clause = clause
 exports.convert = convert
