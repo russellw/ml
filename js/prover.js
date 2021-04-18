@@ -68,14 +68,20 @@ function parseargs(args) {
 }
 
 function test() {
+	function sat(cs) {
+		var problem = { clauses: cs }
+		dpll.solve(problem)
+		return problem.solution
+	}
+
 	function thm(a) {
 		var cs = []
 		cnf.convert([a], cs)
-		assert(dpll.sat(cs))
+		assert(sat(cs))
 
 		var cs = []
 		cnf.convert([etc.mk('!', a)], cs)
-		assert(!dpll.sat(cs))
+		assert(!sat(cs))
 	}
 
 	var a = { type: 'bool' }

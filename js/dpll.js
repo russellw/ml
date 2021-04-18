@@ -46,6 +46,11 @@ function sat(clauses, m = new Map()) {
 	}
 }
 
+function solve(problem) {
+	problem.solution = sat(problem.clauses)
+	problem.result = problem.solution ? 'Satisfiable' : 'Unsatisfiable'
+}
+
 function test() {
 	var m = sat([[[], []]])
 	assert(!m)
@@ -84,4 +89,4 @@ function test() {
 
 test()
 
-exports.sat = sat
+exports.solve = solve
