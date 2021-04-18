@@ -7,44 +7,6 @@ const etc = require('./etc')
 const cnf = require('./cnf')
 const assert = require('assert')
 
-// test
-function thm(a) {
-	var cs = []
-	cnf.convert([a], cs)
-	assert(dpll.sat(cs))
-
-	var cs = []
-	cnf.convert([etc.mk('!', a)], cs)
-	assert(!dpll.sat(cs))
-}
-
-var a = { type: 'bool' }
-var b = { type: 'bool' }
-
-thm(true)
-thm(etc.mk('=>', false, a))
-thm(etc.mk('=>', a, a))
-thm(etc.mk('&&', true, true, true))
-thm(etc.mk('||', false, false, true))
-thm(etc.mk('<=>', a, a))
-
-var p1 = { name: 'p1' }
-var p2 = { name: 'p2' }
-var p3 = { name: 'p3' }
-
-thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p1, p2))))
-
-function eqv(a, b) {
-	thm(etc.mk('<=>', a, b))
-}
-
-eqv(etc.mk('!', etc.mk('!', a)), a)
-eqv(etc.mk('&&', a, b), etc.mk('&&', b, a))
-eqv(etc.mk('||', a, b), etc.mk('||', b, a))
-eqv(etc.mk('<=>', a, b), etc.mk('<=>', b, a))
-eqv(etc.mk('!', etc.mk('<=>', a, b)), etc.mk('!', etc.mk('<=>', b, a)))
-
-// main
 var lang
 var files = []
 
@@ -103,6 +65,46 @@ function parseargs(args) {
 		files.push(s)
 	}
 }
+
+function test() {
+	function thm(a) {
+		var cs = []
+		cnf.convert([a], cs)
+		assert(dpll.sat(cs))
+
+		var cs = []
+		cnf.convert([etc.mk('!', a)], cs)
+		assert(!dpll.sat(cs))
+	}
+
+	var a = { type: 'bool' }
+	var b = { type: 'bool' }
+
+	thm(true)
+	thm(etc.mk('=>', false, a))
+	thm(etc.mk('=>', a, a))
+	thm(etc.mk('&&', true, true, true))
+	thm(etc.mk('||', false, false, true))
+	thm(etc.mk('<=>', a, a))
+
+	var p1 = { name: 'p1' }
+	var p2 = { name: 'p2' }
+	var p3 = { name: 'p3' }
+
+	thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p1, p2))))
+
+	function eqv(a, b) {
+		thm(etc.mk('<=>', a, b))
+	}
+
+	eqv(etc.mk('!', etc.mk('!', a)), a)
+	eqv(etc.mk('&&', a, b), etc.mk('&&', b, a))
+	eqv(etc.mk('||', a, b), etc.mk('||', b, a))
+	eqv(etc.mk('<=>', a, b), etc.mk('<=>', b, a))
+	eqv(etc.mk('!', etc.mk('<=>', a, b)), etc.mk('!', etc.mk('<=>', b, a)))
+}
+
+test()
 
 if (require.main === module) {
 	parseargs(process.argv.slice(2))
