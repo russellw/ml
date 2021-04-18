@@ -497,7 +497,7 @@ function parse1(file, text, selection, problem) {
 				expect(',')
 
 				// role
-				if (tok === 'conjecture' && problem.conjecture) err('Multiple conjectures not supported')
+				if (tok === 'conjecture' && problem.conjecture) err('Multiple conjectures are ambiguous')
 				var role = id()
 				expect(',')
 

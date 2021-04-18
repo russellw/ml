@@ -62,7 +62,7 @@ function version() {
 	console.log('Version 0')
 }
 
-function parseArgs(args) {
+function parseargs(args) {
 	for (var arg of args) {
 		var s = arg
 		if (!s) continue
@@ -86,57 +86,59 @@ function parseArgs(args) {
 			process.exit(1)
 		}
 		if (extension(s) === 'lst') {
-			parseArgs(fs.readFileSync(s, 'utf8').split(/\r?\n/))
+			parseargs(fs.readFileSync(s, 'utf8').split(/\r?\n/))
 			continue
 		}
 		files.push(s)
 	}
 }
 
-parseArgs(process.argv.slice(2))
-if (!files.length) {
-	help()
-	process.exit(0)
-}
-for (var file of files) {
-	console.log(file)
-	try {
-		var text = fs.readFileSync(file, 'utf8')
-		switch (language(file)) {
-			case 'dimacs':
-				var problem = dimacs.parse(file, text)
-				break
-			case 'tptp':
-				var problem = tptp.parse(file, text)
-				break
-			default:
-				console.error(file + ': unknown language')
-				process.exit(1)
-		}
-	} catch (e) {
-		if (e === 'Inappropriate') {
-			console.log('%% SZS status Inappropriate for ' + file)
-			console.log()
-			continue
-		}
-		if (e.code === 'ERR_STRING_TOO_LONG' || e.message === 'Array buffer allocation failed') {
-			console.log('%% SZS status ResourceOut for ' + file)
-			console.log()
-			continue
-		}
-		throw e
+if (require.main === module) {
+	parseargs(process.argv.slice(2))
+	if (!files.length) {
+		help()
+		process.exit(0)
 	}
-	continue
-	var r = dpll.sat(problem.clauses)
-	if (r) {
-		console.log('sat')
-		var more
-		for (var [k, v] of r.entries()) {
-			if (more) process.stdout.write(' ')
-			more = true
-			if (!v) process.stdout.write('-')
-			process.stdout.write(k)
+	for (var file of files) {
+		console.log(file)
+		try {
+			var text = fs.readFileSync(file, 'utf8')
+			switch (language(file)) {
+				case 'dimacs':
+					var problem = dimacs.parse(file, text)
+					break
+				case 'tptp':
+					var problem = tptp.parse(file, text)
+					break
+				default:
+					console.error(file + ': unknown language')
+					process.exit(1)
+			}
+		} catch (e) {
+			if (e === 'Inappropriate') {
+				console.log('%% SZS status Inappropriate for ' + file)
+				console.log()
+				continue
+			}
+			if (e.code === 'ERR_STRING_TOO_LONG' || e.message === 'Array buffer allocation failed') {
+				console.log('%% SZS status ResourceOut for ' + file)
+				console.log()
+				continue
+			}
+			throw e
 		}
-	} else console.log('unsat')
-	console.log()
+		continue
+		var r = dpll.sat(problem.clauses)
+		if (r) {
+			console.log('sat')
+			var more
+			for (var [k, v] of r.entries()) {
+				if (more) process.stdout.write(' ')
+				more = true
+				if (!v) process.stdout.write('-')
+				process.stdout.write(k)
+			}
+		} else console.log('unsat')
+		console.log()
+	}
 }
