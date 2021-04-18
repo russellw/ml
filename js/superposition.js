@@ -14,6 +14,19 @@ function size(a) {
 
 function sat(clauses) {
 	var passive = priorityq.mk(size)
+	for (var c of clauses) priorityq.push(passive, c)
+	var active = []
+
+	function clause(neg, pos) {
+		var c = cnf.clause(neg, pos)
+		if (etc.eq(c, [[], [true]])) return
+		priorityq.push(passive, c)
+	}
+
+	for (;;) {
+		var g = priorityq.pop(passive)
+		if (!g) return true
+	}
 }
 
 function test() {
