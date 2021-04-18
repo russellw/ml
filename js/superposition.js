@@ -25,6 +25,25 @@ function solve(clauses) {
 		priorityq.push(passive, c)
 	}
 
+	/*
+	equality resolution
+		c | c0 !== c1
+	->
+		c/s
+	where
+		s = unify(c0, c1)
+	*/
+
+	// substitute and make new clause
+	function resolveq(c, ci) {
+		var neg = []
+	}
+
+	// for each negative equation
+	function resolve(c) {
+		for (var i = 0; i < c[0].length; i++) {}
+	}
+
 	// saturation proof procedure tries to perform all possible derivations until it derives false
 	loop: for (;;) {
 		// given clause
