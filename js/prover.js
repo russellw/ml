@@ -5,6 +5,7 @@ const tptp = require('./tptp')
 const dpll = require('./dpll')
 const etc = require('./etc')
 const cnf = require('./cnf')
+const superposition = require('./superposition')
 const assert = require('assert')
 
 var lang
