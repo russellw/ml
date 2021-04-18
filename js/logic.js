@@ -31,11 +31,6 @@ function freshvars(a, m = new Map()) {
 	return etc.map(a, (b) => freshvars(b, m))
 }
 
-function simplify(a, m = new Map()) {
-	if (m.has(a)) return simplify(m.get(a), m)
-	return etc.map(a, (b) => simplify(b, m))
-}
-
 function match(a, b, m = new Map()) {
 	if (a === b) return m
 	if (a.o === 'var') {
@@ -297,13 +292,6 @@ function test() {
 	assert(match(x, a, m))
 	assert(!match(b, x, m))
 
-	// simplify
-	assert(etc.eq(simplify(x), x))
-	m = new Map()
-	m.set(x, y)
-	assert(etc.eq(simplify(x, m), y))
-	assert(etc.eq(simplify(etc.mk('call', f, x, y), m), etc.mk('call', f, y, y)))
-
 	// freevars
 	var s = freevars(etc.mk('call', f, x, y))
 	assert(s.size === 2)
@@ -338,5 +326,4 @@ test()
 
 exports.unify = unify
 exports.match = match
-exports.simplify = simplify
 exports.freevars = freevars

@@ -21,6 +21,11 @@ function eq(a, b) {
 	return true
 }
 
+function simplify(a, m = new Map()) {
+	if (m.has(a)) return simplify(m.get(a), m)
+	return map(a, (b) => simplify(b, m))
+}
+
 function map(a, f) {
 	if (!Array.isArray(a)) return a
 	var r = []
@@ -193,6 +198,16 @@ function test() {
 			mk('+', 11, 12)
 		)
 	)
+
+	// simplify
+	var x = {}
+	var y = {}
+	var f = {}
+	assert(eq(simplify(x), x))
+	var m = new Map()
+	m.set(x, y)
+	assert(eq(simplify(x, m), y))
+	assert(eq(simplify(mk('call', f, x, y), m), mk('call', f, y, y)))
 }
 
 test()
@@ -207,3 +222,4 @@ exports.replace = replace
 exports.cartproduct = cartproduct
 exports.extension = extension
 exports.eqn = eqn
+exports.simplify = simplify

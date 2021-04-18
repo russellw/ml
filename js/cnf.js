@@ -7,8 +7,8 @@ function simplify(c, m = new Map()) {
 	var [neg, pos] = c
 
 	// simplify
-	neg = neg.map((a) => logic.simplify(a, m))
-	pos = pos.map((a) => logic.simplify(a, m))
+	neg = neg.map((a) => etc.simplify(a, m))
+	pos = pos.map((a) => etc.simplify(a, m))
 
 	// filter out redundancy
 	neg = neg.filter((a) => a !== true)
