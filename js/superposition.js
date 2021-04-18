@@ -15,15 +15,15 @@ function size(a) {
 function solve(clauses) {
 	var complete = true
 
-	var passive = priorityq.mk(size)
-	for (var c of clauses) priorityq.push(passive, c)
-	var active = []
-
-	function clause(neg, pos, m) {
-		var c = cnf.simplify([neg, pos], m)
+	function push(c, m) {
+		c = cnf.simplify(c, m)
 		if (etc.eq(c, [[], [true]])) return
 		priorityq.push(passive, c)
 	}
+
+	var passive = priorityq.mk(size)
+	for (var c of clauses) push(c, new Map())
+	var active = []
 
 	/*
 	equality resolution
