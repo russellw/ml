@@ -3,7 +3,6 @@ const cnf = require('./cnf')
 const etc = require('./etc')
 const subsumption = require('./subsumption')
 const priorityq = require('./priorityq')
-const logic = require('./logic')
 const assert = require('assert')
 
 function size(a) {
@@ -47,7 +46,7 @@ function solve(clauses) {
 	function resolve(c) {
 		for (var i = 0; i < c[0].length; i++) {
 			var e = etc.eqn(c[0][i])
-			var m = logic.unify(e[0], e[1])
+			var m = etc.unify(e[0], e[1])
 			if (m) resolvep(c, i, m)
 		}
 	}
@@ -76,7 +75,7 @@ function solve(clauses) {
 		if (etc.eq(g, [[], []])) return { sat: false, proof: g }
 
 		// algorithms being used here, assume clauses have distinct variable names
-		var h = logic.freshvars(g)
+		var h = etc.freshvars(g)
 
 		// this is the Discount loop
 		// in which only active clauses participate in subsumption checks

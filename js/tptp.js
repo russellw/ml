@@ -1,7 +1,6 @@
 'use strict'
 const path = require('path')
 const assert = require('assert')
-const logic = require('./logic')
 const etc = require('./etc')
 const fs = require('fs')
 

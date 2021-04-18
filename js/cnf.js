@@ -1,5 +1,4 @@
 'use strict'
-const logic = require('./logic')
 const etc = require('./etc')
 const assert = require('assert')
 
@@ -31,7 +30,7 @@ function convert(c, clauses) {
 	}
 
 	function exists(bound, pol, a) {
-		var free = logic.freevars(a[1])
+		var free = etc.freevars(a[1])
 		var params = []
 		for (var [k, v] of bound.entries()) if (v.o === 'var' && free.has(k)) params.push(v)
 		bound = new Map(bound)
@@ -236,11 +235,11 @@ function test() {
 	var y = { o: 'var' }
 	var z = { o: 'var' }
 
-	assert(logic.match(etc.mk('call', a, x), etc.mk('call', a, 1)))
-	assert(!logic.match(etc.mk('call', a, 1), etc.mk('call', a, x)))
+	assert(etc.match(etc.mk('call', a, x), etc.mk('call', a, 1)))
+	assert(!etc.match(etc.mk('call', a, 1), etc.mk('call', a, x)))
 
 	function isomorphic(a, b) {
-		return logic.match(a, b) && logic.match(b, a)
+		return etc.match(a, b) && etc.match(b, a)
 	}
 
 	var cs = []
@@ -261,7 +260,7 @@ function test() {
 	var cs = []
 	convert([etc.mk('exists', [x], etc.mk('call', a, x))], cs)
 	assert(cs.length === 1)
-	var m = logic.match([etc.mk('call', a, x)], cs[0][1])
+	var m = etc.match([etc.mk('call', a, x)], cs[0][1])
 	assert(m)
 	assert(m.size === 1)
 	assert(!Array.isArray(m.get(x)))
@@ -270,7 +269,7 @@ function test() {
 	var cs = []
 	convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', a, x, y)))], cs)
 	assert(cs.length === 1)
-	var m = logic.match([etc.mk('call', a, x, y)], cs[0][1])
+	var m = etc.match([etc.mk('call', a, x, y)], cs[0][1])
 	assert(m)
 	assert(m.size === 2)
 	assert(!Array.isArray(m.get(x)))
@@ -282,7 +281,7 @@ function test() {
 	var cs = []
 	convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', a, y)))], cs)
 	assert(cs.length === 1)
-	var m = logic.match([etc.mk('call', a, y)], cs[0][1])
+	var m = etc.match([etc.mk('call', a, y)], cs[0][1])
 	assert(m)
 	assert(m.size === 1)
 	assert(!Array.isArray(m.get(y)))

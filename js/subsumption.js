@@ -1,6 +1,5 @@
 'use strict'
 const assert = require('assert')
-const logic = require('./logic')
 const etc = require('./etc')
 
 function match(c0, d0, c1, d1, m) {
@@ -35,7 +34,7 @@ function match(c0, d0, c1, d1, m) {
 
 			// try orienting equation one way
 			var m1 = new Map(m)
-			if (logic.match(ce[0], de[0], m1) && logic.match(ce[1], de[1], m1)) {
+			if (etc.match(ce[0], de[0], m1) && etc.match(ce[1], de[1], m1)) {
 				// if we successfully match this pair of literals
 				// need to continue with the backtracking search
 				// to see if these variable assignments also let us match all the other literals
@@ -45,7 +44,7 @@ function match(c0, d0, c1, d1, m) {
 
 			// and the other way
 			var m1 = new Map(m)
-			if (logic.match(ce[0], de[1], m1) && logic.match(ce[1], de[0], m1)) {
+			if (etc.match(ce[0], de[1], m1) && etc.match(ce[1], de[0], m1)) {
 				m1 = match(cx, dx, c1, d1, m1)
 				if (m1) return m1
 			}
@@ -62,7 +61,7 @@ function subsumes(c, d) {
 	assert(d.length === 2)
 
 	// clauses are assumed to have distinct variable names
-	for (var x of logic.freevars(c)) assert(!logic.freevars(d).has(x))
+	for (var x of etc.freevars(c)) assert(!etc.freevars(d).has(x))
 
 	// negative and positive sides need to be matched separately
 	// though of course with shared variable assignments
