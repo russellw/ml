@@ -3,7 +3,9 @@ const logic = require('./logic')
 const etc = require('./etc')
 const assert = require('assert')
 
-function clause(neg, pos, m = new Map()) {
+function simplify(c, m = new Map()) {
+	var [neg, pos] = c
+
 	// simplify
 	neg = neg.map((a) => logic.simplify(a, m))
 	pos = pos.map((a) => logic.simplify(a, m))
@@ -105,7 +107,6 @@ function convert(c, clauses) {
 	flatten('&&', a, ors)
 	for (var b of ors) {
 		var d = cterm(b)
-		if (etc.eq(d, [[], [true]])) continue
 		d.from = [c]
 		clauses.push(d)
 	}
@@ -137,25 +138,21 @@ function cterm(a) {
 	}
 
 	rec(a)
-	return clause(neg, pos)
+	return [neg, pos]
 }
 
 function test() {
 	// clause
 	var a = {}
 	var b = {}
-	assert(etc.eq(clause([a], [b]), clause([a], [b])))
-	assert(etc.eq(clause([a], [b]), [[a], [b]]))
-	assert(etc.eq(clause([a], [b]), cterm(etc.mk('||', etc.mk('!', a), b))))
-	assert(etc.eq(clause([a], [false]), [[a], []]))
-	assert(etc.eq(clause([a], [true]), [[], [true]]))
-	assert(etc.eq(clause([a], [a]), [[], [true]]))
-	assert(etc.eq([[], [true]], [[], [true]]))
-	assert(!etc.eq([[], [true]], [[], []]))
-	assert(etc.eq([[], []], [[], []]))
+	assert(etc.eq(simplify([[a], [b]]), [[a], [b]]))
+	assert(etc.eq(simplify([[a], [b]]), cterm(etc.mk('||', etc.mk('!', a), b))))
+	assert(etc.eq(simplify([[a], [false]]), [[a], []]))
+	assert(etc.eq(simplify([[a], [true]]), [[], [true]]))
+	assert(etc.eq(simplify([[a], [a]]), [[], [true]]))
 	var m = new Map()
 	m.set(b, false)
-	assert(etc.eq(clause([a], [b], m), clause([a], [])))
+	assert(etc.eq(simplify([[a], [b]], m), simplify([[a], []])))
 
 	// flatten
 	var r = []
@@ -169,12 +166,13 @@ function test() {
 	// convert
 	var cs = []
 	convert([true], cs)
-	assert(cs.length === 0)
+	assert(cs.length === 1)
+	assert(etc.eq(cs[0], [[], [true]]))
 
 	var cs = []
 	convert([false], cs)
 	assert(cs.length === 1)
-	assert(etc.eq(cs[0], [[], []]))
+	assert(etc.eq(simplify(cs[0]), [[], []]))
 
 	var cs = []
 	convert([a], cs)
@@ -302,7 +300,7 @@ function test() {
 		atoms = Array.from(atoms)
 
 		function rec(i, m) {
-			var cs = clauses.map((c) => clause(c[0], c[1], m))
+			var cs = clauses.map((c) => simplify(c, m))
 			for (var c of cs) if (etc.eq(c, [[], []])) return
 			cs = cs.filter((c) => !etc.eq(c, [[], [true]]))
 			if (!cs.length) return m
@@ -358,5 +356,5 @@ function test() {
 
 test()
 
-exports.clause = clause
 exports.convert = convert
+exports.simplify = simplify

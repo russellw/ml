@@ -5,7 +5,7 @@ const etc = require('./etc')
 const cnf = require('./cnf')
 
 function sat(clauses, m = new Map()) {
-	var cs = clauses.map((c) => cnf.clause(c[0], c[1], m))
+	var cs = clauses.map((c) => cnf.simplify(c, m))
 	for (var c of cs) if (etc.eq(c, [[], []])) return
 	cs = cs.filter((c) => !etc.eq(c, [[], [true]]))
 	if (!cs.length) return m

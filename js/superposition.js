@@ -19,8 +19,8 @@ function solve(clauses) {
 	for (var c of clauses) priorityq.push(passive, c)
 	var active = []
 
-	function clause(neg, pos) {
-		var c = cnf.clause(neg, pos)
+	function clause(neg, pos, m) {
+		var c = cnf.simplify([neg, pos], m)
 		if (etc.eq(c, [[], [true]])) return
 		priorityq.push(passive, c)
 	}

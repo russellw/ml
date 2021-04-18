@@ -1,5 +1,4 @@
 'use strict'
-const logic = require('./logic')
 const etc = require('./etc')
 
 var eof = ''
@@ -89,7 +88,7 @@ function parse(file, text) {
 	var clauses = []
 
 	function clause() {
-		var c = cnf.clause(neg, pos)
+		var c = [neg, pos]
 		c.file = file
 		clauses.push(c)
 		neg = []

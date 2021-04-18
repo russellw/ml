@@ -3,7 +3,6 @@ const path = require('path')
 const assert = require('assert')
 const logic = require('./logic')
 const etc = require('./etc')
-const cnf = require('./cnf')
 const fs = require('fs')
 
 var eof = ''
@@ -472,7 +471,7 @@ function parse1(file, text, selection, problem) {
 
 				// select
 				if (select(name)) {
-					var c = cnf.clause(neg, pos)
+					var c = [neg, pos]
 					c.file = file
 					c.name = name
 					problem.clauses.push(c)
