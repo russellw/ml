@@ -599,16 +599,20 @@ function parse(file, text) {
 	return problem
 }
 
-assert(/^[\+\-]?\d/.test('9'))
-assert(/^[\+\-]?\d/.test('99'))
-assert(/^[\+\-]?\d/.test('9x'))
-assert(/^[\+\-]?\d/.test('+9'))
-assert(/^[\+\-]?\d/.test('-9'))
-assert(!/^[\+\-]?\d/.test('x'))
-assert(!/^[\+\-]?\d/.test('x9'))
+function test() {
+	assert(/^[\+\-]?\d/.test('9'))
+	assert(/^[\+\-]?\d/.test('99'))
+	assert(/^[\+\-]?\d/.test('9x'))
+	assert(/^[\+\-]?\d/.test('+9'))
+	assert(/^[\+\-]?\d/.test('-9'))
+	assert(!/^[\+\-]?\d/.test('x'))
+	assert(!/^[\+\-]?\d/.test('x9'))
 
-assert(BigInt('3') === 3n)
-assert(BigInt('+3') === 3n)
-assert(BigInt('-3') === -3n)
+	assert(BigInt('3') === 3n)
+	assert(BigInt('+3') === 3n)
+	assert(BigInt('-3') === -3n)
+}
+
+test()
 
 exports.parse = parse
