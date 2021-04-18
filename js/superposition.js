@@ -35,13 +35,18 @@ function solve(clauses) {
 	*/
 
 	// substitute and make new clause
-	function resolveq(c, ci) {
+	function resolveq(c, ci, m) {
 		var neg = []
+		for (var i = 0; i < c[0].length; i++) if (i !== ci) neg.push(c[0][i])
 	}
 
 	// for each negative equation
 	function resolve(c) {
-		for (var i = 0; i < c[0].length; i++) {}
+		for (var i = 0; i < c[0].length; i++) {
+			var ce = etc.eqn(c[0][i])
+			var m = logic.unify(ce[0], e[1])
+			if (m) resolveq(c, ci, m)
+		}
 	}
 
 	// saturation proof procedure tries to perform all possible derivations until it derives false
