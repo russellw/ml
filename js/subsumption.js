@@ -171,7 +171,9 @@ assert(subsumes(d, c))
 assert(x.name !== y.name)
 c = [[], [etc.mk('call', p2, x, y)]]
 d = [[], [etc.mk('call', p2, a, b)]]
+assert(x.name !== y.name)
 assert(subsumes(c, d))
+assert(x.name !== y.name)
 assert(!subsumes(d, c))
 
 // p(x,x) !<= p(a,b)

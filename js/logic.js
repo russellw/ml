@@ -320,6 +320,8 @@ var y = { o: 'var', name: 'y', type: 'individual' }
 assert(x.name !== y.name)
 assert(match(etc.mk('call', p2, x, y), etc.mk('call', p2, a, b)))
 assert(x.name !== y.name)
+assert(match(eqn(etc.mk('call', p2, x, y)), eqn(etc.mk('call', p2, a, b))))
+assert(x.name !== y.name)
 
 // exports
 exports.unify = unify
