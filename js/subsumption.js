@@ -86,11 +86,11 @@ function test() {
 	var a = { type: 'individual' }
 	var a1 = { type: ['individual', 'individual'] }
 	var b = { type: 'individual' }
-	var p = { type: 'bool' }
-	var p1 = { type: ['bool', 'individual'] }
-	var p2 = { type: ['bool', 'individual', 'individual'] }
-	var q = { type: 'bool' }
-	var q1 = { type: ['bool', 'individual'] }
+	var p = { type: 'boolean' }
+	var p1 = { type: ['boolean', 'individual'] }
+	var p2 = { type: ['boolean', 'individual', 'individual'] }
+	var q = { type: 'boolean' }
+	var q1 = { type: ['boolean', 'individual'] }
 	var x = { o: 'var', name: 'x', type: 'individual' }
 	var y = { o: 'var', name: 'y', type: 'individual' }
 	var c, d

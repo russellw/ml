@@ -82,8 +82,8 @@ function test() {
 		assert(!sat(cs))
 	}
 
-	var a = { type: 'bool' }
-	var b = { type: 'bool' }
+	var a = { type: 'boolean' }
+	var b = { type: 'boolean' }
 
 	thm(true)
 	thm(etc.mk('=>', false, a))

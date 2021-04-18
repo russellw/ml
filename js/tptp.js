@@ -169,7 +169,7 @@ function parse1(file, text, selection, problem) {
 				return 'individual'
 			case '$o':
 				lex()
-				return 'bool'
+				return 'boolean'
 			case '$int':
 				lex()
 				return 'integer'

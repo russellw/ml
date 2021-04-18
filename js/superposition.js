@@ -52,6 +52,15 @@ function solve(clauses) {
 		}
 	}
 
+	/*
+	equality factoring
+		c | c0 = c1 | d0 = d1
+	->
+		(c | c0 = c1 | c1 !== d1)/s
+	where
+		s = unify(c0, d0)
+	*/
+
 	// saturation proof procedure tries to perform all possible derivations until it derives false
 	loop: for (;;) {
 		// given clause
