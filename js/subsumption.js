@@ -58,12 +58,6 @@ function match(c0, d0, c1, d1, m) {
 }
 
 function subsumes(c, d) {
-	console.log('=============================================')
-	console.dir(c === d)
-	console.dir(c, { depth: null })
-	console.dir(d, { depth: null })
-	console.log(logic.freevars(c))
-	console.log(logic.freevars(d))
 	assert(c.length === 2)
 	assert(d.length === 2)
 
@@ -79,13 +73,10 @@ function subsumes(c, d) {
 	if (c0.length > d0.length || c1.length > d1.length) return
 
 	// fewer literals typically fail faster
-	console.trace([c0, d0, c1, d1])
 	if (c1.length < c0.length) {
 		;[c1, c0] = c
 		;[d1, d0] = d
-		console.trace([c0, d0, c1, d1])
 	}
-	console.trace([c0, d0, c1, d1])
 
 	// search for matched literals
 	return match(c0, d0, c1, d1, new Map())
@@ -197,114 +188,64 @@ assert(subsumes(c, d))
 assert(subsumes(d, c))
 
 // p(x) | p(a) <= p(a) | p(b)
-negative.clear()
-positive.clear()
-positive.add(List.of(p1, x))
-positive.add(List.of(p1, a))
-c = new Clause(negative, positive, Inference.AXIOM)
-negative.clear()
-positive.clear()
-positive.add(List.of(p1, a))
-positive.add(List.of(p1, b))
-d = new Clause(negative, positive, Inference.AXIOM)
+c = [[], [etc.mk('call', p1, x), etc.mk('call', p1, a)]]
+d = [[], [etc.mk('call', p1, a), etc.mk('call', p1, b)]]
 assert(subsumes(c, d))
 assert(!subsumes(d, c))
 
 // p(x) | p(a(x)) <= p(a(y)) | p(y)
-negative.clear()
-positive.clear()
-positive.add(List.of(p1, x))
-positive.add(List.of(p1, List.of(a1, x)))
-c = new Clause(negative, positive, Inference.AXIOM)
-negative.clear()
-positive.clear()
-positive.add(List.of(p1, List.of(a1, y)))
-positive.add(List.of(p1, y))
-d = new Clause(negative, positive, Inference.AXIOM)
+c = [[], [etc.mk('call', p1, x), etc.mk('call', p1, etc.mk('call', a1, x))]]
+d = [[], [etc.mk('call', p1, etc.mk('call', a1, y)), etc.mk('call', p1, y)]]
 assert(subsumes(c, d))
 assert(subsumes(d, c))
 
 // p(x) | p(a(x)) | p(a(a(x))) <= p(a(a(y))) | p(a(y)) | p(y)
-negative.clear()
-positive.clear()
-positive.add(List.of(p1, x))
-positive.add(List.of(p1, List.of(a1, x)))
-positive.add(List.of(p1, List.of(a1, List.of(a1, x))))
-c = new Clause(negative, positive, Inference.AXIOM)
-negative.clear()
-positive.clear()
-positive.add(List.of(p1, List.of(a1, List.of(a1, y))))
-positive.add(List.of(p1, List.of(a1, y)))
-positive.add(List.of(p1, y))
-d = new Clause(negative, positive, Inference.AXIOM)
+c = [
+	[],
+	[
+		etc.mk('call', p1, x),
+		etc.mk('call', p1, etc.mk('call', a1, x)),
+		etc.mk('call', p1, etc.mk('call', a1, etc.mk('call', a1, x))),
+	],
+]
+d = [
+	[],
+	[
+		etc.mk('call', p1, etc.mk('call', a1, etc.mk('call', a1, y))),
+		etc.mk('call', p1, etc.mk('call', a1, y)),
+		etc.mk('call', p1, y),
+	],
+]
 assert(subsumes(c, d))
 assert(subsumes(d, c))
 
 // (a = x) <= (a = b)
-negative.clear()
-positive.clear()
-positive.add(Equality.of(a, x))
-c = new Clause(negative, positive, Inference.AXIOM)
-negative.clear()
-positive.clear()
-positive.add(Equality.of(a, b))
-d = new Clause(negative, positive, Inference.AXIOM)
+c = [[], [etc.mk('==', a, x)]]
+d = [[], [etc.mk('==', a, b)]]
 assert(subsumes(c, d))
 assert(!subsumes(d, c))
 
 // (x = a) <= (a = b)
-negative.clear()
-positive.clear()
-positive.add(Equality.of(x, a))
-c = new Clause(negative, positive, Inference.AXIOM)
-negative.clear()
-positive.clear()
-positive.add(Equality.of(a, b))
-d = new Clause(negative, positive, Inference.AXIOM)
+c = [[], [etc.mk('==', x, a)]]
+d = [[], [etc.mk('==', a, b)]]
 assert(subsumes(c, d))
 assert(!subsumes(d, c))
 
 // !p(y) | !p(x) | q(x) <= !p(a) | !p(b) | q(b)
-negative.clear()
-negative.add(List.of(p1, y))
-negative.add(List.of(p1, x))
-positive.clear()
-positive.add(List.of(q1, x))
-c = new Clause(negative, positive, Inference.AXIOM)
-negative.clear()
-negative.add(List.of(p1, a))
-negative.add(List.of(p1, b))
-positive.clear()
-positive.add(List.of(q1, b))
-d = new Clause(negative, positive, Inference.AXIOM)
+c = [[etc.mk('call', p1, y), etc.mk('call', p1, x)], [etc.mk('call', q1, x)]]
+d = [[etc.mk('call', p1, a), etc.mk('call', p1, b)], [etc.mk('call', q1, b)]]
 assert(subsumes(c, d))
 assert(!subsumes(d, c))
 
 // !p(x) | !p(y) | q(x) <= !p(a) | !p(b) | q(b)
-negative.clear()
-negative.add(List.of(p1, x))
-negative.add(List.of(p1, y))
-positive.clear()
-positive.add(List.of(q1, x))
-c = new Clause(negative, positive, Inference.AXIOM)
-negative.clear()
-negative.add(List.of(p1, a))
-negative.add(List.of(p1, b))
-positive.clear()
-positive.add(List.of(q1, b))
-d = new Clause(negative, positive, Inference.AXIOM)
+c = [[etc.mk('call', p1, x), etc.mk('call', p1, y)], [etc.mk('call', q1, x)]]
+d = [[etc.mk('call', p1, a), etc.mk('call', p1, b)], [etc.mk('call', q1, b)]]
 assert(subsumes(c, d))
 assert(!subsumes(d, c))
 
 // p(x,a(x)) !<= p(a(y),a(y))
-negative.clear()
-positive.clear()
-positive.add(List.of(p2, x, List.of(a1, x)))
-c = new Clause(negative, positive, Inference.AXIOM)
-negative.clear()
-positive.clear()
-positive.add(List.of(p2, List.of(a1, y), List.of(a1, y)))
-d = new Clause(negative, positive, Inference.AXIOM)
+c = [[], [etc.mk('call', p2, x, etc.mk('call', a1, x))]]
+d = [[], [etc.mk('call', p2, etc.mk('call', a1, y), y)]]
 assert(!subsumes(c, d))
 assert(!subsumes(d, c))
 
