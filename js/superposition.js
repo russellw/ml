@@ -25,17 +25,32 @@ function solve(clauses) {
 		priorityq.push(passive, c)
 	}
 
+	// saturation proof procedure tries to perform all possible derivations until it derives false
 	for (;;) {
+		// given clause
 		var g = priorityq.pop(passive)
-		if (!g) break
+
+		// no more clauses => we are done, proof not found
+		if (!g) {
+			if (complete) return { sat: true }
+			return { szs: 'GaveUp' }
+		}
+
+		// empty (false) clause => proof found
+		if (etc.eq(g, [[], []]))
+			return {
+				sat: false,
+				proof: g,
+			}
 	}
-	if (complete) return { sat: true }
-	return { szs: 'GaveUp' }
 }
 
 function test() {
 	assert(size(5) === 1)
 	assert(size(etc.mk('==', etc.mk('unary-', 10), etc.mk('+', 11, 12))), 3)
+
+	assert(solve([]).sat === true)
+	assert(solve([[[], []]]).sat === false)
 }
 
 test()
