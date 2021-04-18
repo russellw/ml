@@ -3,6 +3,7 @@ const cnf = require('./cnf')
 const etc = require('./etc')
 const subsumption = require('./subsumption')
 const priorityq = require('./priorityq')
+const logic = require('./logic')
 const assert = require('assert')
 
 function size(a) {
@@ -35,17 +36,19 @@ function solve(clauses) {
 	*/
 
 	// substitute and make new clause
-	function resolveq(c, ci, m) {
-		var neg = []
-		for (var i = 0; i < c[0].length; i++) if (i !== ci) neg.push(c[0][i])
+	function resolvep(c, ci, m) {
+		var neg = c[0].slice()
+		neg.splice(ci, 1)
+		var pos = c[1]
+		push([neg, pos], m)
 	}
 
 	// for each negative equation
 	function resolve(c) {
 		for (var i = 0; i < c[0].length; i++) {
-			var ce = etc.eqn(c[0][i])
-			var m = logic.unify(ce[0], e[1])
-			if (m) resolveq(c, ci, m)
+			var e = etc.eqn(c[0][i])
+			var m = logic.unify(e[0], e[1])
+			if (m) resolvep(c, i, m)
 		}
 	}
 
@@ -89,6 +92,7 @@ function solve(clauses) {
 		active.push(g)
 
 		// infer
+		resolve(h)
 	}
 }
 
@@ -96,8 +100,18 @@ function test() {
 	assert(size(5) === 1)
 	assert(size(etc.mk('==', etc.mk('unary-', 10), etc.mk('+', 11, 12))), 3)
 
-	assert(solve([]).sat === true)
-	assert(solve([[[], []]]).sat === false)
+	var r = solve([])
+	assert(r.sat === true)
+
+	var c = [[], []]
+	var r = solve([c])
+	assert(r.sat === false)
+	assert(etc.eq(r.proof, [[], []]))
+
+	var c = [[etc.mk('==', 1, 1)], []]
+	var r = solve([c])
+	assert(r.sat === false)
+	assert(etc.eq(r.proof, [[], []]))
 }
 
 test()

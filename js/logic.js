@@ -327,3 +327,4 @@ test()
 exports.unify = unify
 exports.match = match
 exports.freevars = freevars
+exports.freshvars = freshvars
