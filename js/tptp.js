@@ -172,10 +172,10 @@ function parse1(file, text, selection, problem) {
 				return 'boolean'
 			case '$int':
 				lex()
-				return 'integer'
+				return 'bigint'
 			case '$rat':
 				lex()
-				return 'rational'
+				return 'rat'
 			case '$real':
 				lex()
 				return 'real'
@@ -272,13 +272,13 @@ function parse1(file, text, selection, problem) {
 			case '$remainder_t':
 				return defined(bound, 'remt', 2)
 			case '$is_int':
-				return defined(bound, 'isinteger', 1)
+				return defined(bound, 'isint', 1)
 			case '$is_rat':
-				return defined(bound, 'isrational', 1)
+				return defined(bound, 'israt', 1)
 			case '$to_int':
-				return defined(bound, 'tointeger', 1)
+				return defined(bound, 'toint', 1)
 			case '$to_rat':
-				return defined(bound, 'torational', 1)
+				return defined(bound, 'torat', 1)
 			case '$to_real':
 				return defined(bound, 'toreal', 1)
 			case '$ceiling':
