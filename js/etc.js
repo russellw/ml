@@ -1,6 +1,11 @@
 'use strict'
 const assert = require('assert')
 
+function eqn(a) {
+	if (a.o === '==') return a
+	return mk('==', a, true)
+}
+
 function extension(file) {
 	var a = file.split('.')
 	if (a.length < 2) return ''
@@ -168,6 +173,13 @@ function test() {
 	assert(eq(rs[i++], ['a1', 'b2', 'c2']))
 	assert(eq(rs[i++], ['a1', 'b2', 'c3']))
 
+	// eqn
+	var a = {}
+	assert(eq(eqn(a), mk('==', a, true)))
+	assert(eq(eqn(true), mk('==', true, true)))
+	assert(eq(eqn(mk('call', a, 1, 2)), mk('==', mk('call', a, 1, 2), true)))
+	assert(eq(eqn(mk('==', 1, 2)), mk('==', 1, 2)))
+
 	// map
 	assert(
 		!eq(
@@ -194,3 +206,4 @@ exports.mk = mk
 exports.replace = replace
 exports.cartproduct = cartproduct
 exports.extension = extension
+exports.eqn = eqn

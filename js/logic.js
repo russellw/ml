@@ -2,11 +2,6 @@
 const assert = require('assert')
 const etc = require('./etc')
 
-function eqn(a) {
-	if (a.o === '==') return a
-	return etc.mk('==', a, true)
-}
-
 function occurs(a, b, m) {
 	if (a === b) return true
 	if (m.has(b)) return occurs(a, m.get(b), m)
@@ -319,12 +314,6 @@ function test() {
 	assert(s.size === 1)
 	assert(s.has(y))
 
-	// eqn
-	assert(etc.eq(eqn(a), etc.mk('==', a, true)))
-	assert(etc.eq(eqn(true), etc.mk('==', true, true)))
-	assert(etc.eq(eqn(etc.mk('call', f, x, y)), etc.mk('==', etc.mk('call', f, x, y), true)))
-	assert(etc.eq(eqn(etc.mk('==', x, y)), etc.mk('==', x, y)))
-
 	// freshvars
 	var y = freshvars(x)
 	assert(y.o === 'var')
@@ -351,4 +340,3 @@ exports.unify = unify
 exports.match = match
 exports.simplify = simplify
 exports.freevars = freevars
-exports.eqn = eqn

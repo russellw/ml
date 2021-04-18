@@ -19,7 +19,7 @@ function match(c0, d0, c1, d1, m) {
 	for (var ci = 0; ci < c0.length; ci++) {
 		// make an equation out of each literal
 		// because an equation can be matched either way around
-		var ce = logic.eqn(c0[ci])
+		var ce = etc.eqn(c0[ci])
 		// if we successfully match a literal
 		// it can be removed from further consideration
 		// on this branch of the search tree
@@ -29,7 +29,7 @@ function match(c0, d0, c1, d1, m) {
 		cx.splice(ci, 1)
 		for (var di = 0; di < d0.length; di++) {
 			// same thing with the literals on the other side
-			var de = logic.eqn(d0[di])
+			var de = etc.eqn(d0[di])
 			var dx = d0.slice()
 			dx.splice(di, 1)
 
