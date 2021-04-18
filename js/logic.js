@@ -313,6 +313,14 @@ assert(etc.eq(eqn(true), etc.mk('==', true, true)))
 assert(etc.eq(eqn(etc.mk('call', f, x, y)), etc.mk('==', etc.mk('call', f, x, y), true)))
 assert(etc.eq(eqn(etc.mk('==', x, y)), etc.mk('==', x, y)))
 
+// check match only reads data
+var p2 = { type: ['bool', 'individual', 'individual'] }
+var x = { o: 'var', name: 'x', type: 'individual' }
+var y = { o: 'var', name: 'y', type: 'individual' }
+assert(x.name !== y.name)
+assert(match(etc.mk('call', p2, x, y), etc.mk('call', p2, a, b)))
+assert(x.name !== y.name)
+
 // exports
 exports.unify = unify
 exports.match = match
