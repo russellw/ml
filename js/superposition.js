@@ -26,7 +26,7 @@ function solve(clauses) {
 	}
 
 	// saturation proof procedure tries to perform all possible derivations until it derives false
-	for (;;) {
+	loop: for (;;) {
 		// given clause
 		var g = priorityq.pop(passive)
 
@@ -37,11 +37,34 @@ function solve(clauses) {
 		}
 
 		// empty (false) clause => proof found
-		if (etc.eq(g, [[], []]))
-			return {
-				sat: false,
-				proof: g,
-			}
+		if (etc.eq(g, [[], []])) return { sat: false, proof: g }
+
+		// algorithms being used here, assume clauses have distinct variable names
+		var h = logic.freshvars(g)
+
+		// this is the Discount loop
+		// in which only active clauses participate in subsumption checks
+		// in tests, it performed slightly better than the Otter loop
+		// in which passive clauses also participate
+
+		// forward subsumption
+		for (var c of active) {
+			if (c.subsumed) continue
+			if (subsumption.subsumes(c, h)) continue loop
+		}
+
+		// backward subsumption
+		for (var c of active) {
+			if (c.subsumed) continue
+			if (subsumption.subsumes(h, c)) c.subsumed = true
+		}
+
+		// add g to active clauses before inference
+		// because we will sometimes need to combine g
+		// with (the fresh-variable version of) itself
+		active.push(g)
+
+		// infer
 	}
 }
 

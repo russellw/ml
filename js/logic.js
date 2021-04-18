@@ -25,6 +25,17 @@ function unify(a, b, m = new Map()) {
 	return m
 }
 
+function freshvars(a, m = new Map()) {
+	if (a.o === 'var') {
+		if (m.has(a)) return m.get(a)
+		var x = { o: 'var', type: a.type }
+		m.set(a, x)
+		return x
+	}
+	if (!Array.isArray(a)) return a
+	return etc.map(a, (b) => freshvars(b, m))
+}
+
 function simplify(a, m = new Map()) {
 	if (m.has(a)) return simplify(m.get(a), m)
 	return etc.map(a, (b) => simplify(b, m))
@@ -314,15 +325,24 @@ function test() {
 	assert(etc.eq(eqn(etc.mk('call', f, x, y)), etc.mk('==', etc.mk('call', f, x, y), true)))
 	assert(etc.eq(eqn(etc.mk('==', x, y)), etc.mk('==', x, y)))
 
-	// check match only reads data
-	var p2 = { type: ['bool', 'individual', 'individual'] }
-	var x = { o: 'var', name: 'x', type: 'individual' }
-	var y = { o: 'var', name: 'y', type: 'individual' }
-	assert(x.name !== y.name)
-	assert(match(etc.mk('call', p2, x, y), etc.mk('call', p2, a, b)))
-	assert(x.name !== y.name)
-	assert(match(eqn(etc.mk('call', p2, x, y)), eqn(etc.mk('call', p2, a, b))))
-	assert(x.name !== y.name)
+	// freshvars
+	var y = freshvars(x)
+	assert(y.o === 'var')
+	assert(y !== x)
+
+	var b = freshvars(5)
+	assert(b === 5)
+
+	var b = freshvars(etc.mk('call', f, x, y))
+	assert(b.o === 'call')
+	assert(b[0] === f)
+	var x1 = b[1]
+	assert(x1.o === 'var')
+	assert(x1 !== x && x1 !== y)
+	var y1 = b[2]
+	assert(y1.o === 'var')
+	assert(y1 !== x && y1 !== y)
+	assert(x1 !== y1)
 }
 
 test()
