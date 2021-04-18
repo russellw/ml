@@ -6,9 +6,9 @@ var eof = ''
 
 function parse(file, text) {
 	var ti = 0
-	var status = ''
 	var tok
 	var toki
+	var expected
 
 	function err(msg) {
 		etc.err(file, text, toki, msg)
@@ -113,7 +113,7 @@ function parse(file, text) {
 	return {
 		formulas: [],
 		clauses,
-		status,
+		expected,
 	}
 }
 
