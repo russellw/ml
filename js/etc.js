@@ -47,7 +47,7 @@ function type(a) {
 function occurs(a, b, m) {
 	if (a === b) return true
 	if (m.has(b)) return occurs(a, m.get(b), m)
-	if (!Array.isArray(b)) return null
+	if (!Array.isArray(b)) return
 	for (var x of b) if (occurs(a, x, m)) return true
 }
 
@@ -55,7 +55,7 @@ function unify(a, b, m = new Map()) {
 	if (a === b) return m
 	if (a.o === 'var') return unifyvar(a, b, m)
 	if (b.o === 'var') return unifyvar(b, a, m)
-	if (!Array.isArray(a)) return null
+	if (!Array.isArray(a)) return
 	if (a.o !== b.o) return
 	if (a.length !== b.length) return
 	for (var i = 0; i < a.length && m; i++) m = unify(a[i], b[i], m)
@@ -80,7 +80,7 @@ function match(a, b, m = new Map()) {
 		m.set(a, b)
 		return m
 	}
-	if (!Array.isArray(a)) return null
+	if (!Array.isArray(a)) return
 	if (a.o !== b.o) return
 	if (a.length !== b.length) return
 	for (var i = 0; i < a.length && m; i++) m = match(a[i], b[i], m)

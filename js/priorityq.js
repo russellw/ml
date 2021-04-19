@@ -13,7 +13,7 @@ function push(q, a) {
 }
 
 function pop(q) {
-	if (!q.data.length) return null
+	if (!q.data.length) return
 	var i = 0
 	var a = q.data[i]
 	for (var j = 1; j < q.data.length; j++)
@@ -37,7 +37,7 @@ function test() {
 	assert(pop(q) === 3)
 	assert(pop(q) === 4)
 	assert(pop(q) === 5)
-	assert(pop(q) === null)
+	assert(!pop(q))
 }
 
 test()
