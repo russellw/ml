@@ -67,10 +67,15 @@ function parseargs(args) {
 	}
 }
 
+function propositional(clauses) {
+	for (var c of clauses) for (var L of c) for (var a of L) if (Array.isArray(a)) return
+	return true
+}
+
 function test() {
 	function sat(cs) {
 		var r1 = superposition.solve(cs).sat
-		if (cnf.propositional(cs)) {
+		if (propositional(cs)) {
 			var r2 = dpll.solve(cs).sat
 			assert(r1 === r2)
 		}
