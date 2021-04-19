@@ -12,6 +12,19 @@ function size(a) {
 	return n
 }
 
+function equatable(a, b) {
+	if (etc.type(a) !== etc.type(b)) return
+	if (type(a) == 'boolean') return a == true || b === true
+	return true
+}
+
+function equate(a, b) {
+	assert(equatable(a, b))
+	if (a === true) return b
+	if (b === true) return a
+	return etc.mk('==', a, b)
+}
+
 function solve(clauses) {
 	var complete = true
 
@@ -38,8 +51,8 @@ function solve(clauses) {
 	function resolvep(c, ci, m) {
 		var neg = c[0].slice()
 		neg.splice(ci, 1)
-		var pos = c[1]
-		push([neg, pos], m)
+
+		push([neg, c[1]], m)
 	}
 
 	// for each negative equation
@@ -59,6 +72,39 @@ function solve(clauses) {
 	where
 		s = unify(c0, d0)
 	*/
+
+	// substitute and make new clause
+	function factorp(c, ci, c0, c1, di, d0, d1) {
+		if (!equatable(c1, d1)) return
+		var m = etc.unify(c0, d0)
+		if (!m) return
+
+		var neg = c[0].slice()
+		neg.push(equate(c1, d1))
+
+		var pos = c[1].slice()
+		pos.splice(di, 1)
+
+		push([neg, pos], m)
+	}
+
+	// for each positive equation (both directions) again
+	function factor1(c, ci, c0, c1) {
+		for (var i = 0; i < c[1].length; i++) {
+			var e = etc.eqn(c[1][i])
+			factorp(c, ci, c0, c1, i, e[0], e[1])
+			factorp(c, ci, c0, c1, i, e[1], e[0])
+		}
+	}
+
+	// for each positive equation (both directions)
+	function factor(c) {
+		for (var i = 0; i < c[1].length; i++) {
+			var e = etc.eqn(c[1][i])
+			factor1(c, i, e[0], e[1])
+			factor1(c, i, e[1], e[0])
+		}
+	}
 
 	// saturation proof procedure tries to perform all possible derivations until it derives false
 	loop: for (;;) {
@@ -101,6 +147,7 @@ function solve(clauses) {
 
 		// infer
 		resolve(h)
+		factor(h)
 	}
 }
 
