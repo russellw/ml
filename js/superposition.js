@@ -14,7 +14,7 @@ function size(a) {
 
 function equatable(a, b) {
 	if (etc.type(a) !== etc.type(b)) return
-	if (type(a) === 'boolean') return a === true || b === true
+	if (etc.type(a) === 'boolean') return a === true || b === true
 	return true
 }
 
@@ -151,8 +151,8 @@ function solve(clauses) {
 		if (c0 === true) return
 		for (var i = 0; i < d[0].length; i++) {
 			var e = etc.eqn(d[0][i])
-			nsuperposition1(c, d, ci, c0, c1, i, e[0], e[1])
-			nsuperposition1(c, d, ci, c0, c1, i, e[1], e[0])
+			nsuperpositiond(c, d, ci, c0, c1, i, e[0], e[1])
+			nsuperpositiond(c, d, ci, c0, c1, i, e[1], e[0])
 		}
 	}
 

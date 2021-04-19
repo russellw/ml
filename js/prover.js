@@ -69,7 +69,10 @@ function parseargs(args) {
 
 function test() {
 	function sat(cs) {
-		return dpll.solve(cs).sat
+		var r1 = dpll.solve(cs).sat
+		var r2 = superposition.solve(cs).sat
+		assert(r1 === r2)
+		return r1
 	}
 
 	function thm(a) {
@@ -92,9 +95,9 @@ function test() {
 	thm(etc.mk('||', false, false, true))
 	thm(etc.mk('<=>', a, a))
 
-	var p1 = { name: 'p1' }
-	var p2 = { name: 'p2' }
-	var p3 = { name: 'p3' }
+	var p1 = { name: 'p1', type: 'boolean' }
+	var p2 = { name: 'p2', type: 'boolean' }
+	var p3 = { name: 'p3', type: 'boolean' }
 
 	thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p1, p2))))
 
