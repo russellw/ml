@@ -53,6 +53,7 @@ function occurs(a, b, m) {
 
 function unify(a, b, m = new Map()) {
 	if (a === b) return m
+	if (type(a) !== type(b)) return
 	if (a.o === 'var') return unifyvar(a, b, m)
 	if (b.o === 'var') return unifyvar(b, a, m)
 	if (!Array.isArray(a)) return
@@ -327,15 +328,15 @@ function test() {
 	assert(eq(simplify(mk('call', f, x, y), m), mk('call', f, y, y)))
 
 	// fn
-	var a = {}
-	var b = {}
+	var a = { type: 'individual' }
+	var b = { type: 'individual' }
 	assert(eq(a, a))
 	assert(!eq(a, b))
 
 	// variable
-	var x = { o: 'var' }
-	var y = { o: 'var' }
-	var z = { o: 'var' }
+	var x = { o: 'var', type: 'individual' }
+	var y = { o: 'var', type: 'individual' }
+	var z = { o: 'var', type: 'individual' }
 	assert(!Array.isArray(x))
 	assert(eq(x, x))
 	assert(eq(y, y))
@@ -366,6 +367,10 @@ function test() {
 	assert(!eq(mk('call', f, 1n, 2n), mk('call', f, 1n, 3n)))
 
 	// https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
+	var f1 = { type: ['individual', 'individual'] }
+	var f2 = { type: ['individual', 'individual', 'individual'] }
+	var g1 = { type: ['individual', 'individual'] }
+	var g2 = { type: ['individual', 'individual', 'individual'] }
 	var m
 
 	// Succeeds. (tautology)
@@ -396,44 +401,44 @@ function test() {
 
 	// function and constant symbols match, x is unified with the constant b
 	m = new Map()
-	assert(unify(mk('call', f, a, x), mk('call', f, a, b), m))
+	assert(unify(mk('call', f2, a, x), mk('call', f2, a, b), m))
 	assert(m.size === 1)
 	assert(eq(replace(x, m), b))
 
 	// f and g do not match
 	m = new Map()
-	assert(!unify(mk('call', f, a), mk('call', g, a), m))
+	assert(!unify(mk('call', f1, a), mk('call', g1, a), m))
 
 	// x and y are aliased
 	m = new Map()
-	assert(unify(mk('call', f, x), mk('call', f, y), m))
+	assert(unify(mk('call', f1, x), mk('call', f1, y), m))
 	assert(m.size === 1)
 	assert(eq(replace(x, m), replace(y, m)))
 
 	// f and g do not match
 	m = new Map()
-	assert(!unify(mk('call', f, x), mk('call', g, y), m))
+	assert(!unify(mk('call', f1, x), mk('call', g1, y), m))
 
 	// Fails. The f function symbols have different arity
 	m = new Map()
-	assert(!unify(mk('call', f, x), mk('call', f, y, z), m))
+	assert(!unify(mk('call', f1, x), mk('call', f2, y, z), m))
 
 	// Unifies y with the term g(x)
 	m = new Map()
-	assert(unify(mk('call', f, mk('call', g, x)), mk('call', f, y), m))
+	assert(unify(mk('call', f1, mk('call', g1, x)), mk('call', f1, y), m))
 	assert(m.size === 1)
-	assert(eq(replace(y, m), mk('call', g, x)))
+	assert(eq(replace(y, m), mk('call', g1, x)))
 
 	// Unifies x with constant a, and y with the term g(a)
 	m = new Map()
-	assert(unify(mk('call', f, mk('call', g, x), x), mk('call', f, y, a), m))
+	assert(unify(mk('call', f2, mk('call', g1, x), x), mk('call', f2, y, a), m))
 	assert(m.size === 2)
 	assert(eq(replace(x, m), a))
-	assert(eq(replace(y, m), mk('call', g, a)))
+	assert(eq(replace(y, m), mk('call', g1, a)))
 
 	// Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
 	m = new Map()
-	assert(!unify(x, mk('call', f, x), m))
+	assert(!unify(x, mk('call', f1, x), m))
 
 	// Both x and y are unified with the constant a
 	m = new Map()
@@ -488,37 +493,37 @@ function test() {
 
 	// function and constant symbols match, x is unified with the constant b
 	m = new Map()
-	assert(match(mk('call', f, a, x), mk('call', f, a, b), m))
+	assert(match(mk('call', f2, a, x), mk('call', f2, a, b), m))
 	assert(m.size === 1)
 	assert(eq(replace(x, m), b))
 
 	// f and g do not match
 	m = new Map()
-	assert(!match(mk('call', f, a), mk('call', g, a), m))
+	assert(!match(mk('call', f1, a), mk('call', g1, a), m))
 
 	// x and y are aliased
 	m = new Map()
-	assert(match(mk('call', f, x), mk('call', f, y), m))
+	assert(match(mk('call', f1, x), mk('call', f1, y), m))
 	assert(m.size === 1)
 	assert(eq(replace(x, m), replace(y, m)))
 
 	// f and g do not match
 	m = new Map()
-	assert(!match(mk('call', f, x), mk('call', g, y), m))
+	assert(!match(mk('call', f1, x), mk('call', g1, y), m))
 
 	// Fails. The f function symbols have different arity
 	m = new Map()
-	assert(!match(mk('call', f, x), mk('call', f, y, z), m))
+	assert(!match(mk('call', f1, x), mk('call', f2, y, z), m))
 
 	// Unifies y with the term g(x)
 	// different result for match!
 	m = new Map()
-	assert(!match(mk('call', f, mk('call', g, x)), mk('call', f, y), m))
+	assert(!match(mk('call', f1, mk('call', g1, x)), mk('call', f1, y), m))
 
 	// Unifies x with constant a, and y with the term g(a)
 	// different result for match!
 	m = new Map()
-	assert(!match(mk('call', f, mk('call', g, x), x), mk('call', f, y, a), m))
+	assert(!match(mk('call', f2, mk('call', g1, x), x), mk('call', f2, y, a), m))
 
 	// Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
 	// not valid for match!
@@ -542,12 +547,12 @@ function test() {
 	assert(!match(b, x, m))
 
 	// freevars
-	var s = freevars(mk('call', f, x, y))
+	var s = freevars(mk('call', f2, x, y))
 	assert(s.size === 2)
 	assert(s.has(x))
 	assert(s.has(y))
 
-	var s = freevars(mk('all', [x], mk('call', f, x, y)))
+	var s = freevars(mk('all', [x], mk('call', f2, x, y)))
 	assert(s.size === 1)
 	assert(s.has(y))
 
@@ -559,9 +564,9 @@ function test() {
 	var b = freshvars(5)
 	assert(b === 5)
 
-	var b = freshvars(mk('call', f, x, y))
+	var b = freshvars(mk('call', f2, x, y))
 	assert(b.o === 'call')
-	assert(b[0] === f)
+	assert(b[0] === f2)
 	var x1 = b[1]
 	assert(x1.o === 'var')
 	assert(x1 !== x && x1 !== y)
