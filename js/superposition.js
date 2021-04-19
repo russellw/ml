@@ -132,6 +132,8 @@ function solve(clauses) {
 		var pos = c[1].slice()
 		pos.splice(ci, 1)
 		pos = pos.concat(d[1])
+
+		push([neg, pos], m)
 	}
 
 	// descend into subterms
@@ -162,6 +164,62 @@ function solve(clauses) {
 			var e = etc.eqn(c[1][i])
 			nsuperposition1(c, d, i, e[0], e[1])
 			nsuperposition1(c, d, i, e[1], e[0])
+		}
+	}
+
+	// positive superposition
+	// c | c0 = c1, d | d0(a) = d1
+	// ->
+	// (c | d | d0(c1) = d1)/m
+	// where
+	// m = unify(c0, a)
+	// a is not a variable
+
+	// check and push new clause
+	function psuperpositionp(c, d, ci, c0, c1, di, d0, d1, path, a) {
+		var m = etc.unify(c0, a)
+		if (!m) return
+
+		var neg = c[0].concat(d[0])
+
+		var cpos = c[1].slice()
+		cpos.splice(ci, 1)
+		var dpos = d[1].slice()
+		dpos.splice(di, 1)
+		var pos = cpos.concat(dpos)
+		pos.push(equate(splice(d0, path, c1), d1))
+
+		push([neg, pos], m)
+	}
+
+	// descend into subterms
+	function psuperpositiond(c, d, ci, c0, c1, di, d0, d1, path, a) {
+		if (a.o === 'var') return
+		psuperpositionp(c, d, ci, c0, c1, di, d0, d1, path, a)
+		if (!Array.isArray(a)) return
+		for (var i = 0; i < a.length; i++) {
+			path.push(i)
+			psuperpositiond(c, d, ci, c0, c1, di, d0, d1, path, a[i])
+			path.pop()
+		}
+	}
+
+	// for each negative equation in d (both directions)
+	function psuperposition1(c, d, ci, c0, c1) {
+		if (c0 === true) return
+		for (var i = 0; i < d[0].length; i++) {
+			var e = etc.eqn(d[0][i])
+			psuperpositiond(c, d, ci, c0, c1, i, e[0], e[1], [], e[0])
+			psuperpositiond(c, d, ci, c0, c1, i, e[1], e[0], [], e[1])
+		}
+	}
+
+	// for each positive equation in c (both directions)
+	function psuperposition(c, d) {
+		for (var i = 0; i < c[1].length; i++) {
+			var e = etc.eqn(c[1][i])
+			psuperposition1(c, d, i, e[0], e[1])
+			psuperposition1(c, d, i, e[1], e[0])
 		}
 	}
 
@@ -210,6 +268,8 @@ function solve(clauses) {
 		for (var c of active) {
 			nsuperposition(c, h)
 			nsuperposition(h, c)
+			psuperposition(c, h)
+			psuperposition(h, c)
 		}
 	}
 }

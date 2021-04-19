@@ -136,8 +136,10 @@ function test() {
 	var fa = etc.mk('call', f1, a)
 	var fb = etc.mk('call', f1, b)
 	var fx = etc.mk('call', f1, x)
+	var fy = etc.mk('call', f1, y)
 
 	imp(eq(a, b), eq(fa, fb))
+	thm(etc.mk('all', [x, y], etc.mk('=>', eq(x, y), eq(fx, fy))))
 }
 
 test()
