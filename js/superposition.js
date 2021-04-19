@@ -14,7 +14,7 @@ function size(a) {
 
 function equatable(a, b) {
 	if (etc.type(a) !== etc.type(b)) return
-	if (type(a) == 'boolean') return a == true || b === true
+	if (type(a) == 'boolean') return a === true || b === true
 	return true
 }
 
@@ -38,14 +38,12 @@ function solve(clauses) {
 	for (var c of clauses) push(c, new Map())
 	var active = []
 
-	/*
-	equality resolution
-		c | c0 !== c1
-	->
-		c/s
-	where
-		s = unify(c0, c1)
-	*/
+	// equality resolution
+	// c | c0 != c1
+	// ->
+	// c/s
+	// where
+	// s = unify(c0, c1)
 
 	// substitute and make new clause
 	function resolvep(c, ci, m) {
@@ -64,14 +62,12 @@ function solve(clauses) {
 		}
 	}
 
-	/*
-	equality factoring
-		c | c0 = c1 | d0 = d1
-	->
-		(c | c0 = c1 | c1 !== d1)/s
-	where
-		s = unify(c0, d0)
-	*/
+	// equality factoring
+	// c | c0 = c1 | d0 = d1
+	// ->
+	// (c | c0 = c1 | c1 != d1)/s
+	// where
+	// s = unify(c0, d0)
 
 	// substitute and make new clause
 	function factorp(c, ci, c0, c1, di, d0, d1) {
