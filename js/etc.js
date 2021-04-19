@@ -1,6 +1,10 @@
 'use strict'
 const assert = require('assert')
 
+function show(a) {
+	console.dir(a, { depth: null })
+}
+
 function type(a) {
 	switch (typeof a) {
 		case 'boolean':
@@ -41,8 +45,8 @@ function type(a) {
 			var t = type(a[0])
 			return t[0]
 	}
-	console.dir('----------------------------------------')
-	console.dir(a, { depth: null })
+	console.log('----------------------------------------')
+	show(a)
 	assert(false)
 }
 
@@ -605,3 +609,4 @@ exports.match = match
 exports.freevars = freevars
 exports.freshvars = freshvars
 exports.type = type
+exports.show = show

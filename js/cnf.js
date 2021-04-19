@@ -37,8 +37,8 @@ function convert(c, clauses) {
 		for (var x of a[0]) {
 			var sk = { type: x.type }
 			if (params.length) {
-				sk = etc.mk('call', ...[sk].concat(params))
 				sk.type = [x.type].concat(params.map(etc.type))
+				sk = etc.mk('call', ...[sk].concat(params))
 			}
 			bound.set(x, sk)
 		}
@@ -304,7 +304,7 @@ function test() {
 	var cs = []
 	convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', f1, y)))], cs)
 	assert(cs.length === 1)
-	var m = etc.match([etc.mk('call', f1, y)], cs[0][1])
+	var m = etc.match(etc.mk('call', f1, y), cs[0][1][0])
 	assert(m)
 	assert(m.size === 1)
 	assert(!Array.isArray(m.get(y)))
