@@ -151,8 +151,8 @@ function solve(clauses) {
 		if (c0 === true) return
 		for (var i = 0; i < d[0].length; i++) {
 			var e = etc.eqn(d[0][i])
-			nsuperpositiond(c, d, ci, c0, c1, i, e[0], e[1])
-			nsuperpositiond(c, d, ci, c0, c1, i, e[1], e[0])
+			nsuperpositiond(c, d, ci, c0, c1, i, e[0], e[1], [], e[0])
+			nsuperpositiond(c, d, ci, c0, c1, i, e[1], e[0], [], e[1])
 		}
 	}
 
