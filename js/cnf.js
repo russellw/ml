@@ -25,7 +25,7 @@ function simplify(c, m = new Map()) {
 function convert(c, clauses) {
 	function all(bound, pol, a) {
 		bound = new Map(bound)
-		for (var x of a[0]) bound.set(x, { o: 'var' })
+		for (var x of a[0]) bound.set(x, { o: 'var', type: x.type })
 		return nnf(bound, pol, a[1])
 	}
 
@@ -35,8 +35,11 @@ function convert(c, clauses) {
 		for (var [k, v] of bound.entries()) if (v.o === 'var' && free.has(k)) params.push(v)
 		bound = new Map(bound)
 		for (var x of a[0]) {
-			var sk = {}
-			if (params.length) sk = etc.mk('call', ...[sk].concat(params))
+			var sk = { type: x.type }
+			if (params.length) {
+				sk = etc.mk('call', ...[sk].concat(params))
+				sk.type = [x.type].concat(params.map(etc.type))
+			}
 			bound.set(x, sk)
 		}
 		return nnf(bound, pol, a[1])
@@ -231,45 +234,50 @@ function test() {
 	assert(etc.eq(cs[0], [[], [a, b1]]))
 	assert(etc.eq(cs[1], [[], [a, b2]]))
 
-	var x = { o: 'var' }
-	var y = { o: 'var' }
-	var z = { o: 'var' }
+	var x = { o: 'var', type: 'individual' }
+	var y = { o: 'var', type: 'individual' }
+	var z = { o: 'var', type: 'individual' }
+	var f1 = { type: ['boolean', 'individual'] }
+	var f2 = { type: ['boolean', 'individual', 'individual'] }
+	var g1 = { type: ['boolean', 'individual'] }
+	var g2 = { type: ['boolean', 'individual', 'individual'] }
+	var h = { type: 'individual' }
 
-	assert(etc.match(etc.mk('call', a, x), etc.mk('call', a, 1)))
-	assert(!etc.match(etc.mk('call', a, 1), etc.mk('call', a, x)))
+	assert(etc.match(etc.mk('call', f1, x), etc.mk('call', f1, h)))
+	assert(!etc.match(etc.mk('call', f1, h), etc.mk('call', f1, x)))
 
 	function isomorphic(a, b) {
 		return etc.match(a, b) && etc.match(b, a)
 	}
 
 	var cs = []
-	convert([etc.mk('all', [x], etc.mk('call', a, x))], cs)
+	convert([etc.mk('all', [x], etc.mk('call', f1, x))], cs)
 	assert(cs.length === 1)
-	assert(isomorphic(cs[0], [[], [etc.mk('call', a, x)]]))
+	assert(isomorphic(cs[0], [[], [etc.mk('call', f1, x)]]))
 
 	var cs = []
-	convert([etc.mk('all', [x, y], etc.mk('call', a, x, y))], cs)
+	convert([etc.mk('all', [x, y], etc.mk('call', f2, x, y))], cs)
 	assert(cs.length === 1)
-	assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
+	assert(isomorphic(cs[0], [[], [etc.mk('call', f2, x, y)]]))
 
 	var cs = []
-	convert([etc.mk('all', [x], etc.mk('all', [y], etc.mk('call', a, x, y)))], cs)
+	convert([etc.mk('all', [x], etc.mk('all', [y], etc.mk('call', f2, x, y)))], cs)
 	assert(cs.length === 1)
-	assert(isomorphic(cs[0], [[], [etc.mk('call', a, x, y)]]))
+	assert(isomorphic(cs[0], [[], [etc.mk('call', f2, x, y)]]))
 
 	var cs = []
-	convert([etc.mk('exists', [x], etc.mk('call', a, x))], cs)
+	convert([etc.mk('exists', [x], etc.mk('call', f1, x))], cs)
 	assert(cs.length === 1)
-	var m = etc.match([etc.mk('call', a, x)], cs[0][1])
+	var m = etc.match([etc.mk('call', f1, x)], cs[0][1])
 	assert(m)
 	assert(m.size === 1)
 	assert(!Array.isArray(m.get(x)))
 	assert(!m.get(x).o)
 
 	var cs = []
-	convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', a, x, y)))], cs)
+	convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', f2, x, y)))], cs)
 	assert(cs.length === 1)
-	var m = etc.match([etc.mk('call', a, x, y)], cs[0][1])
+	var m = etc.match([etc.mk('call', f2, x, y)], cs[0][1])
 	assert(m)
 	assert(m.size === 2)
 	assert(!Array.isArray(m.get(x)))
@@ -279,9 +287,9 @@ function test() {
 	assert(m.get(y).length === 2)
 
 	var cs = []
-	convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', a, y)))], cs)
+	convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', f1, y)))], cs)
 	assert(cs.length === 1)
-	var m = etc.match([etc.mk('call', a, y)], cs[0][1])
+	var m = etc.match([etc.mk('call', f1, y)], cs[0][1])
 	assert(m)
 	assert(m.size === 1)
 	assert(!Array.isArray(m.get(y)))

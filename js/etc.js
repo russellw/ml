@@ -76,6 +76,7 @@ function freshvars(a, m = new Map()) {
 
 function match(a, b, m = new Map()) {
 	if (a === b) return m
+	if (type(a) !== type(b)) return
 	if (a.o === 'var') {
 		if (m.has(a)) return match(m.get(a), b, m)
 		m.set(a, b)
