@@ -22,6 +22,8 @@ function type(a) {
 		case '<=':
 		case '>':
 		case '>=':
+		case 'all':
+		case 'exists':
 			return 'boolean'
 		case '+':
 		case '-':
@@ -35,6 +37,9 @@ function type(a) {
 		case 'remf':
 		case 'remt':
 			return type(a[0])
+		case 'call':
+			var t = type(a[0])
+			return t[0]
 	}
 	assert(false)
 }
@@ -570,6 +575,8 @@ function test() {
 	assert(type(9n) === 'bigint')
 	assert(type({ o: 'var', type: 'rat' }) === 'rat')
 	assert(type(mk('==', 3, 3)) === 'boolean')
+	var p2 = { type: ['boolean', 'individual', 'individual'] }
+	assert(type(mk('call', p2, '3', '3')) === 'boolean')
 }
 
 test()
