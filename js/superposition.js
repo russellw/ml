@@ -14,7 +14,7 @@ function size(a) {
 
 function equatable(a, b) {
 	if (etc.type(a) !== etc.type(b)) return
-	if (type(a) == 'boolean') return a === true || b === true
+	if (type(a) === 'boolean') return a === true || b === true
 	return true
 }
 
@@ -45,7 +45,7 @@ function solve(clauses) {
 	// where
 	// s = unify(c0, c1)
 
-	// substitute and make new clause
+	// push new clause
 	function resolvep(c, ci, m) {
 		var neg = c[0].slice()
 		neg.splice(ci, 1)
@@ -69,7 +69,7 @@ function solve(clauses) {
 	// where
 	// s = unify(c0, d0)
 
-	// substitute and make new clause
+	// check and push new clause
 	function factorp(c, ci, c0, c1, di, d0, d1) {
 		if (!equatable(c1, d1)) return
 		var m = etc.unify(c0, d0)
@@ -99,6 +99,59 @@ function solve(clauses) {
 			var e = etc.eqn(c[1][i])
 			factor1(c, i, e[0], e[1])
 			factor1(c, i, e[1], e[0])
+		}
+	}
+
+	// negative superposition
+	// c | c0 = c1, d | d0(a) != d1
+	// ->
+	// (c | d | d0(c1) != d1)/m
+	// where
+	// m = unify(c0, a)
+	// a is not a variable
+
+	// check and push new clause
+	function superpositionp(c, d, ci, c0, c1, di, d0, d1, path, a) {
+		var m = etc.unify(c0, a)
+		if (!m) return
+
+		var neg = d[0].slice()
+		neg.splice(di, 1)
+		neg = c[0].concat(neg)
+
+		var pos = c[1].slice()
+		pos.splice(ci, 1)
+		pos = pos.concat(d[1])
+	}
+
+	// descend into subterms
+	function superpositiond(c, d, ci, c0, c1, di, d0, d1, path, a) {
+		if (a.o === 'var') return
+		superpositionp(c, d, ci, c0, c1, di, d0, d1, path, a)
+		if (!Array.isArray(a)) return
+		for (var i = 0; i < a.length; i++) {
+			path.push(i)
+			superpositiond(c, d, ci, c0, c1, di, d0, d1, path, a[i])
+			path.pop()
+		}
+	}
+
+	// for each negative equation in d (both directions)
+	function superposition1(c, d, ci, c0, c1) {
+		if (c0 === true) return
+		for (var i = 0; i < d[0].length; i++) {
+			var e = etc.eqn(d[0][i])
+			superposition1(c, d, ci, c0, c1, i, e[0], e[1])
+			superposition1(c, d, ci, c0, c1, i, e[1], e[0])
+		}
+	}
+
+	// for each positive equation in c (both directions)
+	function superposition(c, d) {
+		for (var i = 0; i < c[1].length; i++) {
+			var e = etc.eqn(c[1][i])
+			superposition1(c, d, i, e[0], e[1])
+			superposition1(c, d, i, e[1], e[0])
 		}
 	}
 
