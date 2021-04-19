@@ -302,6 +302,30 @@ function test() {
 	var b = 3
 	var r = etc.mk('+', 3, 2)
 	assert(etc.eq(splice(a, path, b), r))
+
+	var a = { type: 'individual' }
+	var b = { type: 'individual' }
+	var f1 = { type: ['individual', 'individual'] }
+	var f2 = { type: ['individual', 'individual', 'individual'] }
+	var g1 = { type: ['individual', 'individual'] }
+	var g2 = { type: ['individual', 'individual', 'individual'] }
+	var p = { type: 'boolean' }
+	var p1 = { type: ['boolean', 'individual'] }
+	var p2 = { type: ['boolean', 'individual', 'individual'] }
+	var q = { type: 'boolean' }
+	var q1 = { type: ['boolean', 'individual'] }
+	var q2 = { type: ['boolean', 'individual', 'individual'] }
+	var x = { o: 'var', type: 'individual' }
+	var y = { o: 'var', type: 'individual' }
+	var z = { o: 'var', type: 'individual' }
+
+	var c = [[p], []]
+	var r = solve([c])
+	assert(r.sat === true)
+
+	var c = [[], [p]]
+	var r = solve([c])
+	assert(r.sat === true)
 }
 
 test()
