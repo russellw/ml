@@ -1,6 +1,44 @@
 'use strict'
 const assert = require('assert')
 
+function type(a) {
+	switch (typeof a) {
+		case 'boolean':
+		case 'bigint':
+			return typeof a
+		case 'string':
+			return 'individual'
+	}
+	if (a.type) return a.type
+	switch (a.o) {
+		case '&&':
+		case '||':
+		case '!':
+		case '=>':
+		case '<=>':
+		case '==':
+		case '!=':
+		case '<':
+		case '<=':
+		case '>':
+		case '>=':
+			return 'boolean'
+		case '+':
+		case '-':
+		case '/':
+		case '*':
+		case '%':
+		case 'dive':
+		case 'divf':
+		case 'divt':
+		case 'reme':
+		case 'remf':
+		case 'remt':
+			return type(a[0])
+	}
+	assert(false)
+}
+
 function occurs(a, b, m) {
 	if (a === b) return true
 	if (m.has(b)) return occurs(a, m.get(b), m)
@@ -526,6 +564,12 @@ function test() {
 	assert(y1.o === 'var')
 	assert(y1 !== x && y1 !== y)
 	assert(x1 !== y1)
+
+	// type
+	assert(type(true) === 'boolean')
+	assert(type(9n) === 'bigint')
+	assert(type({ o: 'var', type: 'rat' }) === 'rat')
+	assert(type(mk('==', 3, 3)) === 'boolean')
 }
 
 test()
@@ -545,3 +589,4 @@ exports.unify = unify
 exports.match = match
 exports.freevars = freevars
 exports.freshvars = freshvars
+exports.type = type

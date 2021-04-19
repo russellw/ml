@@ -358,9 +358,9 @@ function parse1(file, text, selection, problem) {
 		do {
 			var name = tok
 			lex()
-			var type = 'individual'
-			if (eat(':')) type = atomictype()
-			var x = { o: 'var', type }
+			var t = 'individual'
+			if (eat(':')) t = atomictype()
+			var x = { o: 'var', type: t }
 			bound.set(name, x)
 			v.push(x)
 		} while (eat(','))
@@ -513,9 +513,9 @@ function parse1(file, text, selection, problem) {
 							return { name }
 						})
 						var toki1 = toki
-						var type = topleveltype()
-						if (!a.type) a.type = type
-						else if (!etc.eq(a.type, type)) {
+						var t = topleveltype()
+						if (!a.type) a.type = t
+						else if (!etc.eq(a.type, t)) {
 							toki = toki1
 							err('Type mismatch')
 						}
