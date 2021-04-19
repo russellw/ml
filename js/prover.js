@@ -69,9 +69,11 @@ function parseargs(args) {
 
 function test() {
 	function sat(cs) {
-		var r1 = dpll.solve(cs).sat
-		var r2 = superposition.solve(cs).sat
-		assert(r1 === r2)
+		var r1 = superposition.solve(cs).sat
+		if (cnf.propositional(cs)) {
+			var r2 = dpll.solve(cs).sat
+			assert(r1 === r2)
+		}
 		return r1
 	}
 
@@ -110,6 +112,32 @@ function test() {
 	eqv(etc.mk('||', a, b), etc.mk('||', b, a))
 	eqv(etc.mk('<=>', a, b), etc.mk('<=>', b, a))
 	eqv(etc.mk('!', etc.mk('<=>', a, b)), etc.mk('!', etc.mk('<=>', b, a)))
+
+	thm(etc.mk('=>', etc.mk('&&', a, etc.mk('=>', a, b)), b))
+
+	var a = { type: 'individual' }
+	var b = { type: 'individual' }
+	var f1 = { type: ['individual', 'individual'] }
+	var f2 = { type: ['individual', 'individual', 'individual'] }
+	var g1 = { type: ['individual', 'individual'] }
+	var g2 = { type: ['individual', 'individual', 'individual'] }
+	var x = { o: 'var', type: 'individual' }
+	var y = { o: 'var', type: 'individual' }
+	var z = { o: 'var', type: 'individual' }
+
+	function imp(a, b) {
+		thm(etc.mk('=>', a, b))
+	}
+
+	function eq(a, b) {
+		return etc.mk('==', a, b)
+	}
+
+	var fa = etc.mk('call', f1, a)
+	var fb = etc.mk('call', f1, b)
+	var fx = etc.mk('call', f1, x)
+
+	imp(eq(a, b), eq(fa, fb))
 }
 
 test()

@@ -2,6 +2,11 @@
 const etc = require('./etc')
 const assert = require('assert')
 
+function propositional(clauses) {
+	for (var c of clauses) for (var L of c) for (var a of L) if (Array.isArray(a)) return
+	return true
+}
+
 function simplify(c, m = new Map()) {
 	var [neg, pos] = c
 
@@ -380,3 +385,4 @@ test()
 
 exports.convert = convert
 exports.simplify = simplify
+exports.propositional = propositional

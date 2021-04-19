@@ -21,7 +21,7 @@ function sat(clauses, m = new Map()) {
 
 	// atoms
 	var atoms = new Set()
-	for (var c of cs) for (var p of c) for (var a of p) atoms.add(a)
+	for (var c of cs) for (var L of c) for (var a of L) atoms.add(a)
 
 	// pure atoms
 	function occurs(pol, a) {
