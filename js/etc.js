@@ -41,6 +41,8 @@ function type(a) {
 			var t = type(a[0])
 			return t[0]
 	}
+	console.dir('----------------------------------------')
+	console.dir(a, { depth: null })
 	assert(false)
 }
 

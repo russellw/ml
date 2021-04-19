@@ -246,8 +246,23 @@ function test() {
 	assert(etc.match(etc.mk('call', f1, x), etc.mk('call', f1, h)))
 	assert(!etc.match(etc.mk('call', f1, h), etc.mk('call', f1, x)))
 
-	function isomorphic(a, b) {
-		return etc.match(a, b) && etc.match(b, a)
+	function isomorphic1(a, b, m = new Map()) {
+		if (a.length !== b.length) return
+		for (var i = 0; i < a.length && m; i++) {
+			assert(etc.type(a[i]))
+			assert(etc.type(b[i]))
+			m = etc.match(a[i], b[i], m)
+		}
+		return m
+	}
+
+	function isomorphic(c, d) {
+		var m = isomorphic1(c[0], d[0])
+		assert(m && isomorphic1(c[1], d[1], m))
+
+		var m = isomorphic1(d[0], c[0])
+		assert(m && isomorphic1(d[1], c[1], m))
+		return m
 	}
 
 	var cs = []
@@ -268,7 +283,7 @@ function test() {
 	var cs = []
 	convert([etc.mk('exists', [x], etc.mk('call', f1, x))], cs)
 	assert(cs.length === 1)
-	var m = etc.match([etc.mk('call', f1, x)], cs[0][1])
+	var m = etc.match(etc.mk('call', f1, x), cs[0][1][0])
 	assert(m)
 	assert(m.size === 1)
 	assert(!Array.isArray(m.get(x)))
@@ -277,7 +292,7 @@ function test() {
 	var cs = []
 	convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', f2, x, y)))], cs)
 	assert(cs.length === 1)
-	var m = etc.match([etc.mk('call', f2, x, y)], cs[0][1])
+	var m = etc.match(etc.mk('call', f2, x, y), cs[0][1][0])
 	assert(m)
 	assert(m.size === 2)
 	assert(!Array.isArray(m.get(x)))
