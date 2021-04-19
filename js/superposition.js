@@ -25,6 +25,15 @@ function equate(a, b) {
 	return etc.mk('==', a, b)
 }
 
+function splice(a, path, b, i = 0) {
+	if (i === path.length) return b
+	assert(Array.isArray(a))
+	var r = []
+	Object.assign(r, a)
+	r[path[i]] = splice(r[path[i]], path, b, i + 1)
+	return r
+}
+
 function solve(clauses) {
 	var complete = true
 
@@ -111,13 +120,14 @@ function solve(clauses) {
 	// a is not a variable
 
 	// check and push new clause
-	function superpositionp(c, d, ci, c0, c1, di, d0, d1, path, a) {
+	function nsuperpositionp(c, d, ci, c0, c1, di, d0, d1, path, a) {
 		var m = etc.unify(c0, a)
 		if (!m) return
 
 		var neg = d[0].slice()
 		neg.splice(di, 1)
 		neg = c[0].concat(neg)
+		neg.push(equate(splice(d0, path, c1), d1))
 
 		var pos = c[1].slice()
 		pos.splice(ci, 1)
@@ -125,33 +135,33 @@ function solve(clauses) {
 	}
 
 	// descend into subterms
-	function superpositiond(c, d, ci, c0, c1, di, d0, d1, path, a) {
+	function nsuperpositiond(c, d, ci, c0, c1, di, d0, d1, path, a) {
 		if (a.o === 'var') return
-		superpositionp(c, d, ci, c0, c1, di, d0, d1, path, a)
+		nsuperpositionp(c, d, ci, c0, c1, di, d0, d1, path, a)
 		if (!Array.isArray(a)) return
 		for (var i = 0; i < a.length; i++) {
 			path.push(i)
-			superpositiond(c, d, ci, c0, c1, di, d0, d1, path, a[i])
+			nsuperpositiond(c, d, ci, c0, c1, di, d0, d1, path, a[i])
 			path.pop()
 		}
 	}
 
 	// for each negative equation in d (both directions)
-	function superposition1(c, d, ci, c0, c1) {
+	function nsuperposition1(c, d, ci, c0, c1) {
 		if (c0 === true) return
 		for (var i = 0; i < d[0].length; i++) {
 			var e = etc.eqn(d[0][i])
-			superposition1(c, d, ci, c0, c1, i, e[0], e[1])
-			superposition1(c, d, ci, c0, c1, i, e[1], e[0])
+			nsuperposition1(c, d, ci, c0, c1, i, e[0], e[1])
+			nsuperposition1(c, d, ci, c0, c1, i, e[1], e[0])
 		}
 	}
 
 	// for each positive equation in c (both directions)
-	function superposition(c, d) {
+	function nsuperposition(c, d) {
 		for (var i = 0; i < c[1].length; i++) {
 			var e = etc.eqn(c[1][i])
-			superposition1(c, d, i, e[0], e[1])
-			superposition1(c, d, i, e[1], e[0])
+			nsuperposition1(c, d, i, e[0], e[1])
+			nsuperposition1(c, d, i, e[1], e[0])
 		}
 	}
 
@@ -197,6 +207,10 @@ function solve(clauses) {
 		// infer
 		resolve(h)
 		factor(h)
+		for (var c of active) {
+			nsuperposition(c, h)
+			nsuperposition(h, c)
+		}
 	}
 }
 
@@ -216,6 +230,18 @@ function test() {
 	var r = solve([c])
 	assert(r.sat === false)
 	assert(etc.eq(r.proof, [[], []]))
+
+	var a = 1
+	var path = []
+	var b = 2
+	var r = 2
+	assert(etc.eq(splice(a, path, b), r))
+
+	var a = etc.mk('+', 1, 2)
+	var path = [0]
+	var b = 3
+	var r = etc.mk('+', 3, 2)
+	assert(etc.eq(splice(a, path, b), r))
 }
 
 test()
