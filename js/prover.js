@@ -72,6 +72,12 @@ function propositional(clauses) {
 	return true
 }
 
+function solve(problem) {
+	for (var c of problem.formulas) cnf.convert(c, problem.clauses)
+	if (propositional(problem.clauses)) return dpll.solve(problem.clauses)
+	return superposition.solve(problem.clauses)
+}
+
 function test() {
 	function sat(cs) {
 		var r1 = superposition.solve(cs).sat
@@ -183,8 +189,7 @@ if (require.main === module) {
 			}
 			throw e
 		}
-		continue
-		var r = dpll.sat(problem.clauses)
+		var r = solve(problem)
 		if (r) {
 			console.log('sat')
 			var more
