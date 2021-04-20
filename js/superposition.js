@@ -37,15 +37,25 @@ function splice(a, path, b, i = 0) {
 function solve(clauses) {
 	var complete = true
 
-	function push(c, m) {
+	var passive = priorityq.mk(size)
+	for (var c of clauses) {
+		var d = cnf.simplify(c)
+		if (etc.eq(d, c)) d = c
+		else {
+			d.how = 'simplify'
+			d.from = [c]
+		}
+		priorityq.push(passive, d)
+	}
+	var active = []
+
+	function push(c, m, how, ...from) {
 		c = cnf.simplify(c, m)
 		if (etc.eq(c, [[], [true]])) return
+		c.how = how
+		c.from = from
 		priorityq.push(passive, c)
 	}
-
-	var passive = priorityq.mk(size)
-	for (var c of clauses) push(c, new Map())
-	var active = []
 
 	// equality resolution
 	// c | c0 != c1
@@ -59,7 +69,7 @@ function solve(clauses) {
 		var neg = c[0].slice()
 		neg.splice(ci, 1)
 
-		push([neg, c[1]], m)
+		push([neg, c[1]], m, 'resolve', c)
 	}
 
 	// for each negative equation
@@ -90,7 +100,7 @@ function solve(clauses) {
 		var pos = c[1].slice()
 		pos.splice(di, 1)
 
-		push([neg, pos], m)
+		push([neg, pos], m, 'factor', c)
 	}
 
 	// for each positive equation (both directions) again
@@ -133,7 +143,7 @@ function solve(clauses) {
 		pos.splice(ci, 1)
 		pos = pos.concat(d[1])
 
-		push([neg, pos], m)
+		push([neg, pos], m, 'ns', c, d)
 	}
 
 	// descend into subterms
@@ -189,7 +199,7 @@ function solve(clauses) {
 		var pos = cpos.concat(dpos)
 		pos.push(equate(splice(d0, path, c1), d1))
 
-		push([neg, pos], m)
+		push([neg, pos], m, 'ps', c, d)
 	}
 
 	// descend into subterms
@@ -325,6 +335,7 @@ function test() {
 
 	var c = [[], [p]]
 	var r = solve([c])
+	etc.show(r)
 	assert(r.sat === true)
 }
 
