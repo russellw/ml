@@ -1,6 +1,8 @@
 'use strict'
 const assert = require('assert')
 
+Error.stackTraceLimit = Infinity
+
 function show(a) {
 	console.dir(a, { depth: null })
 }
