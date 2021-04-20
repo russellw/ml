@@ -212,6 +212,13 @@ function getor(m, k, f) {
 	return v
 }
 
+function isfn(a) {
+	if (typeof a !== 'object') return
+	if (Array.isArray(a)) return
+	if (a.o === 'var') return
+	return true
+}
+
 function walk(a, f) {
 	f(a)
 	if (Array.isArray(a)) for (var b of a) walk(b, f)
@@ -609,6 +616,13 @@ function test() {
 	// quote
 	assert(quote('|', 'abc') === '|abc|')
 	assert(quote('|', 'ab|c') === '|ab\\|c|')
+
+	// isfn
+	assert(isfn(p2))
+	assert(isfn({ name: 'foo' }))
+	assert(!isfn('foo'))
+	assert(!isfn(y1))
+	assert(!isfn(mk('!', p2)))
 }
 
 test()
@@ -631,3 +645,4 @@ exports.freshvars = freshvars
 exports.type = type
 exports.show = show
 exports.quote = quote
+exports.isfn = isfn

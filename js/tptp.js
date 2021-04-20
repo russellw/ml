@@ -744,8 +744,7 @@ function prterm(a, parent) {
 			prterm(a[0])
 			return
 	}
-	if (!Array.isArray(a)) {
-		if (!a.name) a.name = 'sK' + skolemname++
+	if (etc.isfn(a)) {
 		prname(a.name)
 		return
 	}
@@ -788,11 +787,65 @@ function prclause(c) {
 	process.stdout.write(', ')
 
 	// source
+	switch (c.how) {
+		case 'negate':
+			process.stdout.write('inference(negate,[status(ceq)],[' + c.from[0].name + '])')
+			break
+		default:
+			if (c.file) {
+				process.stdout.write('file(' + etc.quote("'", c.file) + ',' + c.name + ')')
+				break
+			}
+			process.stdout.write('inference(' + c.how + ',[status(')
+			process.stdout.write(')],[')
+			for (var i = 0; i < c.from.length; i++) {
+				if (i) process.stdout.write(',')
+				process.stdout.write(c.from[i].name)
+			}
+			process.stdout.write('])')
+			break
+	}
 	console.log(').')
 }
 
-function prproof(c) {
-	skolemname = 0
+function walkproof(c, proof, visited = new Set()) {
+	if (visited.has(c)) return
+	visited.add(c)
+	for (var d of c.from) walkproof(d, proof, visited)
+	proof.push(c)
+}
+
+function prproof(conclusion) {
+	var proof = []
+	walkproof(conclusion, proof)
+
+	// check highest number already used for clause name
+	var i = 0
+	for (var c of proof) if (/^\d+$/.test(c.name)) i = Math.max(i, parseInt(c.name, 10))
+	i++
+
+	// name clauses that were not already named
+	for (var c of proof) if (!c.name) c.name = String(i++)
+
+	// check highest number already used for Skolem function name
+	var i = 0
+	for (var c of proof)
+		etc.walk(c, (a) => {
+			if (!etc.isfn(a)) return
+			var m = /^_sK(\d+)$/.match(a.name)
+			if (m) i = Math.max(i, parseInt(m[1], 10))
+		})
+	i++
+
+	// name Skolem functions that were not already named
+	for (var c of proof)
+		etc.walk(c, (a) => {
+			if (!etc.isfn(a)) return
+			if (!a.name) a.name = 'sK' + String(i++)
+		})
+
+	// print clauses
+	for (var c of proof) prclause(c)
 }
 
 function test() {
