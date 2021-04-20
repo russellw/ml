@@ -19,7 +19,9 @@ function simplify(c, m = new Map()) {
 	for (var a of neg) for (var b of pos) if (etc.eq(a, b)) return [[], [true]]
 
 	// make new clause
-	return [neg, pos]
+	c = [neg, pos]
+	ckclause(c)
+	return c
 }
 
 function convert(c, clauses) {

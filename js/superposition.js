@@ -35,6 +35,8 @@ function splice(a, path, b, i = 0) {
 }
 
 function solve(clauses) {
+	cnf.ckclauses(clauses)
+
 	var complete = true
 
 	var passive = priorityq.mk(size)
