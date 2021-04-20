@@ -177,12 +177,12 @@ if (require.main === module) {
 			}
 		} catch (e) {
 			if (e === 'Inappropriate') {
-				console.log('%% SZS status Inappropriate for ' + file)
+				console.log('%% SZS status Inappropriate for %s', file)
 				console.log()
 				continue
 			}
 			if (e.code === 'ERR_STRING_TOO_LONG' || e.message === 'Array buffer allocation failed') {
-				console.log('%% SZS status ResourceOut for ' + file)
+				console.log('%% SZS status ResourceOut for %s', file)
 				console.log()
 				continue
 			}
@@ -190,21 +190,22 @@ if (require.main === module) {
 		}
 		var r = solve(problem)
 		switch (language(file)) {
+			case 'tptp':
+				switch (r.sat) {
+					case true:
+						console.log('%% SZS status %s for %s', problem.conjecture ? 'CounterSatisfiable' : 'Satisfiable', file)
+						break
+					case false:
+						console.log('%% SZS status %s for %s', problem.conjecture ? 'Theorem' : 'Unsatisfiable', file)
+						if (r.proof) tptp.prnproof(r.proof)
+						break
+				}
+				break
 			case 'dimacs':
 				switch (r.sat) {
 					case true:
 						console.log('sat')
-						if (r.solution) {
-							var more
-							for (var [k, v] of r.solution) {
-								if (!k.name) continue
-								if (more) process.stdout.write(' ')
-								more = true
-								if (!v) process.stdout.write('-')
-								process.stdout.write(k.name)
-							}
-							console.log()
-						}
+						if (r.solution) dimacs.prnsolution(r.solution)
 						break
 					case false:
 						console.log('unsat')

@@ -116,4 +116,17 @@ function parse(file, text) {
 	}
 }
 
+function prnsolution(m) {
+	var more
+	for (var [k, v] of m) {
+		if (!k.name) continue
+		if (more) process.stdout.write(' ')
+		more = true
+		if (!v) process.stdout.write('-')
+		process.stdout.write(k.name)
+	}
+	console.log()
+}
+
 exports.parse = parse
+exports.prnsolution = prnsolution
