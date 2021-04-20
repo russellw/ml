@@ -163,8 +163,14 @@ function cterm(a) {
 	var pos = []
 
 	function rec(a) {
-		assert(a.o !== '&&')
 		switch (a.o) {
+			case '&&':
+			case '=>':
+			case '<=>':
+			case '!=':
+			case 'all':
+			case 'exists':
+				assert(false)
 			case '||':
 				for (var b of a) rec(b)
 				return
