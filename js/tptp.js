@@ -597,6 +597,42 @@ function parse(file, text) {
 	return problem
 }
 
+function prname(s) {
+	assert(s)
+	process.stdout.write(/^[a-z][\w_]*$/.test(s) ? s : etc.quote("'", s))
+}
+
+function prtype(t) {
+	switch (t) {
+		case 'boolean':
+			process.stdout.write('$o')
+			return
+		case 'individual':
+			process.stdout.write('$i')
+			return
+		case 'bigint':
+			process.stdout.write('$int')
+			return
+		case 'rat':
+		case 'real':
+			process.stdout.write('$' + t)
+			return
+	}
+	assert(typeof t === 'object')
+	if (!Array.isArray(t)) {
+		prname(t.name)
+		return
+	}
+	if (t.length > 2) process.stdout.write('(')
+	for (var i = 1; i < t.length; i++) {
+		if (i > 1) process.stdout.write(' * ')
+		prterm(t[i])
+	}
+	if (t.length > 2) process.stdout.write(')')
+	process.stdout.write(' * ')
+	prtype(a[0])
+}
+
 var skolemname = 0
 var varnames = new Map()
 
@@ -609,6 +645,53 @@ function args(a) {
 	process.stdout.write(')')
 }
 
+function quant(a) {
+	process.stdout.write('[')
+	for (var i = 0; i < a[0].length; i++) {
+		if (i) process.stdout.write(',')
+		var x = a[0][i]
+		prterm(x)
+		assert(x.type)
+		if (x.type !== 'individual') {
+			process.stdout.write(':')
+			prtype(x.type)
+		}
+	}
+	process.stdout.write(']:')
+	prterm(a[1], a)
+}
+
+function needparens(a, parent) {
+	switch (a.o) {
+		case '&&':
+		case '||':
+		case '<=>':
+		case '=>':
+			if (parent)
+				switch (parent.o) {
+					case '&&':
+					case '||':
+					case '<=>':
+					case '=>':
+					case 'all':
+					case 'exists':
+					case '!':
+						return true
+						break
+				}
+			break
+	}
+}
+
+function infix(k, a, parent) {
+	if (needparens(a, parent)) process.stdout.write('(')
+	for (var i = 0; i < a.length; i++) {
+		if (i) process.stdout.write(k)
+		prterm(a[i], a)
+	}
+	if (needparens(a, parent)) process.stdout.write(')')
+}
+
 function prterm(a, parent) {
 	switch (typeof a) {
 		case 'boolean':
@@ -619,6 +702,26 @@ function prterm(a, parent) {
 			return
 	}
 	switch (a.o) {
+		case '==':
+			infix('=', a)
+			return
+		case '!=':
+			infix('!=', a)
+			return
+		case '&&':
+			infix(' & ', a, parent)
+			return
+		case '||':
+			infix(' | ', a, parent)
+			return
+		case '<=>':
+		case '=>':
+			infix(' ' + a.o + ' ', a, parent)
+			return
+		case 'all':
+			process.stdout.write('!')
+			quant(a)
+			return
 		case 'var':
 			if (!varnames.has(a)) {
 				var i = varnames.size
@@ -641,7 +744,7 @@ function prterm(a, parent) {
 	}
 	if (!Array.isArray(a)) {
 		if (!a.name) a.name = 'sK' + skolemname++
-		process.stdout.write(/^[a-z][\w_]*$/.test(a.name) ? a.name : etc.quote("'", a.name))
+		prname(a.name)
 		return
 	}
 	etc.show(a)
@@ -650,6 +753,29 @@ function prterm(a, parent) {
 
 function prclause(c) {
 	varnames = new Map()
+	process.stdout.write(c.length === 2 ? 'cnf(' : 'fof(')
+	process.stdout.write(c.name)
+	process.stdout.write(', ')
+
+	// role
+	process.stdout.write(', ')
+
+	// term
+	if (c.length === 2) {
+		for (var i = 0; i < c[0].length; i++) {
+			if (i) process.stdout.write(' | ')
+			process.stdout.write('~')
+			prterm(c[0][i])
+		}
+		for (var i = 0; i < c[1].length; i++) {
+			if (c[0].length + i) process.stdout.write(' | ')
+			prterm(c[1][i])
+		}
+	} else prterm(c[0])
+	process.stdout.write(', ')
+
+	// source
+	console.log(').')
 }
 
 function prproof(c) {
