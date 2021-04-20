@@ -873,3 +873,5 @@ function test() {
 test()
 
 exports.parse = parse
+exports.prclause = prclause
+exports.prproof = prproof
