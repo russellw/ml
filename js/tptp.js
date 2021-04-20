@@ -532,10 +532,12 @@ function parse1(file, text, selection, problem) {
 
 					// negate conjecture
 					if (role === 'conjecture') {
+						c.how = 'conjecture'
 						problem.conjecture = c
 						a = etc.mk('!', a)
 						c = [a]
-						c.from = problem.conjecture
+						c.how = 'negate'
+						c.from = [problem.conjecture]
 					}
 
 					// select
@@ -759,6 +761,17 @@ function prclause(c) {
 
 	// role
 	process.stdout.write(', ')
+	switch (c.how) {
+		case 'negate':
+			process.stdout.write('negated_conjecture')
+			break
+		case 'conjecture':
+			process.stdout.write('conjecture')
+			break
+		default:
+			process.stdout.write('plain')
+			break
+	}
 
 	// term
 	if (c.length === 2) {

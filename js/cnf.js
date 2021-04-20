@@ -109,6 +109,7 @@ function convert(c, clauses) {
 	flatten('&&', a, ors)
 	for (var b of ors) {
 		var d = cterm(b)
+		d.how = 'cnf'
 		d.from = [c]
 		clauses.push(d)
 	}
