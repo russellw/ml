@@ -111,7 +111,37 @@ function convert(c, clauses) {
 		var d = cterm(b)
 		d.how = 'cnf'
 		d.from = [c]
+		ckclause(d)
 		clauses.push(d)
+	}
+}
+
+function ckclauses(cs) {
+	for (var c of cs) ckclause(c)
+}
+
+function ckclause(c) {
+	assert(Array.isArray(c))
+	assert(!c.file || typeof c.file === 'string')
+	assert(!c.from || Array.isArray(c.from))
+	assert(!c.how || typeof c.how === 'string')
+	assert(!c.name || typeof c.name === 'string')
+	assert(c.length === 2)
+	for (var L of c) {
+		assert(Array.isArray(L))
+		for (var a of L)
+			switch (a.o) {
+				case '&&':
+				case '||':
+				case '!':
+				case '=>':
+				case '<=>':
+				case '!=':
+				case 'all':
+				case 'exists':
+					etc.show(c)
+					assert(false)
+			}
 	}
 }
 
@@ -381,3 +411,5 @@ test()
 
 exports.convert = convert
 exports.simplify = simplify
+exports.ckclause = ckclause
+exports.ckclauses = ckclauses
