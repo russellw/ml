@@ -133,7 +133,7 @@ function ckclause(c) {
 	for (var L of c) {
 		assert(!L.o)
 		assert(Array.isArray(L))
-		for (var a of L)
+		etc.walk(L, (a) => {
 			switch (a.o) {
 				case '&&':
 				case '||':
@@ -146,6 +146,7 @@ function ckclause(c) {
 					etc.show(c)
 					assert(false)
 			}
+		})
 	}
 }
 
