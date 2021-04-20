@@ -759,11 +759,16 @@ function prterm(a, parent) {
 	assert(false)
 }
 
+function prnterm(a) {
+	prterm(a)
+	console.log()
+}
+
 function prclausename(c) {
 	process.stdout.write(String(c.name))
 }
 
-function prclause(c) {
+function prnclause(c) {
 	varnames = new Map()
 	process.stdout.write(c.length === 2 ? 'cnf(' : 'fof(')
 	prclausename(c)
@@ -831,7 +836,7 @@ function walkproof(c, proof, visited = new Set()) {
 	proof.push(c)
 }
 
-function prproof(conclusion) {
+function prnproof(conclusion) {
 	var proof = []
 	walkproof(conclusion, proof)
 
@@ -861,7 +866,7 @@ function prproof(conclusion) {
 		})
 
 	// print clauses
-	for (var c of proof) prclause(c)
+	for (var c of proof) prnclause(c)
 }
 
 function test() {
@@ -889,5 +894,6 @@ function test() {
 test()
 
 exports.parse = parse
-exports.prclause = prclause
-exports.prproof = prproof
+exports.prnclause = prnclause
+exports.prnproof = prnproof
+exports.prnterm = prnterm
