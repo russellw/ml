@@ -106,6 +106,7 @@ function solve(clauses) {
 	// for each positive equation (both directions) again
 	function factor1(c, ci, c0, c1) {
 		for (var i = 0; i < c[1].length; i++) {
+			if (i === ci) continue
 			var e = etc.eqn(c[1][i])
 			factorp(c, ci, c0, c1, i, e[0], e[1])
 			factorp(c, ci, c0, c1, i, e[1], e[0])
@@ -335,7 +336,6 @@ function test() {
 
 	var c = [[], [p]]
 	var r = solve([c])
-	etc.show(r)
 	assert(r.sat === true)
 }
 
