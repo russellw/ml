@@ -41,7 +41,7 @@ function parse1(file, text, selection, problem) {
 			// line comment
 			if (text[ti] === '%') {
 				while (text[ti] !== '\n') ti++
-				// console.log(text.slice(toki, ti))
+				if (!problem.doneheader) console.log(text.slice(toki, ti))
 				continue
 			}
 
@@ -125,6 +125,7 @@ function parse1(file, text, selection, problem) {
 	}
 
 	lex()
+	problem.doneheader = true
 
 	function eat(k) {
 		if (tok === k) {

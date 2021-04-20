@@ -28,7 +28,7 @@ function parse(file, text) {
 			// line comment
 			if (text[ti] === 'c') {
 				while (text[ti] !== '\n') ti++
-				console.log(text.slice(toki, ti))
+				if (!doneheader) console.log(text.slice(toki, ti))
 				continue
 			}
 
@@ -46,7 +46,9 @@ function parse(file, text) {
 		tok = eof
 	}
 
+	var doneheader
 	lex()
+	doneheader = true
 
 	function eat(k) {
 		if (tok === k) {
