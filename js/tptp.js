@@ -694,6 +694,8 @@ function infix(k, a, parent) {
 	if (needparens(a, parent)) process.stdout.write(')')
 }
 
+var debugnames = 0
+
 function prterm(a, parent) {
 	switch (typeof a) {
 		case 'boolean':
@@ -745,6 +747,11 @@ function prterm(a, parent) {
 			return
 	}
 	if (etc.isfn(a)) {
+		if (!a.name) a.name = debugnames++
+		if (typeof a.name === 'number') {
+			process.stdout.write('#' + a.name.toString(16))
+			return
+		}
 		prname(a.name)
 		return
 	}
@@ -752,14 +759,17 @@ function prterm(a, parent) {
 	assert(false)
 }
 
+function prclausename(c) {
+	process.stdout.write(String(c.name))
+}
+
 function prclause(c) {
 	varnames = new Map()
 	process.stdout.write(c.length === 2 ? 'cnf(' : 'fof(')
-	process.stdout.write(c.name)
+	prclausename(c)
 	process.stdout.write(', ')
 
 	// role
-	process.stdout.write(', ')
 	switch (c.how) {
 		case 'negate':
 			process.stdout.write('negated_conjecture')
@@ -771,6 +781,7 @@ function prclause(c) {
 			process.stdout.write('plain')
 			break
 	}
+	process.stdout.write(', ')
 
 	// term
 	if (c.length === 2) {
@@ -783,24 +794,29 @@ function prclause(c) {
 			if (c[0].length + i) process.stdout.write(' | ')
 			prterm(c[1][i])
 		}
+		if (c[0].length + c[1].length === 0) process.stdout.write('$false')
 	} else prterm(c[0])
 	process.stdout.write(', ')
 
 	// source
 	switch (c.how) {
 		case 'negate':
-			process.stdout.write('inference(negate,[status(ceq)],[' + c.from[0].name + '])')
+			process.stdout.write('inference(negate,[status(ceq)],[')
+			prclausename(c.from[0])
+			process.stdout.write('])')
 			break
 		default:
 			if (c.file) {
-				process.stdout.write('file(' + etc.quote("'", c.file) + ',' + c.name + ')')
+				process.stdout.write('file(' + etc.quote("'", c.file) + ',')
+				prclausename(c)
+				process.stdout.write(')')
 				break
 			}
 			process.stdout.write('inference(' + c.how + ',[status(')
 			process.stdout.write(')],[')
 			for (var i = 0; i < c.from.length; i++) {
 				if (i) process.stdout.write(',')
-				process.stdout.write(c.from[i].name)
+				prclausename(c.from[i])
 			}
 			process.stdout.write('])')
 			break
