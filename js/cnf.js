@@ -123,13 +123,15 @@ function ckclauses(cs) {
 }
 
 function ckclause(c) {
-	assert(Array.isArray(c))
 	assert(!c.file || typeof c.file === 'string')
 	assert(!c.from || Array.isArray(c.from))
 	assert(!c.how || typeof c.how === 'string')
 	assert(!c.name || typeof c.name === 'string')
+	assert(!c.o)
+	assert(Array.isArray(c))
 	assert(c.length === 2)
 	for (var L of c) {
+		assert(!L.o)
 		assert(Array.isArray(L))
 		for (var a of L)
 			switch (a.o) {
