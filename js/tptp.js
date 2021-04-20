@@ -340,7 +340,7 @@ function parse1(file, text, selection, problem) {
 			case '!=':
 				lex()
 				var b = term(bound)
-				return etc.mk('!=', a, b)
+				return etc.mk('!', etc.mk('==', a, b))
 			case '=':
 				lex()
 				var b = term(bound)
@@ -742,6 +742,10 @@ function prterm(a, parent) {
 			args(a.slice(1))
 			return
 		case '!':
+			if (a[0].o === '==') {
+				infix('!=', a[0])
+				return
+			}
 			process.stdout.write('~')
 			prterm(a[0])
 			return
