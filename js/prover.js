@@ -13,7 +13,7 @@ var files = []
 
 function language(file) {
 	if (lang) return lang
-	switch (extension(file)) {
+	switch (etc.extension(file)) {
 		case 'cnf':
 			return 'dimacs'
 		case 'p':
@@ -59,7 +59,7 @@ function parseargs(args) {
 			console.error(arg + ': unknown option')
 			process.exit(1)
 		}
-		if (extension(s) === 'lst') {
+		if (etc.extension(s) === 'lst') {
 			parseargs(fs.readFileSync(s, 'utf8').split(/\r?\n/))
 			continue
 		}
@@ -162,7 +162,6 @@ if (require.main === module) {
 		process.exit(0)
 	}
 	for (var file of files) {
-		console.log(file)
 		try {
 			var text = fs.readFileSync(file, 'utf8')
 			switch (language(file)) {
@@ -190,16 +189,29 @@ if (require.main === module) {
 			throw e
 		}
 		var r = solve(problem)
-		if (r) {
-			console.log('sat')
-			var more
-			for (var [k, v] of r.entries()) {
-				if (more) process.stdout.write(' ')
-				more = true
-				if (!v) process.stdout.write('-')
-				process.stdout.write(k)
-			}
-		} else console.log('unsat')
+		switch (language(file)) {
+			case 'dimacs':
+				switch (r.sat) {
+					case true:
+						console.log('sat')
+						if (r.solution) {
+							var more
+							for (var [k, v] of r.solution) {
+								if (!k.name) continue
+								if (more) process.stdout.write(' ')
+								more = true
+								if (!v) process.stdout.write('-')
+								process.stdout.write(k.name)
+							}
+							console.log()
+						}
+						break
+					case false:
+						console.log('unsat')
+						break
+				}
+				break
+		}
 		console.log()
 	}
 }
