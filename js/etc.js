@@ -3,6 +3,21 @@ const assert = require('assert')
 
 Error.stackTraceLimit = Infinity
 
+function quote(q, s) {
+	var r = [q]
+	for (var i = 0; i < s.length; i++) {
+		switch (s[i]) {
+			case q:
+			case '\\':
+				r.push('\\')
+				break
+		}
+		r.push(s[i])
+	}
+	r.push(q)
+	return r.join('')
+}
+
 function show(a) {
 	console.dir(a, { depth: null })
 }
@@ -47,7 +62,6 @@ function type(a) {
 			var t = type(a[0])
 			return t[0]
 	}
-	console.log('----------------------------------------')
 	show(a)
 	assert(false)
 }
@@ -591,6 +605,10 @@ function test() {
 	assert(type(mk('==', 3, 3)) === 'boolean')
 	var p2 = { type: ['boolean', 'individual', 'individual'] }
 	assert(type(mk('call', p2, '3', '3')) === 'boolean')
+
+	// quote
+	assert(quote('|', 'abc') === '|abc|')
+	assert(quote('|', 'ab|c') === '|ab\\|c|')
 }
 
 test()
@@ -612,3 +630,4 @@ exports.freevars = freevars
 exports.freshvars = freshvars
 exports.type = type
 exports.show = show
+exports.quote = quote

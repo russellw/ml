@@ -323,7 +323,7 @@ function parse1(file, text, selection, problem) {
 
 		// distinct object
 		if (tok[0] === '"') {
-			var s = unquote(tok)
+			var s = tok
 			lex()
 			return s
 		}
@@ -597,6 +597,65 @@ function parse(file, text) {
 	return problem
 }
 
+var skolemname = 0
+var varnames = new Map()
+
+function args(a) {
+	process.stdout.write('(')
+	for (var i = 0; i < a.length; i++) {
+		if (i) process.stdout.write(',')
+		prterm(a[i])
+	}
+	process.stdout.write(')')
+}
+
+function prterm(a, parent) {
+	switch (typeof a) {
+		case 'boolean':
+			process.stdout.write('$')
+		case 'bigint':
+		case 'string':
+			process.stdout.write(String(a))
+			return
+	}
+	switch (a.o) {
+		case 'var':
+			if (!varnames.has(a)) {
+				var i = varnames.size
+				varnames.set(a, i < 26 ? String.fromCharCode(65 + i) : 'Z' + (i - 25))
+			}
+			process.stdout.write(varnames.get(a))
+			return
+		case '+':
+			process.stdout.write('$sum')
+			args(a)
+			return
+		case 'call':
+			prterm(a[0])
+			args(a.slice(1))
+			return
+		case '!':
+			process.stdout.write('~')
+			prterm(a[0])
+			return
+	}
+	if (!Array.isArray(a)) {
+		if (!a.name) a.name = 'sK' + skolemname++
+		process.stdout.write(/^[a-z][\w_]*$/.test(a.name) ? a.name : etc.quote("'", a.name))
+		return
+	}
+	etc.show(a)
+	assert(false)
+}
+
+function prclause(c) {
+	varnames = new Map()
+}
+
+function prproof(c) {
+	skolemname = 0
+}
+
 function test() {
 	assert(/^[\+\-]?\d/.test('9'))
 	assert(/^[\+\-]?\d/.test('99'))
@@ -609,6 +668,14 @@ function test() {
 	assert(BigInt('3') === 3n)
 	assert(BigInt('+3') === 3n)
 	assert(BigInt('-3') === -3n)
+
+	assert(/^[a-z][\w_]*$/.test('a'))
+	assert(/^[a-z][\w_]*$/.test('a9'))
+	assert(/^[a-z][\w_]*$/.test('aA'))
+	assert(/^[a-z][\w_]*$/.test('a_'))
+	assert(!/^[a-z][\w_]*$/.test('9'))
+	assert(!/^[a-z][\w_]*$/.test('A'))
+	assert(!/^[a-z][\w_]*$/.test('$foo'))
 }
 
 test()
