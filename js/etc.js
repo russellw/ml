@@ -214,13 +214,6 @@ function getor(m, k, f) {
 	return v
 }
 
-function isfn(a) {
-	if (typeof a !== 'object') return
-	if (Array.isArray(a)) return
-	if (a.o === 'var') return
-	return true
-}
-
 function walk(a, f) {
 	f(a)
 	if (Array.isArray(a)) for (var b of a) walk(b, f)
@@ -329,7 +322,7 @@ function test() {
 	assert(eq(rs[i++], ['a1', 'b2', 'c3']))
 
 	// eqn
-	var a = {}
+	var a = { o: 'fn' }
 	assert(eq(eqn(a), mk('==', a, true)))
 	assert(eq(eqn(true), mk('==', true, true)))
 	assert(eq(eqn(mk('call', a, 1, 2)), mk('==', mk('call', a, 1, 2), true)))
@@ -360,8 +353,8 @@ function test() {
 	assert(eq(simplify(mk('call', f, x, y), m), mk('call', f, y, y)))
 
 	// fn
-	var a = { type: 'individual' }
-	var b = { type: 'individual' }
+	var a = { o: 'fn', type: 'individual' }
+	var b = { o: 'fn', type: 'individual' }
 	assert(eq(a, a))
 	assert(!eq(a, b))
 
@@ -392,17 +385,17 @@ function test() {
 	assert(!eq([true, true], true))
 
 	// call
-	var f = {}
-	var g = {}
+	var f = { o: 'fn' }
+	var g = { o: 'fn' }
 	assert(eq(mk('call', f, 1n, 2n), mk('call', f, 1n, 2n)))
 	assert(!eq(mk('call', f, 1n, 2n), mk('call', g, 1n, 2n)))
 	assert(!eq(mk('call', f, 1n, 2n), mk('call', f, 1n, 3n)))
 
 	// https://en.wikipedia.org/wiki/Unification_(computer_science)#Examples_of_syntactic_unification_of_first-order_terms
-	var f1 = { type: ['individual', 'individual'] }
-	var f2 = { type: ['individual', 'individual', 'individual'] }
-	var g1 = { type: ['individual', 'individual'] }
-	var g2 = { type: ['individual', 'individual', 'individual'] }
+	var f1 = { o: 'fn', type: ['individual', 'individual'] }
+	var f2 = { o: 'fn', type: ['individual', 'individual', 'individual'] }
+	var g1 = { o: 'fn', type: ['individual', 'individual'] }
+	var g2 = { o: 'fn', type: ['individual', 'individual', 'individual'] }
 	var m
 
 	// Succeeds. (tautology)
@@ -612,19 +605,12 @@ function test() {
 	assert(type(9n) === 'bigint')
 	assert(type({ o: 'var', type: 'rat' }) === 'rat')
 	assert(type(mk('==', 3, 3)) === 'boolean')
-	var p2 = { type: ['boolean', 'individual', 'individual'] }
+	var p2 = { o: 'fn', type: ['boolean', 'individual', 'individual'] }
 	assert(type(mk('call', p2, '3', '3')) === 'boolean')
 
 	// quote
 	assert(quote('|', 'abc') === '|abc|')
 	assert(quote('|', 'ab|c') === '|ab\\|c|')
-
-	// isfn
-	assert(isfn(p2))
-	assert(isfn({ name: 'foo' }))
-	assert(!isfn('foo'))
-	assert(!isfn(y1))
-	assert(!isfn(mk('!', p2)))
 }
 
 test()
@@ -647,4 +633,3 @@ exports.freshvars = freshvars
 exports.type = type
 exports.show = show
 exports.quote = quote
-exports.isfn = isfn

@@ -316,7 +316,7 @@ function parse1(file, text, selection, problem) {
 		if (/^[\w_]/.test(tok) || tok[0] === "'") {
 			var name = id()
 			var a = etc.getor(problem.fns, name, () => {
-				return { name }
+				return { o: 'fn', name }
 			})
 			if (tok !== '(') return a
 			return args(bound, etc.mk('call', a))
@@ -750,15 +750,14 @@ function prterm(a, parent) {
 			process.stdout.write('~')
 			prterm(a[0])
 			return
-	}
-	if (etc.isfn(a)) {
-		if (!a.name) a.name = debugnames++
-		if (typeof a.name === 'number') {
-			process.stdout.write('#' + a.name.toString(16))
+		case 'fn':
+			if (!a.name) a.name = debugnames++
+			if (typeof a.name === 'number') {
+				process.stdout.write('#' + a.name.toString(16))
+				return
+			}
+			prname(a.name)
 			return
-		}
-		prname(a.name)
-		return
 	}
 	etc.show(a)
 	assert(false)
@@ -857,7 +856,7 @@ function prnproof(conclusion) {
 	var i = 0
 	for (var c of proof)
 		etc.walk(c, (a) => {
-			if (!etc.isfn(a)) return
+			if (a.o !== 'fn') return
 			var m = /^_sK(\d+)$/.match(a.name)
 			if (m) i = Math.max(i, parseInt(m[1], 10))
 		})
@@ -866,7 +865,7 @@ function prnproof(conclusion) {
 	// name Skolem functions that were not already named
 	for (var c of proof)
 		etc.walk(c, (a) => {
-			if (!etc.isfn(a)) return
+			if (a.o !== 'fn') return
 			if (!a.name) a.name = 'sK' + String(i++)
 		})
 

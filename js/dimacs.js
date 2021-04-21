@@ -67,7 +67,7 @@ function parse(file, text) {
 		// a propositional variable is a first-order function
 		// for consistency, we use the first-order terminology throughout
 		return etc.getor(atoms, name, () => {
-			return { name }
+			return { o: 'fn', name }
 		})
 	}
 

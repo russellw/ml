@@ -37,7 +37,7 @@ function convert(c, clauses) {
 		for (var [k, v] of bound.entries()) if (v.o === 'var' && free.has(k)) params.push(v)
 		bound = new Map(bound)
 		for (var x of a[0]) {
-			var sk = { type: x.type }
+			var sk = { o: 'fn', type: x.type }
 			if (params.length) {
 				sk.type = [x.type].concat(params.map(etc.type))
 				sk = etc.mk('call', ...[sk].concat(params))
@@ -187,8 +187,8 @@ function cterm(a) {
 
 function test() {
 	// clause
-	var a = {}
-	var b = {}
+	var a = { o: 'fn' }
+	var b = { o: 'fn' }
 	assert(etc.eq(simplify([[a], [b]]), [[a], [b]]))
 	assert(etc.eq(simplify([[a], [b]]), cterm(etc.mk('||', etc.mk('!', a), b))))
 	assert(etc.eq(simplify([[a], [false]]), [[a], []]))
@@ -249,10 +249,10 @@ function test() {
 	assert(etc.eq(cs[0], [[], [a]]))
 	assert(etc.eq(cs[1], [[], [b]]))
 
-	var a1 = {}
-	var b1 = {}
-	var a2 = {}
-	var b2 = {}
+	var a1 = { o: 'fn' }
+	var b1 = { o: 'fn' }
+	var a2 = { o: 'fn' }
+	var b2 = { o: 'fn' }
 
 	var cs = []
 	convert([etc.mk('||', a, b, a1, b1)], cs)
@@ -279,11 +279,11 @@ function test() {
 	var x = { o: 'var', type: 'individual' }
 	var y = { o: 'var', type: 'individual' }
 	var z = { o: 'var', type: 'individual' }
-	var f1 = { type: ['boolean', 'individual'] }
-	var f2 = { type: ['boolean', 'individual', 'individual'] }
-	var g1 = { type: ['boolean', 'individual'] }
-	var g2 = { type: ['boolean', 'individual', 'individual'] }
-	var h = { type: 'individual' }
+	var f1 = { o: 'fn', type: ['boolean', 'individual'] }
+	var f2 = { o: 'fn', type: ['boolean', 'individual', 'individual'] }
+	var g1 = { o: 'fn', type: ['boolean', 'individual'] }
+	var g2 = { o: 'fn', type: ['boolean', 'individual', 'individual'] }
+	var h = { o: 'fn', type: 'individual' }
 
 	assert(etc.match(etc.mk('call', f1, x), etc.mk('call', f1, h)))
 	assert(!etc.match(etc.mk('call', f1, h), etc.mk('call', f1, x)))
@@ -329,7 +329,7 @@ function test() {
 	assert(m)
 	assert(m.size === 1)
 	assert(!Array.isArray(m.get(x)))
-	assert(!m.get(x).o)
+	assert(m.get(x).o === 'fn')
 
 	var cs = []
 	convert([etc.mk('all', [x], etc.mk('exists', [y], etc.mk('call', f2, x, y)))], cs)
@@ -350,7 +350,7 @@ function test() {
 	assert(m)
 	assert(m.size === 1)
 	assert(!Array.isArray(m.get(y)))
-	assert(!m.get(y).o)
+	assert(m.get(y).o === 'fn')
 
 	var cs = []
 	convert([etc.mk('<=>', a, b)], cs)
@@ -410,9 +410,9 @@ function test() {
 	thm(etc.mk('||', false, false, true))
 	thm(etc.mk('<=>', a, a))
 
-	var p1 = { name: 'p1' }
-	var p2 = { name: 'p2' }
-	var p3 = { name: 'p3' }
+	var p1 = { o: 'fn', name: 'p1' }
+	var p2 = { o: 'fn', name: 'p2' }
+	var p3 = { o: 'fn', name: 'p3' }
 
 	thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p1, p2))))
 	// thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p3, etc.mk('<=>', p1, etc.mk('<=>', p2, p3))))))
