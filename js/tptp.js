@@ -494,7 +494,7 @@ function parse1(file, text, selection, problem) {
 				// select
 				if (select(name)) {
 					var c = [neg, pos]
-					c.file = file
+					c.file = path.basename(file)
 					c.name = name
 					problem.clauses.push(c)
 				}
@@ -544,7 +544,7 @@ function parse1(file, text, selection, problem) {
 					free = null
 					var a = formula(new Map())
 					var c = [a]
-					c.file = file
+					c.file = path.basename(file)
 					c.name = name
 
 					// negate conjecture

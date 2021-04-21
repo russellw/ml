@@ -1,4 +1,5 @@
 'use strict'
+const path = require('path')
 const etc = require('./etc')
 
 var eof = ''
@@ -93,7 +94,7 @@ function parse(file, text) {
 
 	function clause() {
 		var c = [neg, pos]
-		c.file = file
+		c.file = path.basename(file)
 		clauses.push(c)
 		neg = []
 		pos = []

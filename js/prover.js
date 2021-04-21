@@ -1,4 +1,5 @@
 'use strict'
+const path = require('path')
 const fs = require('fs')
 const dimacs = require('./dimacs')
 const tptp = require('./tptp')
@@ -177,12 +178,12 @@ if (require.main === module) {
 			}
 		} catch (e) {
 			if (e === 'Inappropriate') {
-				console.log('%% SZS status Inappropriate for %s', file)
+				console.log('%% SZS status Inappropriate for %s', path.basename(file))
 				console.log()
 				continue
 			}
 			if (e.code === 'ERR_STRING_TOO_LONG' || e.message === 'Array buffer allocation failed') {
-				console.log('%% SZS status ResourceOut for %s', file)
+				console.log('%% SZS status ResourceOut for %s', path.basename(file))
 				console.log()
 				continue
 			}
@@ -193,11 +194,23 @@ if (require.main === module) {
 			case 'tptp':
 				switch (r.sat) {
 					case true:
-						console.log('%% SZS status %s for %s', problem.conjecture ? 'CounterSatisfiable' : 'Satisfiable', file)
+						console.log(
+							'%% SZS status %s for %s',
+							problem.conjecture ? 'CounterSatisfiable' : 'Satisfiable',
+							path.basename(file)
+						)
 						break
 					case false:
-						console.log('%% SZS status %s for %s', problem.conjecture ? 'Theorem' : 'Unsatisfiable', file)
-						if (r.proof) tptp.prnproof(r.proof)
+						console.log(
+							'%% SZS status %s for %s',
+							problem.conjecture ? 'Theorem' : 'Unsatisfiable',
+							path.basename(file)
+						)
+						if (r.proof) {
+							console.log('%% SZS output start CNFRefutation for %s', path.basename(file))
+							tptp.prnproof(r.proof)
+							console.log('%% SZS output end CNFRefutation for %s', path.basename(file))
+						}
 						break
 				}
 				break
