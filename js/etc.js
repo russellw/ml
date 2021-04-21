@@ -676,3 +676,4 @@ exports.type = type
 exports.show = show
 exports.quote = quote
 exports.defaulttype = defaulttype
+exports.isnumtype = isnumtype

@@ -20,17 +20,16 @@ function unquote(s) {
 function parse1(file, text, selection, problem) {
 	var ti = 0
 	var tok
-	var toki
 
 	function err(msg) {
-		etc.err(file, text, toki, msg)
+		console.error('%s:%d: %s', file, text.slice(0, ti).split('\n').length, msg)
+		process.exit(1)
 	}
 
 	// tokenizer
 	function lex() {
 		while (ti < text.length) {
-			// mark start of token for error reporting
-			toki = ti
+			var ti0 = ti
 
 			// space
 			if (/\s/.test(text[ti])) {
@@ -41,7 +40,7 @@ function parse1(file, text, selection, problem) {
 			// line comment
 			if (text[ti] === '%') {
 				while (text[ti] !== '\n') ti++
-				if (!problem.doneheader) console.log(text.slice(toki, ti))
+				if (!problem.doneheader) console.log(text.slice(ti0, ti))
 				continue
 			}
 
@@ -79,14 +78,14 @@ function parse1(file, text, selection, problem) {
 						while (/\d/.test(text[ti])) ti++
 					}
 				}
-				tok = text.slice(toki, ti)
+				tok = text.slice(ti0, ti)
 				return
 			}
 
 			// word
 			if (/[\w_\$]/.test(text[ti])) {
 				while (/[\w_\$]/.test(text[ti])) ti++
-				tok = text.slice(toki, ti)
+				tok = text.slice(ti0, ti)
 				return
 			}
 
@@ -97,7 +96,7 @@ function parse1(file, text, selection, problem) {
 					if (ti === text.length) err('Unclosed quote')
 				}
 				ti++
-				tok = text.slice(toki, ti)
+				tok = text.slice(ti0, ti)
 				return
 			}
 
@@ -105,7 +104,7 @@ function parse1(file, text, selection, problem) {
 			var punct = ['<=>', '<~>']
 			if (punct.includes(text.slice(ti, ti + 3))) {
 				ti += 3
-				tok = text.slice(toki, ti)
+				tok = text.slice(ti0, ti)
 				return
 			}
 
@@ -113,7 +112,7 @@ function parse1(file, text, selection, problem) {
 			var punct = ['!=', '=>', '<=', '~|', '~&']
 			if (punct.includes(text.slice(ti, ti + 2))) {
 				ti += 2
-				tok = text.slice(toki, ti)
+				tok = text.slice(ti0, ti)
 				return
 			}
 
@@ -224,8 +223,8 @@ function parse1(file, text, selection, problem) {
 		lex()
 		var a = args(bound)
 		if (a.length !== arity) err('Expected ' + arity + ' arguments')
-		if (!etc.isnumtype(type(a[0]))) err('Expected numeric term')
-		for (var i = 1; i < a.length; i++) requiretype(a[i], type(a[0]))
+		if (!etc.isnumtype(etc.type(a[0]))) err('Expected numeric term')
+		for (var i = 1; i < a.length; i++) requiretype(a[i], etc.type(a[0]))
 		return etc.mk(o, ...a)
 	}
 
@@ -518,7 +517,6 @@ function parse1(file, text, selection, problem) {
 				expect(',')
 
 				// role
-				if (tok === 'conjecture' && problem.conjecture) err('Multiple conjectures are ambiguous')
 				var role = id()
 				expect(',')
 
@@ -549,6 +547,7 @@ function parse1(file, text, selection, problem) {
 
 					// negate conjecture
 					if (role === 'conjecture') {
+						if (problem.conjecture) err('Multiple conjectures are ambiguous')
 						c.how = 'conjecture'
 						problem.conjecture = c
 						a = etc.mk('!', a)
