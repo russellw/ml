@@ -7,18 +7,18 @@ var eof = ''
 function parse(file, text) {
 	var ti = 0
 	var tok
-	var toki
 	var expected
 
 	function err(msg) {
-		etc.err(file, text, toki, msg)
+		console.error('%s:%d: %s', file, text.slice(0, ti).split('\n').length, msg)
+		process.exit(1)
 	}
 
 	// tokenizer
 	function lex() {
 		while (ti < text.length) {
 			// mark start of token for error reporting
-			toki = ti
+			var ti0 = ti
 
 			// space
 			if (/\s/.test(text[ti])) {
@@ -29,14 +29,14 @@ function parse(file, text) {
 			// line comment
 			if (text[ti] === 'c') {
 				while (text[ti] !== '\n') ti++
-				if (!doneheader) console.log(text.slice(toki, ti))
+				if (!doneheader) console.log(text.slice(ti0, ti))
 				continue
 			}
 
 			// number
 			if (/\d/.test(text[ti])) {
 				while (/\d/.test(text[ti])) ti++
-				tok = text.slice(toki, ti)
+				tok = text.slice(ti0, ti)
 				return
 			}
 
@@ -74,10 +74,7 @@ function parse(file, text) {
 
 	if (tok === 'p') {
 		while (ti < text.length && /\s/.test(text[ti])) ti++
-		if (text.slice(ti, ti + 3) !== 'cnf') {
-			toki = ti
-			err("Expected 'cnf'")
-		}
+		if (text.slice(ti, ti + 3) !== 'cnf') err("Expected 'cnf'")
 		ti += 3
 		lex()
 
