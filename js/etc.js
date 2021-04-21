@@ -3,7 +3,27 @@ const assert = require('assert')
 
 Error.stackTraceLimit = Infinity
 
-function settype(a, t) {}
+function isnumtype(t) {
+	switch (t) {
+		case 'bigint':
+		case 'rat':
+		case 'real':
+			return true
+	}
+}
+
+function defaulttype(a, t) {
+	switch (a.o) {
+		case 'fn':
+		case 'var':
+			if (!a.type) a.type = t
+			break
+		case 'call':
+			var f = a[0]
+			if (!f.type) f.type = [t].concat(a.slice(1).map(type))
+			break
+	}
+}
 
 function quote(q, s) {
 	var r = [q]
@@ -611,6 +631,28 @@ function test() {
 	// quote
 	assert(quote('|', 'abc') === '|abc|')
 	assert(quote('|', 'ab|c') === '|ab\\|c|')
+
+	// defaulttype
+	x = { o: 'var' }
+	defaulttype(x, 'real')
+	assert(type(x) === 'real')
+	defaulttype(x, 'rat')
+	assert(type(x) === 'real')
+
+	a = { o: 'fn' }
+	defaulttype(a, 'real')
+	assert(type(a) === 'real')
+	defaulttype(a, 'rat')
+	assert(type(a) === 'real')
+
+	f = { o: 'fn' }
+	a = mk('call', f, 1n, 2n)
+	defaulttype(a, 'real')
+	assert(type(a) === 'real')
+	assert(eq(type(f), ['real', 'bigint', 'bigint']))
+	defaulttype(a, 'rat')
+	assert(type(a) === 'real')
+	assert(eq(type(f), ['real', 'bigint', 'bigint']))
 }
 
 test()
@@ -633,3 +675,4 @@ exports.freshvars = freshvars
 exports.type = type
 exports.show = show
 exports.quote = quote
+exports.defaulttype = defaulttype

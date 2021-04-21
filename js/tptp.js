@@ -201,12 +201,22 @@ function parse1(file, text, selection, problem) {
 		return t
 	}
 
+	function requiretype(a, t) {
+		etc.defaulttype(a, t)
+		if (!etc.eq(etc.type(a), t)) err('Type mismatch')
+	}
+
+	function requirenum(a) {
+		if (!etc.isnumtype(type(a))) err('Expected numeric term')
+	}
+
 	// terms
 	var free = new Map()
 
-	function args(bound, a = []) {
+	function args(bound) {
 		assert(bound instanceof Map)
 		expect('(')
+		var a = []
 		do a.push(term(bound))
 		while (eat(','))
 		expect(')')
@@ -218,6 +228,8 @@ function parse1(file, text, selection, problem) {
 		lex()
 		var a = args(bound)
 		if (a.length !== arity) err('Expected ' + arity + ' arguments')
+		requirenum(a[0])
+		for (var i = 1; i < a.length; i++) requiretype(a[i], type(a[0]))
 		return etc.mk(o, ...a)
 	}
 
@@ -234,9 +246,12 @@ function parse1(file, text, selection, problem) {
 			case '$distinct':
 				lex()
 				var a = args(bound)
-				var clauses = etc.mk('&')
-				for (var i = 0; i < a.length; i++) for (var j = 0; j < i; j++) clauses.push(etc.mk('!=', a[i], a[j]))
-				return clauses
+				etc.defaulttype(a[0], 'individual')
+				for (var i = 1; i < a.length; i++) requiretype(a[i], etc.type(a[0]))
+				var inequalities = etc.mk('&')
+				for (var i = 0; i < a.length; i++)
+					for (var j = 0; j < i; j++) inequalities.push(etc.mk('!', etc.mk('==', a[i], a[j])))
+				return inequalities
 			case '$false':
 				lex()
 				return false
@@ -251,7 +266,9 @@ function parse1(file, text, selection, problem) {
 			case '$product':
 				return defined(bound, '*', 2)
 			case '$quotient':
-				return defined(bound, '/', 2)
+				var a = defined(bound, '/', 2)
+				if (type(a[0]) === 'bigint') err('Expected rational or real')
+				return a
 			case '$sum':
 				return defined(bound, '+', 2)
 			case '$true':
@@ -315,11 +332,16 @@ function parse1(file, text, selection, problem) {
 		// word
 		if (/^[\w_]/.test(tok) || tok[0] === "'") {
 			var name = id()
-			var a = etc.getor(problem.fns, name, () => {
+			var f = etc.getor(problem.fns, name, () => {
 				return { o: 'fn', name }
 			})
-			if (tok !== '(') return a
-			return args(bound, etc.mk('call', a))
+			if (tok !== '(') return f
+			var a = args(bound)
+			for (var b of a) {
+				etc.defaulttype(b, 'individual')
+				if (etc.type(b) === 'boolean') err('Term cannot be boolean')
+			}
+			return etc.mk('call', ...[f].concat(a))
 		}
 
 		// distinct object
@@ -341,12 +363,17 @@ function parse1(file, text, selection, problem) {
 			case '!=':
 				lex()
 				var b = term(bound)
+				etc.defaulttype(a, 'individual')
+				requiretype(b, etc.type(a))
 				return etc.mk('!', etc.mk('==', a, b))
 			case '=':
 				lex()
 				var b = term(bound)
+				etc.defaulttype(a, 'individual')
+				requiretype(b, etc.type(a))
 				return etc.mk('==', a, b)
 		}
+		requiretype(a, 'boolean')
 		return a
 	}
 
@@ -359,9 +386,8 @@ function parse1(file, text, selection, problem) {
 		do {
 			var name = tok
 			lex()
-			var t = 'individual'
-			if (eat(':')) t = atomictype()
-			var x = { o: 'var', type: t }
+			var x = { o: 'var', type: 'individual' }
+			if (eat(':')) x.type = atomictype()
 			bound.set(name, x)
 			v.push(x)
 		} while (eat(','))
@@ -511,15 +537,9 @@ function parse1(file, text, selection, problem) {
 						if (tok === '>') throw 'Inappropriate'
 					} else {
 						var a = etc.getor(problem.fns, name, () => {
-							return { name }
+							return { o: 'fn', name }
 						})
-						var toki1 = toki
-						var t = topleveltype()
-						if (!a.type) a.type = t
-						else if (!etc.eq(a.type, t)) {
-							toki = toki1
-							err('Type mismatch')
-						}
+						requiretype(a, topleveltype())
 					}
 
 					while (parens--) expect(')')
@@ -727,6 +747,10 @@ function prterm(a, parent) {
 			process.stdout.write('!')
 			quant(a)
 			return
+		case 'exists':
+			process.stdout.write('?')
+			quant(a)
+			return
 		case 'var':
 			if (!varnames.has(a)) {
 				var i = varnames.size
@@ -836,7 +860,7 @@ function prnclause(c) {
 function walkproof(c, proof, visited = new Set()) {
 	if (visited.has(c)) return
 	visited.add(c)
-	for (var d of c.from) walkproof(d, proof, visited)
+	if (c.from) for (var d of c.from) walkproof(d, proof, visited)
 	proof.push(c)
 }
 
@@ -857,7 +881,7 @@ function prnproof(conclusion) {
 	for (var c of proof)
 		etc.walk(c, (a) => {
 			if (a.o !== 'fn') return
-			var m = /^_sK(\d+)$/.match(a.name)
+			var m = /^_sK(\d+)$/.exec(a.name)
 			if (m) i = Math.max(i, parseInt(m[1], 10))
 		})
 	i++
