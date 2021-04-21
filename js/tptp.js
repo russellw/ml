@@ -206,10 +206,6 @@ function parse1(file, text, selection, problem) {
 		if (!etc.eq(etc.type(a), t)) err('Type mismatch')
 	}
 
-	function requirenum(a) {
-		if (!etc.isnumtype(type(a))) err('Expected numeric term')
-	}
-
 	// terms
 	var free = new Map()
 
@@ -228,7 +224,7 @@ function parse1(file, text, selection, problem) {
 		lex()
 		var a = args(bound)
 		if (a.length !== arity) err('Expected ' + arity + ' arguments')
-		requirenum(a[0])
+		if (!etc.isnumtype(type(a[0]))) err('Expected numeric term')
 		for (var i = 1; i < a.length; i++) requiretype(a[i], type(a[0]))
 		return etc.mk(o, ...a)
 	}
