@@ -3,6 +3,8 @@ const assert = require('assert')
 
 Error.stackTraceLimit = Infinity
 
+function settype(a, t) {}
+
 function quote(q, s) {
 	var r = [q]
 	for (var i = 0; i < s.length; i++) {
