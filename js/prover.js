@@ -10,7 +10,7 @@ const superposition = require('./superposition')
 const assert = require('assert')
 
 var lang
-var timelimit = 60_000
+var timelimit
 var files = []
 
 function language(file) {
@@ -101,10 +101,10 @@ function propositional(clauses) {
 	return true
 }
 
-function solve(problem) {
+function solve(problem, deadline) {
 	for (var c of problem.formulas) cnf.convert(c, problem.clauses)
-	if (propositional(problem.clauses)) return dpll.solve(problem.clauses)
-	return superposition.solve(problem.clauses)
+	if (propositional(problem.clauses)) return dpll.solve(problem.clauses, deadline)
+	return superposition.solve(problem.clauses, deadline)
 }
 
 function test() {
@@ -192,6 +192,8 @@ if (require.main === module) {
 	}
 	for (var file of files) {
 		var start = new Date().getTime()
+		var deadline
+		if (timelimit) deadline = start + timelimit
 		try {
 			var text = fs.readFileSync(file, 'utf8')
 			switch (language(file)) {
@@ -205,7 +207,7 @@ if (require.main === module) {
 					console.error(file + ': unknown language')
 					process.exit(1)
 			}
-			var r = solve(problem)
+			var r = solve(problem, deadline)
 		} catch (e) {
 			if (typeof e === 'string') r = { szs: e }
 			else if (e.code === 'ERR_STRING_TOO_LONG' || e.message === 'Array buffer allocation failed') r = { szs: 'ResourceOut' }
@@ -240,3 +242,5 @@ if (require.main === module) {
 		console.log()
 	}
 }
+
+exports.solve = solve

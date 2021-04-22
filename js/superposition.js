@@ -34,7 +34,7 @@ function splice(a, path, b, i = 0) {
 	return r
 }
 
-function solve(clauses) {
+function solve(clauses, deadline) {
 	cnf.ckclauses(clauses)
 
 	var complete = true
