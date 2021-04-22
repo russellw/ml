@@ -17,30 +17,30 @@ function unquote(s) {
 	return r.join('')
 }
 
-function parse1(file, text, selection, problem) {
+function parse1(file, txt, selection, problem) {
 	var ti = 0
 	var tok
 
 	function err(msg) {
-		console.error('%s:%d: %s', file, text.slice(0, ti).split('\n').length, msg)
+		console.error('%s:%d: %s', file, txt.slice(0, ti).split('\n').length, msg)
 		process.exit(1)
 	}
 
 	// tokenizer
 	function lex() {
-		while (ti < text.length) {
+		while (ti < txt.length) {
 			var ti0 = ti
 
 			// space
-			if (/\s/.test(text[ti])) {
+			if (/\s/.test(txt[ti])) {
 				ti++
 				continue
 			}
 
 			// line comment
-			if (text[ti] === '%') {
-				while (text[ti] !== '\n') ti++
-				var s = text.slice(ti0, ti)
+			if (txt[ti] === '%') {
+				while (txt[ti] !== '\n') ti++
+				var s = txt.slice(ti0, ti)
 				if (!problem.doneheader) console.log(s)
 				if (!problem.expected) {
 					var m = /%\s*Status\s*:\s*(\w+)/.exec(s)
@@ -50,9 +50,9 @@ function parse1(file, text, selection, problem) {
 			}
 
 			// block comment
-			if (text.slice(ti, ti + 2) === '/*') {
-				for (ti += 2; text.slice(ti, ti + 2) !== '*/'; ti++)
-					if (ti === text.length) {
+			if (txt.slice(ti, ti + 2) === '/*') {
+				for (ti += 2; txt.slice(ti, ti + 2) !== '*/'; ti++)
+					if (ti === txt.length) {
 						ti = ti0
 						err("unclosed '/*'")
 					}
@@ -61,75 +61,75 @@ function parse1(file, text, selection, problem) {
 			}
 
 			// number
-			if (/^[\+\-]?\d/.test(text.slice(ti, ti + 2))) {
+			if (/^[\+\-]?\d/.test(txt.slice(ti, ti + 2))) {
 				// sign
-				if (/[\+\-]/.test(text[ti])) ti++
+				if (/[\+\-]/.test(txt[ti])) ti++
 
 				// integer
-				while (/\d/.test(text[ti])) ti++
+				while (/\d/.test(txt[ti])) ti++
 
 				// fraction
-				if (text[ti] === '/') {
+				if (txt[ti] === '/') {
 					// denominator
 					ti++
-					while (/\d/.test(text[ti])) ti++
+					while (/\d/.test(txt[ti])) ti++
 				} else {
 					// decimal
-					if (text[ti] === '.') {
+					if (txt[ti] === '.') {
 						ti++
-						while (/\d/.test(text[ti])) ti++
+						while (/\d/.test(txt[ti])) ti++
 					}
 
 					// exponent
-					if (/^[\+\-]?[Ee]/.test(text.slice(ti, ti + 2))) {
-						if (/[\+\-]/.test(text[ti])) ti++
-						if (/[Ee]/.test(text[ti])) ti++
-						while (/\d/.test(text[ti])) ti++
+					if (/^[\+\-]?[Ee]/.test(txt.slice(ti, ti + 2))) {
+						if (/[\+\-]/.test(txt[ti])) ti++
+						if (/[Ee]/.test(txt[ti])) ti++
+						while (/\d/.test(txt[ti])) ti++
 					}
 				}
-				tok = text.slice(ti0, ti)
+				tok = txt.slice(ti0, ti)
 				return
 			}
 
 			// word
-			if (/[\w_\$]/.test(text[ti])) {
-				while (/[\w_\$]/.test(text[ti])) ti++
-				tok = text.slice(ti0, ti)
+			if (/[\w_\$]/.test(txt[ti])) {
+				while (/[\w_\$]/.test(txt[ti])) ti++
+				tok = txt.slice(ti0, ti)
 				return
 			}
 
 			// quote
-			if (text[ti] === "'" || text[ti] === '"') {
-				for (var q = text[ti++]; text[ti] !== q; ti++) {
-					if (text[ti] === '\\') ti++
-					if (ti === text.length) {
+			if (txt[ti] === "'" || txt[ti] === '"') {
+				for (var q = txt[ti++]; txt[ti] !== q; ti++) {
+					if (txt[ti] === '\\') ti++
+					if (ti === txt.length) {
 						ti = ti0
 						err('unclosed quote')
 					}
 				}
 				ti++
-				tok = text.slice(ti0, ti)
+				tok = txt.slice(ti0, ti)
 				return
 			}
 
 			// 3-char punctuation
 			var punct = ['<=>', '<~>']
-			if (punct.includes(text.slice(ti, ti + 3))) {
+			if (punct.includes(txt.slice(ti, ti + 3))) {
 				ti += 3
-				tok = text.slice(ti0, ti)
+				tok = txt.slice(ti0, ti)
 				return
 			}
 
 			// 2-char punctuation
 			var punct = ['!=', '=>', '<=', '~|', '~&']
-			if (punct.includes(text.slice(ti, ti + 2))) {
+			if (punct.includes(txt.slice(ti, ti + 2))) {
 				ti += 2
-				tok = text.slice(ti0, ti)
+				tok = txt.slice(ti0, ti)
 				return
 			}
 
 			// other
-			tok = text[ti++]
+			tok = txt[ti++]
 			return
 		}
 		tok = eof
@@ -616,14 +616,14 @@ function parse1(file, text, selection, problem) {
 		}
 }
 
-function parse(file, text) {
+function parse(file, txt) {
 	var problem = {
 		types: new Map(),
 		fns: new Map(),
 		formulas: [],
 		clauses: [],
 	}
-	parse1(file, text, null, problem)
+	parse1(file, txt, null, problem)
 	return problem
 }
 

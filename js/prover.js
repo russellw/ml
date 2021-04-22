@@ -200,13 +200,13 @@ if (require.main === module) {
 		var deadline
 		if (timelimit) deadline = start + timelimit
 		try {
-			var text = fs.readFileSync(file === 'stdin' ? 0 : file, 'utf8')
+			var txt = fs.readFileSync(file === 'stdin' ? 0 : file, 'utf8')
 			switch (language(file)) {
 				case 'dimacs':
-					var problem = dimacs.parse(file, text)
+					var problem = dimacs.parse(file, txt)
 					break
 				case 'tptp':
-					var problem = tptp.parse(file, text)
+					var problem = tptp.parse(file, txt)
 					break
 				default:
 					console.error(file + ': unknown language')

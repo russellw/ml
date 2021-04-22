@@ -4,32 +4,32 @@ const etc = require('./etc')
 
 var eof = ''
 
-function parse(file, text) {
+function parse(file, txt) {
 	var ti = 0
 	var tok
 	var expected
 
 	function err(msg) {
-		console.error('%s:%d: %s', file, text.slice(0, ti).split('\n').length, msg)
+		console.error('%s:%d: %s', file, txt.slice(0, ti).split('\n').length, msg)
 		process.exit(1)
 	}
 
 	// tokenizer
 	function lex() {
-		while (ti < text.length) {
+		while (ti < txt.length) {
 			// mark start of token for error reporting
 			var ti0 = ti
 
 			// space
-			if (/\s/.test(text[ti])) {
+			if (/\s/.test(txt[ti])) {
 				ti++
 				continue
 			}
 
 			// line comment
-			if (text[ti] === 'c') {
-				while (text[ti] !== '\n') ti++
-				var s = text.slice(ti0, ti)
+			if (txt[ti] === 'c') {
+				while (txt[ti] !== '\n') ti++
+				var s = txt.slice(ti0, ti)
 				if (!doneheader) console.log('%' + s.slice(1))
 				if (!expected) {
 					var m = /^c.* (SAT|UNSAT) /.exec(s)
@@ -39,14 +39,14 @@ function parse(file, text) {
 			}
 
 			// number
-			if (/\d/.test(text[ti])) {
-				while (/\d/.test(text[ti])) ti++
-				tok = text.slice(ti0, ti)
+			if (/\d/.test(txt[ti])) {
+				while (/\d/.test(txt[ti])) ti++
+				tok = txt.slice(ti0, ti)
 				return
 			}
 
 			// other
-			tok = text[ti++]
+			tok = txt[ti++]
 			return
 		}
 		tok = eof
@@ -78,8 +78,8 @@ function parse(file, text) {
 	}
 
 	if (tok === 'p') {
-		while (ti < text.length && /\s/.test(text[ti])) ti++
-		if (text.slice(ti, ti + 3) !== 'cnf') err("expected 'cnf'")
+		while (ti < txt.length && /\s/.test(txt[ti])) ti++
+		if (txt.slice(ti, ti + 3) !== 'cnf') err("expected 'cnf'")
 		ti += 3
 		lex()
 
