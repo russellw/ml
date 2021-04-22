@@ -29,7 +29,12 @@ function parse(file, text) {
 			// line comment
 			if (text[ti] === 'c') {
 				while (text[ti] !== '\n') ti++
-				if (!doneheader) console.log(text.slice(ti0, ti))
+				var s = text.slice(ti0, ti)
+				if (!doneheader) console.log(s)
+				if (!expected) {
+					var m = /^c.* (SAT|UNSAT) /.exec(s)
+					if (m) expected = m[1] === 'SAT' ? 'Satisfiable' : 'Unsatisfiable'
+				}
 				continue
 			}
 
