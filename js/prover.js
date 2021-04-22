@@ -163,6 +163,7 @@ if (require.main === module) {
 		process.exit(0)
 	}
 	for (var file of files) {
+		var start = new Date().getTime()
 		try {
 			var text = fs.readFileSync(file, 'utf8')
 			switch (language(file)) {
@@ -230,6 +231,7 @@ if (require.main === module) {
 					console.error(r.szs + ' != ' + problem.expected)
 					process.exit(1)
 			}
+		console.log('%% %d seconds', (new Date().getTime() - start) / 1000)
 		console.log()
 	}
 }
