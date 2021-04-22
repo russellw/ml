@@ -3,6 +3,8 @@ const assert = require('assert')
 
 Error.stackTraceLimit = Infinity
 
+var version = '0'
+
 function isnumtype(t) {
 	switch (t) {
 		case 'bigint':
@@ -654,3 +656,4 @@ exports.show = show
 exports.quote = quote
 exports.defaulttype = defaulttype
 exports.isnumtype = isnumtype
+exports.version = version

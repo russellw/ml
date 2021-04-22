@@ -37,10 +37,6 @@ function help() {
 	console.log('-t seconds  time limit')
 }
 
-function version() {
-	console.log('Version 0')
-}
-
 function parseargs(args) {
 	for (var i = 0; i < args.length; i++) {
 		var s = args[i]
@@ -86,7 +82,7 @@ function parseargs(args) {
 				case 'V':
 				case 'v':
 				case 'version':
-					version()
+					console.log('Aklo version %s', etc.version)
 					process.exit(0)
 			}
 			console.error(args[i] + ': unknown option')
