@@ -30,7 +30,7 @@ function parse(file, text) {
 			if (text[ti] === 'c') {
 				while (text[ti] !== '\n') ti++
 				var s = text.slice(ti0, ti)
-				if (!doneheader) console.log(s)
+				if (!doneheader) console.log('%' + s.slice(1))
 				if (!expected) {
 					var m = /^c.* (SAT|UNSAT) /.exec(s)
 					if (m) expected = m[1] === 'SAT' ? 'Satisfiable' : 'Unsatisfiable'
@@ -123,17 +123,4 @@ function parse(file, text) {
 	}
 }
 
-function prnsolution(m) {
-	var more
-	for (var [k, v] of m) {
-		if (!k.name) continue
-		if (more) process.stdout.write(' ')
-		more = true
-		if (!v) process.stdout.write('-')
-		process.stdout.write(k.name)
-	}
-	console.log()
-}
-
 exports.parse = parse
-exports.prnsolution = prnsolution

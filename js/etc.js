@@ -5,6 +5,10 @@ Error.stackTraceLimit = Infinity
 
 var version = '0'
 
+function cktime(deadline) {
+	if (deadline && new Date().getTime() >= deadline) throw 'Timeout'
+}
+
 function isnumtype(t) {
 	switch (t) {
 		case 'bigint':
@@ -657,3 +661,4 @@ exports.quote = quote
 exports.defaulttype = defaulttype
 exports.isnumtype = isnumtype
 exports.version = version
+exports.cktime = cktime

@@ -205,49 +205,26 @@ if (require.main === module) {
 					console.error(file + ': unknown language')
 					process.exit(1)
 			}
+			var r = solve(problem)
 		} catch (e) {
-			if (e === 'Inappropriate') {
-				console.log('%% SZS status Inappropriate for %s', path.basename(file))
-				console.log()
-				continue
-			}
-			if (e.code === 'ERR_STRING_TOO_LONG' || e.message === 'Array buffer allocation failed') {
-				console.log('%% SZS status ResourceOut for %s', path.basename(file))
-				console.log()
-				continue
-			}
-			throw e
+			if (typeof e === 'string') r = { szs: e }
+			else if (e.code === 'ERR_STRING_TOO_LONG' || e.message === 'Array buffer allocation failed') r = { szs: 'ResourceOut' }
+			else throw e
 		}
-		var r = solve(problem)
-		switch (language(file)) {
-			case 'tptp':
-				if (problem.conjecture)
-					switch (r.szs) {
-						case 'Satisfiable':
-							r.szs = 'CounterSatisfiable'
-							break
-						case 'Unsatisfiable':
-							r.szs = 'Theorem'
-							break
-					}
-				console.log('%% SZS status %s for %s', r.szs, path.basename(file))
-				if (r.proof) {
-					console.log('%% SZS output start CNFRefutation for %s', path.basename(file))
-					tptp.prnproof(r.proof)
-					console.log('%% SZS output end CNFRefutation for %s', path.basename(file))
-				}
-				break
-			case 'dimacs':
-				switch (r.szs) {
-					case 'Satisfiable':
-						console.log('sat')
-						if (r.solution) dimacs.prnsolution(r.solution)
-						break
-					case 'Unsatisfiable':
-						console.log('unsat')
-						break
-				}
-				break
+		if (problem.conjecture)
+			switch (r.szs) {
+				case 'Satisfiable':
+					r.szs = 'CounterSatisfiable'
+					break
+				case 'Unsatisfiable':
+					r.szs = 'Theorem'
+					break
+			}
+		console.log('%% SZS status %s for %s', r.szs, path.basename(file))
+		if (r.proof) {
+			console.log('%% SZS output start CNFRefutation for %s', path.basename(file))
+			tptp.prnproof(r.proof)
+			console.log('%% SZS output end CNFRefutation for %s', path.basename(file))
 		}
 		if (problem.expected && r.szs !== problem.expected)
 			switch (r.szs) {
