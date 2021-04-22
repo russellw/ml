@@ -10,6 +10,7 @@ const superposition = require('./superposition')
 const assert = require('assert')
 
 var lang
+var timelimit = 60_000
 var files = []
 
 function language(file) {
@@ -25,12 +26,15 @@ function language(file) {
 
 function help() {
 	console.log('General options:')
-	console.log('-h       Show help')
-	console.log('-v       Show version')
+	console.log('-h          Show help')
+	console.log('-V          Show version')
 	console.log()
 	console.log('Input:')
-	console.log('-dimacs  DIMACS format')
-	console.log('-tptp    TPTP   format')
+	console.log('-dimacs     DIMACS format')
+	console.log('-tptp       TPTP   format')
+	console.log()
+	console.log('Resources:')
+	console.log('-t seconds  Time limit')
 }
 
 function version() {
@@ -38,12 +42,39 @@ function version() {
 }
 
 function parseargs(args) {
-	for (var arg of args) {
-		var s = arg
+	for (var i = 0; i < args.length; i++) {
+		var s = args[i]
 		if (!s) continue
 		if (s.startsWith('-')) {
 			while (s.startsWith('-')) s = s.slice(1)
+
+			var optarg
+			var m = /^([a-zA-Z\-])+[:=](.+)$/.exec(s)
+			if (m) {
+				s = m[1]
+				optarg = m[2]
+			} else {
+				var m = /^([a-zA-Z\-])+(\d+)$/.exec(s)
+				if (m) {
+					s = m[1]
+					optarg = m[2]
+				}
+			}
+
+			function getoptarg() {
+				if (optarg) return optarg
+				if (i + 1 === args.length) {
+					console.error(args[i] + ': expected arg')
+					process.exit(1)
+				}
+				return args[++i]
+			}
+
 			switch (s) {
+				case 't':
+				case 'soft-cpu-limit':
+					timelimit = parseFloat(getoptarg()) * 1000
+					continue
 				case 'dimacs':
 				case 'tptp':
 					lang = s
@@ -52,12 +83,13 @@ function parseargs(args) {
 				case 'help':
 					help()
 					process.exit(0)
-				case 'h':
+				case 'V':
+				case 'v':
 				case 'version':
 					version()
 					process.exit(0)
 			}
-			console.error(arg + ': unknown option')
+			console.error(args[i] + ': unknown option')
 			process.exit(1)
 		}
 		if (etc.extension(s) === 'lst') {
