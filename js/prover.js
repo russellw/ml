@@ -26,15 +26,15 @@ function language(file) {
 
 function help() {
 	console.log('General options:')
-	console.log('-h          Show help')
-	console.log('-V          Show version')
+	console.log('-h          show help')
+	console.log('-V          show version')
 	console.log()
 	console.log('Input:')
 	console.log('-dimacs     DIMACS format')
 	console.log('-tptp       TPTP   format')
 	console.log()
 	console.log('Resources:')
-	console.log('-t seconds  Time limit')
+	console.log('-t seconds  time limit')
 }
 
 function version() {

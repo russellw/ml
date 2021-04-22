@@ -51,7 +51,11 @@ function parse1(file, text, selection, problem) {
 
 			// block comment
 			if (text.slice(ti, ti + 2) === '/*') {
-				for (ti += 2; text.slice(ti, ti + 2) !== '*/'; ti++) if (ti === text.length) err("Unclosed '/*'")
+				for (ti += 2; text.slice(ti, ti + 2) !== '*/'; ti++)
+					if (ti === text.length) {
+						ti = ti0
+						err("unclosed '/*'")
+					}
 				ti += 2
 				continue
 			}
@@ -98,7 +102,10 @@ function parse1(file, text, selection, problem) {
 			if (text[ti] === "'" || text[ti] === '"') {
 				for (var q = text[ti++]; text[ti] !== q; ti++) {
 					if (text[ti] === '\\') ti++
-					if (ti === text.length) err('Unclosed quote')
+					if (ti === text.length) {
+						ti = ti0
+						err('unclosed quote')
+					}
 				}
 				ti++
 				tok = text.slice(ti0, ti)
@@ -139,7 +146,7 @@ function parse1(file, text, selection, problem) {
 	}
 
 	function expect(k) {
-		if (!eat(k)) err("Expected '" + k + "'")
+		if (!eat(k)) err("expected '" + k + "'")
 	}
 
 	function id() {
@@ -153,7 +160,7 @@ function parse1(file, text, selection, problem) {
 			lex()
 			return name
 		}
-		err('Expected name')
+		err('expected name')
 	}
 
 	// types
@@ -207,7 +214,7 @@ function parse1(file, text, selection, problem) {
 
 	function requiretype(a, t) {
 		etc.defaulttype(a, t)
-		if (!etc.eq(etc.type(a), t)) err('Type mismatch')
+		if (!etc.eq(etc.type(a), t)) err('type mismatch')
 	}
 
 	// terms
@@ -227,8 +234,8 @@ function parse1(file, text, selection, problem) {
 		assert(bound instanceof Map)
 		lex()
 		var a = args(bound)
-		if (a.length !== arity) err('Expected ' + arity + ' arguments')
-		if (!etc.isnumtype(etc.type(a[0]))) err('Expected numeric term')
+		if (a.length !== arity) err('expected ' + arity + ' arguments')
+		if (!etc.isnumtype(etc.type(a[0]))) err('expected numeric term')
 		for (var i = 1; i < a.length; i++) requiretype(a[i], etc.type(a[0]))
 		return etc.mk(o, ...a)
 	}
@@ -267,7 +274,7 @@ function parse1(file, text, selection, problem) {
 				return defined(bound, '*', 2)
 			case '$quotient':
 				var a = defined(bound, '/', 2)
-				if (type(a[0]) === 'bigint') err('Expected rational or real')
+				if (type(a[0]) === 'bigint') err('expected rational or real')
 				return a
 			case '$sum':
 				return defined(bound, '+', 2)
@@ -323,7 +330,7 @@ function parse1(file, text, selection, problem) {
 			var name = tok
 			lex()
 			if (bound.has(name)) return bound.get(name)
-			if (!free) err('Unbound variable')
+			if (!free) err(name + ': unbound variable')
 			return etc.getor(free, name, () => {
 				return { o: 'var', type: 'individual' }
 			})
@@ -339,7 +346,7 @@ function parse1(file, text, selection, problem) {
 			var a = args(bound)
 			for (var b of a) {
 				etc.defaulttype(b, 'individual')
-				if (etc.type(b) === 'boolean') err('Term cannot be boolean')
+				if (etc.type(b) === 'boolean') err('term cannot be boolean')
 			}
 			return etc.mk('call', ...[f].concat(a))
 		}
@@ -352,7 +359,7 @@ function parse1(file, text, selection, problem) {
 		}
 
 		// other
-		err('Expected term')
+		err('expected term')
 	}
 
 	// formulas
@@ -460,7 +467,7 @@ function parse1(file, text, selection, problem) {
 				while (!eat(')')) ignore()
 				return
 			case eof:
-				err("Expected ')'")
+				err("expected ')'")
 		}
 		lex()
 	}
@@ -552,7 +559,7 @@ function parse1(file, text, selection, problem) {
 
 					// negate conjecture
 					if (role === 'conjecture') {
-						if (problem.conjecture) err('Multiple conjectures are ambiguous')
+						if (problem.conjecture) err('multiple conjectures are ambiguous')
 						c.how = 'conjecture'
 						problem.conjecture = c
 						a = etc.mk('!', a)
@@ -605,7 +612,7 @@ function parse1(file, text, selection, problem) {
 				parse1(name, text1, selection1, problem)
 				break
 			default:
-				err('Syntax error')
+				err('syntax error')
 		}
 }
 

@@ -67,7 +67,7 @@ function parse(file, text) {
 	var atoms = new Map()
 
 	function atom() {
-		if (!/[1-9]\d*/.test(tok)) err('Expected atom')
+		if (!/[1-9]\d*/.test(tok)) err('expected atom')
 		var name = tok
 		lex()
 		// a propositional variable is a first-order function
@@ -79,14 +79,14 @@ function parse(file, text) {
 
 	if (tok === 'p') {
 		while (ti < text.length && /\s/.test(text[ti])) ti++
-		if (text.slice(ti, ti + 3) !== 'cnf') err("Expected 'cnf'")
+		if (text.slice(ti, ti + 3) !== 'cnf') err("expected 'cnf'")
 		ti += 3
 		lex()
 
-		if (!/^\d+$/.test(tok)) err('Expected count')
+		if (!/^\d+$/.test(tok)) err('expected count')
 		lex()
 
-		if (!/^\d+$/.test(tok)) err('Expected count')
+		if (!/^\d+$/.test(tok)) err('expected count')
 		lex()
 	}
 
