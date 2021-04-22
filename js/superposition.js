@@ -244,6 +244,8 @@ function solve(clauses, deadline) {
 
 	// saturation proof procedure tries to perform all possible derivations until it derives false
 	loop: for (;;) {
+		etc.cktime(deadline)
+
 		// given clause
 		var g = priorityq.pop(passive)
 
