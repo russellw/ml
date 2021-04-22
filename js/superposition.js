@@ -38,6 +38,12 @@ function solve(clauses) {
 	cnf.ckclauses(clauses)
 
 	var complete = true
+	for (var c of clauses)
+		for (var L of c)
+			for (var a of L)
+				etc.walk(a, (b) => {
+					if (etc.isnumtype(etc.type(b))) complete = false
+				})
 
 	var passive = priorityq.mk(size)
 	for (var c of clauses) {
@@ -299,7 +305,7 @@ function test() {
 	assert(r.szs === 'Unsatisfiable')
 	assert(etc.eq(r.proof, [[], []]))
 
-	var c = [[etc.mk('==', 1, 1)], []]
+	var c = [[etc.mk('==', 1n, 1n)], []]
 	var r = solve([c])
 	assert(r.szs === 'Unsatisfiable')
 	assert(etc.eq(r.proof, [[], []]))
