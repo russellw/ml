@@ -25,30 +25,30 @@ function simplify(c, m = new Map()) {
 }
 
 function convert(c, clauses) {
-	function all(bound, pol, a) {
-		bound = new Map(bound)
-		for (var x of a[0]) bound.set(x, { o: 'var', type: x.type })
-		return nnf(bound, pol, a[1])
+	function all(env, pol, a) {
+		env = new Map(env)
+		for (var x of a[0]) env.set(x, { o: 'var', type: x.type })
+		return nnf(env, pol, a[1])
 	}
 
-	function exists(bound, pol, a) {
+	function exists(env, pol, a) {
 		var free = etc.freevars(a[1])
 		var params = []
-		for (var [k, v] of bound.entries()) if (v.o === 'var' && free.has(k)) params.push(v)
-		bound = new Map(bound)
+		for (var [k, v] of env.entries()) if (v.o === 'var' && free.has(k)) params.push(v)
+		env = new Map(env)
 		for (var x of a[0]) {
 			var sk = { o: 'fn', type: x.type }
 			if (params.length) {
 				sk.type = [x.type].concat(params.map(etc.type))
 				sk = etc.mk('call', ...[sk].concat(params))
 			}
-			bound.set(x, sk)
+			env.set(x, sk)
 		}
-		return nnf(bound, pol, a[1])
+		return nnf(env, pol, a[1])
 	}
 
 	// most of the work is done in conversion to negation normal form
-	function nnf(bound, pol, a) {
+	function nnf(env, pol, a) {
 		switch (a) {
 			case false:
 				return !pol
@@ -57,26 +57,26 @@ function convert(c, clauses) {
 		}
 		switch (a.o) {
 			case 'all':
-				return (pol ? all : exists)(bound, pol, a)
+				return (pol ? all : exists)(env, pol, a)
 			case 'exists':
-				return (pol ? exists : all)(bound, pol, a)
+				return (pol ? exists : all)(env, pol, a)
 			case '!':
-				return nnf(bound, !pol, a[0])
+				return nnf(env, !pol, a[0])
 			case '=>':
-				return nnf(bound, pol, etc.mk('||', etc.mk('!', a[0]), a[1]))
+				return nnf(env, pol, etc.mk('||', etc.mk('!', a[0]), a[1]))
 			case '&&':
-				return etc.mk(pol ? '&&' : '||', ...a.map((b) => nnf(bound, pol, b)))
+				return etc.mk(pol ? '&&' : '||', ...a.map((b) => nnf(env, pol, b)))
 			case '||':
-				return etc.mk(pol ? '||' : '&&', ...a.map((b) => nnf(bound, pol, b)))
+				return etc.mk(pol ? '||' : '&&', ...a.map((b) => nnf(env, pol, b)))
 			case 'var':
-				assert(bound.has(a))
-				return bound.get(a)
+				assert(env.has(a))
+				return env.get(a)
 			case '<=>':
 				var x = a[0]
 				var y = a[1]
-				return nnf(bound, pol, etc.mk('&&', etc.mk('=>', x, y), etc.mk('=>', y, x)))
+				return nnf(env, pol, etc.mk('&&', etc.mk('=>', x, y), etc.mk('=>', y, x)))
 		}
-		a = etc.map(a, (b) => nnf(bound, true, b))
+		a = etc.map(a, (b) => nnf(env, true, b))
 		return pol ? a : etc.mk('!', a)
 	}
 
