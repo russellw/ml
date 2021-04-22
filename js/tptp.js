@@ -40,7 +40,12 @@ function parse1(file, text, selection, problem) {
 			// line comment
 			if (text[ti] === '%') {
 				while (text[ti] !== '\n') ti++
-				if (!problem.doneheader) console.log(text.slice(ti0, ti))
+				var s = text.slice(ti0, ti)
+				if (!problem.doneheader) console.log(s)
+				if (!problem.expected) {
+					var m = /%\s*Status\s*:\s*(\w+)/.exec(s)
+					if (m) problem.expected = m[1]
+				}
 				continue
 			}
 
