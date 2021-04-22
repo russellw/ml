@@ -47,10 +47,7 @@ function sat(clauses, m = new Map()) {
 
 function solve(clauses) {
 	var solution = sat(clauses)
-	return {
-		sat: !!solution,
-		solution,
-	}
+	return { szs: solution ? 'Satisfiable' : 'Unsatisfiable', solution }
 }
 
 function test() {

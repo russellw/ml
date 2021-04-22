@@ -243,12 +243,12 @@ function solve(clauses) {
 
 		// no more clauses => we are done, proof not found
 		if (!g) {
-			if (complete) return { sat: true }
+			if (complete) return { szs: 'Satisfiable' }
 			return { szs: 'GaveUp' }
 		}
 
 		// empty (false) clause => proof found
-		if (etc.eq(g, [[], []])) return { sat: false, proof: g }
+		if (etc.eq(g, [[], []])) return { szs: 'Unsatisfiable', proof: g }
 
 		// algorithms being used here, assume clauses have distinct variable names
 		var h = etc.freshvars(g)
@@ -292,16 +292,16 @@ function test() {
 	assert(size(etc.mk('==', etc.mk('unary-', 10), etc.mk('+', 11, 12))), 3)
 
 	var r = solve([])
-	assert(r.sat === true)
+	assert(r.szs === 'Satisfiable')
 
 	var c = [[], []]
 	var r = solve([c])
-	assert(r.sat === false)
+	assert(r.szs === 'Unsatisfiable')
 	assert(etc.eq(r.proof, [[], []]))
 
 	var c = [[etc.mk('==', 1, 1)], []]
 	var r = solve([c])
-	assert(r.sat === false)
+	assert(r.szs === 'Unsatisfiable')
 	assert(etc.eq(r.proof, [[], []]))
 
 	var a = 1
@@ -334,11 +334,11 @@ function test() {
 
 	var c = [[p], []]
 	var r = solve([c])
-	assert(r.sat === true)
+	assert(r.szs === 'Satisfiable')
 
 	var c = [[], [p]]
 	var r = solve([c])
-	assert(r.sat === true)
+	assert(r.szs === 'Satisfiable')
 }
 
 test()

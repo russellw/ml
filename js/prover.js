@@ -81,9 +81,9 @@ function solve(problem) {
 
 function test() {
 	function sat(cs) {
-		var r1 = superposition.solve(cs).sat
+		var r1 = superposition.solve(cs).szs
 		if (propositional(cs)) {
-			var r2 = dpll.solve(cs).sat
+			var r2 = dpll.solve(cs).szs
 			assert(r1 === r2)
 		}
 		return r1
@@ -92,11 +92,11 @@ function test() {
 	function thm(a) {
 		var cs = []
 		cnf.convert([a], cs)
-		assert(sat(cs))
+		assert(sat(cs) === 'Satisfiable')
 
 		var cs = []
 		cnf.convert([etc.mk('!', a)], cs)
-		assert(!sat(cs))
+		assert(sat(cs) === 'Unsatisfiable')
 	}
 
 	var a = { type: 'boolean' }
@@ -192,40 +192,44 @@ if (require.main === module) {
 		var r = solve(problem)
 		switch (language(file)) {
 			case 'tptp':
-				switch (r.sat) {
-					case true:
-						console.log(
-							'%% SZS status %s for %s',
-							problem.conjecture ? 'CounterSatisfiable' : 'Satisfiable',
-							path.basename(file)
-						)
-						break
-					case false:
-						console.log(
-							'%% SZS status %s for %s',
-							problem.conjecture ? 'Theorem' : 'Unsatisfiable',
-							path.basename(file)
-						)
-						if (r.proof) {
-							console.log('%% SZS output start CNFRefutation for %s', path.basename(file))
-							tptp.prnproof(r.proof)
-							console.log('%% SZS output end CNFRefutation for %s', path.basename(file))
-						}
-						break
+				if (problem.conjecture)
+					switch (r.szs) {
+						case 'Satisfiable':
+							r.szs = 'CounterSatisfiable'
+							break
+						case 'Unsatisfiable':
+							r.szs = 'Theorem'
+							break
+					}
+				console.log('%% SZS status %s for %s', r.szs, path.basename(file))
+				if (r.proof) {
+					console.log('%% SZS output start CNFRefutation for %s', path.basename(file))
+					tptp.prnproof(r.proof)
+					console.log('%% SZS output end CNFRefutation for %s', path.basename(file))
 				}
 				break
 			case 'dimacs':
-				switch (r.sat) {
-					case true:
+				switch (r.szs) {
+					case 'Satisfiable':
 						console.log('sat')
 						if (r.solution) dimacs.prnsolution(r.solution)
 						break
-					case false:
+					case 'Unsatisfiable':
 						console.log('unsat')
 						break
 				}
 				break
 		}
+		if (problem.expected && r.szs !== problem.expected)
+			switch (r.szs) {
+				case 'Unsatisfiable':
+				case 'Theorem':
+					if (problem.expected === 'ContradictoryAxioms') break
+				case 'Satisfiable':
+				case 'CounterSatisfiable':
+					console.error(r.szs + ' != ' + problem.expected)
+					process.exit(1)
+			}
 		console.log()
 	}
 }
