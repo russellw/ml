@@ -32,6 +32,7 @@ function help() {
 	console.log('Input:')
 	console.log('-dimacs     DIMACS format')
 	console.log('-tptp       TPTP   format')
+	console.log('-           read stdin')
 	console.log()
 	console.log('Resources:')
 	console.log('-t seconds  time limit')
@@ -41,6 +42,10 @@ function parseargs(args) {
 	for (var i = 0; i < args.length; i++) {
 		var s = args[i]
 		if (!s) continue
+		if (s === '-') {
+			files.push('stdin')
+			continue
+		}
 		if (s.startsWith('-')) {
 			while (s.startsWith('-')) s = s.slice(1)
 
@@ -195,7 +200,7 @@ if (require.main === module) {
 		var deadline
 		if (timelimit) deadline = start + timelimit
 		try {
-			var text = fs.readFileSync(file, 'utf8')
+			var text = fs.readFileSync(file === 'stdin' ? 0 : file, 'utf8')
 			switch (language(file)) {
 				case 'dimacs':
 					var problem = dimacs.parse(file, text)
