@@ -42,7 +42,7 @@ function skolem(rt, params) {
 	var sk = { o: 'fn', type: rt }
 	if (!params.length) return sk
 	sk.type = [rt].concat(params.map(etc.type))
-	return etc.mk('call', [sk].concat(params))
+	return etc.mk('call', ...[sk].concat(params))
 }
 
 function convert(c, clauses) {
