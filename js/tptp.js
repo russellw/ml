@@ -434,7 +434,7 @@ function parse1(file, txt, selection, problem) {
 				break
 			case '<=':
 				lex()
-				return etc.mk('=>', unitary(bound), a)
+				return etc.mk('||', a, etc.mk('!', unitary(bound)))
 			case '<=>':
 				lex()
 				return etc.mk('<=>', a, unitary(bound))
@@ -443,7 +443,7 @@ function parse1(file, txt, selection, problem) {
 				return etc.mk('!', etc.mk('<=>', a, unitary(bound)))
 			case '=>':
 				lex()
-				return etc.mk('=>', a, unitary(bound))
+				return etc.mk('||', etc.mk('!', a), unitary(bound))
 			case '~&':
 				lex()
 				return etc.mk('!', etc.mk('&&', a, unitary(bound)))

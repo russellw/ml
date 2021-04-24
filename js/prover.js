@@ -136,8 +136,6 @@ function test() {
 	var b = { type: 'boolean' }
 
 	thm(true)
-	thm(etc.mk('=>', false, a))
-	thm(etc.mk('=>', a, a))
 	thm(etc.mk('&&', true, true, true))
 	thm(etc.mk('||', false, false, true))
 	thm(etc.mk('<=>', a, a))
@@ -158,8 +156,6 @@ function test() {
 	eqv(etc.mk('<=>', a, b), etc.mk('<=>', b, a))
 	eqv(etc.mk('!', etc.mk('<=>', a, b)), etc.mk('!', etc.mk('<=>', b, a)))
 
-	thm(etc.mk('=>', etc.mk('&&', a, etc.mk('=>', a, b)), b))
-
 	var a = { type: 'individual' }
 	var b = { type: 'individual' }
 	var f1 = { type: ['individual', 'individual'] }
@@ -171,7 +167,7 @@ function test() {
 	var z = { o: 'var', type: 'individual' }
 
 	function imp(a, b) {
-		thm(etc.mk('=>', a, b))
+		return etc.mk('||', etc.mk('!', a), b)
 	}
 
 	function eq(a, b) {
@@ -184,7 +180,7 @@ function test() {
 	var fy = etc.mk('call', f1, y)
 
 	imp(eq(a, b), eq(fa, fb))
-	thm(etc.mk('all', [x, y], etc.mk('=>', eq(x, y), eq(fx, fy))))
+	thm(etc.mk('all', [x, y], imp(eq(x, y), eq(fx, fy))))
 }
 
 test()

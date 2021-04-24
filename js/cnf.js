@@ -46,6 +46,33 @@ function skolem(rt, params) {
 }
 
 function convert(c, clauses) {
+	function and(...a) {
+		a = etc.mk('&&', ...a)
+
+		// verify before returning
+		csterm(a)
+		return a
+	}
+
+	function or(...a) {
+		// arguments can be taken without loss of generality as ANDs
+		var ands = []
+		for (var b of a) {
+			var and = []
+			flatten('&&', b, and)
+			ands.push(and)
+		}
+
+		// OR distributes over AND by Cartesian product
+		a = etc.cartproduct(ands)
+		for (var b of a) b.o = '||'
+		a.o = '&&'
+
+		// verify before returning
+		csterm(a)
+		return a
+	}
+
 	// most of the work is done in conversion to negation normal form
 	// the logic of which depends on whether the caller wants a negative or positive version of the formula
 	// or both, if the caller was an equivalence
@@ -60,19 +87,17 @@ function convert(c, clauses) {
 				return nnfneg(all(env, a), body)
 			case '!':
 				return nnfpos(env, a[0])
-			case '=>':
-				return nnfneg(env, etc.mk('||', etc.mk('!', a[0]), a[1]))
 			case '&&':
-				return etc.mk('||', ...a.map((b) => nnfneg(env, b)))
+				return or(...a.map((b) => nnfneg(env, b)))
 			case '||':
-				return etc.mk('&&', ...a.map((b) => nnfneg(env, b)))
+				return and(...a.map((b) => nnfneg(env, b)))
 			case 'var':
 				assert(env.has(a))
 				return env.get(a)
 			case '<=>':
 				var x = nnfboth(env, a[0])
 				var y = nnfboth(env, a[1])
-				return etc.mk('&&', etc.mk('||', x[0], y[0]), etc.mk('||', x[1], y[1]))
+				return and(or(x[0], y[0]), or(x[1], y[1]))
 		}
 		return etc.mk(
 			'!',
@@ -90,19 +115,17 @@ function convert(c, clauses) {
 				return nnfpos(exists(env, a), body)
 			case '!':
 				return nnfneg(env, a[0])
-			case '=>':
-				return nnfpos(env, etc.mk('||', etc.mk('!', a[0]), a[1]))
 			case '&&':
-				return etc.mk('&&', ...a.map((b) => nnfpos(env, b)))
+				return and(...a.map((b) => nnfpos(env, b)))
 			case '||':
-				return etc.mk('||', ...a.map((b) => nnfpos(env, b)))
+				return or(...a.map((b) => nnfpos(env, b)))
 			case 'var':
 				assert(env.has(a))
 				return env.get(a)
 			case '<=>':
 				var x = nnfboth(env, a[0])
 				var y = nnfboth(env, a[1])
-				return etc.mk('&&', etc.mk('||', x[0], y[1]), etc.mk('||', x[1], y[0]))
+				return and(or(x[0], y[1]), or(x[1], y[0]))
 		}
 		return etc.map(a, (b) => nnfpos(env, b))
 	}
@@ -168,60 +191,30 @@ function convert(c, clauses) {
 			case '!':
 				a = nnfboth(env, a[0])
 				return [a[1], a[0]]
-			case '=>':
-				return nnfboth(env, etc.mk('||', etc.mk('!', a[0]), a[1]))
 			case '&&':
 				var a2 = a.map((b) => nnfboth(env, b))
-				return [etc.mk('||', ...a2.map((b) => b[0])), etc.mk('&&', ...a2.map((b) => b[1]))]
+				return [or(...a2.map((b) => b[0])), and(...a2.map((b) => b[1]))]
 			case '||':
 				var a2 = a.map((b) => nnfboth(env, b))
-				return [etc.mk('&&', ...a2.map((b) => b[0])), etc.mk('||', ...a2.map((b) => b[1]))]
+				return [and(...a2.map((b) => b[0])), or(...a2.map((b) => b[1]))]
 			case 'var':
 				assert(env.has(a))
 				return env.get(a)
 			case '<=>':
 				var x = nnfboth(env, a[0])
 				var y = nnfboth(env, a[1])
-				return [
-					etc.mk('&&', etc.mk('||', x[0], y[0]), etc.mk('||', x[1], y[1])),
-					etc.mk('&&', etc.mk('||', x[0], y[1]), etc.mk('||', x[1], y[0])),
-				]
+				return [and(or(x[0], y[0]), or(x[1], y[1])), and(or(x[0], y[1]), or(x[1], y[0]))]
 		}
 		a = etc.map(a, (b) => nnfpos(env, b))
 		return [etc.mk('!', a), a]
 	}
 
-	// make AND rise to the top
-	function rise(a) {
-		a = etc.map(a, rise)
-		if (a.o !== '||') return a
-
-		// now we know this term is an OR
-		// its arguments can be taken without loss of generality as ANDs
-		var ands = []
-		for (var b of a) {
-			var and = []
-			flatten('&&', b, and)
-			ands.push(and)
-		}
-
-		// OR distributes over AND by Cartesian product
-		a = etc.cartproduct(ands)
-		for (var b of a) b.o = '||'
-		a.o = '&&'
-		return a
-	}
-
 	var a = c[0]
 	a = nnfpos(new Map(), a)
-	a = rise(a)
 
 	// now we have a term in CNF
 	// need to convert it to actual clauses
-	var ors = []
-	flatten('&&', a, ors)
-	for (var b of ors) {
-		var d = cterm(b)
+	for (var d of csterm(a)) {
 		d.how = 'cnf'
 		d.from = [c]
 		ckclause(d)
@@ -251,6 +244,7 @@ function ckclause(c) {
 				case '!':
 				case '=>':
 				case '<=>':
+				case '<~>':
 				case '!=':
 				case 'all':
 				case 'exists':
@@ -269,6 +263,14 @@ function flatten(o, a, r) {
 	r.push(a)
 }
 
+function csterm(a) {
+	var ors = []
+	flatten('&&', a, ors)
+	var cs = []
+	for (var b of ors) cs.push(cterm(b))
+	return cs
+}
+
 function cterm(a) {
 	var neg = []
 	var pos = []
@@ -278,9 +280,11 @@ function cterm(a) {
 			case '&&':
 			case '=>':
 			case '<=>':
+			case '<~>':
 			case '!=':
 			case 'all':
 			case 'exists':
+				etc.show(a)
 				assert(false)
 			case '||':
 				for (var b of a) rec(b)
@@ -343,11 +347,6 @@ function test() {
 	convert([etc.mk('!', etc.mk('!', a))], cs)
 	assert(cs.length === 1)
 	assert(etc.eq(cs[0], [[], [a]]))
-
-	var cs = []
-	convert([etc.mk('=>', a, b)], cs)
-	assert(cs.length === 1)
-	assert(etc.eq(cs[0], [[a], [b]]))
 
 	var cs = []
 	convert([etc.mk('||', a, b)], cs)
@@ -515,8 +514,6 @@ function test() {
 	}
 
 	thm(true)
-	thm(etc.mk('=>', false, a))
-	thm(etc.mk('=>', a, a))
 	thm(etc.mk('&&', true, true, true))
 	thm(etc.mk('||', false, false, true))
 	thm(etc.mk('<=>', a, a))
