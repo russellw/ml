@@ -24,83 +24,85 @@ function simplify(c, m = new Map()) {
 	return c
 }
 
-	function all(env,  a) {
-		env = new Map(env)
-		for (var x of a[0]) env.set(x, { o: 'var', type: x.type })
-		return env
-	}
+function all(env, a) {
+	env = new Map(env)
+	for (var x of a[0]) env.set(x, { o: 'var', type: x.type })
+	return env
+}
 
-	function exists(env,  a) {
-		var params = []
-		for (var [k, v] of env.entries()) if (v.o === 'var' && etc.freevars(a[1]).has(k)) params.push(v)
-		env = new Map(env)
-		for (var x of a[0])
-			env.set(x, skolem(x.type,params))
-		return env
-	}
+function exists(env, a) {
+	var params = []
+	for (var [k, v] of env.entries()) if (v.o === 'var' && etc.freevars(a[1]).has(k)) params.push(v)
+	env = new Map(env)
+	for (var x of a[0]) env.set(x, skolem(x.type, params))
+	return env
+}
 
-	function skolem(rt,params){
-		var sk= { o: 'fn', type: rt }
-		if(!params.length)return sk
-		sk.type=[rt].concat(params.map(etc.type))
-		return etc.mk('call',[sk].concat(params))
-	}
+function skolem(rt, params) {
+	var sk = { o: 'fn', type: rt }
+	if (!params.length) return sk
+	sk.type = [rt].concat(params.map(etc.type))
+	return etc.mk('call', [sk].concat(params))
+}
 
 function convert(c, clauses) {
 	// most of the work is done in conversion to negation normal form
-	//the logic of which depends on whether the caller wants a negative or positive version of the formula
-	//or both, if the caller was an equivalence
+	// the logic of which depends on whether the caller wants a negative or positive version of the formula
+	// or both, if the caller was an equivalence
 	function nnfneg(env, a) {
-		if(typeof a=='boolean')return!a
+		if (typeof a === 'boolean') return !a
 		switch (a.o) {
 			case 'all':
-			var body=a[1]
-			return nnfneg(exists(env,a),body)
+				var body = a[1]
+				return nnfneg(exists(env, a), body)
 			case 'exists':
-			var body=a[1]
-			return nnfneg(all(env,a),body)
+				var body = a[1]
+				return nnfneg(all(env, a), body)
 			case '!':
 				return nnfpos(env, a[0])
 			case '=>':
 				return nnfneg(env, etc.mk('||', etc.mk('!', a[0]), a[1]))
 			case '&&':
-				return etc.mk('||', ...a.map((b) =>nnfneg(env, b)))
+				return etc.mk('||', ...a.map((b) => nnfneg(env, b)))
 			case '||':
-				return etc.mk('&&', ...a.map((b) =>nnfneg(env, b)))
+				return etc.mk('&&', ...a.map((b) => nnfneg(env, b)))
 			case 'var':
 				assert(env.has(a))
 				return env.get(a)
 			case '<=>':
-				var x =nnfboth(env, a[0])
-				var y =nnfboth(env, a[1])
-				return etc.mk('&&', etc.mk('||',x[0],y[0]), etc.mk('||',x[1],y[1]))
+				var x = nnfboth(env, a[0])
+				var y = nnfboth(env, a[1])
+				return etc.mk('&&', etc.mk('||', x[0], y[0]), etc.mk('||', x[1], y[1]))
 		}
-		return etc.mk('!',etc.map(a, (b) => nnfpos(env, b)))
+		return etc.mk(
+			'!',
+			etc.map(a, (b) => nnfpos(env, b))
+		)
 	}
 
 	function nnfpos(env, a) {
 		switch (a.o) {
 			case 'all':
-			var body=a[1]
-			return nnfpos(all(env,a),body)
+				var body = a[1]
+				return nnfpos(all(env, a), body)
 			case 'exists':
-			var body=a[1]
-			return nnfpos(exists(env,a),body)
+				var body = a[1]
+				return nnfpos(exists(env, a), body)
 			case '!':
 				return nnfneg(env, a[0])
 			case '=>':
 				return nnfpos(env, etc.mk('||', etc.mk('!', a[0]), a[1]))
 			case '&&':
-				return etc.mk('&&', ...a.map((b) =>nnfpos(env, b)))
+				return etc.mk('&&', ...a.map((b) => nnfpos(env, b)))
 			case '||':
-				return etc.mk('||', ...a.map((b) =>nnfpos(env, b)))
+				return etc.mk('||', ...a.map((b) => nnfpos(env, b)))
 			case 'var':
 				assert(env.has(a))
 				return env.get(a)
 			case '<=>':
-				var x =nnfboth(env, a[0])
-				var y =nnfboth(env, a[1])
-				return etc.mk('&&', etc.mk('||',x[0],y[1]), etc.mk('||',x[1],y[0]))
+				var x = nnfboth(env, a[0])
+				var y = nnfboth(env, a[1])
+				return etc.mk('&&', etc.mk('||', x[0], y[1]), etc.mk('||', x[1], y[0]))
 		}
 		return etc.map(a, (b) => nnfpos(env, b))
 	}
@@ -152,17 +154,17 @@ function convert(c, clauses) {
 	function nnfboth(env, a) {
 		switch (a) {
 			case false:
-				return [true,false]
+				return [true, false]
 			case true:
-				return [false,true]
+				return [false, true]
 		}
 		switch (a.o) {
 			case 'all':
-			var body=a[1]
-			return[nnfneg(exists(env,a),body),nnfpos(all(env,a),body)]
+				var body = a[1]
+				return [nnfneg(exists(env, a), body), nnfpos(all(env, a), body)]
 			case 'exists':
-			var body=a[1]
-			return[nnfneg(all(env,a),body),nnfpos(exists(env,a),body)]
+				var body = a[1]
+				return [nnfneg(all(env, a), body), nnfpos(exists(env, a), body)]
 			case '!':
 				a = nnfboth(env, a[0])
 				return [a[1], a[0]]
@@ -170,23 +172,23 @@ function convert(c, clauses) {
 				return nnfboth(env, etc.mk('||', etc.mk('!', a[0]), a[1]))
 			case '&&':
 				var a2 = a.map((b) => nnfboth(env, b))
-				return [etc.mk('||', ...a2.map((b) => b[0])),etc.mk('&&', ...a2.map((b) => b[1]))]
+				return [etc.mk('||', ...a2.map((b) => b[0])), etc.mk('&&', ...a2.map((b) => b[1]))]
 			case '||':
 				var a2 = a.map((b) => nnfboth(env, b))
-				return [ etc.mk('&&', ...a2.map((b) => b[0])),etc.mk('||', ...a2.map((b) => b[1]))]
+				return [etc.mk('&&', ...a2.map((b) => b[0])), etc.mk('||', ...a2.map((b) => b[1]))]
 			case 'var':
 				assert(env.has(a))
 				return env.get(a)
 			case '<=>':
-				var x =nnfboth(env, a[0])
-				var y =nnfboth(env, a[1])
+				var x = nnfboth(env, a[0])
+				var y = nnfboth(env, a[1])
 				return [
-					etc.mk('&&', etc.mk('||',x[0],y[0]), etc.mk('||',x[1],y[1])),
-					etc.mk('&&', etc.mk('||',x[0],y[1]), etc.mk('||',x[1],y[0]))
-					]
+					etc.mk('&&', etc.mk('||', x[0], y[0]), etc.mk('||', x[1], y[1])),
+					etc.mk('&&', etc.mk('||', x[0], y[1]), etc.mk('||', x[1], y[0])),
+				]
 		}
 		a = etc.map(a, (b) => nnfpos(env, b))
-		return [ etc.mk('!', a),a]
+		return [etc.mk('!', a), a]
 	}
 
 	// make AND rise to the top
@@ -211,7 +213,7 @@ function convert(c, clauses) {
 	}
 
 	var a = c[0]
-	a = nnfpos(new Map(),  a)
+	a = nnfpos(new Map(), a)
 	a = rise(a)
 
 	// now we have a term in CNF
