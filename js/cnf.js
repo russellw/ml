@@ -162,13 +162,12 @@ function convert(c, clauses) {
 		var b = skolem('boolean', xs)
 
 		// b implies and is implied by a
-		// by construction, given that a was converted to NNF, the expanded equivalence is still so
-		// because NOT is placed only over an atomic term
-		// but in general the expanded equivalence is not in CNF
-		// because OR is placed over converted subformulas which could contain AND
-		// so we continue the conversion process from the point where AND needs to rise over OR
-		// and then to generate clauses to define the new symbol
-		convertrise(etc.mk('&&', etc.mk('||', etc.mk('!', b), a2[1]), etc.mk('||', b, a2[0])))
+		// generate clauses to define the new symbol
+		for (var d of csterm(and(or(etc.mk('!', b), a2[1]), or(b, a2[0])))) {
+			d.how = 'def'
+			ckclause(d)
+			clauses.push(d)
+		}
 
 		// return the new name by which the caller shall now know the formula
 		return b
