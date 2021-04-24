@@ -24,60 +24,169 @@ function simplify(c, m = new Map()) {
 	return c
 }
 
-function convert(c, clauses) {
-	function all(env, pol, a) {
+	function all(env,  a) {
 		env = new Map(env)
 		for (var x of a[0]) env.set(x, { o: 'var', type: x.type })
-		return nnf(env, pol, a[1])
+		return env
 	}
 
-	function exists(env, pol, a) {
-		var free = etc.freevars(a[1])
+	function exists(env,  a) {
 		var params = []
-		for (var [k, v] of env.entries()) if (v.o === 'var' && free.has(k)) params.push(v)
+		for (var [k, v] of env.entries()) if (v.o === 'var' && etc.freevars(a[1]).has(k)) params.push(v)
 		env = new Map(env)
-		for (var x of a[0]) {
-			var sk = { o: 'fn', type: x.type }
-			if (params.length) {
-				sk.type = [x.type].concat(params.map(etc.type))
-				sk = etc.mk('call', ...[sk].concat(params))
-			}
-			env.set(x, sk)
-		}
-		return nnf(env, pol, a[1])
+		for (var x of a[0])
+			env.set(x, skolem(x.type,params))
+		return env
 	}
 
+	function skolem(rt,params){
+		var sk= { o: 'fn', type: rt }
+		if(!params.length)return sk
+		sk.type=[rt].concat(params.map(etc.type))
+		return etc.mk('call',[sk].concat(params))
+	}
+
+function convert(c, clauses) {
 	// most of the work is done in conversion to negation normal form
-	function nnf(env, pol, a) {
-		switch (a) {
-			case false:
-				return !pol
-			case true:
-				return pol
-		}
+	//the logic of which depends on whether the caller wants a negative or positive version of the formula
+	//or both, if the caller was an equivalence
+	function nnfneg(env, a) {
+		if(typeof a=='boolean')return!a
 		switch (a.o) {
 			case 'all':
-				return (pol ? all : exists)(env, pol, a)
+			var body=a[1]
+			return nnfneg(exists(env,a),body)
 			case 'exists':
-				return (pol ? exists : all)(env, pol, a)
+			var body=a[1]
+			return nnfneg(all(env,a),body)
 			case '!':
-				return nnf(env, !pol, a[0])
+				return nnfpos(env, a[0])
 			case '=>':
-				return nnf(env, pol, etc.mk('||', etc.mk('!', a[0]), a[1]))
+				return nnfneg(env, etc.mk('||', etc.mk('!', a[0]), a[1]))
 			case '&&':
-				return etc.mk(pol ? '&&' : '||', ...a.map((b) => nnf(env, pol, b)))
+				return etc.mk('||', ...a.map((b) =>nnfneg(env, b)))
 			case '||':
-				return etc.mk(pol ? '||' : '&&', ...a.map((b) => nnf(env, pol, b)))
+				return etc.mk('&&', ...a.map((b) =>nnfneg(env, b)))
 			case 'var':
 				assert(env.has(a))
 				return env.get(a)
 			case '<=>':
-				var x = a[0]
-				var y = a[1]
-				return nnf(env, pol, etc.mk('&&', etc.mk('=>', x, y), etc.mk('=>', y, x)))
+				var x =nnfboth(env, a[0])
+				var y =nnfboth(env, a[1])
+				return etc.mk('&&', etc.mk('||',x[0],y[0]), etc.mk('||',x[1],y[1]))
 		}
-		a = etc.map(a, (b) => nnf(env, true, b))
-		return pol ? a : etc.mk('!', a)
+		return etc.mk('!',etc.map(a, (b) => nnfpos(env, b)))
+	}
+
+	function nnfpos(env, a) {
+		switch (a.o) {
+			case 'all':
+			var body=a[1]
+			return nnfpos(all(env,a),body)
+			case 'exists':
+			var body=a[1]
+			return nnfpos(exists(env,a),body)
+			case '!':
+				return nnfneg(env, a[0])
+			case '=>':
+				return nnfpos(env, etc.mk('||', etc.mk('!', a[0]), a[1]))
+			case '&&':
+				return etc.mk('&&', ...a.map((b) =>nnfpos(env, b)))
+			case '||':
+				return etc.mk('||', ...a.map((b) =>nnfpos(env, b)))
+			case 'var':
+				assert(env.has(a))
+				return env.get(a)
+			case '<=>':
+				var x =nnfboth(env, a[0])
+				var y =nnfboth(env, a[1])
+				return etc.mk('&&', etc.mk('||',x[0],y[1]), etc.mk('||',x[1],y[0]))
+		}
+		return etc.map(a, (b) => nnfpos(env, b))
+	}
+
+	// rename a formula that will be used as an equivalence argument
+	// that means both negative and positive versions are needed
+	// so the renaming needs implications in both directions
+	// that means we have to construct an equivalence involving the formula
+	// on the face of it, that puts us back where we started
+	// but the saving grace is that the definitional equivalence is a separate thing outside the original context
+	// which means it does not need to use the original environment
+	// which means all free variables of the formula are universally quantified
+	// and the positive and negative versions do not differ in the meanings they assign to the variables
+	function renameboth(a) {
+		// treat all free variables of the formula as universally quantified
+		// with the exception that we don't need to bother renaming them
+		// the actual handling of universal quantifiers involves renaming the variables
+		// in case the same names are reused in different parts of an overall formula
+		// but here we are dealing with exactly one layer
+		// and if these variable names are reused in quantifiers in subformulas
+		// then those occurrences will be renamed
+		// unless those subformulas are themselves renamed
+		// in which case they will end up in different clauses
+		// so the variables will still not overlap
+		var xs = Array.from(etc.freevars(a))
+		var env = new Map()
+		for (var x of xs) env.set(x, x)
+
+		// need both positive and negative versions of the formula
+		var a2 = nnfboth(env, a)
+
+		// b is defined as being equal to a
+		// it needs to take the free variables of a as parameters
+		var b = skolem('boolean', xs)
+
+		// b implies and is implied by a
+		// by construction, given that a was converted to NNF, the expanded equivalence is still so
+		// because NOT is placed only over an atomic term
+		// but in general the expanded equivalence is not in CNF
+		// because OR is placed over converted subformulas which could contain AND
+		// so we continue the conversion process from the point where AND needs to rise over OR
+		// and then to generate clauses to define the new symbol
+		convertrise(etc.mk('&&', etc.mk('||', etc.mk('!', b), a2[1]), etc.mk('||', b, a2[0])))
+
+		// return the new name by which the caller shall now know the formula
+		return b
+	}
+
+	function nnfboth(env, a) {
+		switch (a) {
+			case false:
+				return [true,false]
+			case true:
+				return [false,true]
+		}
+		switch (a.o) {
+			case 'all':
+			var body=a[1]
+			return[nnfneg(exists(env,a),body),nnfpos(all(env,a),body)]
+			case 'exists':
+			var body=a[1]
+			return[nnfneg(all(env,a),body),nnfpos(exists(env,a),body)]
+			case '!':
+				a = nnfboth(env, a[0])
+				return [a[1], a[0]]
+			case '=>':
+				return nnfboth(env, etc.mk('||', etc.mk('!', a[0]), a[1]))
+			case '&&':
+				var a2 = a.map((b) => nnfboth(env, b))
+				return [etc.mk('||', ...a2.map((b) => b[0])),etc.mk('&&', ...a2.map((b) => b[1]))]
+			case '||':
+				var a2 = a.map((b) => nnfboth(env, b))
+				return [ etc.mk('&&', ...a2.map((b) => b[0])),etc.mk('||', ...a2.map((b) => b[1]))]
+			case 'var':
+				assert(env.has(a))
+				return env.get(a)
+			case '<=>':
+				var x =nnfboth(env, a[0])
+				var y =nnfboth(env, a[1])
+				return [
+					etc.mk('&&', etc.mk('||',x[0],y[0]), etc.mk('||',x[1],y[1])),
+					etc.mk('&&', etc.mk('||',x[0],y[1]), etc.mk('||',x[1],y[0]))
+					]
+		}
+		a = etc.map(a, (b) => nnfpos(env, b))
+		return [ etc.mk('!', a),a]
 	}
 
 	// make AND rise to the top
@@ -102,7 +211,7 @@ function convert(c, clauses) {
 	}
 
 	var a = c[0]
-	a = nnf(new Map(), true, a)
+	a = nnfpos(new Map(),  a)
 	a = rise(a)
 
 	// now we have a term in CNF
