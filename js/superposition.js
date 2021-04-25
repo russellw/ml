@@ -55,7 +55,6 @@ function solve(clauses, deadline) {
 		}
 		priorityq.push(passive, d)
 	}
-	var active = []
 
 	function push(c, m, how, ...from) {
 		c = cnf.simplify(c, m)
@@ -64,6 +63,8 @@ function solve(clauses, deadline) {
 		c.from = from
 		priorityq.push(passive, c)
 	}
+
+	var active = []
 
 	// equality resolution
 	// c | c0 != c1
