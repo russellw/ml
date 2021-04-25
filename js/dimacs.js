@@ -52,7 +52,7 @@ function parse(file, txt) {
 		tok = eof
 	}
 
-	var doneheader
+	var doneheader = false
 	lex()
 	doneheader = true
 
