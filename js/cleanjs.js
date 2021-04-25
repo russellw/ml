@@ -49,6 +49,7 @@ for (var file of fs.readdirSync('.')) {
 	var lines = fs.readFileSync(file, 'utf8').split(/\r?\n/)
 	var old = lines.slice()
 
+	// use strict
 	for (var i = 0; i < lines.length; i++) if (lines[i] && !lines[i].startsWith('//')) break
 	if (lines[i] !== "'use strict'") lines.splice(i, 0, "'use strict'")
 

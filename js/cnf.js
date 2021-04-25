@@ -596,7 +596,7 @@ function test() {
 	assert(nclausespos(etc.mk('||', etc.mk('&&', a, a, a), etc.mk('&&', a, a, a))) === 9)
 
 	var ands = []
-	for (i = 0; i < 10; i++) {}
+	for (var i = 0; i < 10; i++) {}
 }
 
 test()
