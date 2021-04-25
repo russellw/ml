@@ -262,8 +262,14 @@ function convert(c, clauses) {
 				assert(env.has(a))
 				return env.get(a)
 			case '<=>':
-				var x = nnfboth(env, a[0])
-				var y = nnfboth(env, a[1])
+				var x = a[0]
+				if (nclausesneg(x) + nclausespos(x) >= many) x = renameboth(x)
+				x = nnfboth(env, x)
+
+				var y = a[1]
+				if (nclausesneg(y) + nclausespos(y) >= many) y = renameboth(y)
+				y = nnfboth(env, y)
+
 				return [and(or(x[0], y[0]), or(x[1], y[1])), and(or(x[0], y[1]), or(x[1], y[0]))]
 		}
 		a = etc.map(a, (b) => nnfpos(env, b))
