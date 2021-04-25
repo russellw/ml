@@ -167,58 +167,58 @@ function convert(c, clauses) {
 	// most of the work is done in conversion to negation normal form
 	// the logic of which depends on whether the caller wants a negative or positive version of the formula
 	// or both, if the caller was an equivalence
-	function nnfneg(env, a) {
+	function cnfneg(env, a) {
 		if (typeof a === 'boolean') return !a
 		switch (a.o) {
 			case 'all':
 				var body = a[1]
-				return nnfneg(exists(env, a), body)
+				return cnfneg(exists(env, a), body)
 			case 'exists':
 				var body = a[1]
-				return nnfneg(all(env, a), body)
+				return cnfneg(all(env, a), body)
 			case '!':
-				return nnfpos(env, a[0])
+				return cnfpos(env, a[0])
 			case '&&':
-				return or(...a.map((b) => nnfneg(env, b)))
+				return or(...a.map((b) => cnfneg(env, b)))
 			case '||':
-				return and(...a.map((b) => nnfneg(env, b)))
+				return and(...a.map((b) => cnfneg(env, b)))
 			case 'var':
 				assert(env.has(a))
 				return env.get(a)
 			case '<=>':
-				var x = nnfboth(env, a[0])
-				var y = nnfboth(env, a[1])
+				var x = cnfboth(env, a[0])
+				var y = cnfboth(env, a[1])
 				return and(or(x[0], y[0]), or(x[1], y[1]))
 		}
 		return etc.mk(
 			'!',
-			etc.map(a, (b) => nnfpos(env, b))
+			etc.map(a, (b) => cnfpos(env, b))
 		)
 	}
 
-	function nnfpos(env, a) {
+	function cnfpos(env, a) {
 		switch (a.o) {
 			case 'all':
 				var body = a[1]
-				return nnfpos(all(env, a), body)
+				return cnfpos(all(env, a), body)
 			case 'exists':
 				var body = a[1]
-				return nnfpos(exists(env, a), body)
+				return cnfpos(exists(env, a), body)
 			case '!':
-				return nnfneg(env, a[0])
+				return cnfneg(env, a[0])
 			case '&&':
-				return and(...a.map((b) => nnfpos(env, b)))
+				return and(...a.map((b) => cnfpos(env, b)))
 			case '||':
-				return or(...a.map((b) => nnfpos(env, b)))
+				return or(...a.map((b) => cnfpos(env, b)))
 			case 'var':
 				assert(env.has(a))
 				return env.get(a)
 			case '<=>':
-				var x = nnfboth(env, a[0])
-				var y = nnfboth(env, a[1])
+				var x = cnfboth(env, a[0])
+				var y = cnfboth(env, a[1])
 				return and(or(x[0], y[1]), or(x[1], y[0]))
 		}
-		return etc.map(a, (b) => nnfpos(env, b))
+		return etc.map(a, (b) => cnfpos(env, b))
 	}
 
 	// rename a formula that will be used as an equivalence argument
@@ -249,7 +249,7 @@ function convert(c, clauses) {
 		// and need to do the recursive call here within the rename function
 		// to avoid the rename function having to be called twice
 		// (and thus four times in the next level down, etc.)
-		a = nnfboth(env, a)
+		a = cnfboth(env, a)
 
 		// b is defined as being equal to a
 		// it needs to take the free variables of a as parameters
@@ -270,7 +270,7 @@ function convert(c, clauses) {
 		return b
 	}
 
-	function nnfboth(env, a) {
+	function cnfboth(env, a) {
 		switch (a) {
 			case false:
 				return [true, false]
@@ -280,18 +280,18 @@ function convert(c, clauses) {
 		switch (a.o) {
 			case 'all':
 				var body = a[1]
-				return [nnfneg(exists(env, a), body), nnfpos(all(env, a), body)]
+				return [cnfneg(exists(env, a), body), cnfpos(all(env, a), body)]
 			case 'exists':
 				var body = a[1]
-				return [nnfneg(all(env, a), body), nnfpos(exists(env, a), body)]
+				return [cnfneg(all(env, a), body), cnfpos(exists(env, a), body)]
 			case '!':
-				a = nnfboth(env, a[0])
+				a = cnfboth(env, a[0])
 				return [a[1], a[0]]
 			case '&&':
-				var a2 = a.map((b) => nnfboth(env, b))
+				var a2 = a.map((b) => cnfboth(env, b))
 				return [or(...a2.map((b) => b[0])), and(...a2.map((b) => b[1]))]
 			case '||':
-				var a2 = a.map((b) => nnfboth(env, b))
+				var a2 = a.map((b) => cnfboth(env, b))
 				return [and(...a2.map((b) => b[0])), or(...a2.map((b) => b[1]))]
 			case 'var':
 				assert(env.has(a))
@@ -299,20 +299,20 @@ function convert(c, clauses) {
 			case '<=>':
 				var x = a[0]
 				if (nclausesneg(x) + nclausespos(x) >= many) x = renameboth(x)
-				x = nnfboth(env, x)
+				x = cnfboth(env, x)
 
 				var y = a[1]
 				if (nclausesneg(y) + nclausespos(y) >= many) y = renameboth(y)
-				y = nnfboth(env, y)
+				y = cnfboth(env, y)
 
 				return [and(or(x[0], y[0]), or(x[1], y[1])), and(or(x[0], y[1]), or(x[1], y[0]))]
 		}
-		a = etc.map(a, (b) => nnfpos(env, b))
+		a = etc.map(a, (b) => cnfpos(env, b))
 		return [etc.mk('!', a), a]
 	}
 
 	var a = c[0]
-	a = nnfpos(new Map(), a)
+	a = cnfpos(new Map(), a)
 
 	// now we have a term in CNF
 	// need to convert it to actual clauses
