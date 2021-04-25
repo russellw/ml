@@ -2,6 +2,8 @@
 const etc = require('./etc')
 const assert = require('assert')
 
+var many = 10
+
 function simplify(c, m = new Map()) {
 	var [neg, pos] = c
 
@@ -43,6 +45,66 @@ function skolem(rt, params) {
 	if (!params.length) return sk
 	sk.type = [rt].concat(params.map(etc.type))
 	return etc.mk('call', ...[sk].concat(params))
+}
+
+function nclausesneg(a) {
+	switch (a.o) {
+		case 'exists':
+		case 'all':
+			return nclausesneg(a[1])
+		case '!':
+			return nclausespos(a[0])
+		case '||':
+			var r = 0
+			for (var b of a) {
+				r += nclausesneg(b)
+				if (r >= many) return many
+			}
+			return r
+		case '&&':
+			var r = 1
+			for (var b of a) {
+				r *= nclausesneg(b)
+				if (r >= many) return many
+			}
+			return r
+		case '<=>':
+			var x = a[0]
+			var y = a[1]
+			var r = nclausesneg(x) * nclausesneg(y) + nclausespos(x) * nclausespos(y)
+			return r > many ? many : r
+	}
+	return 1
+}
+
+function nclausespos(a) {
+	switch (a.o) {
+		case 'exists':
+		case 'all':
+			return nclausespos(a[1])
+		case '!':
+			return nclausesneg(a[0])
+		case '&&':
+			var r = 0
+			for (var b of a) {
+				r += nclausespos(b)
+				if (r >= many) return many
+			}
+			return r
+		case '||':
+			var r = 1
+			for (var b of a) {
+				r *= nclausespos(b)
+				if (r >= many) return many
+			}
+			return r
+		case '<=>':
+			var x = a[0]
+			var y = a[1]
+			var r = nclausesneg(x) * nclausespos(y) + nclausespos(x) * nclausesneg(y)
+			return r > many ? many : r
+	}
+	return 1
 }
 
 function convert(c, clauses) {
@@ -522,7 +584,10 @@ function test() {
 	var p3 = { o: 'fn', name: 'p3' }
 
 	thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p1, p2))))
-	// thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p3, etc.mk('<=>', p1, etc.mk('<=>', p2, p3))))))
+	thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p3, etc.mk('<=>', p1, etc.mk('<=>', p2, p3))))))
+
+	assert(nclausespos(etc.mk('&&', etc.mk('||', a, a, a), etc.mk('||', a, a, a))) === 2)
+	assert(nclausespos(etc.mk('||', etc.mk('&&', a, a, a), etc.mk('&&', a, a, a))) === 9)
 }
 
 test()
