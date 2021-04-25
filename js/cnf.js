@@ -144,8 +144,11 @@ function convert(c, clauses) {
 
 	function or(...a) {
 		// arguments can be taken without loss of generality as ANDs
+		var n = 1
 		var ands = []
 		for (var b of a) {
+			if (n > 1 && nclausespos(b) > 1 && n * nclausespos(b) >= many) b = renamepos(b)
+			n = Math.min(n * nclausespos(b), many)
 			var and = []
 			flatten('&&', b, and)
 			ands.push(and)
