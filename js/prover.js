@@ -191,10 +191,12 @@ if (require.main === module) {
 		help()
 		process.exit(0)
 	}
+	var start = new Date().getTime()
+	var solved = 0
 	for (var file of files) {
-		var start = new Date().getTime()
+		var start1 = new Date().getTime()
 		var deadline = null
-		if (timelimit) deadline = start + timelimit
+		if (timelimit) deadline = start1 + timelimit
 		try {
 			var txt = fs.readFileSync(file === 'stdin' ? 0 : file, 'utf8')
 			switch (language(file)) {
@@ -239,9 +241,19 @@ if (require.main === module) {
 					console.error(r.szs + ' != ' + problem.expected)
 					process.exit(1)
 			}
-		console.log('%% %d seconds', (new Date().getTime() - start) / 1000)
+		switch (r.szs) {
+			case 'Unsatisfiable':
+			case 'Theorem':
+			case 'Satisfiable':
+			case 'CounterSatisfiable':
+				solved++
+				break
+		}
+		console.log('%% %d seconds', (new Date().getTime() - start1) / 1000)
 		console.log()
 	}
+	console.log('%% Solved %d/%d(%d%%)', solved, files.length, (solved / files.length) * 100)
+	console.log('%% %d seconds', (new Date().getTime() - start) / 1000)
 }
 
 exports.solve = solve
