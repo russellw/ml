@@ -337,9 +337,9 @@ function test() {
 	var q = { o: 'fn', type: 'boolean' }
 	var q1 = { o: 'fn', type: ['boolean', 'individual'] }
 	var q2 = { o: 'fn', type: ['boolean', 'individual', 'individual'] }
-	var x = { o: 'var', type: 'individual' }
-	var y = { o: 'var', type: 'individual' }
-	var z = { o: 'var', type: 'individual' }
+	var x = { o: 'var', type: 'individual', name: 'x' }
+	var y = { o: 'var', type: 'individual', name: 'y' }
+	var z = { o: 'var', type: 'individual', name: 'z' }
 
 	var c = [[p], []]
 	var r = solve([c])
@@ -370,9 +370,9 @@ function test() {
 	for (var c of r.active) if (etc.eq(c, c1)) found = true
 	assert(found)
 
-	var x = { o: 'var', type: 'individual' }
-	var y = { o: 'var', type: 'individual' }
-	var z = { o: 'var', type: 'individual' }
+	var x = { o: 'var', type: 'individual', name: 'x' }
+	var y = { o: 'var', type: 'individual', name: 'y' }
+	var z = { o: 'var', type: 'individual', name: 'z' }
 	var transitivityish = [[etc.mk('call', equalish, x, y), etc.mk('call', equalish, y, z)], [etc.mk('call', equalish, x, z)]]
 	var r = solve([transitivityish, c1])
 	assert(r.szs === 'Satisfiable')
@@ -387,8 +387,13 @@ function test() {
 	assert(r.szs === 'Unsatisfiable')
 
 	// now try with reflexivityish
-	var x = { o: 'var', type: 'individual' }
+	var x = { o: 'var', type: 'individual', name: 'xr' }
 	var reflexivityish = [[], [etc.mk('call', equalish, x, x)]]
+
+	var m = subsumption.subsumes(reflexivityish, symmetryish)
+	if (m) etc.show(m)
+	assert(!m)
+
 	var r = solve([reflexivityish, symmetryish, c_20])
 	assert(r.szs === 'Satisfiable')
 	var c1 = [[], [etc.mk('call', equalish, k, n)]]

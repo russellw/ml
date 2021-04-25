@@ -128,7 +128,7 @@ function match(a, b, m = new Map()) {
 	if (a === b) return m
 	if (type(a) !== type(b)) return
 	if (a.o === 'var') {
-		if (m.has(a)) return match(m.get(a), b, m)
+		if (m.has(a)) return eq(m.get(a), b) ? m : null
 		m.set(a, b)
 		return m
 	}
