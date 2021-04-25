@@ -595,8 +595,13 @@ function test() {
 	assert(nclausespos(etc.mk('&&', etc.mk('||', a, a, a), etc.mk('||', a, a, a))) === 2)
 	assert(nclausespos(etc.mk('||', etc.mk('&&', a, a, a), etc.mk('&&', a, a, a))) === 9)
 
+	var p = { o: 'fn', name: 'p' }
 	var ands = []
-	for (var i = 0; i < 10; i++) {}
+	for (var i = 0; i < 10; i++) ands.push(etc.mk('&&', p, p))
+	var a1 = etc.mk('||', ...ands)
+	var cs = []
+	convert([a1], cs)
+	etc.show(cs.length)
 }
 
 test()
