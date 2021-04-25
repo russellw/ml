@@ -72,7 +72,7 @@ function nclausesneg(a) {
 			var x = a[0]
 			var y = a[1]
 			var r = nclausesneg(x) * nclausesneg(y) + nclausespos(x) * nclausespos(y)
-			return r > many ? many : r
+			return Math.min(r, many)
 	}
 	return 1
 }
@@ -102,7 +102,7 @@ function nclausespos(a) {
 			var x = a[0]
 			var y = a[1]
 			var r = nclausesneg(x) * nclausespos(y) + nclausespos(x) * nclausesneg(y)
-			return r > many ? many : r
+			return Math.min(r, many)
 	}
 	return 1
 }
