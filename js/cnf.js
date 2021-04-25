@@ -108,6 +108,32 @@ function nclausespos(a) {
 }
 
 function convert(c, clauses) {
+	function renamepos(a) {
+		// at this point we can assume a recursive call has already been made
+		// because we only need the positive version of the formula
+		// so there was no problem doing this before renaming
+		// but verify this before proceeding
+		csterm(a)
+
+		// b is defined as being equal to a
+		// it needs to take the free variables of a as parameters
+		var b = skolem('boolean', Array.from(etc.freevars(a)))
+
+		// b implies a
+		// generate clauses to define the new symbol
+		// we don't need another recursive call, but can jump straight to generating clauses
+		// because we only place NOT on an atomic term, so don't break NNF
+		// and or() will bubble up any occurrences of AND within a
+		for (var d of csterm(or(etc.mk('!', b), a))) {
+			d.how = 'def'
+			ckclause(d)
+			clauses.push(d)
+		}
+
+		// return the new name by which the caller shall now know the formula
+		return b
+	}
+
 	function and(...a) {
 		a = etc.mk('&&', ...a)
 
@@ -217,7 +243,10 @@ function convert(c, clauses) {
 		for (var x of xs) env.set(x, x)
 
 		// need both positive and negative versions of the formula
-		var a2 = nnfboth(env, a)
+		// and need to do the recursive call here within the rename function
+		// to avoid the rename function having to be called twice
+		// (and thus four times in the next level down, etc.)
+		a = nnfboth(env, a)
 
 		// b is defined as being equal to a
 		// it needs to take the free variables of a as parameters
@@ -225,7 +254,10 @@ function convert(c, clauses) {
 
 		// b implies and is implied by a
 		// generate clauses to define the new symbol
-		for (var d of csterm(and(or(etc.mk('!', b), a2[1]), or(b, a2[0])))) {
+		// we don't need another recursive call, but can jump straight to generating clauses
+		// because we only place NOT on an atomic term, so don't break NNF
+		// and or() will bubble up any occurrences of AND within a
+		for (var d of csterm(and(or(etc.mk('!', b), a[1]), or(b, a[0])))) {
 			d.how = 'def'
 			ckclause(d)
 			clauses.push(d)

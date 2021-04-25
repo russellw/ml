@@ -141,6 +141,10 @@ function match(a, b, m = new Map()) {
 
 function isomorphic(a, b, m = new Map()) {
 	if (a.o !== b.o) return
+	// there is some superficial similarity to unification here, but the logical sequence is different
+	// in particular, identity of terms is not checked until after variables
+	// because two identical variables should not be cleared as isomorphic
+	// without checking for bindings
 	if (a.o === 'var') {
 		if (a.type !== b.type) return
 		if (m.has(a) && m.has(b)) {
