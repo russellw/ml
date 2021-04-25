@@ -350,30 +350,72 @@ function test() {
 	assert(r.szs === 'Satisfiable')
 
 	// from SYN014-2
-	var equalish = { o: 'fn', type: ['boolean', 'individual', 'individual'] }
-	var symmetryish = [[etc.mk('call', equalish, x, y)], [etc.mk('call', equalish, y, x)]]
+	// used clauses:
+	// symmetryish
+	// c_20
+	// transitivityish
+	// c_19
+	// c_23
 	var n = { o: 'fn', type: 'individual' }
 	var k = { o: 'fn', type: 'individual' }
+	var m = { o: 'fn', type: 'individual' }
+	var equalish = { o: 'fn', type: ['boolean', 'individual', 'individual'] }
+
+	var symmetryish = [[etc.mk('call', equalish, x, y)], [etc.mk('call', equalish, y, x)]]
 	var c_20 = [[], [etc.mk('call', equalish, n, k)]]
 	var r = solve([symmetryish, c_20])
 	assert(r.szs === 'Satisfiable')
 	var c1 = [[], [etc.mk('call', equalish, k, n)]]
-	var found
+	var found = false
 	for (var c of r.active) if (etc.eq(c, c1)) found = true
 	assert(found)
 
+	var x = { o: 'var', type: 'individual' }
+	var y = { o: 'var', type: 'individual' }
+	var z = { o: 'var', type: 'individual' }
 	var transitivityish = [[etc.mk('call', equalish, x, y), etc.mk('call', equalish, y, z)], [etc.mk('call', equalish, x, z)]]
 	var r = solve([transitivityish, c1])
 	assert(r.szs === 'Satisfiable')
 	var c2 = [[etc.mk('call', equalish, x, k)], [etc.mk('call', equalish, x, n)]]
-	var found
-	for (var c of r.active) if (etc.eq(c, c2)) found = true
+	var found = false
+	for (var c of r.active) if (etc.isomorphic(c, c2)) found = true
 	assert(found)
 
-	var m = { o: 'fn', type: 'individual' }
 	var c_19 = [[etc.mk('call', equalish, m, n)], []]
 	var c_23 = [[], [etc.mk('call', equalish, m, k)]]
 	var r = solve([c2, c_19, c_23])
+	assert(r.szs === 'Unsatisfiable')
+
+	// now try with reflexivityish
+	var x = { o: 'var', type: 'individual' }
+	var reflexivityish = [[], [etc.mk('call', equalish, x, x)]]
+	var r = solve([reflexivityish, symmetryish, c_20])
+	assert(r.szs === 'Satisfiable')
+	var c1 = [[], [etc.mk('call', equalish, k, n)]]
+	var found = false
+	for (var c of r.active) if (etc.isomorphic(c, c1)) found = true
+	assert(found)
+
+	var r = solve([reflexivityish, transitivityish, c1])
+	assert(r.szs === 'Satisfiable')
+	var x = { o: 'var', type: 'individual' }
+	var c2 = [[etc.mk('call', equalish, x, k)], [etc.mk('call', equalish, x, n)]]
+	var found = false
+	assert(!found)
+	for (var c of r.active) if (etc.isomorphic(c, c2)) found = true
+	assert(found)
+
+	// c2  : ~ equalish(X,k) | equalish(X,n)
+	// c_19: ~ equalish(m,n)
+	// c_23: equalish(m,k)
+	var c_19 = [[etc.mk('call', equalish, m, n)], []]
+	var c_23 = [[], [etc.mk('call', equalish, m, k)]]
+
+	// assert(!subsumption.subsumes(reflexivityish,c2))
+	assert(!subsumption.subsumes(reflexivityish, c_19))
+	assert(!subsumption.subsumes(reflexivityish, c_23))
+
+	var r = solve([reflexivityish, c2, c_19, c_23])
 	assert(r.szs === 'Unsatisfiable')
 }
 

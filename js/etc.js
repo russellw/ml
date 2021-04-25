@@ -139,6 +139,31 @@ function match(a, b, m = new Map()) {
 	return m
 }
 
+function isomorphic(a, b, m = new Map()) {
+	if (a.o !== b.o) return
+	if (a.o === 'var') {
+		if (a.type !== b.type) return
+		if (m.has(a) && m.has(b)) {
+			if (m.get(a) === b) {
+				assert(m.get(b) === a)
+				return m
+			}
+			return
+		}
+		if (!m.has(a) && !m.has(b)) {
+			m.set(a, b)
+			m.set(b, a)
+			return m
+		}
+		return
+	}
+	if (a === b) return m
+	if (!Array.isArray(a)) return
+	if (a.length !== b.length) return
+	for (var i = 0; i < a.length && m; i++) m = isomorphic(a[i], b[i], m)
+	return m
+}
+
 function unifyvar(a, b, m) {
 	if (m.has(a)) return unify(m.get(a), b, m)
 	if (m.has(b)) return unify(a, m.get(b), m)
@@ -637,6 +662,18 @@ function test() {
 	defaulttype(a, 'rat')
 	assert(type(a) === 'real')
 	assert(eq(type(f), ['real', 'bigint', 'bigint']))
+
+	// isomorphic
+	assert(isomorphic(1n, 1n))
+	assert(isomorphic(mk('==', 1n, 1n), mk('==', 1n, 1n)))
+	assert(!isomorphic(mk('==', 1n, 1n), mk('==', 1n, 2n)))
+	x = { o: 'var', type: 'bigint' }
+	y = { o: 'var', type: 'bigint' }
+	assert(isomorphic(x, x))
+	assert(isomorphic(x, y))
+	assert(!isomorphic(x, 1n))
+	assert(isomorphic(mk('==', x, x), mk('==', x, x)))
+	assert(!isomorphic(mk('==', x, x), mk('==', x, y)))
 }
 
 test()
@@ -662,3 +699,4 @@ exports.defaulttype = defaulttype
 exports.isnumtype = isnumtype
 exports.version = version
 exports.cktime = cktime
+exports.isomorphic = isomorphic

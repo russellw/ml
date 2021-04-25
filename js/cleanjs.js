@@ -5,7 +5,21 @@
 'use strict'
 const fs = require('fs')
 const os = require('os')
-const etc = require('./etc')
+
+function eq(a, b) {
+	if (a === b) return true
+	if (!Array.isArray(a)) return
+	if (a.o !== b.o) return
+	if (a.length !== b.length) return
+	for (var i = 0; i < a.length; i++) if (!eq(a[i], b[i])) return
+	return true
+}
+
+function extension(file) {
+	var a = file.split('.')
+	if (a.length < 2) return ''
+	return a.pop()
+}
 
 function quote(s) {
 	var q = ''
@@ -31,7 +45,7 @@ function quote(s) {
 
 if (process.argv[2] !== '.') process.exit(1)
 for (var file of fs.readdirSync('.')) {
-	if (etc.extension(file) !== 'js') continue
+	if (extension(file) !== 'js') continue
 	var lines = fs.readFileSync(file, 'utf8').split(/\r?\n/)
 	var old = lines.slice()
 	for (var i = 0; i < lines.length; i++) {
@@ -55,7 +69,7 @@ for (var file of fs.readdirSync('.')) {
 		var m = /^(.*) != (.*)$/.exec(lines[i])
 		if (m && !quote(m[1])) lines[i] = m[1] + ' !== ' + m[2]
 	}
-	if (etc.eq(lines, old)) continue
+	if (eq(lines, old)) continue
 	fs.renameSync(file, os.tmpdir() + '/' + file)
 	fs.writeFileSync(file, lines.join('\n'), 'utf8')
 	console.log(file)

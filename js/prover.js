@@ -193,7 +193,7 @@ if (require.main === module) {
 	}
 	for (var file of files) {
 		var start = new Date().getTime()
-		var deadline
+		var deadline = null
 		if (timelimit) deadline = start + timelimit
 		try {
 			var txt = fs.readFileSync(file === 'stdin' ? 0 : file, 'utf8')
