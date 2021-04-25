@@ -252,7 +252,7 @@ function solve(clauses, deadline) {
 
 		// no more clauses => we are done, proof not found
 		if (!g) {
-			if (complete) return { szs: 'Satisfiable' }
+			if (complete) return { szs: 'Satisfiable', active }
 			return { szs: 'GaveUp' }
 		}
 
@@ -348,6 +348,25 @@ function test() {
 	var c = [[], [p]]
 	var r = solve([c])
 	assert(r.szs === 'Satisfiable')
+
+	// from SYN014-2
+	var equalish = { o: 'fn', type: ['boolean', 'individual', 'individual'] }
+	var symmetryish = [[etc.mk('call', equalish, x, y)], [etc.mk('call', equalish, y, x)]]
+	var c_20 = [[], [etc.mk('call', equalish, a, b)]]
+	var r = solve([symmetryish, c_20])
+	assert(r.szs === 'Satisfiable')
+	var c1 = [[], [etc.mk('call', equalish, b, a)]]
+	var found
+	for (var c of r.active) if (etc.eq(c, c1)) found = true
+	assert(found)
+
+	var transitivityish = [[etc.mk('call', equalish, x, y), etc.mk('call', equalish, y, z)], [etc.mk('call', equalish, x, z)]]
+	var r = solve([transitivityish, c1])
+	assert(r.szs === 'Satisfiable')
+	var c2 = [[etc.mk('call', equalish, x, b)], [etc.mk('call', equalish, x, a)]]
+	var found
+	for (var c of r.active) if (etc.eq(c, c2)) found = true
+	assert(found)
 }
 
 test()
