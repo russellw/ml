@@ -358,7 +358,7 @@ function test() {
 	// c_23
 	var n = { o: 'fn', type: 'individual' }
 	var k = { o: 'fn', type: 'individual' }
-	var m = { o: 'fn', type: 'individual' }
+	var M = { o: 'fn', type: 'individual' }
 	var equalish = { o: 'fn', type: ['boolean', 'individual', 'individual'] }
 
 	var symmetryish = [[etc.mk('call', equalish, x, y)], [etc.mk('call', equalish, y, x)]]
@@ -374,19 +374,19 @@ function test() {
 	var y = { o: 'var', type: 'individual', name: 'y' }
 	var z = { o: 'var', type: 'individual', name: 'z' }
 	var transitivityish = [[etc.mk('call', equalish, x, y), etc.mk('call', equalish, y, z)], [etc.mk('call', equalish, x, z)]]
+	var c2 = [[etc.mk('call', equalish, x, k)], [etc.mk('call', equalish, x, n)]]
 	/*
 	var r = solve([transitivityish, c1])
 	assert(r.szs === 'Satisfiable')
-	var c2 = [[etc.mk('call', equalish, x, k)], [etc.mk('call', equalish, x, n)]]
 	var found = false
 	for (var c of r.active) if (etc.isomorphic(c, c2)) found = true
 	assert(found)
+	*/
 
-	var c_19 = [[etc.mk('call', equalish, m, n)], []]
-	var c_23 = [[], [etc.mk('call', equalish, m, k)]]
+	var c_19 = [[etc.mk('call', equalish, M, n)], []]
+	var c_23 = [[], [etc.mk('call', equalish, M, k)]]
 	var r = solve([c2, c_19, c_23])
 	assert(r.szs === 'Unsatisfiable')
-	*/
 
 	// now try with reflexivityish
 	var x = { o: 'var', type: 'individual', name: 'xr' }
@@ -416,8 +416,8 @@ function test() {
 	// c2  : ~ equalish(X,k) | equalish(X,n)
 	// c_19: ~ equalish(m,n)
 	// c_23: equalish(m,k)
-	var c_19 = [[etc.mk('call', equalish, m, n)], []]
-	var c_23 = [[], [etc.mk('call', equalish, m, k)]]
+	var c_19 = [[etc.mk('call', equalish, M, n)], []]
+	var c_23 = [[], [etc.mk('call', equalish, M, k)]]
 
 	// assert(!subsumption.subsumes(reflexivityish,c2))
 	assert(!subsumption.subsumes(reflexivityish, c_19))
