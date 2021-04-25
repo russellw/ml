@@ -6,8 +6,8 @@ var eof = ''
 
 function parse(file, txt) {
 	var ti = 0
-	var tok
-	var expected
+	var tok = null
+	var expected = null
 
 	function err(msg) {
 		console.error('%s:%d: %s', file, txt.slice(0, ti).split('\n').length, msg)

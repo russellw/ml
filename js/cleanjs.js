@@ -72,6 +72,10 @@ for (var file of fs.readdirSync('.')) {
 		// != -> !==
 		var m = /^(.*) != (.*)$/.exec(lines[i])
 		if (m && !quote(m[1])) lines[i] = m[1] + ' !== ' + m[2]
+
+		// var x -> var x = null
+		var m = /^\s*var \w+$/.exec(lines[i])
+		if (m) lines[i] += ' = null'
 	}
 
 	if (eq(lines, old)) continue

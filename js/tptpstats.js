@@ -51,7 +51,7 @@ for (var file of files) {
 			}
 		}
 	} catch (e) {
-		var r
+		var r = null
 		if (typeof e === 'string') r = { szs: e }
 		else if (e.code === 'ERR_STRING_TOO_LONG' || e.message === 'Array buffer allocation failed') r = { szs: 'ResourceOut' }
 		else throw e

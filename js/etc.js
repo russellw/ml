@@ -307,7 +307,7 @@ function test() {
 
 	// cartesian product
 	var qs = []
-	var q
+	var q = null
 	q = []
 	q.push('a0')
 	q.push('a1')
@@ -425,7 +425,7 @@ function test() {
 	var f2 = { o: 'fn', type: ['individual', 'individual', 'individual'] }
 	var g1 = { o: 'fn', type: ['individual', 'individual'] }
 	var g2 = { o: 'fn', type: ['individual', 'individual', 'individual'] }
-	var m
+	var m = null
 
 	// Succeeds. (tautology)
 	m = new Map()

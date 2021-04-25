@@ -19,7 +19,7 @@ function unquote(s) {
 
 function parse1(file, txt, selection, problem) {
 	var ti = 0
-	var tok
+	var tok = null
 
 	function err(msg) {
 		console.error('%s:%d: %s', file, txt.slice(0, ti).split('\n').length, msg)

@@ -9,8 +9,8 @@ const cnf = require('./cnf')
 const superposition = require('./superposition')
 const assert = require('assert')
 
-var lang
-var timelimit
+var lang = null
+var timelimit = null
 var files = []
 
 function language(file) {
@@ -49,7 +49,7 @@ function parseargs(args) {
 		if (s.startsWith('-')) {
 			while (s.startsWith('-')) s = s.slice(1)
 
-			var optarg
+			var optarg = null
 			var m = /^([a-zA-Z\-])+[:=](.+)$/.exec(s)
 			if (m) {
 				s = m[1]
