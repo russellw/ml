@@ -352,10 +352,12 @@ function test() {
 	// from SYN014-2
 	var equalish = { o: 'fn', type: ['boolean', 'individual', 'individual'] }
 	var symmetryish = [[etc.mk('call', equalish, x, y)], [etc.mk('call', equalish, y, x)]]
-	var c_20 = [[], [etc.mk('call', equalish, a, b)]]
+	var n = { o: 'fn', type: 'individual' }
+	var k = { o: 'fn', type: 'individual' }
+	var c_20 = [[], [etc.mk('call', equalish, n, k)]]
 	var r = solve([symmetryish, c_20])
 	assert(r.szs === 'Satisfiable')
-	var c1 = [[], [etc.mk('call', equalish, b, a)]]
+	var c1 = [[], [etc.mk('call', equalish, k, n)]]
 	var found
 	for (var c of r.active) if (etc.eq(c, c1)) found = true
 	assert(found)
@@ -363,10 +365,16 @@ function test() {
 	var transitivityish = [[etc.mk('call', equalish, x, y), etc.mk('call', equalish, y, z)], [etc.mk('call', equalish, x, z)]]
 	var r = solve([transitivityish, c1])
 	assert(r.szs === 'Satisfiable')
-	var c2 = [[etc.mk('call', equalish, x, b)], [etc.mk('call', equalish, x, a)]]
+	var c2 = [[etc.mk('call', equalish, x, k)], [etc.mk('call', equalish, x, n)]]
 	var found
 	for (var c of r.active) if (etc.eq(c, c2)) found = true
 	assert(found)
+
+	var m = { o: 'fn', type: 'individual' }
+	var c_19 = [[etc.mk('call', equalish, m, n)], []]
+	var c_23 = [[], [etc.mk('call', equalish, m, k)]]
+	var r = solve([c2, c_19, c_23])
+	assert(r.szs === 'Unsatisfiable')
 }
 
 test()
