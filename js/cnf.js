@@ -636,7 +636,16 @@ function test() {
 	var a1 = etc.mk('||', ...ands)
 	var cs = []
 	convert([a1], cs)
-	etc.show(cs.length)
+
+	var cs = []
+	convert([etc.mk('<=>', a1, p)], cs)
+
+	var ors = []
+	for (var i = 0; i < 10; i++) ors.push(etc.mk('||', p, p))
+	var a1 = etc.mk('&&', ...ors)
+	var cs = []
+	convert([etc.mk('!', a1)], cs)
+	// etc.show(cs.length)
 }
 
 test()
