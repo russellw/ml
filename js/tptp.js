@@ -853,12 +853,17 @@ function prnclause(c) {
 				break
 			}
 			process.stdout.write('inference(' + c.how + ',[status(')
-			process.stdout.write(')],[')
-			for (var i = 0; i < c.from.length; i++) {
-				if (i) process.stdout.write(',')
-				prclausename(c.from[i])
+			process.stdout.write(c.how === 'cnf' ? 'esa' : 'thm')
+			process.stdout.write(')]')
+			if (c.from) {
+				process.stdout.write(',[')
+				for (var i = 0; i < c.from.length; i++) {
+					if (i) process.stdout.write(',')
+					prclausename(c.from[i])
+				}
+				process.stdout.write(']')
 			}
-			process.stdout.write('])')
+			process.stdout.write(')')
 			break
 	}
 	console.log(').')

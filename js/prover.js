@@ -132,17 +132,17 @@ function test() {
 		assert(sat(cs) === 'Unsatisfiable')
 	}
 
-	var a = { type: 'boolean' }
-	var b = { type: 'boolean' }
+	var a = { o: 'fn', type: 'boolean' }
+	var b = { o: 'fn', type: 'boolean' }
 
 	thm(true)
 	thm(etc.mk('&&', true, true, true))
 	thm(etc.mk('||', false, false, true))
 	thm(etc.mk('<=>', a, a))
 
-	var p1 = { name: 'p1', type: 'boolean' }
-	var p2 = { name: 'p2', type: 'boolean' }
-	var p3 = { name: 'p3', type: 'boolean' }
+	var p1 = { o: 'fn', name: 'p1', type: 'boolean' }
+	var p2 = { o: 'fn', name: 'p2', type: 'boolean' }
+	var p3 = { o: 'fn', name: 'p3', type: 'boolean' }
 
 	thm(etc.mk('<=>', p1, etc.mk('<=>', p2, etc.mk('<=>', p1, p2))))
 
@@ -156,12 +156,12 @@ function test() {
 	eqv(etc.mk('<=>', a, b), etc.mk('<=>', b, a))
 	eqv(etc.mk('!', etc.mk('<=>', a, b)), etc.mk('!', etc.mk('<=>', b, a)))
 
-	var a = { type: 'individual' }
-	var b = { type: 'individual' }
-	var f1 = { type: ['individual', 'individual'] }
-	var f2 = { type: ['individual', 'individual', 'individual'] }
-	var g1 = { type: ['individual', 'individual'] }
-	var g2 = { type: ['individual', 'individual', 'individual'] }
+	var a = { o: 'fn', type: 'individual' }
+	var b = { o: 'fn', type: 'individual' }
+	var f1 = { o: 'fn', type: ['individual', 'individual'] }
+	var f2 = { o: 'fn', type: ['individual', 'individual', 'individual'] }
+	var g1 = { o: 'fn', type: ['individual', 'individual'] }
+	var g2 = { o: 'fn', type: ['individual', 'individual', 'individual'] }
 	var x = { o: 'var', type: 'individual' }
 	var y = { o: 'var', type: 'individual' }
 	var z = { o: 'var', type: 'individual' }
