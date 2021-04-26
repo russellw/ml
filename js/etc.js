@@ -63,19 +63,20 @@ function type(a) {
 		case '&&':
 		case '||':
 		case '!':
-		case '=>':
 		case '<=>':
 		case '==':
-		case '!=':
 		case '<':
 		case '<=':
-		case '>':
-		case '>=':
 		case 'all':
 		case 'exists':
 			return 'boolean'
 		case '+':
 		case '-':
+		case 'unary-':
+		case 'floor':
+		case 'ceil':
+		case 'trunc':
+		case 'round':
 		case '/':
 		case '*':
 		case '%':

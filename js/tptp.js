@@ -263,9 +263,11 @@ function parse1(file, txt, selection, problem) {
 				lex()
 				return false
 			case '$greater':
-				return defined(bound, '>', 2)
+				var a = defined(bound, '>', 2)
+				return etc.mk('<', a[1], a[0])
 			case '$greatereq':
-				return defined(bound, '>=', 2)
+				var a = defined(bound, '>=', 2)
+				return etc.mk('<=', a[1], a[0])
 			case '$less':
 				return defined(bound, '<', 2)
 			case '$lesseq':
@@ -737,9 +739,6 @@ function prterm(a, parent) {
 		case '==':
 			infix('=', a)
 			return
-		case '!=':
-			infix('!=', a)
-			return
 		case '&&':
 			infix(' & ', a, parent)
 			return
@@ -747,7 +746,6 @@ function prterm(a, parent) {
 			infix(' | ', a, parent)
 			return
 		case '<=>':
-		case '=>':
 			infix(' ' + a.o + ' ', a, parent)
 			return
 		case 'all':
@@ -767,6 +765,66 @@ function prterm(a, parent) {
 			return
 		case '+':
 			process.stdout.write('$sum')
+			args(a)
+			return
+		case 'ceil':
+			process.stdout.write('$ceiling')
+			args(a)
+			return
+		case 'floor':
+			process.stdout.write('$floor')
+			args(a)
+			return
+		case 'round':
+			process.stdout.write('$round')
+			args(a)
+			return
+		case 'trunc':
+			process.stdout.write('$truncate')
+			args(a)
+			return
+		case '<':
+			process.stdout.write('$less')
+			args(a)
+			return
+		case '<=':
+			process.stdout.write('$lesseq')
+			args(a)
+			return
+		case '-':
+			process.stdout.write('$difference')
+			args(a)
+			return
+		case '*':
+			process.stdout.write('$product')
+			args(a)
+			return
+		case '/':
+			process.stdout.write('$quotient')
+			args(a)
+			return
+		case 'dive':
+			process.stdout.write('$quotient_e')
+			args(a)
+			return
+		case 'divt':
+			process.stdout.write('$quotient_t')
+			args(a)
+			return
+		case 'divf':
+			process.stdout.write('$quotient_f')
+			args(a)
+			return
+		case 'reme':
+			process.stdout.write('$remainder_e')
+			args(a)
+			return
+		case 'remt':
+			process.stdout.write('$remainder_t')
+			args(a)
+			return
+		case 'remf':
+			process.stdout.write('$remainder_f')
 			args(a)
 			return
 		case 'call':
