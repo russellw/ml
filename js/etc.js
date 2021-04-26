@@ -239,10 +239,27 @@ function isconst(a) {
 function simplify(a, m = new Map()) {
 	if (m.has(a)) return simplify(m.get(a), m)
 	a = map(a, (b) => simplify(b, m))
+	var x = a[0]
+	var y = a[1]
 	switch (a.o) {
+		case '<':
+			if (typeof x == 'bigint' && typeof y === 'bigint') return x < y
+			break
+		case '<=':
+			if (typeof x == 'bigint' && typeof y === 'bigint') return x <= y
+			break
+		case '+':
+			if (typeof x == 'bigint' && typeof y === 'bigint') return x + y
+			break
+		case '*':
+			if (typeof x == 'bigint' && typeof y === 'bigint') return x * y
+			break
+		case '-':
+			if (typeof x == 'bigint' && typeof y === 'bigint') return x - y
+			break
 		case '==':
-			if (eq(a[0], a[1])) return true
-			if (isconst(a[0]) && isconst(a[1])) return false
+			if (eq(x, y)) return true
+			if (isconst(x) && isconst(y)) return false
 			break
 	}
 	return a
@@ -710,6 +727,8 @@ function test() {
 	assert(eq(simplify(mk('==', x, y)), mk('==', x, y)))
 	assert(eq(simplify(mk('==', 1000000n, 1000000n)), true))
 	assert(eq(simplify(mk('==', 1n, 2n)), false))
+	assert(eq(simplify(mk('<', 1n, 2n)), true))
+	assert(eq(simplify(mk('+', 1n, 2n)), 3n))
 }
 
 test()
