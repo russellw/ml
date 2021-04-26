@@ -228,9 +228,24 @@ function eq(a, b) {
 	return true
 }
 
+function isconst(a) {
+	switch (typeof a) {
+		case 'bigint':
+		case 'string':
+			return true
+	}
+}
+
 function simplify(a, m = new Map()) {
 	if (m.has(a)) return simplify(m.get(a), m)
-	return map(a, (b) => simplify(b, m))
+	a = map(a, (b) => simplify(b, m))
+	switch (a.o) {
+		case '==':
+			if (eq(a[0], a[1])) return true
+			if (isconst(a[0]) && isconst(a[1])) return false
+			break
+	}
+	return a
 }
 
 function map(a, f) {
@@ -687,6 +702,14 @@ function test() {
 	assert(!isomorphic(x, 1n))
 	assert(isomorphic(mk('==', x, x), mk('==', x, x)))
 	assert(!isomorphic(mk('==', x, x), mk('==', x, y)))
+
+	// simplify
+	assert(simplify(5n) === 5n)
+	assert(simplify(x) === x)
+	assert(simplify(mk('==', x, x)) === true)
+	assert(eq(simplify(mk('==', x, y)), mk('==', x, y)))
+	assert(eq(simplify(mk('==', 1000000n, 1000000n)), true))
+	assert(eq(simplify(mk('==', 1n, 2n)), false))
 }
 
 test()
