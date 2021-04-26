@@ -97,7 +97,7 @@ class graph {
 	}
 
 	successors(x) {
-		if (!this.arcs.has(x)) return []
+		if (!this.arcs.has(x)) return new Set()
 		return this.arcs.get(x)
 	}
 }
