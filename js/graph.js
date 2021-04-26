@@ -6,7 +6,10 @@ class graph {
 	constructor(nodes, arcs) {
 		this.nodes = nodes
 		this.arcs = new Map()
-		for (var a of arcs) this.add(a[0], a[1])
+		for (var a of arcs) {
+			assert(a.length === 2)
+			this.add(a[0], a[1])
+		}
 	}
 
 	add(x, y) {
