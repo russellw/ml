@@ -1,47 +1,45 @@
 'use strict'
 const assert = require('assert')
 
-function mk(priority = (a) => a) {
-	return {
-		priority,
-		data: [],
+class priorityq {
+	constructor(priority = (a) => a) {
+		this.priority = priority
+		this.data = []
+	}
+
+	push(a) {
+		this.data.push(a)
+	}
+
+	pop() {
+		if (!this.data.length) return
+		var i = 0
+		var a = this.data[i]
+		for (var j = 1; j < this.data.length; j++)
+			if (this.priority(this.data[j]) < this.priority(a)) {
+				i = j
+				a = this.data[j]
+			}
+		this.data.splice(i, 1)
+		return a
 	}
 }
 
-function push(q, a) {
-	q.data.push(a)
-}
-
-function pop(q) {
-	if (!q.data.length) return
-	var i = 0
-	var a = q.data[i]
-	for (var j = 1; j < q.data.length; j++)
-		if (q.priority(q.data[j]) < q.priority(a)) {
-			i = j
-			a = q.data[j]
-		}
-	q.data.splice(i, 1)
-	return a
-}
-
 function test() {
-	var q = mk()
-	push(q, 5)
-	push(q, 1)
-	push(q, 4)
-	push(q, 2)
-	push(q, 3)
-	assert(pop(q) === 1)
-	assert(pop(q) === 2)
-	assert(pop(q) === 3)
-	assert(pop(q) === 4)
-	assert(pop(q) === 5)
-	assert(!pop(q))
+	var q = new priorityq()
+	q.push(5)
+	q.push(1)
+	q.push(4)
+	q.push(2)
+	q.push(3)
+	assert(q.pop() === 1)
+	assert(q.pop() === 2)
+	assert(q.pop() === 3)
+	assert(q.pop() === 4)
+	assert(q.pop() === 5)
+	assert(!q.pop())
 }
 
 test()
 
-exports.mk = mk
-exports.push = push
-exports.pop = pop
+exports.priorityq = priorityq

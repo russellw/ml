@@ -45,7 +45,7 @@ function solve(clauses, deadline) {
 					if (etc.isnumtype(etc.type(b))) complete = false
 				})
 
-	var passive = priorityq.mk(size)
+	var passive = new priorityq.priorityq(size)
 	for (var c of clauses) {
 		var d = cnf.simplify(c)
 		if (etc.eq(d, c)) d = c
@@ -53,7 +53,7 @@ function solve(clauses, deadline) {
 			d.how = 'simplify'
 			d.from = [c]
 		}
-		priorityq.push(passive, d)
+		passive.push(d)
 	}
 
 	function push(c, m, how, ...from) {
@@ -61,7 +61,7 @@ function solve(clauses, deadline) {
 		if (etc.eq(c, [[], [true]])) return
 		c.how = how
 		c.from = from
-		priorityq.push(passive, c)
+		passive.push(c)
 	}
 
 	var active = []
@@ -248,7 +248,7 @@ function solve(clauses, deadline) {
 		etc.cktime(deadline)
 
 		// given clause
-		var g = priorityq.pop(passive)
+		var g = passive.pop()
 
 		// no more clauses => we are done, proof not found
 		if (!g) {
