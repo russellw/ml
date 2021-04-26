@@ -220,28 +220,28 @@ function parse1(file, txt, selection, problem) {
 	// terms
 	var free = new Map()
 
-	function args(bound) {
-		assert(bound instanceof Map)
+	function args(env) {
+		assert(env instanceof Map)
 		expect('(')
 		var a = []
-		do a.push(term(bound))
+		do a.push(term(env))
 		while (eat(','))
 		expect(')')
 		return a
 	}
 
-	function defined(bound, o, arity) {
-		assert(bound instanceof Map)
+	function defined(env, o, arity) {
+		assert(env instanceof Map)
 		lex()
-		var a = args(bound)
+		var a = args(env)
 		if (a.length !== arity) err('expected ' + arity + ' arguments')
 		if (!etc.isnumtype(etc.type(a[0]))) err('expected numeric term')
 		for (var i = 1; i < a.length; i++) requiretype(a[i], etc.type(a[0]))
 		return etc.mk(o, ...a)
 	}
 
-	function term(bound) {
-		assert(bound instanceof Map)
+	function term(env) {
+		assert(env instanceof Map)
 
 		// defined functor
 		switch (tok) {
@@ -249,10 +249,10 @@ function parse1(file, txt, selection, problem) {
 			case '$ite':
 				throw 'Inappropriate'
 			case '$difference':
-				return defined(bound, '-', 2)
+				return defined(env, '-', 2)
 			case '$distinct':
 				lex()
-				var a = args(bound)
+				var a = args(env)
 				etc.defaulttype(a[0], 'individual')
 				for (var i = 1; i < a.length; i++) requiretype(a[i], etc.type(a[0]))
 				var inequalities = etc.mk('&')
@@ -263,58 +263,58 @@ function parse1(file, txt, selection, problem) {
 				lex()
 				return false
 			case '$greater':
-				var a = defined(bound, '>', 2)
+				var a = defined(env, '>', 2)
 				return etc.mk('<', a[1], a[0])
 			case '$greatereq':
-				var a = defined(bound, '>=', 2)
+				var a = defined(env, '>=', 2)
 				return etc.mk('<=', a[1], a[0])
 			case '$less':
-				return defined(bound, '<', 2)
+				return defined(env, '<', 2)
 			case '$lesseq':
-				return defined(bound, '<=', 2)
+				return defined(env, '<=', 2)
 			case '$product':
-				return defined(bound, '*', 2)
+				return defined(env, '*', 2)
 			case '$quotient':
-				var a = defined(bound, '/', 2)
+				var a = defined(env, '/', 2)
 				if (type(a[0]) === 'bigint') err('expected rational or real')
 				return a
 			case '$sum':
-				return defined(bound, '+', 2)
+				return defined(env, '+', 2)
 			case '$true':
 				lex()
 				return true
 			case '$uminus':
-				return defined(bound, 'unary-', 1)
+				return defined(env, 'unary-', 1)
 			case '$quotient_e':
-				return defined(bound, 'dive', 2)
+				return defined(env, 'dive', 2)
 			case '$quotient_f':
-				return defined(bound, 'divf', 2)
+				return defined(env, 'divf', 2)
 			case '$quotient_t':
-				return defined(bound, 'divt', 2)
+				return defined(env, 'divt', 2)
 			case '$remainder_e':
-				return defined(bound, 'reme', 2)
+				return defined(env, 'reme', 2)
 			case '$remainder_f':
-				return defined(bound, 'remf', 2)
+				return defined(env, 'remf', 2)
 			case '$remainder_t':
-				return defined(bound, 'remt', 2)
+				return defined(env, 'remt', 2)
 			case '$is_int':
-				return defined(bound, 'isint', 1)
+				return defined(env, 'isint', 1)
 			case '$is_rat':
-				return defined(bound, 'israt', 1)
+				return defined(env, 'israt', 1)
 			case '$to_int':
-				return defined(bound, 'toint', 1)
+				return defined(env, 'toint', 1)
 			case '$to_rat':
-				return defined(bound, 'torat', 1)
+				return defined(env, 'torat', 1)
 			case '$to_real':
-				return defined(bound, 'toreal', 1)
+				return defined(env, 'toreal', 1)
 			case '$ceiling':
-				return defined(bound, 'ceil', 1)
+				return defined(env, 'ceil', 1)
 			case '$floor':
-				return defined(bound, 'floor', 1)
+				return defined(env, 'floor', 1)
 			case '$round':
-				return defined(bound, 'round', 1)
+				return defined(env, 'round', 1)
 			case '$truncate':
-				return defined(bound, 'trunc', 1)
+				return defined(env, 'trunc', 1)
 		}
 
 		// integer
@@ -331,7 +331,7 @@ function parse1(file, txt, selection, problem) {
 		if (/^[A-Z]/.test(tok)) {
 			var name = tok
 			lex()
-			if (bound.has(name)) return bound.get(name)
+			if (env.has(name)) return env.get(name)
 			if (!free) err(name + ': unbound variable')
 			return etc.getor(free, name, () => {
 				return { o: 'var', type: 'individual' }
@@ -345,7 +345,7 @@ function parse1(file, txt, selection, problem) {
 				return { o: 'fn', name }
 			})
 			if (tok !== '(') return f
-			var a = args(bound)
+			var a = args(env)
 			for (var b of a) {
 				etc.defaulttype(b, 'individual')
 				if (etc.type(b) === 'boolean') err('term cannot be boolean')
@@ -365,19 +365,19 @@ function parse1(file, txt, selection, problem) {
 	}
 
 	// formulas
-	function eq(bound) {
-		assert(bound instanceof Map)
-		var a = term(bound)
+	function eq(env) {
+		assert(env instanceof Map)
+		var a = term(env)
 		switch (tok) {
 			case '!=':
 				lex()
-				var b = term(bound)
+				var b = term(env)
 				etc.defaulttype(a, 'individual')
 				requiretype(b, etc.type(a))
 				return etc.mk('!', etc.mk('==', a, b))
 			case '=':
 				lex()
-				var b = term(bound)
+				var b = term(env)
 				etc.defaulttype(a, 'individual')
 				requiretype(b, etc.type(a))
 				return etc.mk('==', a, b)
@@ -386,72 +386,72 @@ function parse1(file, txt, selection, problem) {
 		return a
 	}
 
-	function quant(bound, o) {
-		assert(bound instanceof Map)
+	function quant(env, o) {
+		assert(env instanceof Map)
 		lex()
 		expect('[')
-		bound = new Map(bound)
+		env = new Map(env)
 		var v = []
 		do {
 			var name = tok
 			lex()
 			var x = { o: 'var', type: 'individual' }
 			if (eat(':')) x.type = atomictype()
-			bound.set(name, x)
+			env.set(name, x)
 			v.push(x)
 		} while (eat(','))
 		expect(']')
 		expect(':')
-		return etc.mk(o, v, unitary(bound))
+		return etc.mk(o, v, unitary(env))
 	}
 
-	function unitary(bound) {
-		assert(bound instanceof Map)
+	function unitary(env) {
+		assert(env instanceof Map)
 		switch (tok) {
 			case '!':
-				return quant(bound, 'all')
+				return quant(env, 'all')
 			case '?':
-				return quant(bound, 'exists')
+				return quant(env, 'exists')
 			case '(':
 				lex()
-				var a = formula(bound)
+				var a = formula(env)
 				expect(')')
 				return a
 			case '~':
 				lex()
-				return etc.mk('!', unitary(bound))
+				return etc.mk('!', unitary(env))
 		}
-		return eq(bound)
+		return eq(env)
 	}
 
-	function formula(bound) {
-		assert(bound instanceof Map)
-		var a = unitary(bound)
+	function formula(env) {
+		assert(env instanceof Map)
+		var a = unitary(env)
 		switch (tok) {
 			case '&':
 			case '|':
 				var k = tok
 				a = etc.mk(k + k, a)
-				while (eat(k)) a.push(unitary(bound))
+				while (eat(k)) a.push(unitary(env))
 				break
 			case '<=':
 				lex()
-				return etc.mk('||', a, etc.mk('!', unitary(bound)))
+				return etc.mk('||', a, etc.mk('!', unitary(env)))
 			case '<=>':
 				lex()
-				return etc.mk('<=>', a, unitary(bound))
+				return etc.mk('<=>', a, unitary(env))
 			case '<~>':
 				lex()
-				return etc.mk('!', etc.mk('<=>', a, unitary(bound)))
+				return etc.mk('!', etc.mk('<=>', a, unitary(env)))
 			case '=>':
 				lex()
-				return etc.mk('||', etc.mk('!', a), unitary(bound))
+				return etc.mk('||', etc.mk('!', a), unitary(env))
 			case '~&':
 				lex()
-				return etc.mk('!', etc.mk('&&', a, unitary(bound)))
+				return etc.mk('!', etc.mk('&&', a, unitary(env)))
 			case '~|':
 				lex()
-				return etc.mk('!', etc.mk('||', a, unitary(bound)))
+				return etc.mk('!', etc.mk('||', a, unitary(env)))
 		}
 		return a
 	}
