@@ -242,20 +242,43 @@ function simplify(a, m = new Map()) {
 	var x = a[0]
 	var y = a[1]
 	switch (a.o) {
+		case 'israt':
+			switch (typeof x) {
+				case 'bigint':
+				case 'rat':
+					return true
+			}
+			break
+		case 'isint':
+			if (type(x) === 'bigint') return true
+			break
+		case 'toint':
+		case 'round':
+		case 'trunc':
+		case 'floor':
+		case 'ceil':
+			if (type(x) === 'bigint') return x
+			break
+		case 'torat':
+			if (type(x) === 'rat') return x
+			break
+		case 'toreal':
+			if (type(x) === 'real') return x
+			break
 		case '<':
-			if (typeof x == 'bigint' && typeof y === 'bigint') return x < y
+			if (typeof x === 'bigint' && typeof y === 'bigint') return x < y
 			break
 		case '<=':
-			if (typeof x == 'bigint' && typeof y === 'bigint') return x <= y
+			if (typeof x === 'bigint' && typeof y === 'bigint') return x <= y
 			break
 		case '+':
-			if (typeof x == 'bigint' && typeof y === 'bigint') return x + y
+			if (typeof x === 'bigint' && typeof y === 'bigint') return x + y
 			break
 		case '*':
-			if (typeof x == 'bigint' && typeof y === 'bigint') return x * y
+			if (typeof x === 'bigint' && typeof y === 'bigint') return x * y
 			break
 		case '-':
-			if (typeof x == 'bigint' && typeof y === 'bigint') return x - y
+			if (typeof x === 'bigint' && typeof y === 'bigint') return x - y
 			break
 		case '==':
 			if (eq(x, y)) return true
@@ -729,6 +752,8 @@ function test() {
 	assert(eq(simplify(mk('==', 1n, 2n)), false))
 	assert(eq(simplify(mk('<', 1n, 2n)), true))
 	assert(eq(simplify(mk('+', 1n, 2n)), 3n))
+	assert(eq(simplify(mk('isint', 2n)), true))
+	assert(eq(simplify(mk('toint', 2n)), 2n))
 }
 
 test()
