@@ -289,6 +289,18 @@ function simplify(a, m = new Map()) {
 			if (x === 0n) return y
 			if (y === 0n) return x
 			break
+		case 'dive':
+		case 'divf':
+		case 'divt':
+			if (x === 0n) return x
+			if (y === 1n) return x
+			break
+		case 'reme':
+		case 'remf':
+		case 'remt':
+			if (x === 0n) return x
+			if (y === 1n) return 0n
+			break
 		case '*':
 			if (typeof x === 'bigint' && typeof y === 'bigint') return x * y
 			if (x === 0n) return x
