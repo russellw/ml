@@ -237,11 +237,15 @@ function isconst(a) {
 }
 
 function subset(s, t) {
+	if (Array.isArray(s)) s = new Set(s)
+	if (Array.isArray(t)) t = new Set(t)
 	for (var a of s) if (!t.has(a)) return
 	return true
 }
 
 function eqsets(s, t) {
+	if (Array.isArray(s)) s = new Set(s)
+	if (Array.isArray(t)) t = new Set(t)
 	return s.size === t.size && subset(s, t)
 }
 
@@ -775,6 +779,10 @@ function test() {
 	assert(!eqsets(new Set([1, 2, 3, 4]), new Set([1, 2, 3])))
 	assert(!eqsets(new Set([1, 2, 3]), new Set([1, 2, 3, 4])))
 	assert(!eqsets(new Set([2, 3]), new Set([1, 2, 3])))
+	assert(eqsets([1, 2, 3], new Set([1, 2, 3])))
+	assert(!eqsets([1, 2, 3, 4], new Set([1, 2, 3])))
+	assert(!eqsets(new Set([1, 2, 3]), [1, 2, 3, 4]))
+	assert(!eqsets(new Set([2, 3]), [1, 2, 3]))
 }
 
 test()

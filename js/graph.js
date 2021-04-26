@@ -27,16 +27,16 @@ class graph {
 	}
 
 	domfrontier(s, x) {
-		var u = []
+		var r = []
 		for (var y of this.nodes) {
 			if (this.strictlydominates(s, x, y)) continue
 			for (var z of this.predecessors(y))
 				if (this.dominates(s, x, z)) {
-					u.push(y)
+					r.push(y)
 					break
 				}
 		}
-		return u
+		return r
 	}
 
 	domtree(s) {
@@ -63,16 +63,16 @@ class graph {
 	isidom(s, x, y) {
 		if (!this.strictlydominates(s, x, y)) return
 		for (var z of this.strictdominators(s, y)) if (!this.dominates(s, z, x)) return
-		return 1
+		return true
 	}
 
 	predecessors(y) {
-		var u = []
+		var r = []
 		for (var a of this.arcs) {
 			var [x, ys] = a
-			if (ys.has(y)) u.push(x)
+			if (ys.has(y)) r.push(x)
 		}
-		return u
+		return r
 	}
 
 	reacheswithout(x, y, w) {
