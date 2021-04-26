@@ -76,14 +76,15 @@ class graph {
 	}
 
 	reacheswithout(x, y, w) {
-		if (w === x) return
-		var r = null
-
-		function f(z) {
-			if (y === z) r = 1
-		}
-
-		this.dfswithout(x, f, w)
+		if (x === w) return
+		var r = false
+		this.dfswithout(
+			x,
+			(z) => {
+				if (z === y) r = true
+			},
+			w
+		)
 		return r
 	}
 
