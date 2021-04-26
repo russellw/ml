@@ -69,7 +69,15 @@ function type(a) {
 		case '<=':
 		case 'all':
 		case 'exists':
+		case 'isint':
+		case 'israt':
 			return 'boolean'
+		case 'toint':
+			return 'bigint'
+		case 'torat':
+			return 'rat'
+		case 'toreal':
+			return 'real'
 		case '+':
 		case '-':
 		case 'unary-':

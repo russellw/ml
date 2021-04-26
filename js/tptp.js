@@ -767,6 +767,26 @@ function prterm(a, parent) {
 			process.stdout.write('$sum')
 			args(a)
 			return
+		case 'isint':
+			process.stdout.write('$is_int')
+			args(a)
+			return
+		case 'israt':
+			process.stdout.write('$is_rat')
+			args(a)
+			return
+		case 'toint':
+			process.stdout.write('$to_int')
+			args(a)
+			return
+		case 'torat':
+			process.stdout.write('$to_rat')
+			args(a)
+			return
+		case 'toreal':
+			process.stdout.write('$to_real')
+			args(a)
+			return
 		case 'ceil':
 			process.stdout.write('$ceiling')
 			args(a)
