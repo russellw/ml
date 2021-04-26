@@ -236,6 +236,15 @@ function isconst(a) {
 	}
 }
 
+function subset(s, t) {
+	for (var a of s) if (!t.has(a)) return
+	return true
+}
+
+function eqsets(s, t) {
+	return s.size === t.size && subset(s, t)
+}
+
 function simplify(a, m = new Map()) {
 	if (m.has(a)) return simplify(m.get(a), m)
 	a = map(a, (b) => simplify(b, m))
@@ -754,6 +763,18 @@ function test() {
 	assert(eq(simplify(mk('+', 1n, 2n)), 3n))
 	assert(eq(simplify(mk('isint', 2n)), true))
 	assert(eq(simplify(mk('toint', 2n)), 2n))
+
+	// subset
+	assert(subset(new Set([1, 2, 3]), new Set([1, 2, 3])))
+	assert(!subset(new Set([1, 2, 3, 4]), new Set([1, 2, 3])))
+	assert(subset(new Set([1, 2, 3]), new Set([1, 2, 3, 4])))
+	assert(subset(new Set([2, 3]), new Set([1, 2, 3])))
+
+	// eqsets
+	assert(eqsets(new Set([1, 2, 3]), new Set([1, 2, 3])))
+	assert(!eqsets(new Set([1, 2, 3, 4]), new Set([1, 2, 3])))
+	assert(!eqsets(new Set([1, 2, 3]), new Set([1, 2, 3, 4])))
+	assert(!eqsets(new Set([2, 3]), new Set([1, 2, 3])))
 }
 
 test()
@@ -780,3 +801,5 @@ exports.isnumtype = isnumtype
 exports.version = version
 exports.cktime = cktime
 exports.isomorphic = isomorphic
+exports.subset = subset
+exports.eqsets = eqsets

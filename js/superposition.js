@@ -45,7 +45,7 @@ function solve(clauses, deadline) {
 					if (etc.isnumtype(etc.type(b))) complete = false
 				})
 
-	var passive = new priorityq.priorityq(size)
+	var passive = new priorityq(size)
 	for (var c of clauses) {
 		var d = cnf.simplify(c)
 		if (etc.eq(d, c)) d = c

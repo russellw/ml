@@ -42,4 +42,4 @@ function test() {
 
 test()
 
-exports.priorityq = priorityq
+module.exports = priorityq
