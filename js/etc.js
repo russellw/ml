@@ -286,12 +286,23 @@ function simplify(a, m = new Map()) {
 			break
 		case '+':
 			if (typeof x === 'bigint' && typeof y === 'bigint') return x + y
+			if (x === 0n) return y
+			if (y === 0n) return x
 			break
 		case '*':
 			if (typeof x === 'bigint' && typeof y === 'bigint') return x * y
+			if (x === 0n) return x
+			if (y === 0n) return y
+			if (x === 1n) return y
+			if (y === 1n) return x
+			break
+		case 'unary-':
+			if (typeof x === 'bigint') return -x
 			break
 		case '-':
 			if (typeof x === 'bigint' && typeof y === 'bigint') return x - y
+			if (x === 0n) return mk('unary-', y)
+			if (y === 0n) return x
 			break
 		case '==':
 			if (eq(x, y)) return true
@@ -765,6 +776,9 @@ function test() {
 	assert(eq(simplify(mk('==', 1n, 2n)), false))
 	assert(eq(simplify(mk('<', 1n, 2n)), true))
 	assert(eq(simplify(mk('+', 1n, 2n)), 3n))
+	assert(eq(simplify(mk('+', x, 0n)), x))
+	assert(eq(simplify(mk('*', x, 0n)), 0n))
+	assert(eq(simplify(mk('*', x, 1n)), x))
 	assert(eq(simplify(mk('isint', 2n)), true))
 	assert(eq(simplify(mk('toint', 2n)), 2n))
 
