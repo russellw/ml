@@ -15,9 +15,8 @@ class graph {
 		arcs.get(x).add(y)
 	}
 
-	dfswithout(x, f, w, visited) {
+	dfswithout(x, f, w, visited = new Set()) {
 		if (x === w) return
-		if (!visited) var visited = new Set()
 		if (visited.has(x)) return
 		visited.add(x)
 		f(x)
