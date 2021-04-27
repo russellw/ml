@@ -182,6 +182,27 @@ function test() {
 		new Map()
 	)
 	assert(!m)
+
+	var atoms = []
+	for (var i = 0; i < 10; i++) atoms.push({ o: 'fn', name: i, type: 'boolean' })
+
+	for (var i = 0; i < 10; i++) {
+		var clauses = []
+		var nc = Math.random() * 10
+		for (var j = 0; j < nc; j++) {
+			var c = [[], []]
+			var nL = Math.random() * 10
+			for (var k = 0; k < nL; k++) {
+				var a = atoms[Math.floor(Math.random() * atoms.length)]
+				c[Math.floor(Math.random() * 2)].push(a)
+			}
+			clauses.push(c)
+		}
+		var s1 = !!dpll(clauses, new Map())
+		var s2 = !!sat(clauses)
+		if (s1 !== s2) etc.show(clauses)
+		assert(s1 === s2)
+	}
 }
 
 test()
