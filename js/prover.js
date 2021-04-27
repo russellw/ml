@@ -3,7 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const dimacs = require('./dimacs')
 const tptp = require('./tptp')
-const dpll = require('./dpll')
+const cdcl = require('./cdcl')
 const etc = require('./etc')
 const cnf = require('./cnf')
 const superposition = require('./superposition')
@@ -108,7 +108,7 @@ function propositional(clauses) {
 
 function solve(problem, deadline) {
 	for (var c of problem.formulas) cnf.convert(c, problem.clauses)
-	if (propositional(problem.clauses)) return dpll.solve(problem.clauses, deadline)
+	if (propositional(problem.clauses)) return cdcl.solve(problem.clauses, deadline)
 	return superposition.solve(problem.clauses, deadline)
 }
 
@@ -116,7 +116,7 @@ function test() {
 	function sat(cs) {
 		var r1 = superposition.solve(cs).szs
 		if (propositional(cs)) {
-			var r2 = dpll.solve(cs).szs
+			var r2 = cdcl.solve(cs).szs
 			assert(r1 === r2)
 		}
 		return r1

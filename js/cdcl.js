@@ -8,34 +8,58 @@ function simplify(clauses, m) {
 	return cs.filter((c) => !etc.eq(c, [[], [true]]))
 }
 
-function unit(clauses, m) {
-	var cs = simplify(cs, m)
+function unit(cs) {
 	for (var c of cs) {
 		var [neg, pos] = c
-		if (neg.length === 1 && pos.length === 0) return [neg[0], false]
-		if (neg.length === 0 && pos.length === 1) return [pos[0], true]
+		if (neg.length === 1 && pos.length === 0) return etc.mk('unit', neg[0], false)
+		if (neg.length === 0 && pos.length === 1) return etc.mk('unit', pos[0], true)
 	}
 }
 
 function sat(clauses, deadline) {
-	// atoms
-	var atoms = new Set()
-	for (var c of cs) for (var L of c) for (var a of L) atoms.add(a)
-
 	var ps = []
-	for (;;) {
-		for (;;) {
-			var p = unit(clauses, new Map(ps))
-			if (!p) break
+	loop: for (;;) {
+		etc.cktime(deadline)
+
+		var m = new Map(ps)
+		var cs = simplify(clauses, m)
+
+		// unit propagation
+		var p = unit(cs)
+		if (p) {
 			ps.push(p)
+			continue
 		}
-		for (var c of cs) if (etc.eq(c, [[], []])) return
-		var i = vs.length
-		var a = atoms[i]
-		vs.push(false)
-		var m = mkmap(atoms, vs)
-		var cs = simplify(cs, m)
+
+		// solution
+		if (!cs.length) return m
+
+		// contradiction: backtrack
+		for (var c of cs)
+			if (etc.eq(c, [[], []]))
+				for (var i = ps.length; ; i--) {
+					if (!i) return
+					var p = ps[i - 1]
+					if (p.o === 'guess' && !p[1]) {
+						p[1] = true
+						continue loop
+					}
+				}
+
+		// unassigned atoms
+		var atoms = new Set()
+		for (var c of cs) for (var L of c) for (var a of L) atoms.add(a)
+		assert(atoms.size)
+
+		// pick one and guess
+		var a = [...atoms][0]
+		ps.push(etc.mk('guess', a, false))
 	}
+}
+
+function solve(clauses, deadline) {
+	var solution = sat(clauses, deadline)
+	return { szs: solution ? 'Satisfiable' : 'Unsatisfiable', solution }
 }
 
 function test() {
@@ -75,3 +99,5 @@ function test() {
 }
 
 test()
+
+exports.solve = solve
