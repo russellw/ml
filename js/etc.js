@@ -352,7 +352,7 @@ function cartproduct(qs) {
 }
 
 function mk(o, ...args) {
-	var a = Array.from(args)
+	var a = [...args]
 	a.o = o
 	return a
 }

@@ -117,7 +117,7 @@ function convert(c, clauses) {
 
 		// b is defined as being equal to a
 		// it needs to take the free variables of a as parameters
-		var b = skolem('boolean', Array.from(etc.freevars(a)))
+		var b = skolem('boolean', [...etc.freevars(a)])
 
 		// b implies a
 		// generate clauses to define the new symbol
@@ -241,7 +241,7 @@ function convert(c, clauses) {
 		// unless those subformulas are themselves renamed
 		// in which case they will end up in different clauses
 		// so the variables will still not overlap
-		var xs = Array.from(etc.freevars(a))
+		var xs = [...etc.freevars(a)]
 		var env = new Map()
 		for (var x of xs) env.set(x, x)
 
@@ -573,7 +573,7 @@ function test() {
 	function sat(clauses) {
 		var atoms = new Set()
 		for (var c of clauses) for (var p of c) for (var a of p) atoms.add(a)
-		atoms = Array.from(atoms)
+		atoms = [...atoms]
 
 		function rec(i, m) {
 			var cs = clauses.map((c) => simplify(c, m))
