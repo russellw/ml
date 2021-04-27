@@ -213,7 +213,8 @@ if (require.main === module) {
 			var r = solve(problem, deadline)
 		} catch (e) {
 			if (typeof e === 'string') r = { szs: e }
-			else if (e.code === 'ERR_STRING_TOO_LONG' || e.message === 'Array buffer allocation failed') r = { szs: 'ResourceOut' }
+			else if (e.code === 'ERR_STRING_TOO_LONG') r = { szs: 'ResourceOut' }
+			else if (e.message === 'Array buffer allocation failed') r = { szs: 'MemoryOut' }
 			else throw e
 		}
 		if (problem.conjecture)
