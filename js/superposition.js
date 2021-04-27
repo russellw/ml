@@ -161,11 +161,7 @@ function solve(clauses, deadline) {
 		if (a.o === 'var') return
 		nsuperpositionp(c, d, ci, c0, c1, di, d0, d1, path, a)
 		if (!Array.isArray(a)) return
-		for (var i = 0; i < a.length; i++) {
-			path.push(i)
-			nsuperpositiond(c, d, ci, c0, c1, di, d0, d1, path, a[i])
-			path.pop()
-		}
+		for (var i = 0; i < a.length; i++) nsuperpositiond(c, d, ci, c0, c1, di, d0, d1, path.concat(i), a[i])
 	}
 
 	// for each negative equation in d (both directions)
@@ -217,11 +213,7 @@ function solve(clauses, deadline) {
 		if (a.o === 'var') return
 		psuperpositionp(c, d, ci, c0, c1, di, d0, d1, path, a)
 		if (!Array.isArray(a)) return
-		for (var i = 0; i < a.length; i++) {
-			path.push(i)
-			psuperpositiond(c, d, ci, c0, c1, di, d0, d1, path, a[i])
-			path.pop()
-		}
+		for (var i = 0; i < a.length; i++) psuperpositiond(c, d, ci, c0, c1, di, d0, d1, path.concat(i), a[i])
 	}
 
 	// for each negative equation in d (both directions)
