@@ -835,6 +835,10 @@ function prterm(a, parent) {
 			process.stdout.write('$quotient_f')
 			args(a)
 			return
+		case 'unary-':
+			process.stdout.write('$uminus')
+			args(a)
+			return
 		case 'reme':
 			process.stdout.write('$remainder_e')
 			args(a)
