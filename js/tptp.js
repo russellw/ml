@@ -907,16 +907,16 @@ function prnclause(c) {
 
 	// term
 	if (c.length === 2) {
-		for (var i = 0; i < c[0].length; i++) {
+		var [neg, pos] = c
+		for (var i = 0; i < neg.length; i++) {
 			if (i) process.stdout.write(' | ')
-			process.stdout.write('~')
-			prterm(c[0][i])
+			prterm(etc.mk('!', neg[i]))
 		}
-		for (var i = 0; i < c[1].length; i++) {
-			if (c[0].length + i) process.stdout.write(' | ')
-			prterm(c[1][i])
+		for (var i = 0; i < pos.length; i++) {
+			if (neg.length + i) process.stdout.write(' | ')
+			prterm(pos[i])
 		}
-		if (c[0].length + c[1].length === 0) process.stdout.write('$false')
+		if (neg.length + pos.length === 0) process.stdout.write('$false')
 	} else prterm(c[0])
 	process.stdout.write(', ')
 
