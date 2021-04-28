@@ -134,8 +134,13 @@ function convert(c, clauses) {
 		return b
 	}
 
-	function and(...a) {
-		a = etc.mk('&&', ...a)
+	// arguments are taken as an array instead of on the call stack
+	// to avoid Node.js hitting stack overflow
+	// https://stackoverflow.com/questions/67305689/node-js-stack-size-silently-crashing
+	function and(a) {
+		// copy the argument array just in case it is still in use elsewhere
+		a = [...a]
+		a.o = '&&'
 
 		// verify before returning
 		csterm(a)
@@ -181,14 +186,14 @@ function convert(c, clauses) {
 			case '&&':
 				return or(...a.map((b) => cnfneg(env, b)))
 			case '||':
-				return and(...a.map((b) => cnfneg(env, b)))
+				return and(a.map((b) => cnfneg(env, b)))
 			case 'var':
 				assert(env.has(a))
 				return env.get(a)
 			case '<=>':
 				var x = cnfboth(env, a[0])
 				var y = cnfboth(env, a[1])
-				return and(or(x[0], y[0]), or(x[1], y[1]))
+				return and([or(x[0], y[0]), or(x[1], y[1])])
 		}
 		return etc.mk(
 			'!',
@@ -207,7 +212,7 @@ function convert(c, clauses) {
 			case '!':
 				return cnfneg(env, a[0])
 			case '&&':
-				return and(...a.map((b) => cnfpos(env, b)))
+				return and(a.map((b) => cnfpos(env, b)))
 			case '||':
 				return or(...a.map((b) => cnfpos(env, b)))
 			case 'var':
@@ -216,7 +221,7 @@ function convert(c, clauses) {
 			case '<=>':
 				var x = cnfboth(env, a[0])
 				var y = cnfboth(env, a[1])
-				return and(or(x[0], y[1]), or(x[1], y[0]))
+				return and([or(x[0], y[1]), or(x[1], y[0])])
 		}
 		return etc.map(a, (b) => cnfpos(env, b))
 	}
@@ -260,7 +265,7 @@ function convert(c, clauses) {
 		// we don't need another recursive call, but can jump straight to generating clauses
 		// because we only place NOT on an atomic term, so don't break NNF
 		// and or() will bubble up any occurrences of AND within a
-		for (var d of csterm(and(or(etc.mk('!', b), a[1]), or(b, a[0])))) {
+		for (var d of csterm(and([or(etc.mk('!', b), a[1]), or(b, a[0])]))) {
 			d.how = 'def'
 			ckclause(d)
 			clauses.push(d)
@@ -289,10 +294,10 @@ function convert(c, clauses) {
 				return [a[1], a[0]]
 			case '&&':
 				var a2 = a.map((b) => cnfboth(env, b))
-				return [or(...a2.map((b) => b[0])), and(...a2.map((b) => b[1]))]
+				return [or(...a2.map((b) => b[0])), and(a2.map((b) => b[1]))]
 			case '||':
 				var a2 = a.map((b) => cnfboth(env, b))
-				return [and(...a2.map((b) => b[0])), or(...a2.map((b) => b[1]))]
+				return [and(a2.map((b) => b[0])), or(...a2.map((b) => b[1]))]
 			case 'var':
 				assert(env.has(a))
 				return env.get(a)
@@ -305,7 +310,9 @@ function convert(c, clauses) {
 				if (nclausesneg(y) + nclausespos(y) >= many) y = renameboth(y)
 				y = cnfboth(env, y)
 
-				return [and(or(x[0], y[0]), or(x[1], y[1])), and(or(x[0], y[1]), or(x[1], y[0]))]
+				var z0 = and([or(x[0], y[0]), or(x[1], y[1])])
+				var z1 = and([or(x[0], y[1]), or(x[1], y[0])])
+				return [z0, z1]
 		}
 		a = etc.map(a, (b) => cnfpos(env, b))
 		return [etc.mk('!', a), a]
