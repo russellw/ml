@@ -2,60 +2,6 @@
 const assert = require('assert')
 const etc = require('./etc')
 
-function match(c0, d0, c1, d1, m) {
-	// empty list means we have matched everything in one polarity
-	// note the asymmetry:
-	// for c to subsume d, we need to match every c literal
-	// but it's okay to have leftover d literals
-	if (!c0.length) {
-		// try the other polarity
-		if (c1) return match(c1, d1, null, null, m)
-		// have already matched everything in the other polarity
-		return m
-	}
-
-	// try matching literals
-	for (var ci = 0; ci < c0.length; ci++) {
-		// make an equation out of each literal
-		// because an equation can be matched either way around
-		var ce = etc.eqn(c0[ci])
-		// if we successfully match a literal
-		// it can be removed from further consideration
-		// on this branch of the search tree
-		// so make a copy of this list of literals
-		// minus the candidate lateral we are trying to match
-		var cx = c0.slice()
-		cx.splice(ci, 1)
-		for (var di = 0; di < d0.length; di++) {
-			// same thing with the literals on the other side
-			var de = etc.eqn(d0[di])
-			var dx = d0.slice()
-			dx.splice(di, 1)
-
-			// try orienting equation one way
-			var m1 = new Map(m)
-			if (etc.match(ce[0], de[0], m1) && etc.match(ce[1], de[1], m1)) {
-				// if we successfully match this pair of literals
-				// need to continue with the backtracking search
-				// to see if these variable assignments also let us match all the other literals
-				m1 = match(cx, dx, c1, d1, m1)
-				if (m1) return m1
-			}
-
-			// and the other way
-			var m1 = new Map(m)
-			if (etc.match(ce[0], de[1], m1) && etc.match(ce[1], de[0], m1)) {
-				m1 = match(cx, dx, c1, d1, m1)
-				if (m1) return m1
-			}
-
-			// if this pair of literals did not match
-			// in either orientation of the respective equations
-			// continue to look at all the other possible pairs of literals
-		}
-	}
-}
-
 function subsumes(c, d) {
 	assert(c.length === 2)
 	assert(d.length === 2)
@@ -71,14 +17,84 @@ function subsumes(c, d) {
 	// it is impossible for a longer clause to subsume a shorter one
 	if (c0.length > d0.length || c1.length > d1.length) return
 
-	// fewer literals typically fail faster
+	// fewer literals are likely to fail faster
+	// so if there are fewer positive literals than negative
+	// swap them around and try the positive side first
 	if (c1.length < c0.length) {
 		;[c1, c0] = c
 		;[d1, d0] = d
 	}
 
+	// worst-case time is exponential
+	// so give up if taking too long
+	var steps = 1000
+
+	function match(c0, d0, c1, d1, m) {
+		if (!steps) throw 'break'
+		steps--
+
+		// empty list means we have matched everything in one polarity
+		// note the asymmetry:
+		// for c to subsume d, we need to match every c literal
+		// but it's okay to have leftover d literals
+		if (!c0.length) {
+			// try the other polarity
+			if (c1) return match(c1, d1, null, null, m)
+			// have already matched everything in the other polarity
+			return m
+		}
+
+		// try matching literals
+		for (var ci = 0; ci < c0.length; ci++) {
+			// make an equation out of each literal
+			// because an equation can be matched either way around
+			var ce = etc.eqn(c0[ci])
+			// if we successfully match a literal
+			// it can be removed from further consideration
+			// on this branch of the search tree
+			// so make a copy of this list of literals
+			// minus the candidate lateral we are trying to match
+			var cx = c0.slice()
+			cx.splice(ci, 1)
+			for (var di = 0; di < d0.length; di++) {
+				// same thing with the literals on the other side
+				var de = etc.eqn(d0[di])
+				var dx = d0.slice()
+				dx.splice(di, 1)
+
+				// try orienting equation one way
+				var m1 = new Map(m)
+				if (etc.match(ce[0], de[0], m1) && etc.match(ce[1], de[1], m1)) {
+					// if we successfully match this pair of literals
+					// need to continue with the backtracking search
+					// to see if these variable assignments also let us match all the other literals
+					m1 = match(cx, dx, c1, d1, m1)
+					if (m1) return m1
+				}
+
+				// and the other way
+				var m1 = new Map(m)
+				if (etc.match(ce[0], de[1], m1) && etc.match(ce[1], de[0], m1)) {
+					m1 = match(cx, dx, c1, d1, m1)
+					if (m1) return m1
+				}
+
+				// if this pair of literals did not match
+				// in either orientation of the respective equations
+				// continue to look at all the other possible pairs of literals
+			}
+		}
+	}
+
 	// search for matched literals
-	return match(c0, d0, c1, d1, new Map())
+	try {
+		return match(c0, d0, c1, d1, new Map())
+	} catch (e) {
+		// if we failed to find proof of subsumption within allocated time
+		// completeness requires the conservative assumption of no subsumption
+		if (e === 'break') return
+		throw e
+	}
 }
 
 function test() {
