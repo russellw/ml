@@ -2,6 +2,10 @@
 const assert = require('assert')
 const etc = require('./etc')
 
+// one clause subsumes another if there exists a variable substitution
+// that makes the first clause a sub-multiset of the second
+// multiset not set because otherwise a clause could subsume its own factors
+// which would break completeness of the superposition calculus
 function subsumes(c, d) {
 	assert(c.length === 2)
 	assert(d.length === 2)
