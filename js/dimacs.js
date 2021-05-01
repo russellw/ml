@@ -123,6 +123,6 @@ function parse(file, txt) {
 	}
 }
 
-exports = {
+module.exports = {
 	parse,
 }

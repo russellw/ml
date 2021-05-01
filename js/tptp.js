@@ -1015,7 +1015,7 @@ function test() {
 
 test()
 
-exports = {
+module.exports = {
 	prnterm,
 	prnproof,
 	prnclause,
