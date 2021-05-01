@@ -79,13 +79,12 @@ for (var file of fs.readdirSync('.')) {
 		if (m) lines[i] += ' = null'
 	}
 
-	var i = lines.length
-	while (i && !lines[i]) i--
+	for(var i = lines.length;i && !lines[i-1];) i--
 	var ex = []
-	while (i) {
-		var m = /^exports\.(\w*) = (\w*)$/.exec(lines[i])
+	for (;i;i--) {
+		var m = /^exports\.(\w*) = (\w*)$/.exec(lines[i-1])
 		if (!m) break
-		if (m[1] != m[2]) throw lines[i]
+		if (m[1] != m[2]) throw lines[i-1]
 		ex.push(m[1])
 	}
 	if (ex.length) {
