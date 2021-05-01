@@ -47,7 +47,7 @@ if (process.argv[2] !== '.') process.exit(1)
 for (var file of fs.readdirSync('.')) {
 	if (extension(file) !== 'js') continue
 	var lines = fs.readFileSync(file, 'utf8').split(/\r?\n/)
-	var old = lines.slice()
+	var old = [...lines]
 
 	// use strict
 	for (var i = 0; i < lines.length; i++) if (lines[i] && !lines[i].startsWith('//')) break

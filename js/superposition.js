@@ -75,7 +75,7 @@ function solve(clauses, deadline) {
 
 	// push new clause
 	function resolvep(c, ci, m) {
-		var neg = c[0].slice()
+		var neg = [...c[0]]
 		neg.splice(ci, 1)
 
 		push([neg, c[1]], m, 'resolve', c)
@@ -103,10 +103,10 @@ function solve(clauses, deadline) {
 		var m = etc.unify(c0, d0)
 		if (!m) return
 
-		var neg = c[0].slice()
+		var neg = [...c[0]]
 		neg.push(equate(c1, d1))
 
-		var pos = c[1].slice()
+		var pos = [...c[1]]
 		pos.splice(di, 1)
 
 		push([neg, pos], m, 'factor', c)
@@ -144,12 +144,12 @@ function solve(clauses, deadline) {
 		var m = etc.unify(c0, a)
 		if (!m) return
 
-		var neg = d[0].slice()
+		var neg = [...d[0]]
 		neg.splice(di, 1)
 		neg = c[0].concat(neg)
 		neg.push(equate(splice(d0, path, c1), d1))
 
-		var pos = c[1].slice()
+		var pos = [...c[1]]
 		pos.splice(ci, 1)
 		pos = pos.concat(d[1])
 
@@ -198,9 +198,9 @@ function solve(clauses, deadline) {
 
 		var neg = c[0].concat(d[0])
 
-		var cpos = c[1].slice()
+		var cpos = [...c[1]]
 		cpos.splice(ci, 1)
-		var dpos = d[1].slice()
+		var dpos = [...d[1]]
 		dpos.splice(di, 1)
 		var pos = cpos.concat(dpos)
 		pos.push(equate(splice(d0, path, c1), d1))

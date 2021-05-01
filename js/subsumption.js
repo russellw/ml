@@ -58,12 +58,12 @@ function subsumes(c, d) {
 			// on this branch of the search tree
 			// so make a copy of this list of literals
 			// minus the candidate lateral we are trying to match
-			var cx = c0.slice()
+			var cx = [...c0]
 			cx.splice(ci, 1)
 			for (var di = 0; di < d0.length; di++) {
 				// same thing with the literals on the other side
 				var de = etc.eqn(d0[di])
-				var dx = d0.slice()
+				var dx = [...d0]
 				dx.splice(di, 1)
 
 				// try orienting equation one way
