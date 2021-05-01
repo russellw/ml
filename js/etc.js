@@ -813,27 +813,29 @@ function test() {
 
 test()
 
-exports.walk = walk
-exports.getor = getor
-exports.eq = eq
-exports.map = map
-exports.mk = mk
-exports.replace = replace
-exports.cartproduct = cartproduct
-exports.extension = extension
-exports.eqn = eqn
-exports.simplify = simplify
-exports.unify = unify
-exports.match = match
-exports.freevars = freevars
-exports.freshvars = freshvars
-exports.type = type
-exports.show = show
-exports.quote = quote
-exports.defaulttype = defaulttype
-exports.isnumtype = isnumtype
-exports.version = version
-exports.cktime = cktime
-exports.isomorphic = isomorphic
-exports.subset = subset
-exports.eqsets = eqsets
+module.exports = {
+	eqsets,
+	subset,
+	isomorphic,
+	cktime,
+	version,
+	isnumtype,
+	defaulttype,
+	quote,
+	show,
+	type,
+	freshvars,
+	freevars,
+	match,
+	unify,
+	simplify,
+	eqn,
+	extension,
+	cartproduct,
+	replace,
+	mk,
+	map,
+	eq,
+	getor,
+	walk,
+}

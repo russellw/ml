@@ -657,7 +657,9 @@ function test() {
 
 test()
 
-exports.convert = convert
-exports.simplify = simplify
-exports.ckclause = ckclause
-exports.ckclauses = ckclauses
+module.exports = {
+	ckclauses,
+	ckclause,
+	simplify,
+	convert,
+}

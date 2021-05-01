@@ -1015,7 +1015,9 @@ function test() {
 
 test()
 
-exports.parse = parse
-exports.prnclause = prnclause
-exports.prnproof = prnproof
-exports.prnterm = prnterm
+exports = {
+	prnterm,
+	prnproof,
+	prnclause,
+	parse,
+}

@@ -271,4 +271,6 @@ function test() {
 
 test()
 
-exports.subsumes = subsumes
+module.exports = {
+	subsumes,
+}

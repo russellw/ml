@@ -421,4 +421,6 @@ function test() {
 
 test()
 
-exports.solve = solve
+module.exports = {
+	solve,
+}

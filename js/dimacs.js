@@ -123,4 +123,6 @@ function parse(file, txt) {
 	}
 }
 
-exports.parse = parse
+exports = {
+	parse,
+}
