@@ -79,20 +79,19 @@ for (var file of fs.readdirSync('.')) {
 		if (m) lines[i] += ' = null'
 	}
 
-	var i=lines.length
-	while(i&&!lines[i])i--
-	var ex=[]
-	while(i){
+	var i = lines.length
+	while (i && !lines[i]) i--
+	var ex = []
+	while (i) {
 		var m = /^exports\.(\w*) = (\w*)$/.exec(lines[i])
-		if(!m)break
-		if(m[1]!=m[2])throw lines[i]
+		if (!m) break
+		if (m[1] != m[2]) throw lines[i]
 		ex.push(m[1])
 	}
-	if(ex.length){
-		lines.splice(i,lines.length-i)
+	if (ex.length) {
+		lines.splice(i, lines.length - i)
 		lines.push('exports = {')
-		for(var s of ex)
-		lines.push('\t'+s+',')
+		for (var s of ex) lines.push('\t' + s + ',')
 		lines.push('}')
 		lines.push('')
 	}
