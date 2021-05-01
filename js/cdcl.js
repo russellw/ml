@@ -36,15 +36,16 @@ function sat(clauses, deadline) {
 
 		// contradiction: backtrack
 		for (var c of cs)
-			if (etc.eq(c, [[], []]))
-				for (var i = ps.length; ; i--) {
-					if (!i) return
-					var p = ps[i - 1]
+			if (etc.eq(c, [[], []])) {
+				while (ps.length) {
+					var p = ps.pop()
 					if (p.o === 'guess' && !p[1]) {
-						p[1] = true
+						ps.push(etc.mk('guess', p[0], true))
 						continue loop
 					}
 				}
+				return
+			}
 
 		// unassigned atoms
 		var atoms = new Set()

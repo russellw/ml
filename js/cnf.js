@@ -4,6 +4,10 @@ const assert = require('assert')
 
 var many = 10
 
+function rmdup(a) {
+	return [...new Set(a)]
+}
+
 function simplify(c, m = new Map()) {
 	var [neg, pos] = c
 
@@ -14,6 +18,10 @@ function simplify(c, m = new Map()) {
 	// filter out redundancy
 	neg = neg.filter((a) => a !== true)
 	pos = pos.filter((a) => a !== false)
+
+	// remove duplicates
+	neg = rmdup(neg)
+	pos = rmdup(pos)
 
 	// tautology?
 	for (var a of neg) if (a === false) return [[], [true]]
