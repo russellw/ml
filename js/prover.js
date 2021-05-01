@@ -257,4 +257,6 @@ if (require.main === module) {
 	console.log('%% %d seconds', (new Date().getTime() - start) / 1000)
 }
 
-exports.solve = solve
+exports = {
+	solve,
+}
