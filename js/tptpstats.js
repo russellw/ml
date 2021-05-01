@@ -1,6 +1,6 @@
 'use strict'
 const fs = require('fs')
-const etc = require('./etc')
+const etc = require('./aklo/etc')
 
 var files = []
 
