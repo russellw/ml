@@ -99,72 +99,72 @@ function parseargs(args) {
 	}
 }
 
-	parseargs(process.argv.slice(2))
-	if (!files.length) {
-		help()
-		process.exit(0)
+parseargs(process.argv.slice(2))
+if (!files.length) {
+	help()
+	process.exit(0)
+}
+var start = new Date().getTime()
+var solved = 0
+for (var file of files) {
+	var start1 = new Date().getTime()
+	var deadline = null
+	if (timelimit) deadline = start1 + timelimit
+	try {
+		var txt = fs.readFileSync(file === 'stdin' ? 0 : file, 'utf8')
+		switch (language(file)) {
+			case 'dimacs':
+				var problem = dimacs.parse(file, txt)
+				break
+			case 'tptp':
+				var problem = tptp.parse(file, txt)
+				break
+			default:
+				console.error(file + ': unknown language')
+				process.exit(1)
+		}
+		var r = solver.solve(problem, deadline)
+	} catch (e) {
+		if (typeof e === 'string') r = { szs: e }
+		else if (e.code === 'ERR_STRING_TOO_LONG') r = { szs: 'ResourceOut' }
+		else if (e.message === 'Array buffer allocation failed') r = { szs: 'MemoryOut' }
+		else throw e
 	}
-	var start = new Date().getTime()
-	var solved = 0
-	for (var file of files) {
-		var start1 = new Date().getTime()
-		var deadline = null
-		if (timelimit) deadline = start1 + timelimit
-		try {
-			var txt = fs.readFileSync(file === 'stdin' ? 0 : file, 'utf8')
-			switch (language(file)) {
-				case 'dimacs':
-					var problem = dimacs.parse(file, txt)
-					break
-				case 'tptp':
-					var problem = tptp.parse(file, txt)
-					break
-				default:
-					console.error(file + ': unknown language')
-					process.exit(1)
-			}
-			var r = solver.solve(problem, deadline)
-		} catch (e) {
-			if (typeof e === 'string') r = { szs: e }
-			else if (e.code === 'ERR_STRING_TOO_LONG') r = { szs: 'ResourceOut' }
-			else if (e.message === 'Array buffer allocation failed') r = { szs: 'MemoryOut' }
-			else throw e
+	if (problem.conjecture)
+		switch (r.szs) {
+			case 'Satisfiable':
+				r.szs = 'CounterSatisfiable'
+				break
+			case 'Unsatisfiable':
+				r.szs = 'Theorem'
+				break
 		}
-		if (problem.conjecture)
-			switch (r.szs) {
-				case 'Satisfiable':
-					r.szs = 'CounterSatisfiable'
-					break
-				case 'Unsatisfiable':
-					r.szs = 'Theorem'
-					break
-			}
-		console.log('%% SZS status %s for %s', r.szs, path.basename(file))
-		if (r.proof) {
-			console.log('%% SZS output start CNFRefutation for %s', path.basename(file))
-			tptp.prnproof(r.proof)
-			console.log('%% SZS output end CNFRefutation for %s', path.basename(file))
-		}
-		if (problem.expected && r.szs !== problem.expected)
-			switch (r.szs) {
-				case 'Unsatisfiable':
-				case 'Theorem':
-					if (problem.expected === 'ContradictoryAxioms') break
-				case 'Satisfiable':
-				case 'CounterSatisfiable':
-					console.error(r.szs + ' != ' + problem.expected)
-					process.exit(1)
-			}
+	console.log('%% SZS status %s for %s', r.szs, path.basename(file))
+	if (r.proof) {
+		console.log('%% SZS output start CNFRefutation for %s', path.basename(file))
+		tptp.prnproof(r.proof)
+		console.log('%% SZS output end CNFRefutation for %s', path.basename(file))
+	}
+	if (problem.expected && r.szs !== problem.expected)
 		switch (r.szs) {
 			case 'Unsatisfiable':
 			case 'Theorem':
+				if (problem.expected === 'ContradictoryAxioms') break
 			case 'Satisfiable':
 			case 'CounterSatisfiable':
-				solved++
-				break
+				console.error(r.szs + ' != ' + problem.expected)
+				process.exit(1)
 		}
-		console.log('%% %d seconds', (new Date().getTime() - start1) / 1000)
-		console.log()
+	switch (r.szs) {
+		case 'Unsatisfiable':
+		case 'Theorem':
+		case 'Satisfiable':
+		case 'CounterSatisfiable':
+			solved++
+			break
 	}
-	console.log('%% Solved %d/%d(%d%%)', solved, files.length, (solved / files.length) * 100)
-	console.log('%% %d seconds', (new Date().getTime() - start) / 1000)
+	console.log('%% %d seconds', (new Date().getTime() - start1) / 1000)
+	console.log()
+}
+console.log('%% Solved %d/%d(%d%%)', solved, files.length, (solved / files.length) * 100)
+console.log('%% %d seconds', (new Date().getTime() - start) / 1000)
