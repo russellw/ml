@@ -53,6 +53,7 @@ for (var file of fs.readdirSync('.')) {
 	for (var i = 0; i < lines.length; i++) if (lines[i] && !lines[i].startsWith('//')) break
 	if (lines[i] !== "'use strict'") lines.splice(i, 0, "'use strict'")
 
+	// individual lines
 	for (var i = 0; i < lines.length; i++) {
 		// comments begin with spaces
 		var m = /^(\s*)\/\/(\S.*)$/.exec(lines[i])
@@ -79,6 +80,7 @@ for (var file of fs.readdirSync('.')) {
 		if (m) lines[i] += ' = null'
 	}
 
+	// module.exports
 	for (var i = lines.length; i && !lines[i - 1]; ) i--
 	var ex = []
 	for (; i; i--) {
@@ -95,6 +97,7 @@ for (var file of fs.readdirSync('.')) {
 		lines.push('')
 	}
 
+	// save
 	if (eq(lines, old)) continue
 	fs.renameSync(file, os.tmpdir() + '/' + file)
 	fs.writeFileSync(file, lines.join('\n'), 'utf8')
