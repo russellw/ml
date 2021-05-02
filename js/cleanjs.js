@@ -5,6 +5,7 @@
 'use strict'
 const fs = require('fs')
 const os = require('os')
+const path = require('path')
 
 // copy paste some standard library code instead of 'require'ing it
 // to preserve the ability to run this program when in the middle of editing the standard library
@@ -61,9 +62,9 @@ function quote(s) {
 	return q
 }
 
-if (process.argv[2] !== '.') process.exit(1)
-for (var file of fs.readdirSync('.')) {
-	if (extension(file) !== 'js') continue
+walkfiles (process.argv.slice(2),
+file=>extension(file)=='.js',
+file=>{
 	var lines = fs.readFileSync(file, 'utf8').split(/\r?\n/)
 	var old = [...lines]
 
@@ -116,8 +117,8 @@ for (var file of fs.readdirSync('.')) {
 	}
 
 	// save
-	if (eq(lines, old)) continue
-	fs.renameSync(file, os.tmpdir() + '/' + file)
+	if (eq(lines, old)) return
+	fs.renameSync(file, os.tmpdir() + '/' + path.basename(file))
 	fs.writeFileSync(file, lines.join('\n'), 'utf8')
 	console.log(file)
 }
