@@ -62,9 +62,7 @@ function quote(s) {
 	return q
 }
 
-walkfiles (process.argv.slice(2),
-file=>extension(file)=='.js',
-file=>{
+function dofile(file) {
 	var lines = fs.readFileSync(file, 'utf8').split(/\r?\n/)
 	var old = [...lines]
 
@@ -122,3 +120,5 @@ file=>{
 	fs.writeFileSync(file, lines.join('\n'), 'utf8')
 	console.log(file)
 }
+
+walkfiles(process.argv.slice(2), (file) => extension(file) == '.js', dofile)
