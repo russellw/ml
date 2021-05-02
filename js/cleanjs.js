@@ -23,6 +23,7 @@ function walkfiles(files, filter, act) {
 	function rec(dir) {
 		var fis = fs.readdirSync(dir)
 		for (var fi of fis) {
+			if (fi === 'node_modules') continue
 			var file = dir + '/' + fi
 			if (fs.statSync(file).isDirectory()) rec(file)
 			else if (filter(file)) act(file)
@@ -121,4 +122,4 @@ function dofile(file) {
 	console.log(file)
 }
 
-walkfiles(process.argv.slice(2), (file) => extension(file) == '.js', dofile)
+walkfiles(process.argv.slice(2), (file) => extension(file) === 'js', dofile)
