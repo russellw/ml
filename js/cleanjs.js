@@ -40,7 +40,7 @@ function extension(file) {
 	return a.pop()
 }
 
-function quote(s) {
+function quoted(s) {
 	var q = ''
 	for (var i = 0; i < s.length; i++) {
 		if (s.slice(i, i + 2) === '//' && !q) return '//'
@@ -82,15 +82,15 @@ function dofile(file) {
 
 		// for ... in -> of
 		var m = /^(.*)for (.*) in (.*)$/.exec(lines[i])
-		if (m && !quote(m[1]) && !quote(m[2])) lines[i] = m[1] + 'for ' + m[2] + ' of ' + m[3]
+		if (m && !quoted(m[1]) && !quoted(m[2])) lines[i] = m[1] + 'for ' + m[2] + ' of ' + m[3]
 
 		// == -> ===
 		var m = /^(.*) == (.*)$/.exec(lines[i])
-		if (m && !quote(m[1])) lines[i] = m[1] + ' === ' + m[2]
+		if (m && !quoted(m[1])) lines[i] = m[1] + ' === ' + m[2]
 
 		// != -> !==
 		var m = /^(.*) != (.*)$/.exec(lines[i])
-		if (m && !quote(m[1])) lines[i] = m[1] + ' !== ' + m[2]
+		if (m && !quoted(m[1])) lines[i] = m[1] + ' !== ' + m[2]
 
 		// var x -> var x = null
 		var m = /^\s*var \w+$/.exec(lines[i])
