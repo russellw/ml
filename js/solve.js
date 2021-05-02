@@ -1,10 +1,10 @@
 'use strict'
 const path = require('path')
 const fs = require('fs')
-const dimacs = require('./aklo/dimacs')
-const tptp = require('./aklo/tptp')
-const solver = require('./aklo/solver')
-const etc = require('./aklo/etc')
+const dimacs = require('./lib/dimacs')
+const tptp = require('./lib/tptp')
+const solver = require('./lib/solver')
+const etc = require('./lib/etc')
 const assert = require('assert')
 
 var lang = null
