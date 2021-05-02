@@ -104,7 +104,7 @@ function type(a) {
 }
 
 function occurs(a, b, m) {
-	if (a === b) return true
+	if (a == b) return true
 	if (m.has(b)) return occurs(a, m.get(b), m)
 	if (!Array.isArray(b)) return
 	for (var x of b) if (occurs(a, x, m)) return true

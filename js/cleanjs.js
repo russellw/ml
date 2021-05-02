@@ -6,6 +6,9 @@
 const fs = require('fs')
 const os = require('os')
 
+// copy paste some standard library code instead of 'require'ing it
+// to preserve the ability to run this program when in the middle of editing the standard library
+
 function eq(a, b) {
 	if (a === b) return true
 	if (!Array.isArray(a)) return
@@ -13,6 +16,21 @@ function eq(a, b) {
 	if (a.length !== b.length) return
 	for (var i = 0; i < a.length; i++) if (!eq(a[i], b[i])) return
 	return true
+}
+
+function walkfiles(files, filter, act) {
+	function rec(dir) {
+		var fis = fs.readdirSync(dir)
+		for (var fi of fis) {
+			var file = dir + '/' + fi
+			if (fs.statSync(file).isDirectory()) rec(file)
+			else if (filter(file)) act(file)
+		}
+	}
+
+	for (var file of files)
+		if (fs.statSync(file).isDirectory()) rec(file)
+		else act(file)
 }
 
 function extension(file) {
