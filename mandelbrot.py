@@ -24,6 +24,18 @@ def calc(x0=-2.25, y0=-1.5, size=3.0, res=64.0, iters=1000):
     return w
 
 
+def table(x0=-2.25, y0=-1.5, size=3.0, res=64.0, iters=1000):
+    v = []
+    for y in np.arange(y0, y0 + size, size / res):
+        for x in np.arange(x0, x0 + size, size / res):
+            c = complex(x, y)
+            if esc(c, iters) == iters:
+                v.append((x, y, 1))
+            else:
+                v.append((x, y, 0))
+    return v
+
+
 if __name__ == "__main__":
     w = calc()
     for v in w:
