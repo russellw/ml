@@ -14,6 +14,8 @@ y_tensor = torch.from_numpy(y_train)
 
 # hyperparameters
 in_features = X_train.shape[1]
+# if the hidden size is increased to 1000
+# then the network converges on positive error
 hidden_size = 100
 epochs = 1000
 
@@ -45,7 +47,6 @@ criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
 
 # train
-# This never quite converges on zero error
 print("training")
 for epoch in range(1, epochs + 1):
     # forward
