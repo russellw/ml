@@ -1,11 +1,4 @@
-import os
-import sys
-
-from sklearn import preprocessing
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import torch
 import torch.nn as nn
 
@@ -21,13 +14,12 @@ y_tensor = torch.from_numpy(y_train)
 
 # hyperparameters
 in_features = X_train.shape[1]
-hidden_size = 1000
-out_features = 1
-epochs = 5000
+hidden_size = 100
+epochs = 1000
 
 # model
 class Net(nn.Module):
-    def __init__(self, hidden_size):
+    def __init__(self):
         super(Net, self).__init__()
         self.L0 = nn.Linear(in_features, hidden_size)
         self.N0 = nn.ReLU()
@@ -48,7 +40,7 @@ class Net(nn.Module):
         return x
 
 
-model = Net(hidden_size).to(device)
+model = Net().to(device)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
 
