@@ -53,7 +53,7 @@ print()
 
 # torch tensors
 X_tensor = torch.from_numpy(X_train)
-y_tensor = torch.from_numpy(y_train)
+y_tensor = torch.from_numpy(y_train).unsqueeze(1)
 
 # hyperparameters
 in_features = X_train.shape[1]
@@ -107,7 +107,7 @@ print()
 
 # test
 with torch.no_grad():
-    X_tensor = torch.from_numpy(X_train)
+    X_tensor = torch.from_numpy(X_test)
     predicted = model(X_tensor).detach().numpy()
     errors = abs(predicted - y_test)
     print("mean squared  error:", np.mean(np.square(errors)))
