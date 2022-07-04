@@ -14,8 +14,6 @@ y_tensor = torch.from_numpy(y_train)
 
 # hyperparameters
 in_features = X_train.shape[1]
-# if the hidden size is increased to 1000
-# then the network converges on positive error
 hidden_size = 100
 epochs = 1000
 
@@ -23,23 +21,18 @@ epochs = 1000
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.L0 = nn.Linear(in_features, hidden_size)
-        self.N0 = nn.ReLU()
-        self.L1 = nn.Linear(hidden_size, hidden_size)
-        self.N1 = nn.Tanh()
-        self.L2 = nn.Linear(hidden_size, hidden_size)
-        self.N2 = nn.ReLU()
-        self.L3 = nn.Linear(hidden_size, 1)
+        self.layers = nn.Sequential(
+            nn.Linear(in_features, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, hidden_size),
+            nn.Tanh(),
+            nn.Linear(hidden_size, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, 1),
+        )
 
     def forward(self, x):
-        x = self.L0(x)
-        x = self.N0(x)
-        x = self.L1(x)
-        x = self.N1(x)
-        x = self.L2(x)
-        x = self.N2(x)
-        x = self.L3(x)
-        return x
+        return self.layers(x)
 
 
 model = Net().to(device)
@@ -47,6 +40,7 @@ criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
 
 # train
+# sometimes this converges on zero error, sometimes not
 print("training")
 for epoch in range(1, epochs + 1):
     # forward
