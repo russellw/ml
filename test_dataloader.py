@@ -90,7 +90,7 @@ model = Net().to(device)
 criterion = nn.BCELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 
-for epoch in range(1, epochs + 1):
+for epoch in range(epochs):
     for bi, (X, y) in enumerate(train_dataloader):
         X, y = X.to(device), y.to(device)
 
@@ -102,5 +102,4 @@ for epoch in range(1, epochs + 1):
         optimizer.step()
 
         if epoch % (epochs / 20) == 0 and not bi:
-            loss = loss.item()
             print(f"loss: {loss:>7f}")
