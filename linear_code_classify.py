@@ -6,7 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 
 import linear_code
 
-size = 5
+size = 10
 
 
 def good(code):
@@ -17,7 +17,7 @@ def rands(n):
     pos = []
     neg = []
     while len(pos) < n / 2 or len(neg) < n / 2:
-        code = linear_code.rand()
+        code = linear_code.rand(size)
         y = good(code)
         if y:
             w = pos
@@ -77,7 +77,6 @@ for x, y in train_dl:
     break
 
 hidden_size = 100
-epochs = 1000
 
 
 class Net(nn.Module):
@@ -115,6 +114,7 @@ def accuracy(model, ds):
     return n / len(ds)
 
 
+epochs = 100
 for epoch in range(epochs):
     for bi, (x, y) in enumerate(train_dl):
         x = x.to(device)

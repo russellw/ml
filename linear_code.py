@@ -3,9 +3,9 @@ import random
 symbols = ("+", "-", "*", "//", "0", "1")
 
 
-def rand():
+def rand(size):
     code = []
-    for i in range(10):
+    for i in range(size):
         a = random.choice(symbols)
         code.append(a)
     return code
@@ -35,6 +35,6 @@ def run(code):
 
 if __name__ == "__main__":
     for i in range(10):
-        code = rand()
+        code = rand(10)
         print(code)
         print(run(code))
