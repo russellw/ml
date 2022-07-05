@@ -1,12 +1,12 @@
 import random
 
-ops = ("+", "-", "*", "/", "0", "1")
+symbols = ("+", "-", "*", "/", "0", "1")
 
 
 def rand():
     v = []
     for i in range(10):
-        a = random.choice(ops)
+        a = random.choice(symbols)
         v.append(a)
     return v
 
