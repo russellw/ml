@@ -1,22 +1,22 @@
 import random
-import statistics
 
 import torch
 from torch import nn
 from torch.utils.data import Dataset, DataLoader
 
+symbols = ("orange", "lemon", "stone")
 size = 5
-
-
-def good(v):
-    return statistics.fmean(v) > 0.5
 
 
 def rand():
     v = []
     while len(v) < size:
-        v.append(random.uniform(0.0, 1.0))
+        v.append(random.choice(symbols))
     return v
+
+
+def good(v):
+    return int(v.count("orange") > v.count("lemon"))
 
 
 def rands(n):
@@ -30,17 +30,31 @@ def rands(n):
         else:
             w = neg
         if len(w) < n / 2:
-            v = torch.as_tensor(v)
-            y = torch.as_tensor([float(y)])
-            w.append((v, y))
+            w.append(v)
     w = pos + neg
     random.shuffle(w)
     return w
 
 
+def convert1(a):
+    v = [0.0] * len(symbols)
+    i = symbols.index(a)
+    assert i >= 0
+    v[i] = 1.0
+    return v
+
+
+def convert(v):
+    x = [convert1(a) for a in v]
+    y = good(v)
+    x = torch.as_tensor(x)
+    y = torch.as_tensor([float(y)])
+    return x, y
+
+
 class Dataset1(Dataset):
     def __init__(self, n):
-        self.w = rands(n)
+        self.w = [convert(v) for v in rands(n)]
 
     def __len__(self):
         return len(self.w)
@@ -49,7 +63,7 @@ class Dataset1(Dataset):
         return self.w[i]
 
 
-batch_size = 64
+batch_size = 8
 
 train_ds = Dataset1(800)
 test_ds = Dataset1(200)
@@ -74,7 +88,9 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.layers = nn.Sequential(
-            nn.Linear(size, hidden_size),
+            # this does not work in this form
+            # the shapes do not line up
+            nn.Linear(size * len(symbols), hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, hidden_size),
             nn.Tanh(),
