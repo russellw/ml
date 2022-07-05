@@ -49,7 +49,7 @@ class Dataset1(Dataset):
         return self.w[i]
 
 
-batch_size = 16
+batch_size = 64
 
 train_dataloader = DataLoader(Dataset1(800), batch_size=batch_size)
 test_dataloader = DataLoader(Dataset1(200), batch_size=batch_size)
@@ -92,10 +92,10 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 
 for epoch in range(epochs):
     for bi, (X, y) in enumerate(train_dataloader):
-        X, y = X.to(device), y.to(device)
+        X = X.to(device)
+        y = y.to(device)
 
-        pred = model(X)
-        loss = criterion(pred, y)
+        loss = criterion(model(X), y)
 
         optimizer.zero_grad()
         loss.backward()
