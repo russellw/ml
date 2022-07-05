@@ -1,32 +1,36 @@
 import random
 
-symbols = ("+", "-", "*", "/", "0", "1")
+symbols = ("+", "-", "*", "//", "0", "1")
 
 
 def rand():
-    v = []
+    code = []
     for i in range(10):
         a = random.choice(symbols)
-        v.append(a)
-    return v
+        code.append(a)
+    return code
 
 
 def run(code):
     stack = []
+
+    def pop():
+        if stack:
+            return stack.pop()
+        return 0
+
     for a in code:
         if a.isdigit():
             stack.append(int(a))
-        elif len(stack) < 2:
-            stack = [0]
+            continue
+        y = pop()
+        x = pop()
+        if a == "//" and y == 0:
+            z = 0
         else:
-            x = stack[-2]
-            y = stack[-1]
-            if a == "/" and y == 0:
-                z = 0
-            else:
-                z = eval(str(x) + a + str(y))
-            stack = stack[:-2] + [z]
-    return stack[-1]
+            z = eval(str(x) + a + str(y))
+        stack.append(z)
+    return pop()
 
 
 if __name__ == "__main__":
