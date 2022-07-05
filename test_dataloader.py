@@ -51,13 +51,16 @@ class Dataset1(Dataset):
 
 batch_size = 64
 
-train_dataloader = DataLoader(Dataset1(800), batch_size=batch_size)
-test_dataloader = DataLoader(Dataset1(200), batch_size=batch_size)
+train_ds = Dataset1(800)
+test_ds = Dataset1(200)
 
-for X, y in train_dataloader:
-    print(X)
-    print(X.shape)
-    print(X.dtype)
+train_dl = DataLoader(train_ds, batch_size=batch_size)
+test_dl = DataLoader(test_ds, batch_size=batch_size)
+
+for x, y in train_dl:
+    print(x)
+    print(x.shape)
+    print(x.dtype)
     print(y)
     print(y.shape)
     print(y.dtype)
@@ -90,16 +93,31 @@ model = Net().to(device)
 criterion = nn.BCELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 
+
+def accuracy(model, ds):
+    n_correct = 0
+    for x, y in ds:
+        y = y[0]
+        with torch.no_grad():
+            z = model(x)[0]
+        if (y and z > 0.5) or (not y and z <= 0.5):
+            n_correct += 1
+    return n_correct / len(ds)
+
+
 for epoch in range(epochs):
-    for bi, (X, y) in enumerate(train_dataloader):
-        X = X.to(device)
+    for bi, (x, y) in enumerate(train_dl):
+        x = x.to(device)
         y = y.to(device)
 
-        loss = criterion(model(X), y)
+        loss = criterion(model(x), y)
 
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
         if epoch % (epochs / 20) == 0 and not bi:
-            print(f"loss: {loss:>7f}")
+            print(
+                "%f\t%f\t%f"
+                % (loss, accuracy(model, train_ds), accuracy(model, test_ds))
+            )
