@@ -30,6 +30,8 @@ def rands(n):
         else:
             w = neg
         if len(w) < n / 2:
+            v = torch.as_tensor(v)
+            y = torch.as_tensor([float(y)])
             w.append((v, y))
     w = pos + neg
     random.shuffle(w)
@@ -38,13 +40,13 @@ def rands(n):
 
 class Dataset1(Dataset):
     def __init__(self, n):
-        self.v = rands(n)
+        self.w = rands(n)
 
     def __len__(self):
-        return len(self.v)
+        return len(self.w)
 
     def __getitem__(self, i):
-        return self.v[i]
+        return self.w[i]
 
 
 batch_size = 16
@@ -52,16 +54,19 @@ batch_size = 16
 train_dataloader = DataLoader(Dataset1(800), batch_size=batch_size)
 test_dataloader = DataLoader(Dataset1(200), batch_size=batch_size)
 
-for X, y in test_dataloader:
-    print(f"X: {X}")
-    print(f"y: {y.shape} {y.dtype} {y}")
+for X, y in train_dataloader:
+    print(X)
+    print(X.shape)
+    print(X.dtype)
+    print(y)
+    print(y.shape)
+    print(y.dtype)
     break
 
-# hyperparameters
 hidden_size = 100
 epochs = 1000
 
-# model
+
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -85,21 +90,17 @@ model = Net().to(device)
 criterion = nn.BCELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 
-# train
-print("training")
 for epoch in range(1, epochs + 1):
     for bi, (X, y) in enumerate(train_dataloader):
         X, y = X.to(device), y.to(device)
 
-        # Compute prediction error
         pred = model(X)
         loss = criterion(pred, y)
 
-        # Backpropagation
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
-        if bi % 100 == 0:
-            loss, current = loss.item(), bi * len(X)
-            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+        if epoch % (epochs / 20) == 0 and not bi:
+            loss = loss.item()
+            print(f"loss: {loss:>7f}")
