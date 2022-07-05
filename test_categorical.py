@@ -45,7 +45,9 @@ def convert1(a):
 
 
 def convert(v):
-    x = [convert1(a) for a in v]
+    x = []
+    for a in v:
+        x.extend(convert1(a))
     y = good(v)
     x = torch.as_tensor(x)
     y = torch.as_tensor([float(y)])
