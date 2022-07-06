@@ -6,7 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 
 import linear_code
 
-size = 10
+size = 50
 
 
 def good(code):
