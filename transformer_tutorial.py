@@ -274,6 +274,8 @@ def get_batch(source: Tensor, i: int) -> Tuple[Tensor, Tensor]:
 # equal to the length of the vocab object.
 #
 
+# XXX
+# this is not right; len(vocab)=1
 ntokens = len(vocab)  # size of vocabulary
 emsize = 200  # embedding dimension
 d_hid = 200  # dimension of the feedforward network model in nn.TransformerEncoder
