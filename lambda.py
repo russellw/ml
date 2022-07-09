@@ -1,7 +1,7 @@
 import operator
 import random
 
-atoms = (0, 1, "arg")
+atoms = (0, 1, [], "arg")
 ops = {
     "*": operator.mul,
     "+": operator.add,
@@ -62,6 +62,8 @@ class Closure:
 
 
 def eva(a, env):
+    if not a:
+        return a
     if type(a) is list:
         o = a[0]
         if o == "arg":
@@ -86,8 +88,8 @@ if __name__ == "__main__":
     for i in range(10000000):
         a = rand(4)
         try:
-            x = eva(a, []) + 0
-            if x < 3:
+            x = eva(a, [])
+            if len(x) < 2:
                 continue
             print(a)
             print(x)
