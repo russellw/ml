@@ -1,13 +1,24 @@
 import random
+import operator
 
 atoms = (0, 1, "arg")
-ops = ("+", "-", "*", "//", "if", "lambda")
+ops = {
+    "+": operator.add,
+    "-": operator.sub,
+    "*": operator.mul,
+    "/": operator.truediv,
+    "<": operator.lt,
+    "<=": operator.le,
+    "=": operator.eq,
+    "if": None,
+    "lambda": None,
+}
 
 
 def rand(depth):
     if depth:
         depth -= 1
-        o = random.choice(ops)
+        o = random.choice(list(ops.keys()))
         n = 2
         if o == "if":
             n = 3
@@ -27,6 +38,9 @@ class Closure:
     def __init__(self, body, env):
         self.body = body
         self.env = env
+
+    def __call__(self, arg):
+        return eva(self.body, self.env + [arg])
 
 
 def apply(f, args):
@@ -52,7 +66,9 @@ def eva(a, env):
             return Closure(a[1], env)
         f = eva(o, env)
         args = [eva(x, env) for x in a[1:]]
-        return apply(o, args)
+        return f(*args)
+    if type(a) is str:
+        return ops[a]
     return a
 
 
@@ -60,7 +76,7 @@ if __name__ == "__main__":
     for i in range(1000):
         a = rand(3)
         try:
-            x = eva(a, [])
+            x = eva(a, []) + 0
             print(a)
             print(x)
             print()
