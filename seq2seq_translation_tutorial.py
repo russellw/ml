@@ -795,6 +795,11 @@ def evaluateRandomly(encoder, decoder, n=100):
         if output_sentence == pair[1] + " <EOS>":
             score += 1
     print(f"{score}/{n} = {score/n*100}%")
+    # scores so far:
+    # 55
+    # 50
+    # 55
+    # 53
 
 
 ######################################################################
