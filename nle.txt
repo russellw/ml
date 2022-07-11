@@ -1,0 +1,1 @@
+https://askubuntu.com/questions/1208449/e-could-not-open-lock-file-var-lib-dpkg-lock-frontend-open-13-permission-d
