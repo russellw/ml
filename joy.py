@@ -3,9 +3,11 @@
 import operator
 import random
 
+import balanced_dpv
+
 stack = []
 
-# data types
+
 def is_num():
     x = stack.pop()
     stack.append(isinstance(x, int) or isinstance(x, float))
@@ -21,7 +23,6 @@ def is_sym():
     stack.append(type(x) == str)
 
 
-# arithmetic
 def add():
     y = stack.pop()
     x = stack.pop()
@@ -58,7 +59,6 @@ def mod():
     stack.append(x % y)
 
 
-# comparison
 def eq():
     y = stack.pop()
     x = stack.pop()
@@ -77,7 +77,6 @@ def le():
     stack.append(x <= y)
 
 
-# logic
 def not1():
     x = stack.pop()
     stack.append(not x)
@@ -96,7 +95,6 @@ def or1():
     stack.append(x or y)
 
 
-# stack
 def dup():
     x = stack[-1]
     stack.append(x)
@@ -113,7 +111,6 @@ def swap():
     stack.append(x)
 
 
-# lists
 def cons():
     v = stack.pop()
     x = stack.pop()
@@ -190,7 +187,6 @@ def fold():
         run(f)
 
 
-# control
 def ii():
     f = stack.pop()
     run(f)
@@ -225,41 +221,41 @@ def linrec():
 
 
 ops = {
-    # data types
-    "num?": is_num,
-    "sym?": is_sym,
-    "list?": is_list,
-    # arithmetic
-    "+": add,
-    "-": sub,
-    "*": mul,
-    "/": div,
-    "div": floordiv,
-    "mod": mod,
-    # comparison
-    "=": eq,
-    "<": lt,
-    "<=": le,
-    # logic
-    "not": not1,
-    "and": and1,
-    "or": or1,
     # stack
     "dup": dup,
     "pop": pop,
     "swap": swap,
+    # data types
+    "list?": is_list,
+    "num?": is_num,
+    "sym?": is_sym,
+    # comparison
+    "=": eq,
+    "<": lt,
+    "<=": le,
+    # arithmetic
+    "*": mul,
+    "+": add,
+    "-": sub,
+    "/": div,
+    "div": floordiv,
+    "mod": mod,
+    # logic
+    "and": and1,
+    "not": not1,
+    "or": or1,
     # lists
-    "cons": cons,
-    "hd": hd,
-    "tl": tl,
     "at": at,
-    "len": len1,
+    "cons": cons,
     "drop": drop,
-    "take": take,
-    "in": in1,
-    "map": map1,
     "filter": filter1,
     "fold": fold,
+    "hd": hd,
+    "in": in1,
+    "len": len1,
+    "map": map1,
+    "take": take,
+    "tl": tl,
     # control
     "i": ii,
     "if": if1,
@@ -267,20 +263,11 @@ ops = {
 }
 
 
-# random generator
-def rand(size):
-    code = []
-    for i in range(size):
-        a = random.choice(symbols)
-        code.append(a)
-    return code
-
-
 # parser
 def constituent(c):
     if c.isspace():
         return
-    if c in "[]":
+    if c in "()[]":
         return
     return 1
 
@@ -293,7 +280,7 @@ def lex(s):
         if c.isspace():
             i += 1
             continue
-        if c in "[]":
+        if c in "()[]":
             v.append(c)
             i += 1
             continue
@@ -313,19 +300,27 @@ def parse(v):
         i += 1
         if a[0].isdigit():
             return int(a)
-        if a != "[":
+        if a not in ("(", "["):
             return a
         r = []
-        while v[i] != "]":
+        while v[i] not in (")", "]"):
             r.append(expr())
         i += 1
         return r
 
     r = []
-    while i < len(v) and v[i] != "]":
+    while i < len(v) and v[i] not in (")", "]"):
         r.append(expr())
     i += 1
     return r
+
+
+# random generator
+def rand(n):
+    alphabet = list(ops.keys()) + ["0", "1"]
+    n = random.randint(1, n)
+    v = balanced_dpv.balanced_dp(n, alphabet).random()
+    return parse(v)
 
 
 # interpreter
@@ -350,12 +345,9 @@ def test(s, r):
     stack = []
     v = lex(s)
     code = parse(v)
-    print(code)
     run(code)
-    print(stack)
     x = stack[-1]
     assert x == r
-    print()
 
 
 if __name__ == "__main__":
@@ -377,8 +369,13 @@ if __name__ == "__main__":
     test("0 1 2 3 4 [] cons cons cons cons cons 2 take", [0, 1])
     test("0 1 2 3 4 [] cons cons cons cons cons 2 drop", [2, 3, 4])
 
-    exit(0)
-    for i in range(20):
-        code = rand(10)
-        print(code)
-        a = parse(code)
+    for i in range(100000):
+        try:
+            v = rand(10)
+            stack = []
+            x = run1(v)
+            print(v)
+            print(x)
+            print()
+        except:
+            pass
