@@ -184,12 +184,12 @@ def fold():
     stack.append(a)
     for x in v:
         stack.append(x)
-        run(f)
+        run0(f)
 
 
 def ii():
     f = stack.pop()
-    run(f)
+    run0(f)
 
 
 def if1():
@@ -197,19 +197,19 @@ def if1():
     x = stack.pop()
     c = stack.pop()
     if c:
-        run(x)
+        run0(x)
     else:
-        run(y)
+        run0(y)
 
 
 def linrec1(c, then, rec1, rec2):
     dup()
     if run1(c):
-        run(then)
+        run0(then)
         return
-    run(rec1)
+    run0(rec1)
     linrec1(c, then, rec1, rec2)
-    run(rec2)
+    run0(rec2)
 
 
 def linrec():
@@ -324,7 +324,7 @@ def rand(n):
 
 
 # interpreter
-def run(code):
+def run0(code):
     if type(code) != list:
         stack.append(code)
         return
@@ -336,17 +336,20 @@ def run(code):
 
 
 def run1(code):
-    run(code)
+    run0(code)
     return stack.pop()
 
 
-def test(s, r):
+def run(code, arg):
     global stack
     stack = []
+    return run1(code)
+
+
+def test(s, r):
     v = lex(s)
     code = parse(v)
-    run(code)
-    x = stack[-1]
+    x = run(code, 0)
     assert x == r
 
 
@@ -369,11 +372,10 @@ if __name__ == "__main__":
     test("0 1 2 3 4 [] cons cons cons cons cons 2 take", [0, 1])
     test("0 1 2 3 4 [] cons cons cons cons cons 2 drop", [2, 3, 4])
 
-    for i in range(100000):
+    for i in range(1000):
         try:
             v = rand(10)
-            stack = []
-            x = run1(v)
+            x = run(v, 0)
             print(v)
             print(x)
             print()
