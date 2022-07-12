@@ -5,6 +5,21 @@ import random
 
 stack = []
 
+# data types
+def is_num():
+    x = stack.pop()
+    stack.append(isinstance(x, int) or isinstance(x, float))
+
+
+def is_list():
+    x = stack.pop()
+    stack.append(type(x) == list)
+
+
+def is_sym():
+    x = stack.pop()
+    stack.append(type(x) == str)
+
 
 # arithmetic
 def add():
@@ -81,16 +96,6 @@ def or1():
     stack.append(x or y)
 
 
-def if1():
-    y = stack.pop()
-    x = stack.pop()
-    c = stack.pop()
-    if c:
-        run(x)
-    else:
-        run(y)
-
-
 # stack
 def dup():
     x = stack[-1]
@@ -109,9 +114,49 @@ def swap():
 
 
 # lists
-def identity():
-    f = stack.pop()
-    run(f)
+def cons():
+    v = stack.pop()
+    x = stack.pop()
+    stack.append([x] + v)
+
+
+def hd():
+    v = stack.pop()
+    stack.append(v[0])
+
+
+def tl():
+    v = stack.pop()
+    stack.append(v[1:])
+
+
+def at():
+    i = stack.pop()
+    v = stack.pop()
+    stack.append(v[i])
+
+
+def len1():
+    v = stack.pop()
+    stack.append(len(v))
+
+
+def drop():
+    n = stack.pop()
+    v = stack.pop()
+    stack.append(v[n:])
+
+
+def take():
+    n = stack.pop()
+    v = stack.pop()
+    stack.append(v[:n])
+
+
+def in1():
+    v = stack.pop()
+    x = stack.pop()
+    stack.append(x in v)
 
 
 def map1():
@@ -145,8 +190,24 @@ def fold():
         run(f)
 
 
-# recursion
+# control
+def ii():
+    f = stack.pop()
+    run(f)
+
+
+def if1():
+    y = stack.pop()
+    x = stack.pop()
+    c = stack.pop()
+    if c:
+        run(x)
+    else:
+        run(y)
+
+
 def linrec1(c, then, rec1, rec2):
+    dup()
     if run1(c):
         run(then)
         return
@@ -164,6 +225,10 @@ def linrec():
 
 
 ops = {
+    # data types
+    "num?": is_num,
+    "sym?": is_sym,
+    "list?": is_list,
     # arithmetic
     "+": add,
     "-": sub,
@@ -179,17 +244,25 @@ ops = {
     "not": not1,
     "and": and1,
     "or": or1,
-    "if": if1,
     # stack
     "dup": dup,
     "pop": pop,
     "swap": swap,
     # lists
-    "i": identity,
+    "cons": cons,
+    "hd": hd,
+    "tl": tl,
+    "at": at,
+    "len": len1,
+    "drop": drop,
+    "take": take,
+    "in": in1,
     "map": map1,
     "filter": filter1,
     "fold": fold,
-    # recursion
+    # control
+    "i": ii,
+    "if": if1,
     "linrec": linrec,
 }
 
@@ -298,7 +371,11 @@ if __name__ == "__main__":
     test("1 2 3 if", 2)
     test("1 [ 1 1 +] [1 1 1 + +] if", 2)
     test("0 [ 1 1 +] [1 1 1 + +] if", 3)
-    test("4 not 1 [dup 1 -] * linrec", 24)
+    test("4 [not] [pop 1] [dup 1 -] [*] linrec", 24)
+    test("5 [not] [pop 1] [dup 1 -] [*] linrec", 120)
+    test("0 1 2 3 4 [] cons cons cons cons cons", [0, 1, 2, 3, 4])
+    test("0 1 2 3 4 [] cons cons cons cons cons 2 take", [0, 1])
+    test("0 1 2 3 4 [] cons cons cons cons cons 2 drop", [2, 3, 4])
 
     exit(0)
     for i in range(20):
