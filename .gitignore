@@ -1,3 +1,6 @@
+*.dll
+*.exe
+*.obj
 data/
 
 # Byte-compiled / optimized / DLL files
