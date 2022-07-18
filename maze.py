@@ -11,13 +11,12 @@ from colorama import Fore, Back, Style
 def printMaze(maze):
     for i in range(0, height):
         for j in range(0, width):
-            if maze[i][j] == "u":
-                print(Fore.WHITE + str(maze[i][j]), end=" ")
+            if maze[i][j] == "#":
+                print(Fore.RED + str(maze[i][j]), end=" ")
             elif maze[i][j] == "c":
                 print(Fore.GREEN + str(maze[i][j]), end=" ")
             else:
-                print(Fore.RED + str(maze[i][j]), end=" ")
-
+                print(Fore.WHITE + str(maze[i][j]), end=" ")
         print()
 
 
@@ -38,7 +37,7 @@ def surroundingCells(rand_wall):
 
 ## Main code
 # Init variables
-wall = "w"
+wall = "#"
 cell = "c"
 unvisited = "u"
 height = 40
@@ -76,10 +75,10 @@ walls.append([starting_height, starting_width + 1])
 walls.append([starting_height + 1, starting_width])
 
 # Denote walls in maze
-maze[starting_height - 1][starting_width] = "w"
-maze[starting_height][starting_width - 1] = "w"
-maze[starting_height][starting_width + 1] = "w"
-maze[starting_height + 1][starting_width] = "w"
+maze[starting_height - 1][starting_width] = "#"
+maze[starting_height][starting_width - 1] = "#"
+maze[starting_height][starting_width + 1] = "#"
+maze[starting_height + 1][starting_width] = "#"
 
 while walls:
     # Pick a random wall
@@ -102,21 +101,21 @@ while walls:
                 # Upper cell
                 if rand_wall[0] != 0:
                     if maze[rand_wall[0] - 1][rand_wall[1]] != "c":
-                        maze[rand_wall[0] - 1][rand_wall[1]] = "w"
+                        maze[rand_wall[0] - 1][rand_wall[1]] = "#"
                     if [rand_wall[0] - 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] - 1, rand_wall[1]])
 
                 # Bottom cell
                 if rand_wall[0] != height - 1:
                     if maze[rand_wall[0] + 1][rand_wall[1]] != "c":
-                        maze[rand_wall[0] + 1][rand_wall[1]] = "w"
+                        maze[rand_wall[0] + 1][rand_wall[1]] = "#"
                     if [rand_wall[0] + 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] + 1, rand_wall[1]])
 
                 # Leftmost cell
                 if rand_wall[1] != 0:
                     if maze[rand_wall[0]][rand_wall[1] - 1] != "c":
-                        maze[rand_wall[0]][rand_wall[1] - 1] = "w"
+                        maze[rand_wall[0]][rand_wall[1] - 1] = "#"
                     if [rand_wall[0], rand_wall[1] - 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] - 1])
 
@@ -143,21 +142,21 @@ while walls:
                 # Upper cell
                 if rand_wall[0] != 0:
                     if maze[rand_wall[0] - 1][rand_wall[1]] != "c":
-                        maze[rand_wall[0] - 1][rand_wall[1]] = "w"
+                        maze[rand_wall[0] - 1][rand_wall[1]] = "#"
                     if [rand_wall[0] - 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] - 1, rand_wall[1]])
 
                 # Leftmost cell
                 if rand_wall[1] != 0:
                     if maze[rand_wall[0]][rand_wall[1] - 1] != "c":
-                        maze[rand_wall[0]][rand_wall[1] - 1] = "w"
+                        maze[rand_wall[0]][rand_wall[1] - 1] = "#"
                     if [rand_wall[0], rand_wall[1] - 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] - 1])
 
                 # Rightmost cell
                 if rand_wall[1] != width - 1:
                     if maze[rand_wall[0]][rand_wall[1] + 1] != "c":
-                        maze[rand_wall[0]][rand_wall[1] + 1] = "w"
+                        maze[rand_wall[0]][rand_wall[1] + 1] = "#"
                     if [rand_wall[0], rand_wall[1] + 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] + 1])
 
@@ -183,17 +182,17 @@ while walls:
                 # Mark the new walls
                 if rand_wall[0] != height - 1:
                     if maze[rand_wall[0] + 1][rand_wall[1]] != "c":
-                        maze[rand_wall[0] + 1][rand_wall[1]] = "w"
+                        maze[rand_wall[0] + 1][rand_wall[1]] = "#"
                     if [rand_wall[0] + 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] + 1, rand_wall[1]])
                 if rand_wall[1] != 0:
                     if maze[rand_wall[0]][rand_wall[1] - 1] != "c":
-                        maze[rand_wall[0]][rand_wall[1] - 1] = "w"
+                        maze[rand_wall[0]][rand_wall[1] - 1] = "#"
                     if [rand_wall[0], rand_wall[1] - 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] - 1])
                 if rand_wall[1] != width - 1:
                     if maze[rand_wall[0]][rand_wall[1] + 1] != "c":
-                        maze[rand_wall[0]][rand_wall[1] + 1] = "w"
+                        maze[rand_wall[0]][rand_wall[1] + 1] = "#"
                     if [rand_wall[0], rand_wall[1] + 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] + 1])
 
@@ -219,17 +218,17 @@ while walls:
                 # Mark the new walls
                 if rand_wall[1] != width - 1:
                     if maze[rand_wall[0]][rand_wall[1] + 1] != "c":
-                        maze[rand_wall[0]][rand_wall[1] + 1] = "w"
+                        maze[rand_wall[0]][rand_wall[1] + 1] = "#"
                     if [rand_wall[0], rand_wall[1] + 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] + 1])
                 if rand_wall[0] != height - 1:
                     if maze[rand_wall[0] + 1][rand_wall[1]] != "c":
-                        maze[rand_wall[0] + 1][rand_wall[1]] = "w"
+                        maze[rand_wall[0] + 1][rand_wall[1]] = "#"
                     if [rand_wall[0] + 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] + 1, rand_wall[1]])
                 if rand_wall[0] != 0:
                     if maze[rand_wall[0] - 1][rand_wall[1]] != "c":
-                        maze[rand_wall[0] - 1][rand_wall[1]] = "w"
+                        maze[rand_wall[0] - 1][rand_wall[1]] = "#"
                     if [rand_wall[0] - 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] - 1, rand_wall[1]])
 
@@ -250,17 +249,17 @@ while walls:
 for i in range(0, height):
     for j in range(0, width):
         if maze[i][j] == "u":
-            maze[i][j] = "w"
+            maze[i][j] = "#"
 
 # Set entrance and exit
 for i in range(0, width):
     if maze[1][i] == "c":
-        maze[0][i] = "c"
+        maze[1][i] = "@"
         break
 
 for i in range(width - 1, 0, -1):
     if maze[height - 2][i] == "c":
-        maze[height - 1][i] = "c"
+        maze[height - 2][i] = ">"
         break
 
 # Print final maze
