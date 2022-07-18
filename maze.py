@@ -13,7 +13,7 @@ def printMaze(maze):
         for j in range(0, width):
             if maze[i][j] == "#":
                 print(Fore.RED + str(maze[i][j]), end=" ")
-            elif maze[i][j] == "c":
+            elif maze[i][j] == ".":
                 print(Fore.GREEN + str(maze[i][j]), end=" ")
             else:
                 print(Fore.WHITE + str(maze[i][j]), end=" ")
@@ -23,13 +23,13 @@ def printMaze(maze):
 # Find number of surrounding cells
 def surroundingCells(rand_wall):
     s_cells = 0
-    if maze[rand_wall[0] - 1][rand_wall[1]] == "c":
+    if maze[rand_wall[0] - 1][rand_wall[1]] == ".":
         s_cells += 1
-    if maze[rand_wall[0] + 1][rand_wall[1]] == "c":
+    if maze[rand_wall[0] + 1][rand_wall[1]] == ".":
         s_cells += 1
-    if maze[rand_wall[0]][rand_wall[1] - 1] == "c":
+    if maze[rand_wall[0]][rand_wall[1] - 1] == ".":
         s_cells += 1
-    if maze[rand_wall[0]][rand_wall[1] + 1] == "c":
+    if maze[rand_wall[0]][rand_wall[1] + 1] == ".":
         s_cells += 1
 
     return s_cells
@@ -38,7 +38,7 @@ def surroundingCells(rand_wall):
 ## Main code
 # Init variables
 wall = "#"
-cell = "c"
+cell = "."
 unvisited = "u"
 height = 40
 width = 40
@@ -88,33 +88,33 @@ while walls:
     if rand_wall[1] != 0:
         if (
             maze[rand_wall[0]][rand_wall[1] - 1] == "u"
-            and maze[rand_wall[0]][rand_wall[1] + 1] == "c"
+            and maze[rand_wall[0]][rand_wall[1] + 1] == "."
         ):
             # Find the number of surrounding cells
             s_cells = surroundingCells(rand_wall)
 
             if s_cells < 2:
                 # Denote the new path
-                maze[rand_wall[0]][rand_wall[1]] = "c"
+                maze[rand_wall[0]][rand_wall[1]] = "."
 
                 # Mark the new walls
                 # Upper cell
                 if rand_wall[0] != 0:
-                    if maze[rand_wall[0] - 1][rand_wall[1]] != "c":
+                    if maze[rand_wall[0] - 1][rand_wall[1]] != ".":
                         maze[rand_wall[0] - 1][rand_wall[1]] = "#"
                     if [rand_wall[0] - 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] - 1, rand_wall[1]])
 
                 # Bottom cell
                 if rand_wall[0] != height - 1:
-                    if maze[rand_wall[0] + 1][rand_wall[1]] != "c":
+                    if maze[rand_wall[0] + 1][rand_wall[1]] != ".":
                         maze[rand_wall[0] + 1][rand_wall[1]] = "#"
                     if [rand_wall[0] + 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] + 1, rand_wall[1]])
 
                 # Leftmost cell
                 if rand_wall[1] != 0:
-                    if maze[rand_wall[0]][rand_wall[1] - 1] != "c":
+                    if maze[rand_wall[0]][rand_wall[1] - 1] != ".":
                         maze[rand_wall[0]][rand_wall[1] - 1] = "#"
                     if [rand_wall[0], rand_wall[1] - 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] - 1])
@@ -130,32 +130,32 @@ while walls:
     if rand_wall[0] != 0:
         if (
             maze[rand_wall[0] - 1][rand_wall[1]] == "u"
-            and maze[rand_wall[0] + 1][rand_wall[1]] == "c"
+            and maze[rand_wall[0] + 1][rand_wall[1]] == "."
         ):
 
             s_cells = surroundingCells(rand_wall)
             if s_cells < 2:
                 # Denote the new path
-                maze[rand_wall[0]][rand_wall[1]] = "c"
+                maze[rand_wall[0]][rand_wall[1]] = "."
 
                 # Mark the new walls
                 # Upper cell
                 if rand_wall[0] != 0:
-                    if maze[rand_wall[0] - 1][rand_wall[1]] != "c":
+                    if maze[rand_wall[0] - 1][rand_wall[1]] != ".":
                         maze[rand_wall[0] - 1][rand_wall[1]] = "#"
                     if [rand_wall[0] - 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] - 1, rand_wall[1]])
 
                 # Leftmost cell
                 if rand_wall[1] != 0:
-                    if maze[rand_wall[0]][rand_wall[1] - 1] != "c":
+                    if maze[rand_wall[0]][rand_wall[1] - 1] != ".":
                         maze[rand_wall[0]][rand_wall[1] - 1] = "#"
                     if [rand_wall[0], rand_wall[1] - 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] - 1])
 
                 # Rightmost cell
                 if rand_wall[1] != width - 1:
-                    if maze[rand_wall[0]][rand_wall[1] + 1] != "c":
+                    if maze[rand_wall[0]][rand_wall[1] + 1] != ".":
                         maze[rand_wall[0]][rand_wall[1] + 1] = "#"
                     if [rand_wall[0], rand_wall[1] + 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] + 1])
@@ -171,27 +171,27 @@ while walls:
     if rand_wall[0] != height - 1:
         if (
             maze[rand_wall[0] + 1][rand_wall[1]] == "u"
-            and maze[rand_wall[0] - 1][rand_wall[1]] == "c"
+            and maze[rand_wall[0] - 1][rand_wall[1]] == "."
         ):
 
             s_cells = surroundingCells(rand_wall)
             if s_cells < 2:
                 # Denote the new path
-                maze[rand_wall[0]][rand_wall[1]] = "c"
+                maze[rand_wall[0]][rand_wall[1]] = "."
 
                 # Mark the new walls
                 if rand_wall[0] != height - 1:
-                    if maze[rand_wall[0] + 1][rand_wall[1]] != "c":
+                    if maze[rand_wall[0] + 1][rand_wall[1]] != ".":
                         maze[rand_wall[0] + 1][rand_wall[1]] = "#"
                     if [rand_wall[0] + 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] + 1, rand_wall[1]])
                 if rand_wall[1] != 0:
-                    if maze[rand_wall[0]][rand_wall[1] - 1] != "c":
+                    if maze[rand_wall[0]][rand_wall[1] - 1] != ".":
                         maze[rand_wall[0]][rand_wall[1] - 1] = "#"
                     if [rand_wall[0], rand_wall[1] - 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] - 1])
                 if rand_wall[1] != width - 1:
-                    if maze[rand_wall[0]][rand_wall[1] + 1] != "c":
+                    if maze[rand_wall[0]][rand_wall[1] + 1] != ".":
                         maze[rand_wall[0]][rand_wall[1] + 1] = "#"
                     if [rand_wall[0], rand_wall[1] + 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] + 1])
@@ -207,27 +207,27 @@ while walls:
     if rand_wall[1] != width - 1:
         if (
             maze[rand_wall[0]][rand_wall[1] + 1] == "u"
-            and maze[rand_wall[0]][rand_wall[1] - 1] == "c"
+            and maze[rand_wall[0]][rand_wall[1] - 1] == "."
         ):
 
             s_cells = surroundingCells(rand_wall)
             if s_cells < 2:
                 # Denote the new path
-                maze[rand_wall[0]][rand_wall[1]] = "c"
+                maze[rand_wall[0]][rand_wall[1]] = "."
 
                 # Mark the new walls
                 if rand_wall[1] != width - 1:
-                    if maze[rand_wall[0]][rand_wall[1] + 1] != "c":
+                    if maze[rand_wall[0]][rand_wall[1] + 1] != ".":
                         maze[rand_wall[0]][rand_wall[1] + 1] = "#"
                     if [rand_wall[0], rand_wall[1] + 1] not in walls:
                         walls.append([rand_wall[0], rand_wall[1] + 1])
                 if rand_wall[0] != height - 1:
-                    if maze[rand_wall[0] + 1][rand_wall[1]] != "c":
+                    if maze[rand_wall[0] + 1][rand_wall[1]] != ".":
                         maze[rand_wall[0] + 1][rand_wall[1]] = "#"
                     if [rand_wall[0] + 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] + 1, rand_wall[1]])
                 if rand_wall[0] != 0:
-                    if maze[rand_wall[0] - 1][rand_wall[1]] != "c":
+                    if maze[rand_wall[0] - 1][rand_wall[1]] != ".":
                         maze[rand_wall[0] - 1][rand_wall[1]] = "#"
                     if [rand_wall[0] - 1, rand_wall[1]] not in walls:
                         walls.append([rand_wall[0] - 1, rand_wall[1]])
@@ -253,12 +253,12 @@ for i in range(0, height):
 
 # Set entrance and exit
 for i in range(0, width):
-    if maze[1][i] == "c":
+    if maze[1][i] == ".":
         maze[1][i] = "@"
         break
 
 for i in range(width - 1, 0, -1):
-    if maze[height - 2][i] == "c":
+    if maze[height - 2][i] == ".":
         maze[height - 2][i] = ">"
         break
 
