@@ -1,3 +1,11 @@
+// Suppress Microsoft C++ warnings in Torch header files
+#ifdef _MSC_VER
+#pragma warning(disable : 4067)
+#pragma warning(disable : 4530)
+#pragma warning(disable : 4624)
+#pragma warning(disable : 4805)
+#endif
+
 #include <torch/torch.h>
 #include <iostream>
 
