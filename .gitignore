@@ -8,6 +8,7 @@ data/
 .vs/
 obj/
 bin/
+*.class
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
