@@ -29,12 +29,6 @@
 
 // with /O2 /arch:AVX2
 
-// vector length 10
-// 6666e6
-
-// vector length 100
-// 9090e6
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
