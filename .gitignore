@@ -1,9 +1,13 @@
+*.asm
 *.dll
 *.exe
 *.exp
 *.lib
 *.obj
 data/
+.vs/
+obj/
+bin/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
