@@ -287,7 +287,7 @@ if __name__ == "__main__":
 
     test("True dup and", True)
 
-    for i in range(100):
+    for i in range(1000):
         try:
             v = rand(10)
             x = rand(10)
