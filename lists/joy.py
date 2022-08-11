@@ -5,9 +5,16 @@ import random
 
 import balanced_dpv
 
+
+def immutable(a):
+    if type(a) is list:
+        return tuple(map(immutable, a))
+    return a
+
+
 stack = []
 
-
+# operators
 def is_list():
     x = stack.pop()
     stack.append(type(x) == list)
@@ -243,42 +250,66 @@ def parse(v):
     return r
 
 
-# random generator
-def rand(n):
-    alphabet = list(ops.keys()) + ["False", "True"]
-    n = random.randint(1, n)
-    v = balanced_dpv.balanced_dp(n, alphabet).random()
-    return parse(v)
-
-
 # interpreter
-def run0(code):
-    if type(code) != list:
-        stack.append(code)
+def run0(f):
+    if type(f) != list:
+        stack.append(f)
         return
-    for a in code:
+    for a in f:
         if type(a) is str:
             ops[a]()
             continue
         stack.append(a)
 
 
-def run1(code):
-    run0(code)
+def run1(f):
+    run0(f)
     return stack.pop()
 
 
-def run(code, arg):
+def run(f, arg):
     global stack
-    stack = []
-    return run1(code)
+    stack = [arg]
+    return run1(f)
 
 
+# random generators
+def rand_fn(n):
+    alphabet = list(ops.keys()) + ["False", "True"]
+    n = random.randrange(1, n)
+    v = balanced_dpv.balanced_dp(n, alphabet).random()
+    return parse(v)
+
+
+def rand_input(n):
+    v = []
+    for i in range(n):
+        v.append(random.randrange(2))
+    return v
+
+
+# top level
 def test(s, r):
     v = lex(s)
-    code = parse(v)
-    x = run(code, 0)
+    f = parse(v)
+    x = run(f, 0)
     assert x == r
+
+
+inputs = []
+for i in range(20):
+    inputs.append(rand_input(10))
+
+
+def nontrivial(f):
+    s = set()
+    try:
+        for x in inputs:
+            y = run(f, x)
+            s.add(immutable(y))
+        return len(s) > 1
+    except:
+        pass
 
 
 if __name__ == "__main__":
@@ -287,14 +318,14 @@ if __name__ == "__main__":
 
     test("True dup and", True)
 
-    for i in range(1000):
-        try:
-            v = rand(10)
-            x = rand(10)
-            y = run(v, x)
-            print(v)
+    fs = []
+    while len(fs) < 5:
+        f = rand_fn(10)
+        if nontrivial(f):
+            fs.append(f)
+            x = inputs[0]
+            y = run(f, x)
+            print(f)
             print(x)
             print(y)
             print()
-        except:
-            pass
