@@ -276,7 +276,6 @@ def run(f, arg):
 # random generators
 def rand_fn(n):
     alphabet = list(ops.keys()) + ["False", "True"]
-    n = random.randrange(1, n)
     v = balanced_dpv.balanced_dp(n, alphabet).random()
     return parse(v)
 
