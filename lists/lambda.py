@@ -2,21 +2,38 @@ import operator
 import random
 
 # interpreter
-def ev(env, a):
-    if type(a) in (list, tuple):
-        return evs[a[0]](env, a[1:])
-    if type(a) is str:
-        return env[a]
-    return a
+class Env(dict):
+    def __init__(self, outer, params, args):
+        self.outer = outer
+        self.update(zip(params, args))
+
+    def get(self, k):
+        env = self
+        while env:
+            if k in env:
+                return env[k]
+            env = env.outer
+        raise Exception(k)
 
 
 class Closure:
-    def __init__(self, body, env):
-        self.body = body
+    def __init__(self, env, params, body):
         self.env = env
+        self.params = params
+        self.body = body
 
-    def __call__(self, arg):
+    def __call__(self, args):
+        env = Env(self.env, self.params, args)
         return ev(self.body, self.env + [arg])
+
+
+def ev(env, a):
+    if type(a) is list:
+        o, *s = a
+        return evs[o](env, *s)
+    if type(a) is str:
+        return env.get(a)
+    return a
 
 
 ops = (
@@ -27,43 +44,47 @@ ops = (
     ("<", ("bool", "num", "num"), lambda env, a, b: ev(env, a) < ev(env, b)),
     ("<=", ("bool", "num", "num"), lambda env, a, b: ev(env, a) <= ev(env, b)),
     ("==", ("bool", "T", "T"), lambda env, a, b: ev(env, a) == ev(env, b)),
+    ("and", ("bool", "bool", "bool"), lambda env, a, b: ev(env, a) and ev(env, b)),
+    ("at", ("T", ("list", "T"), "num"), lambda env, s, i: ev(env, s)[int(ev(env, i))]),
+    ("call", None, lambda env, f, *s: ev(env, f)(*[ev(env, a) for a in s])),
+    ("car", ("T", ("list", "T")), lambda env, s: ev(env, s)[0]),
+    ("cdr", (("list", "T"), ("list", "T")), lambda env, s: ev(env, s)[1:]),
     ("div", ("num", "num", "num"), lambda env, a, b: ev(env, a) // ev(env, b)),
+    ("lambda", None, lambda env, params, body: Closure(env, params, body)),
+    ("len", ("num", ("list", "T")), lambda env, s: len(ev(env, s))),
+    ("mod", ("num", "num", "num"), lambda env, a, b: ev(env, a) % ev(env, b)),
+    ("not", ("bool", "bool"), lambda env, a: not (ev(env, a))),
+    ("or", ("bool", "bool", "bool"), lambda env, a, b: ev(env, a) or ev(env, b)),
+    ("pow", ("num", "num", "num"), lambda env, a, b: ev(env, a) ** ev(env, b)),
+    (
+        "cons",
+        (("list", "T"), "T", ("list", "T")),
+        lambda env, a, s: [ev(env, a)] + ev(env, s),
+    ),
     (
         "if",
         ("T", "bool", "T", "T"),
         lambda env, c, a, b: ev(env, a) if ev(env, c) else ev(env, b),
     ),
-    ("lambda", None, lambda env, params, *body: Closure(env, params, body)),
-    ("mod", ("num", "num", "num"), lambda env, a, b: ev(env, a) % ev(env, b)),
-    ("pow", ("num", "num", "num"), lambda env, a, b: ev(env, a) ** ev(env, b)),
-    ("at", ("T", ("list", "T"), "num"), lambda env, a, b: ev(env, a)[int(ev(env, b))]),
-    (
-        "cons",
-        (("list", "T"), "T", ("list", "T")),
-        lambda env, a, b: [ev(env, a)] + ev(env, b),
-    ),
-    ("car", ("T", ("list", "T")), lambda env, a: ev(env, a)[0]),
-    ("len", ("num", ("list", "T")), lambda env, a: len(ev(env, a))),
     (
         "map",
         (("list", "T"), ("fn", "T", "T"), ("list", "T")),
-        lambda env, a, b: [ev(env, a)] + ev(env, b),
+        lambda env, f, s: map(ev(env, f), ev(env, s)),
     ),
-    ("not", ("bool", "bool"), lambda env, a: not (ev(env, a))),
-    ("cdr", (("list", "T"), ("list", "T")), lambda env, a: ev(env, a)[1:]),
 )
 
 evs = {}
 for name, t, f in ops:
     evs[name] = f
 
+globalEnv = Env(None, ["nil"], [[]])
 
 # random generator
 atoms = (0, 1, [], "arg")
 
 
-def rand(depth):
-    if not random.randrange(0, 16):
+def rand(env, t, depth):
+    if not depth or not random.randrange(0, 16):
         depth = 0
     if depth:
         depth -= 1
@@ -81,7 +102,18 @@ def rand(depth):
     return a
 
 
+# top level
+def test(code, expected, arg=None):
+    env = Env(globalEnv, ["a"], [arg])
+    actual = ev(env, code)
+    assert actual == expected
+
+
 if __name__ == "__main__":
+    test(2, 2)
+    test("a", 3, 3)
+    test(["+", "a", "a"], 6, 3)
+    exit(0)
     for i in range(10000000):
         a = rand(4)
         try:
