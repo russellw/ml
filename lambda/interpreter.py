@@ -3,7 +3,7 @@ import random
 
 from env import Env
 from var import Var
-import types
+import types1
 
 
 class Closure:
@@ -76,7 +76,7 @@ def rand(env, t, depth):
     if not depth or not random.randrange(0, 16):
         s = []
         for a in env.keys1():
-            if types.unify({}, env.get(a), t):
+            if types1.unify({}, env.get(a), t):
                 s.append(a)
         return random.choice(s)
     depth -= 1
