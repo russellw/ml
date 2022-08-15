@@ -18,3 +18,22 @@ class Env(dict):
             s.update(env.keys())
             env = env.outer
         return s
+
+
+class Var:
+    # this class is intended for logic variables, not necessarily program variables
+    def __init__(self, t=None):
+        self.t = t
+
+    def __repr__(self):
+        if not hasattr(self, "name"):
+            return "Var"
+        return self.name
+
+
+def replace(d, a):
+    if a in d:
+        return replace(d, d[a])
+    if isinstance(a, tuple):
+        return tuple([replace(d, b) for b in a])
+    return a

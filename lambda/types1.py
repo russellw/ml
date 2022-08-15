@@ -1,4 +1,4 @@
-from var import Var
+from etc import *
 
 
 def occurs(d, a, b):
@@ -41,14 +41,6 @@ def unify(d, a, b):
         return unifyVar(d, a, b)
     if isinstance(b, Var):
         return unifyVar(d, b, a)
-
-
-def replace(d, a):
-    if a in d:
-        return replace(d, d[a])
-    if isinstance(a, tuple):
-        return tuple([replace(d, b) for b in a])
-    return a
 
 
 if __name__ == "__main__":

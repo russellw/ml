@@ -1,8 +1,6 @@
-import operator
 import random
 
-from env import Env
-from var import Var
+from etc import *
 import types1
 
 
