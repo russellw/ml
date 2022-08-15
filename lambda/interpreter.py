@@ -77,10 +77,14 @@ def lam(env, t, depth):
 def rand(env, t, depth):
     s = []
 
+    # required or decided to return an atom
     if not depth or not random.randrange(0, 16):
+        # available local variables that match the required type
         for a in env.keys1():
             if types1.unify({}, env.get(a), t):
                 s.append(a)
+
+        # some types can also be provided by literals
         match t:
             case "bool":
                 s.append(False)
@@ -95,25 +99,27 @@ def rand(env, t, depth):
                 # then we don't have a choice
                 if not s:
                     return lam(env, t, 0)
-            case ("list", *_):
+            case ("list", _):
                 s.append(())
 
-        if not s:
-            dbg(t)
+        # choose a suitable atom at random
         return random.choice(s)
 
+    # one more level of compound recursion
     depth -= 1
 
+    # operators that match the required type
     for name, u, f in ops:
         if u and types1.unify({}, u[0], t):
             s.append((name, u))
     match t:
         case ("fn", *_):
             s.append(("lambda", None))
-    if not s:
-        dbg(t)
+
+    # choose a suitable operator at random
     name, u = random.choice(s)
 
+    # recursively generate arguments
     if name == "lambda":
         return lam(env, t, depth)
     s = [name]
