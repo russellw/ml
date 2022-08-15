@@ -63,8 +63,20 @@ for name, t, f in ops:
     evs[name] = f
 
 
+def lam(env, t, depth):
+    params = []
+    paramts = []
+    for paramt in t[2:]:
+        params.append("a" + str(env.count()))
+        paramts.append(paramt)
+    env = Env(env, params, paramts)
+    body = rand(env, t[1], depth)
+    return "lambda", tuple(params), body
+
+
 def rand(env, t, depth):
     s = []
+
     if not depth or not random.randrange(0, 16):
         for a in env.keys1():
             if types1.unify({}, env.get(a), t):
@@ -77,27 +89,27 @@ def rand(env, t, depth):
             s.append(1)
         if isinstance(t, tuple):
             if t[0] == "fn" and not s:
-                params = []
-                paramts = []
-                for paramt in t[2:]:
-                    params.append("a" + str(env.count()))
-                    paramts.append(paramt)
-                env = Env(env, params, paramts)
-                body = rand(env, t[1], 0)
-                return "lambda", tuple(params), body
+                return lam(env, t, 0)
             if t[0] == "list":
                 s.append(())
+
         if not s:
             dbg(t)
         return random.choice(s)
+
     depth -= 1
+
     for name, u, f in ops:
         if u and types1.unify({}, u[0], t):
             s.append((name, u))
+    if isinstance(t, tuple) and t[0] == "fn":
+        s.append(("lambda", None))
     if not s:
         dbg(t)
     name, u = random.choice(s)
-    dbg(name)
+
+    if name == "lambda":
+        return lam(env, t, depth)
     s = [name]
     for t in u[1:]:
         s.append(rand(env, t, depth))
@@ -108,7 +120,7 @@ env = Env()
 env["a"] = "num"
 random.seed(1)
 for i in range(20):
-    print(rand(env, "num", 3))
+    print(rand(env, "num", 5))
 
 
 def test(code, expected, arg=None):
