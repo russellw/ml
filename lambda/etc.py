@@ -6,6 +6,14 @@ class Env(dict):
         self.outer = outer
         self.update(zip(params, args))
 
+    def count(self):
+        n = 0
+        env = self
+        while env:
+            n += len(env)
+            env = env.outer
+        return n
+
     def get(self, k):
         env = self
         while env:

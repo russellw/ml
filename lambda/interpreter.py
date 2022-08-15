@@ -75,8 +75,18 @@ def rand(env, t, depth):
         if t == "num":
             s.append(0)
             s.append(1)
-        if isinstance(t, tuple) and t[0] == "list":
-            s.append(())
+        if isinstance(t, tuple):
+            if t[0] == "fn" and not s:
+                params = []
+                paramts = []
+                for paramt in t[2:]:
+                    params.append("a" + str(env.count()))
+                    paramts.append(paramt)
+                env = Env(env, params, paramts)
+                body = rand(env, t[1], 0)
+                return "lambda", tuple(params), body
+            if t[0] == "list":
+                s.append(())
         if not s:
             dbg(t)
         return random.choice(s)
@@ -87,6 +97,7 @@ def rand(env, t, depth):
     if not s:
         dbg(t)
     name, u = random.choice(s)
+    dbg(name)
     s = [name]
     for t in u[1:]:
         s.append(rand(env, t, depth))
@@ -97,7 +108,7 @@ env = Env()
 env["a"] = "num"
 random.seed(1)
 for i in range(20):
-    print(rand(env, "num", 2))
+    print(rand(env, "num", 3))
 
 
 def test(code, expected, arg=None):
