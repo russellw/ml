@@ -64,21 +64,25 @@ for name, t, f in ops:
 
 
 def rand(env, t, depth):
+    s = []
     if not depth or not random.randrange(0, 16):
-        s = []
         for a in env.keys1():
             if types1.unify({}, env.get(a), t):
                 s.append(a)
+        if not s:
+            dbg(t)
         return random.choice(s)
     depth -= 1
-    o = random.choice(list(ops.keys()))
-    n = 2
-    if o in arity:
-        n = arity[o]
-    v = [o]
-    for i in range(n):
-        v.append(rand(depth))
-    return v
+    for name, u, f in ops:
+        if u and types1.unify({}, u[0], t):
+            s.append((name, u))
+    if not s:
+        dbg(t)
+    name, u = random.choice(s)
+    s = [name]
+    for t in u[1:]:
+        s.append(rand(env, t, depth))
+    return tuple(s)
 
 
 env = Env()
@@ -86,7 +90,7 @@ env[0] = "num"
 env[1] = "num"
 env["a"] = "num"
 for i in range(20):
-    print(rand(env, "num", 0))
+    print(rand(env, "num", 1))
 
 
 def test(code, expected, arg=None):
@@ -153,7 +157,7 @@ if __name__ == "__main__":
     test(("call", square, ("+", 1, 2)), 9)
     test(("map", square, s), (1, 4, 9))
 
-    print('ok')
+    print("ok")
     exit(0)
     for i in range(10000000):
         a = rand(4)

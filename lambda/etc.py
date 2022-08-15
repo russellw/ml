@@ -1,3 +1,6 @@
+import inspect
+
+
 class Env(dict):
     def __init__(self, outer=None, params=(), args=()):
         self.outer = outer
@@ -29,6 +32,11 @@ class Var:
         if not hasattr(self, "name"):
             return "Var"
         return self.name
+
+
+def dbg(a):
+    info = inspect.getframeinfo(inspect.currentframe().f_back)
+    print(f"{info.filename}:{info.function}:{info.lineno}: {repr(a)}")
 
 
 def replace(d, a):
