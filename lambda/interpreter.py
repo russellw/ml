@@ -69,6 +69,14 @@ def rand(env, t, depth):
         for a in env.keys1():
             if types1.unify({}, env.get(a), t):
                 s.append(a)
+        if t == "bool":
+            s.append(False)
+            s.append(True)
+        if t == "num":
+            s.append(0)
+            s.append(1)
+        if isinstance(t, tuple) and t[0] == "list":
+            s.append(())
         if not s:
             dbg(t)
         return random.choice(s)
@@ -86,11 +94,10 @@ def rand(env, t, depth):
 
 
 env = Env()
-env[0] = "num"
-env[1] = "num"
 env["a"] = "num"
+random.seed(1)
 for i in range(20):
-    print(rand(env, "num", 1))
+    print(rand(env, "num", 2))
 
 
 def test(code, expected, arg=None):
