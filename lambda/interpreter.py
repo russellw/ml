@@ -81,16 +81,17 @@ def rand(env, t, depth):
         for a in env.keys1():
             if types1.unify({}, env.get(a), t):
                 s.append(a)
-        if t == "bool":
-            s.append(False)
-            s.append(True)
-        if t == "num":
-            s.append(0)
-            s.append(1)
-        if isinstance(t, tuple):
-            if t[0] == "fn" and not s:
-                return lam(env, t, 0)
-            if t[0] == "list":
+        match t:
+            case "bool":
+                s.append(False)
+                s.append(True)
+            case "num":
+                s.append(0)
+                s.append(1)
+            case ("fn", *_):
+                if not s:
+                    return lam(env, t, 0)
+            case ("list", *_):
                 s.append(())
 
         if not s:
@@ -102,8 +103,9 @@ def rand(env, t, depth):
     for name, u, f in ops:
         if u and types1.unify({}, u[0], t):
             s.append((name, u))
-    if isinstance(t, tuple) and t[0] == "fn":
-        s.append(("lambda", None))
+    match t:
+        case ("fn", *_):
+            s.append(("lambda", None))
     if not s:
         dbg(t)
     name, u = random.choice(s)
