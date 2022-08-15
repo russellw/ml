@@ -89,6 +89,10 @@ def rand(env, t, depth):
                 s.append(0)
                 s.append(1)
             case ("fn", *_):
+                # if we were supposed to be returning an atom, prefer to avoid further recursion,
+                # but if the required return type is a function,
+                # and we don't have any variables of that function type to hand,
+                # then we don't have a choice
                 if not s:
                     return lam(env, t, 0)
             case ("list", *_):
