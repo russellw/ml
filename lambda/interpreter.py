@@ -146,6 +146,9 @@ if __name__ == "__main__":
     test(("cdr", "a"), (2, 3), (1, 2, 3))
     test(("len", "a"), 3, (1, 2, 3))
 
+    lam = ("lambda", ("x",), ("*", "x", "x"))
+    test(("call", lam, 3), 9)
+
     exit(0)
     for i in range(10000000):
         a = rand(4)
