@@ -158,7 +158,7 @@ if __name__ == "__main__":
     test(("at", s, 2), 3)
 
     square = ("lambda", ("x",), ("*", "x", "x"))
-    test(("call", square, 3), 9)
+    test(("call", square, ("+", 1, 2)), 9)
     test(("map", square, s), (1, 4, 9))
 
     exit(0)
