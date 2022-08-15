@@ -18,6 +18,8 @@ class Closure:
 
 def ev(env, a):
     if isinstance(a, tuple):
+        if not a:
+            return a
         o, *s = a
         return evs[o](env, *s)
     if isinstance(a, str):
@@ -68,7 +70,6 @@ evs = {}
 for name, t, f in ops:
     evs[name] = f
 
-globalEnv = Env(None, ["nil"], [()])
 
 # random generator
 atoms = (0, 1, [], "arg")
@@ -95,7 +96,7 @@ def rand(env, t, depth):
 
 # top level
 def test(code, expected, arg=None):
-    env = Env(globalEnv, ["a"], [arg])
+    env = Env(None, ["a"], [arg])
     actual = ev(env, code)
     assert actual == expected
 
@@ -142,14 +143,14 @@ if __name__ == "__main__":
     test(("if", True, 1, ("div", 1, 0)), 1)
     test(("if", False, 1, 2), 2)
 
-    test("nil", ())
-    test(("cons", 1, "nil"), (1,))
-    test(("cons", 1, ("cons", 2, "nil")), (1, 2))
+    test((), ())
+    test(("cons", 1, ()), (1,))
+    test(("cons", 1, ("cons", 2, ())), (1, 2))
     test(("car", "a"), 1, (1, 2, 3))
     test(("cdr", "a"), (2, 3), (1, 2, 3))
     test(("len", "a"), 3, (1, 2, 3))
 
-    s = ("cons", 1, ("cons", 2, ("cons", 3, "nil")))
+    s = ("cons", 1, ("cons", 2, ("cons", 3, ())))
     test(("at", s, 0), 1)
     test(("at", s, 1), 2)
     test(("at", s, 2), 3)
