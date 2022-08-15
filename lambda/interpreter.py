@@ -4,17 +4,6 @@ from etc import *
 import types1
 
 
-class Closure:
-    def __init__(self, env, params, body):
-        self.env = env
-        self.params = params
-        self.body = body
-
-    def __call__(self, *args):
-        env = Env(self.env, self.params, args)
-        return ev(env, self.body)
-
-
 def ev(env, a):
     if isinstance(a, tuple):
         if not a:
@@ -42,7 +31,6 @@ ops = (
     ("car", (t, lst), lambda env, s: ev(env, s)[0]),
     ("cdr", (lst, lst), lambda env, s: ev(env, s)[1:]),
     ("div", ("num", "num", "num"), lambda env, a, b: ev(env, a) // ev(env, b)),
-    ("lambda", None, lambda env, params, body: Closure(env, params, body)),
     ("len", ("num", lst), lambda env, s: len(ev(env, s))),
     ("mod", ("num", "num", "num"), lambda env, a, b: ev(env, a) % ev(env, b)),
     ("not", ("bool", "bool"), lambda env, a: not (ev(env, a))),
@@ -57,6 +45,11 @@ ops = (
         "if",
         (t, "bool", t, t),
         lambda env, c, a, b: ev(env, a) if ev(env, c) else ev(env, b),
+    ),
+    (
+        "lambda",
+        None,
+        lambda env, params, body: lambda *args: ev(Env(env, params, args), body),
     ),
     (
         "map",
@@ -94,7 +87,6 @@ env[1] = "num"
 env["a"] = "num"
 for i in range(20):
     print(rand(env, "num", 0))
-exit(0)
 
 
 def test(code, expected, arg=None):
@@ -161,6 +153,7 @@ if __name__ == "__main__":
     test(("call", square, ("+", 1, 2)), 9)
     test(("map", square, s), (1, 4, 9))
 
+    print('ok')
     exit(0)
     for i in range(10000000):
         a = rand(4)
