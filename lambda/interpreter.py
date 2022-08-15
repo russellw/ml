@@ -50,7 +50,7 @@ ops = (
     (
         "cons",
         (lst, t, lst),
-        lambda env, a, s: [ev(env, a)] + ev(env, s),
+        lambda env, a, s: (ev(env, a),) + ev(env, s),
     ),
     (
         "if",
@@ -68,7 +68,7 @@ evs = {}
 for name, t, f in ops:
     evs[name] = f
 
-globalEnv = Env(None, ["nil"], [[]])
+globalEnv = Env(None, ["nil"], [()])
 
 # random generator
 atoms = (0, 1, [], "arg")
@@ -138,6 +138,13 @@ if __name__ == "__main__":
     test(("or", True, False), True)
     test(("or", True, True), True)
     test(("or", True, ("==", ("div", 1, 0), 99)), True)
+
+    test("nil", ())
+    test(("cons", 1, "nil"), (1,))
+    test(("cons", 1, ("cons", 2, "nil")), (1, 2))
+    test(("car", "a"), 1, (1, 2, 3))
+    test(("cdr", "a"), (2, 3), (1, 2, 3))
+    test(("len", "a"), 3, (1, 2, 3))
 
     exit(0)
     for i in range(10000000):
