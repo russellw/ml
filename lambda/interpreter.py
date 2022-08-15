@@ -3,6 +3,7 @@ import random
 
 from env import Env
 from var import Var
+import types
 
 
 class Closure:
@@ -71,30 +72,33 @@ for name, t, f in ops:
     evs[name] = f
 
 
-# random generator
-atoms = (0, 1, [], "arg")
-
-
 def rand(env, t, depth):
     if not depth or not random.randrange(0, 16):
-        depth = 0
-    if depth:
-        depth -= 1
-        o = random.choice(list(ops.keys()))
-        n = 2
-        if o in arity:
-            n = arity[o]
-        v = [o]
-        for i in range(n):
-            v.append(rand(depth))
-        return v
-    a = random.choice(atoms)
-    if a == "arg":
-        return [a, random.randrange(0, 2)]
-    return a
+        s = []
+        for a in env.keys1():
+            if types.unify({}, env.get(a), t):
+                s.append(a)
+        return random.choice(s)
+    depth -= 1
+    o = random.choice(list(ops.keys()))
+    n = 2
+    if o in arity:
+        n = arity[o]
+    v = [o]
+    for i in range(n):
+        v.append(rand(depth))
+    return v
 
 
-# top level
+env = Env()
+env[0] = "num"
+env[1] = "num"
+env["a"] = "num"
+for i in range(20):
+    print(rand(env, "num", 0))
+exit(0)
+
+
 def test(code, expected, arg=None):
     env = Env(None, ["a"], [arg])
     actual = ev(env, code)
