@@ -11,9 +11,9 @@ class Closure:
         self.params = params
         self.body = body
 
-    def __call__(self, args):
+    def __call__(self, *args):
         env = Env(self.env, self.params, args)
-        return ev(self.body, self.env + [arg])
+        return ev(env, self.body)
 
 
 def ev(env, a):
@@ -60,7 +60,7 @@ ops = (
     (
         "map",
         (lst, ("fn", t, t), lst),
-        lambda env, f, s: map(ev(env, f), ev(env, s)),
+        lambda env, f, s: tuple(map(ev(env, f), ev(env, s))),
     ),
 )
 
@@ -146,8 +146,14 @@ if __name__ == "__main__":
     test(("cdr", "a"), (2, 3), (1, 2, 3))
     test(("len", "a"), 3, (1, 2, 3))
 
-    lam = ("lambda", ("x",), ("*", "x", "x"))
-    test(("call", lam, 3), 9)
+    test(("if", True, 1, ("div", 1, 0)), 1)
+    test(("if", False, 1, 2), 2)
+
+    square = ("lambda", ("x",), ("*", "x", "x"))
+    test(("call", square, 3), 9)
+
+    s = ("cons", 1, ("cons", 2, ("cons", 3, "nil")))
+    test(("map", square, s), (1, 4, 9))
 
     exit(0)
     for i in range(10000000):
