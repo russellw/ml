@@ -103,7 +103,42 @@ def test(code, expected, arg=None):
 if __name__ == "__main__":
     test(2, 2)
     test("a", 3, 3)
+
     test(("+", "a", "a"), 6, 3)
+    test(("*", 8, 3), 24)
+    test(("/", 3, 4), 0.75)
+    test(("div", 8, 4), 2)
+    test(("mod", 10, 3), 1)
+    test(("pow", 10, 3), 1000)
+
+    test(("==", 3, 3), True)
+    test(("==", 3, 4), False)
+
+    test(("<", 1, 1), False)
+    test(("<", 1, 2), True)
+    test(("<", 2, 1), False)
+    test(("<", 2, 2), False)
+
+    test(("<=", 1, 1), True)
+    test(("<=", 1, 2), True)
+    test(("<=", 2, 1), False)
+    test(("<=", 2, 2), True)
+
+    test(("not", False), True)
+    test(("not", True), False)
+
+    test(("and", False, False), False)
+    test(("and", False, True), False)
+    test(("and", True, False), False)
+    test(("and", True, True), True)
+    test(("and", False, ("==", ("div", 1, 0), 99)), False)
+
+    test(("or", False, False), False)
+    test(("or", False, True), True)
+    test(("or", True, False), True)
+    test(("or", True, True), True)
+    test(("or", True, ("==", ("div", 1, 0), 99)), True)
+
     exit(0)
     for i in range(10000000):
         a = rand(4)
