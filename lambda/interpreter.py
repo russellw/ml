@@ -139,6 +139,9 @@ if __name__ == "__main__":
     test(("or", True, True), True)
     test(("or", True, ("==", ("div", 1, 0), 99)), True)
 
+    test(("if", True, 1, ("div", 1, 0)), 1)
+    test(("if", False, 1, 2), 2)
+
     test("nil", ())
     test(("cons", 1, "nil"), (1,))
     test(("cons", 1, ("cons", 2, "nil")), (1, 2))
@@ -146,13 +149,13 @@ if __name__ == "__main__":
     test(("cdr", "a"), (2, 3), (1, 2, 3))
     test(("len", "a"), 3, (1, 2, 3))
 
-    test(("if", True, 1, ("div", 1, 0)), 1)
-    test(("if", False, 1, 2), 2)
+    s = ("cons", 1, ("cons", 2, ("cons", 3, "nil")))
+    test(("at", s, 0), 1)
+    test(("at", s, 1), 2)
+    test(("at", s, 2), 3)
 
     square = ("lambda", ("x",), ("*", "x", "x"))
     test(("call", square, 3), 9)
-
-    s = ("cons", 1, ("cons", 2, ("cons", 3, "nil")))
     test(("map", square, s), (1, 4, 9))
 
     exit(0)
