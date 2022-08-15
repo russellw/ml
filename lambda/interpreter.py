@@ -2,6 +2,7 @@ import operator
 import random
 
 from env import Env
+from var import Var
 
 
 class Closure:
@@ -24,6 +25,8 @@ def ev(env, a):
     return a
 
 
+t = Var()
+lst = ("list", t)
 ops = (
     ("*", ("num", "num", "num"), lambda env, a, b: ev(env, a) * ev(env, b)),
     ("+", ("num", "num", "num"), lambda env, a, b: ev(env, a) + ev(env, b)),
@@ -31,32 +34,32 @@ ops = (
     ("/", ("num", "num", "num"), lambda env, a, b: ev(env, a) / ev(env, b)),
     ("<", ("bool", "num", "num"), lambda env, a, b: ev(env, a) < ev(env, b)),
     ("<=", ("bool", "num", "num"), lambda env, a, b: ev(env, a) <= ev(env, b)),
-    ("==", ("bool", "T", "T"), lambda env, a, b: ev(env, a) == ev(env, b)),
+    ("==", ("bool", t, t), lambda env, a, b: ev(env, a) == ev(env, b)),
     ("and", ("bool", "bool", "bool"), lambda env, a, b: ev(env, a) and ev(env, b)),
-    ("at", ("T", ("list", "T"), "num"), lambda env, s, i: ev(env, s)[int(ev(env, i))]),
+    ("at", (t, lst, "num"), lambda env, s, i: ev(env, s)[int(ev(env, i))]),
     ("call", None, lambda env, f, *s: ev(env, f)(*[ev(env, a) for a in s])),
-    ("car", ("T", ("list", "T")), lambda env, s: ev(env, s)[0]),
-    ("cdr", (("list", "T"), ("list", "T")), lambda env, s: ev(env, s)[1:]),
+    ("car", (t, lst), lambda env, s: ev(env, s)[0]),
+    ("cdr", (lst, lst), lambda env, s: ev(env, s)[1:]),
     ("div", ("num", "num", "num"), lambda env, a, b: ev(env, a) // ev(env, b)),
     ("lambda", None, lambda env, params, body: Closure(env, params, body)),
-    ("len", ("num", ("list", "T")), lambda env, s: len(ev(env, s))),
+    ("len", ("num", lst), lambda env, s: len(ev(env, s))),
     ("mod", ("num", "num", "num"), lambda env, a, b: ev(env, a) % ev(env, b)),
     ("not", ("bool", "bool"), lambda env, a: not (ev(env, a))),
     ("or", ("bool", "bool", "bool"), lambda env, a, b: ev(env, a) or ev(env, b)),
     ("pow", ("num", "num", "num"), lambda env, a, b: ev(env, a) ** ev(env, b)),
     (
         "cons",
-        (("list", "T"), "T", ("list", "T")),
+        (lst, t, lst),
         lambda env, a, s: [ev(env, a)] + ev(env, s),
     ),
     (
         "if",
-        ("T", "bool", "T", "T"),
+        (t, "bool", t, t),
         lambda env, c, a, b: ev(env, a) if ev(env, c) else ev(env, b),
     ),
     (
         "map",
-        (("list", "T"), ("fn", "T", "T"), ("list", "T")),
+        (lst, ("fn", t, t), lst),
         lambda env, f, s: map(ev(env, f), ev(env, s)),
     ),
 )
