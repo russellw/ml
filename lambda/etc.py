@@ -65,6 +65,22 @@ def freeVars(a):
     return free
 
 
+def freshVars(a):
+    d = {}
+
+    def rec(a):
+        match a:
+            case Var() as a:
+                if a not in d:
+                    d[a] = Var(a.t)
+            case _, *s:
+                for a in s:
+                    rec(a)
+
+    rec(a)
+    return replace(d, a)
+
+
 def replace(d, a):
     if a in d:
         return replace(d, d[a])

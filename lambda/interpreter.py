@@ -75,6 +75,7 @@ def lam(env, t, depth):
 
 
 def rand(env, t, depth):
+    t = freshVars(t)
     s = []
 
     # required or decided to return an atom
