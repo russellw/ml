@@ -13,11 +13,11 @@ def lam(env, t, depth):
         params.append("x" + str(env.count()))
         paramts.append(paramt)
     env = Env(env, params, paramts)
-    body = rand(env, t[1], depth)
+    body = expr(env, t[1], depth)
     return "lambda", tuple(params), body
 
 
-def rand(env, t, depth):
+def expr(env, t, depth):
     t = freshVars(t)
     s = []
 
@@ -73,33 +73,49 @@ def rand(env, t, depth):
 
     s = [name]
     for t in u[1:]:
-        s.append(rand(env, t, depth))
+        s.append(expr(env, t, depth))
     return tuple(s)
+
+
+def consistent(a, b, xs):
+    env = Env()
+    for x in xs:
+        env["x"] = x
+        y = interpreter.ev(env, a)
+        z = interpreter.ev(env, b)
+        if y != z:
+            print(a)
+            print(b)
+            print(x)
+            print(y)
+            print(z)
+            exit(1)
+
+
+def trivial(a, xs):
+    if not isinstance(a, tuple):
+        return True
+    env = Env()
+    ys = set()
+    for x in xs:
+        env["x"] = x
+        y = interpreter.ev(env, a)
+        ys.add(y)
+    return len(ys) == 1
 
 
 if __name__ == "__main__":
     random.seed(0)
     env = Env()
-    n = 0
 
     env["x"] = "num"
     for i in range(10000):
         try:
-            a = rand(env, "num", 5)
+            a = expr(env, "num", 5)
             b = simplify(a)
-            for x in range(10):
-                env["x"] = x
-                y = interpreter.ev(env, a)
-                z = interpreter.ev(env, b)
-                if y != z:
-                    print(a)
-                    print(b)
-                    print(x)
-                    print(y)
-                    print(z)
-                    exit(1)
-                n += 1
-            if const(b):
+            xs = range(10)
+            consistent(a, b, xs)
+            if trivial(b, xs):
                 continue
             print(a)
             print(b)
@@ -107,4 +123,4 @@ if __name__ == "__main__":
         except (IndexError, ZeroDivisionError):
             pass
 
-    print(n)
+    print("ok")
