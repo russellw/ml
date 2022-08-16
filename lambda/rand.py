@@ -1,6 +1,7 @@
 import random
 
 from etc import *
+from simplify import simplify
 import interpreter
 import types1
 
