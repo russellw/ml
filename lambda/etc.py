@@ -42,6 +42,21 @@ class Var:
         return self.name
 
 
+def const(a):
+    match a:
+        case str():
+            return
+        case Var():
+            return
+        case ():
+            return True
+        case "quote", _:
+            return True
+        case *_,:
+            return
+    return True
+
+
 def dbg(a):
     info = inspect.getframeinfo(inspect.currentframe().f_back)
     print(f"{info.filename}:{info.function}:{info.lineno}: {repr(a)}")
@@ -135,6 +150,9 @@ def simplify(a):
             return x
         case "if", False, _, x:
             return x
+        case "if", _, x, y:
+            if x == y:
+                return x
         case "==", x, y:
             if x == y:
                 return True
@@ -150,6 +168,17 @@ def simplify(a):
 if __name__ == "__main__":
     a = "a"
     x = Var()
+
+    assert const(True)
+    assert const(1)
+    assert not const(a)
+    assert not const(x)
+    assert const(())
+    assert const(("quote", "a"))
+    assert not const(("not", "a"))
+
     assert freeVars("a") == set()
     assert freeVars(x) == set([x])
     assert freeVars(("+", x, x)) == set([x])
+
+    print("ok")

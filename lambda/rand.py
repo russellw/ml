@@ -100,5 +100,8 @@ if __name__ == "__main__":
                 n += 1
             except:
                 continue
+        print(a)
+        print(b)
+        print()
 
     print(n)
