@@ -94,10 +94,56 @@ def simplify(a):
         return a
     a = tuple(map(simplify, a))
     match a:
+        case "or", x, False:
+            return x
+        case "or", False, x:
+            return x
+        case "or", _, True:
+            return True
+        case "or", True, _:
+            return True
+        case "and", x, True:
+            return x
+        case "and", True, x:
+            return x
+        case "and", _, False:
+            return False
+        case "and", False, _:
+            return False
         case "+", x, 0:
+            return x
+        case "+", 0, x:
             return x
         case "-", x, 0:
             return x
+        case "-", x, y:
+            if x == y:
+                return 0
+        case "*", _, 0:
+            return 0
+        case "*", 0, _:
+            return 0
+        case "*", x, 1:
+            return x
+        case "*", 1, x:
+            return x
+        case "/", x, 1:
+            return x
+        case "div", x, 1:
+            return x
+        case "if", True, x, _:
+            return x
+        case "if", False, _, x:
+            return x
+        case "==", x, y:
+            if x == y:
+                return True
+        case "<=", x, y:
+            if x == y:
+                return True
+        case "<", x, y:
+            if x == y:
+                return False
     return a
 
 

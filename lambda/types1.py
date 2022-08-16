@@ -141,3 +141,5 @@ if __name__ == "__main__":
     assert unify(d, x, a)
     assert len(d) == 1
     assert not unify(d, b, x)
+
+    print("ok")
