@@ -9,7 +9,7 @@ def lam(env, t, depth):
     params = []
     paramts = []
     for paramt in t[2:]:
-        params.append("a" + str(env.count()))
+        params.append("x" + str(env.count()))
         paramts.append(paramt)
     env = Env(env, params, paramts)
     body = rand(env, t[1], depth)
@@ -23,9 +23,9 @@ def rand(env, t, depth):
     # required or decided to return an atom
     if not depth or not random.randrange(0, 16):
         # available local variables that match the required type
-        for a in env.keys1():
-            if types1.unify({}, env.get(a), t):
-                s.append(a)
+        for x in env.keys1():
+            if types1.unify({}, env.get(x), t):
+                s.append(x)
 
         # some types can also be provided by literals
         match t:
@@ -77,25 +77,28 @@ def rand(env, t, depth):
 
 
 if __name__ == "__main__":
-    env = Env()
-    env["a"] = "num"
     random.seed(0)
+    env = Env()
+    n = 0
+
+    env["x"] = "num"
     for i in range(1000):
-        f = rand(env, "num", 5)
-        g = simplify(f)
+        a = rand(env, "num", 5)
+        b = simplify(a)
         for x in range(10):
-            env["a"] = x
+            env["x"] = x
             try:
-                y1 = interpreter.ev(env, f)
-                y2 = interpreter.ev(env, g)
-                if y1 != y2:
-                    print(f)
-                    print(g)
+                y = interpreter.ev(env, a)
+                z = interpreter.ev(env, b)
+                if y != z:
+                    print(a)
+                    print(b)
                     print(x)
-                    print(y1)
-                    print(y2)
+                    print(y)
+                    print(z)
                     exit(1)
+                n += 1
             except:
                 continue
 
-    print("ok")
+    print(n)

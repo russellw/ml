@@ -60,17 +60,17 @@ def ev(env, a):
     return a
 
 
-def test(code, expected, arg=None):
-    env = Env(None, ["a"], [arg])
-    actual = ev(env, code)
-    assert actual == expected
+def test(a, y, x=None):
+    env = Env(None, ["x"], [x])
+    z = ev(env, a)
+    assert y == z
 
 
 if __name__ == "__main__":
     test(2, 2)
-    test("a", 3, 3)
+    test("x", 3, 3)
 
-    test(("+", "a", "a"), 6, 3)
+    test(("+", "x", "x"), 6, 3)
     test(("*", 8, 3), 24)
     test(("/", 3, 4), 0.75)
     test(("div", 8, 4), 2)
@@ -111,9 +111,9 @@ if __name__ == "__main__":
     test((), ())
     test(("cons", 1, ()), (1,))
     test(("cons", 1, ("cons", 2, ())), (1, 2))
-    test(("car", "a"), 1, (1, 2, 3))
-    test(("cdr", "a"), (2, 3), (1, 2, 3))
-    test(("len", "a"), 3, (1, 2, 3))
+    test(("car", "x"), 1, (1, 2, 3))
+    test(("cdr", "x"), (2, 3), (1, 2, 3))
+    test(("len", "x"), 3, (1, 2, 3))
 
     s = ("cons", 1, ("cons", 2, ("cons", 3, ())))
     test(("at", s, 0), 1)
