@@ -47,6 +47,24 @@ def dbg(a):
     print(f"{info.filename}:{info.function}:{info.lineno}: {repr(a)}")
 
 
+def freeVars(a):
+    free = set()
+
+    def rec(bound, a):
+        match a:
+            case Var() as a:
+                if a not in bound:
+                    free.add(a)
+            case "lambda", params, body:
+                rec(bound | set(params), body)
+            case _, *s:
+                for a in s:
+                    rec(bound, a)
+
+    rec(set(), a)
+    return free
+
+
 def replace(d, a):
     if a in d:
         return replace(d, d[a])
@@ -65,3 +83,11 @@ def simplify(a):
         case "-", x, 0:
             return x
     return a
+
+
+if __name__ == "__main__":
+    a = "a"
+    x = Var()
+    assert freeVars("a") == set()
+    assert freeVars(x) == set([x])
+    assert freeVars(("+", x, x)) == set([x])
