@@ -23,7 +23,7 @@ def expr(env, t, depth):
 
     # required or decided to return an atom
     if not depth or not random.randrange(0, 16):
-        # available local variables that match the required type
+        # available variables that match the required type
         for x in env.keys1():
             if types1.unify({}, env.get(x), t):
                 s.append(x)

@@ -36,9 +36,7 @@ def unify(d, a, b):
     if isinstance(b, Var):
         return unifyVar(d, b, a)
 
-    if isinstance(a, tuple) and isinstance(b, tuple):
-        if len(a) != len(b):
-            return
+    if isinstance(a, tuple) and isinstance(b, tuple) and len(a) == len(b):
         for i in range(len(a)):
             if not unify(d, a[i], b[i]):
                 return
