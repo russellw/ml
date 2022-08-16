@@ -78,10 +78,24 @@ def rand(env, t, depth):
 
 if __name__ == "__main__":
     env = Env()
-    env["a"] = "list", "bool"
-    random.seed(1)
-    for i in range(20):
-        a = rand(env, ("list", "bool"), 5)
-        print(a)
-        print(simplify(a))
-        print()
+    env["a"] = "num"
+    random.seed(0)
+    for i in range(1000):
+        f = rand(env, "num", 5)
+        g = simplify(f)
+        for x in range(10):
+            env["a"] = x
+            try:
+                y1 = interpreter.ev(env, f)
+                y2 = interpreter.ev(env, g)
+                if y1 != y2:
+                    print(f)
+                    print(g)
+                    print(x)
+                    print(y1)
+                    print(y2)
+                    exit(1)
+            except:
+                continue
+
+    print("ok")

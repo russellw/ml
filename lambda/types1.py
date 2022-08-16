@@ -14,6 +14,7 @@ def occurs(d, a, b):
 
 
 def unifyVar(d, a, b):
+    assert isinstance(a, Var)
     if a in d:
         return unify(d, d[a], b)
     if b in d:
@@ -24,17 +25,9 @@ def unifyVar(d, a, b):
     return True
 
 
-# this version of unify skips the type check
-# because it makes no sense to ask the type of a type
 def unify(d, a, b):
-    assert not freeVars(a) & freeVars(b)
-    if isinstance(a, tuple) and isinstance(b, tuple):
-        if len(a) != len(b):
-            return
-        for i in range(len(a)):
-            if not unify(d, a[i], b[i]):
-                return
-        return True
+    # this version of unify skips the type check
+    # because it makes no sense to ask the type of a type
     if a == b:
         return True
 
@@ -42,6 +35,14 @@ def unify(d, a, b):
         return unifyVar(d, a, b)
     if isinstance(b, Var):
         return unifyVar(d, b, a)
+
+    if isinstance(a, tuple) and isinstance(b, tuple):
+        if len(a) != len(b):
+            return
+        for i in range(len(a)):
+            if not unify(d, a[i], b[i]):
+                return
+        return True
 
 
 if __name__ == "__main__":
@@ -67,9 +68,10 @@ if __name__ == "__main__":
     d = {}
     assert not unify(d, a, b)
 
-    # unification is expected to be used such that the inputs have disjoint variable names.
-    # to allow this to be asserted, tests  where the same variable occurs in both inputs
-    # have been removed
+    # Succeeds. (tautology)
+    d = {}
+    assert unify(d, x, x)
+    assert len(d) == 0
 
     # x is unified with the constant a
     d = {}
@@ -119,6 +121,10 @@ if __name__ == "__main__":
     assert len(d) == 2
     assert replace(d, x) == a
     assert replace(d, y) == (g, a)
+
+    # Returns false in first-order logic and many modern Prolog dialects (enforced by the occurs check).
+    d = {}
+    assert not unify(d, x, (f, x))
 
     # Both x and y are unified with the constant a
     d = {}
