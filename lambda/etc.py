@@ -53,3 +53,15 @@ def replace(d, a):
     if isinstance(a, tuple):
         return tuple([replace(d, b) for b in a])
     return a
+
+
+def simplify(a):
+    if not isinstance(a, tuple):
+        return a
+    a = tuple(map(simplify, a))
+    match a:
+        case "+", x, 0:
+            return x
+        case "-", x, 0:
+            return x
+    return a

@@ -92,14 +92,14 @@ def rand(env, t, depth):
             case "num":
                 s.append(0)
                 s.append(1)
-            case ("fn", *_):
+            case "fn", *_:
                 # if we were supposed to be returning an atom, prefer to avoid further recursion,
                 # but if the required return type is a function,
                 # and we don't have any variables of that function type to hand,
                 # then we don't have a choice
                 if not s:
                     return lam(env, t, 0)
-            case ("list", _):
+            case "list", _:
                 s.append(())
 
         # choose a suitable atom at random
@@ -113,7 +113,7 @@ def rand(env, t, depth):
         if u and types1.unify({}, u[0], t):
             s.append((name, u))
     match t:
-        case ("fn", *_):
+        case "fn", *_:
             s.append(("lambda", None))
 
     # choose a suitable operator at random
@@ -129,10 +129,13 @@ def rand(env, t, depth):
 
 
 env = Env()
-env["a"] = "num"
+env["a"] = "list", "bool"
 random.seed(1)
 for i in range(20):
-    print(rand(env, "num", 5))
+    a = rand(env, ("list", "bool"), 5)
+    print(a)
+    print(simplify(a))
+    print()
 
 
 def test(code, expected, arg=None):
