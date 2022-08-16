@@ -1,6 +1,21 @@
 from etc import *
 
 
+class Unknown(Exception):
+    pass
+
+
+def len1(a):
+    match a:
+        case ():
+            return 0
+        case "cons", x, s:
+            return 1 + len1(s)
+        case "cdr", s:
+            return max(len1(s) - 1, 0)
+    raise Unknown()
+
+
 def quote(a):
     if not const(a):
         return "quote", a
@@ -89,12 +104,11 @@ def simplify(a):
         case "map", ("lambda", (x,), y), s:
             if x == y:
                 return s
-        case "len", ("cons", _, ()):
-            return 1
-        case "len", ("cons", _, ("cons", _, ())):
-            return 2
-        case "len", ("cons", _, ("cons", _, ("cons", _, ()))):
-            return 3
+        case "len", s:
+            try:
+                return len1(s)
+            except Unknown:
+                pass
 
     # are all the arguments constant?
     if not all(map(const, a[1:])):
