@@ -4,10 +4,13 @@ import types1
 t = Var()
 lst = ("list", t)
 ops = (
+    ("%", ("num", "num", "num"), lambda env, a, b: ev(env, a) % ev(env, b)),
     ("*", ("num", "num", "num"), lambda env, a, b: ev(env, a) * ev(env, b)),
+    ("**", ("num", "num", "num"), lambda env, a, b: ev(env, a) ** ev(env, b)),
     ("+", ("num", "num", "num"), lambda env, a, b: ev(env, a) + ev(env, b)),
     ("-", ("num", "num", "num"), lambda env, a, b: ev(env, a) - ev(env, b)),
     ("/", ("num", "num", "num"), lambda env, a, b: ev(env, a) / ev(env, b)),
+    ("//", ("num", "num", "num"), lambda env, a, b: ev(env, a) // ev(env, b)),
     ("<", ("bool", "num", "num"), lambda env, a, b: ev(env, a) < ev(env, b)),
     ("<=", ("bool", "num", "num"), lambda env, a, b: ev(env, a) <= ev(env, b)),
     ("==", ("bool", t, t), lambda env, a, b: ev(env, a) == ev(env, b)),
@@ -16,12 +19,9 @@ ops = (
     ("call", None, lambda env, f, *s: ev(env, f)(*[ev(env, a) for a in s])),
     ("car", (t, lst), lambda env, s: ev(env, s)[0]),
     ("cdr", (lst, lst), lambda env, s: ev(env, s)[1:]),
-    ("div", ("num", "num", "num"), lambda env, a, b: ev(env, a) // ev(env, b)),
     ("len", ("num", lst), lambda env, s: len(ev(env, s))),
-    ("mod", ("num", "num", "num"), lambda env, a, b: ev(env, a) % ev(env, b)),
     ("not", ("bool", "bool"), lambda env, a: not (ev(env, a))),
     ("or", ("bool", "bool", "bool"), lambda env, a, b: ev(env, a) or ev(env, b)),
-    ("pow", ("num", "num", "num"), lambda env, a, b: ev(env, a) ** ev(env, b)),
     (
         "cons",
         (lst, t, lst),

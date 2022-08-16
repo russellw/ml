@@ -162,6 +162,17 @@ def simplify(a):
         case "<", x, y:
             if x == y:
                 return False
+    if not all(map(const, a[1:])):
+        return a
+    match a:
+        case "+", x, y:
+            return x + y
+        case "-", x, y:
+            return x - y
+        case "*", x, y:
+            return x * y
+        case "/", x, y:
+            return x / y
     return a
 
 

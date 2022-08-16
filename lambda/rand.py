@@ -83,11 +83,13 @@ if __name__ == "__main__":
 
     env["x"] = "num"
     for i in range(1000):
-        a = rand(env, "num", 5)
-        b = simplify(a)
-        for x in range(10):
-            env["x"] = x
-            try:
+        try:
+            a = rand(env, "num", 5)
+            if const(a):
+                continue
+            b = simplify(a)
+            for x in range(10):
+                env["x"] = x
                 y = interpreter.ev(env, a)
                 z = interpreter.ev(env, b)
                 if y != z:
@@ -98,10 +100,10 @@ if __name__ == "__main__":
                     print(z)
                     exit(1)
                 n += 1
-            except:
-                continue
-        print(a)
-        print(b)
-        print()
+            print(a)
+            print(b)
+            print()
+        except:
+            pass
 
     print(n)
