@@ -59,7 +59,7 @@ ops = (
 )
 
 evs = {}
-for name, t, f in ops:
+for name, _, f in ops:
     evs[name] = f
 
 
@@ -109,7 +109,7 @@ def rand(env, t, depth):
     depth -= 1
 
     # operators that match the required type
-    for name, u, f in ops:
+    for name, u, _ in ops:
         if u and types1.unify({}, u[0], t):
             s.append((name, u))
     match t:
