@@ -82,12 +82,12 @@ if __name__ == "__main__":
     n = 0
 
     env["x"] = "num"
-    for i in range(1000):
+    for i in range(100000):
         try:
             a = rand(env, "num", 5)
-            if const(a):
-                continue
             b = simplify(a)
+            if const(b):
+                continue
             for x in range(10):
                 env["x"] = x
                 y = interpreter.ev(env, a)
