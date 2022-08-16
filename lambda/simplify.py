@@ -9,6 +9,8 @@ def len1(a):
     match a:
         case ():
             return 0
+        case "quote", s:
+            return len(s)
         case "cons", x, s:
             return 1 + len1(s)
         case "cdr", s:
@@ -117,13 +119,13 @@ def simplify(a):
     # if so, we can evaluate the term immediately
     match a:
         case "not", x:
-            return eval(f"{a[0]} {x}")
+            return eval(f"{a[0]} ({x})")
         case (
             "and" | "or" | "==" | "<" | "<=" | "+" | "-" | "*" | "/" | "//" | "%" | "**"
         ), x, y:
             x = unquote(x)
             y = unquote(y)
-            return eval(f"{x} {a[0]} {y}")
+            return eval(f"({x}) {a[0]} ({y})")
         case "cons", x, s:
             x = unquote(x)
             s = unquote(s)

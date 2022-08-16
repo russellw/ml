@@ -22,6 +22,7 @@ ops = (
     ("len", ("num", lst), lambda env, s: len(ev(env, s))),
     ("not", ("bool", "bool"), lambda env, a: not (ev(env, a))),
     ("or", ("bool", "bool", "bool"), lambda env, a, b: ev(env, a) or ev(env, b)),
+    ("quote", None, lambda env, a: a),
     (
         "cons",
         (lst, t, lst),
