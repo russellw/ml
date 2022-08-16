@@ -83,7 +83,7 @@ def simplify(a):
             return x
         case "/", x, 1:
             return x
-        case "div", x, 1:
+        case "//", x, 1:
             return x
         case "if", True, x, _:
             return x
