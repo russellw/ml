@@ -123,6 +123,11 @@ def rand(env, t, depth):
     # recursively generate arguments
     if name == "lambda":
         return lam(env, t, depth)
+
+    d = {}
+    types1.unify(d, u[0], t)
+    u = replace(d, u)
+
     s = [name]
     for t in u[1:]:
         s.append(rand(env, t, depth))
