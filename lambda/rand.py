@@ -36,6 +36,8 @@ def consistent(a, b, xs):
     for x in xs:
         y = interpreter.eval1(a, x)
         z = interpreter.eval1(b, x)
+        if isinstance(y, interpreter.Closure) and isinstance(z, interpreter.Closure):
+            raise TypeError()
         if y != z:
             print(a)
             print(b)
@@ -58,7 +60,7 @@ def trivial(a, xs):
 if __name__ == "__main__":
     random.seed(0)
 
-    for i in range(100):
+    for i in range(10000):
         try:
             a = expr(0, 5)
             b = simplify(a)
@@ -69,7 +71,7 @@ if __name__ == "__main__":
             print(a)
             print(b)
             print()
-        except (IndexError, TypeError, ZeroDivisionError):
+        except (IndexError, TypeError, ValueError, ZeroDivisionError):
             pass
 
     print("ok")
