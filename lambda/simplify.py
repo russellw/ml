@@ -39,7 +39,7 @@ def unquote(a):
 
 def simplify(a):
     # an atom is already in simplest form
-    if not isinstance(a, tuple):
+    if not isinstance(a, tuple) or not a:
         return a
 
     # special form whose arguments cannot be recursively simplified
@@ -99,7 +99,21 @@ def simplify(a):
         return a
 
     # if so, we can evaluate the term immediately
-    o = a[0]
-    f = interpreter.genv(o)
-    s = map(unquote, a[1:])
-    return f(*s)
+    a = tuple(map(unquote, a))
+    match a:
+        case "and", x, y:
+            return x and y
+        case "or", x, y:
+            return x or y
+        case "if", c, x, y:
+            return x if c else y
+        case o, *s:
+            f = interpreter.genv[o]
+            if f:
+                return f(*s)
+    raise Exception(a)
+
+
+if __name__ == "__main__":
+    assert simplify(("if", 2, 1, 0)) == 1
+    print("ok")
