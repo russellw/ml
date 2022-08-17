@@ -104,16 +104,17 @@ def simplify(a):
     a = tuple(map(unquote, a))
     match a:
         case "and", x, y:
-            return x and y
+            a = x and y
         case "or", x, y:
-            return x or y
+            a = x or y
         case "if", c, x, y:
-            return x if c else y
+            a = x if c else y
         case o, *s:
             f = interpreter.genv[o]
-            if f:
-                return f(*s)
-    raise Exception(a)
+            a = f(*s)
+        case _:
+            raise Exception(a)
+    return quote(a)
 
 
 if __name__ == "__main__":

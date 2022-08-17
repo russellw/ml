@@ -49,7 +49,7 @@ ops = (
     ("round", 1, round),
     ("slice", 3, lambda s, i, j: s[int(i) : int(j)]),
     ("sum", 1, sum),
-    ("zip", 2, zip),
+    ("zip", 2, lambda *s: tuple(zip(*s))),
 )
 
 genv = Env()
