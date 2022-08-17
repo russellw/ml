@@ -60,7 +60,8 @@ def trivial(a, xs):
 if __name__ == "__main__":
     random.seed(0)
 
-    for i in range(10000):
+    seen = set()
+    for i in range(100000):
         try:
             a = expr(0, 5)
             b = simplify(a)
@@ -68,10 +69,13 @@ if __name__ == "__main__":
             consistent(a, b, xs)
             if trivial(b, xs):
                 continue
+            if a in seen:
+                continue
+            seen.add(a)
             print(a)
             print(b)
             print()
         except (IndexError, TypeError, ValueError, ZeroDivisionError):
             pass
 
-    print("ok")
+    print(len(seen))

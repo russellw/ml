@@ -1,4 +1,5 @@
 from etc import *
+import interpreter
 
 
 class Unknown(Exception):
@@ -114,14 +115,7 @@ def simplify(a):
         return a
 
     # if so, we can evaluate the term immediately
-    match a:
-        case ("bool" | "int" | "len" | "not"), x:
-            x = unquote(x)
-            return eval(f"{a[0]} ({x})")
-        case (
-            "and" | "or" | "==" | "!=" | "<" | "<=" | "+" | "-" | "*" | "/" | "//" | "%"
-        ), x, y:
-            x = unquote(x)
-            y = unquote(y)
-            return eval(f"({x}) {a[0]} ({y})")
-    return a
+    o = a[0]
+    f = interpreter.genv(o)
+    s = map(unquote, a[1:])
+    return f(*s)
