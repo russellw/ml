@@ -1,69 +1,94 @@
-from etc import *
-import types1
+import operator
 
-t = Var()
-lst = ("list", t)
+from etc import *
+
+
+class Closure:
+    def __init__(self, env, params, body):
+        self.env = env
+        self.params = params
+        self.body = body
+
+    def __call__(self, *args):
+        env = Env(self.env, self.params, args)
+        return ev(env, self.body)
+
+
 ops = (
-    ("%", ("num", "num", "num"), lambda env, a, b: ev(env, a) % ev(env, b)),
-    ("*", ("num", "num", "num"), lambda env, a, b: ev(env, a) * ev(env, b)),
-    ("**", ("num", "num", "num"), lambda env, a, b: ev(env, a) ** ev(env, b)),
-    ("+", ("num", "num", "num"), lambda env, a, b: ev(env, a) + ev(env, b)),
-    ("-", ("num", "num", "num"), lambda env, a, b: ev(env, a) - ev(env, b)),
-    ("/", ("num", "num", "num"), lambda env, a, b: ev(env, a) / ev(env, b)),
-    ("//", ("num", "num", "num"), lambda env, a, b: ev(env, a) // ev(env, b)),
-    ("<", ("bool", "num", "num"), lambda env, a, b: ev(env, a) < ev(env, b)),
-    ("<=", ("bool", "num", "num"), lambda env, a, b: ev(env, a) <= ev(env, b)),
-    ("==", ("bool", t, t), lambda env, a, b: ev(env, a) == ev(env, b)),
-    ("and", ("bool", "bool", "bool"), lambda env, a, b: ev(env, a) and ev(env, b)),
-    ("at", (t, lst, "num"), lambda env, s, i: ev(env, s)[int(ev(env, i))]),
-    ("call", None, lambda env, f, *s: ev(env, f)(*[ev(env, a) for a in s])),
-    ("car", (t, lst), lambda env, s: ev(env, s)[0]),
-    ("cdr", (lst, lst), lambda env, s: ev(env, s)[1:]),
-    ("len", ("num", lst), lambda env, s: len(ev(env, s))),
-    ("not", ("bool", "bool"), lambda env, a: not (ev(env, a))),
-    ("or", ("bool", "bool", "bool"), lambda env, a, b: ev(env, a) or ev(env, b)),
-    ("quote", None, lambda env, a: a),
-    (
-        "cons",
-        (lst, t, lst),
-        lambda env, a, s: (ev(env, a),) + ev(env, s),
-    ),
-    (
-        "if",
-        (t, "bool", t, t),
-        lambda env, c, a, b: ev(env, a) if ev(env, c) else ev(env, b),
-    ),
-    (
-        "lambda",
-        None,
-        lambda env, params, body: lambda *args: ev(Env(env, params, args), body),
-    ),
-    (
-        "map",
-        (lst, ("fn", t, t), lst),
-        lambda env, f, s: tuple(map(ev(env, f), ev(env, s))),
-    ),
+    ("!=", 2, operator.ne),
+    ("%", 2, operator.mod),
+    ("*", 2, operator.mul),
+    ("+", 2, operator.add),
+    ("-", 2, operator.sub),
+    ("/", 2, operator.truediv),
+    ("//", 2, operator.floordiv),
+    ("<", 2, operator.lt),
+    ("<=", 2, operator.le),
+    ("==", 2, operator.eq),
+    ("abs", 1, abs),
+    ("all", 1, all),
+    ("and", 2, None),
+    ("any", 1, any),
+    ("bool", 1, bool),
+    ("contains", 2, operator.contains),
+    ("countOf", 2, operator.countOf),
+    ("getitem", 2, operator.getitem),
+    ("if", 3, None),
+    ("int", 1, int),
+    ("lambda", 2, None),
+    ("len", 1, len),
+    ("map", 2, lambda f, s: tuple(map(f, s))),
+    ("max", 2, max),
+    ("min", 2, min),
+    ("neg", 1, operator.neg),
+    ("not", 1, operator.not_),
+    ("or", 2, None),
+    ("pow", 2, pow),
+    ("quote", 1, None),
+    ("range", 2, range),
+    ("round", 1, round),
+    ("slice", 3, lambda s, i, j: s[int(i) : int(j)]),
+    ("sum", 1, sum),
+    ("zip", 2, zip),
 )
 
-evs = {}
+genv = Env()
 for name, _, f in ops:
-    evs[name] = f
+    genv[name] = f
 
 
 def ev(env, a):
-    if isinstance(a, tuple):
-        if not a:
-            return a
-        o, *s = a
-        return evs[o](env, *s)
     if isinstance(a, str):
         return env.get(a)
-    return a
+    if not isinstance(a, tuple):
+        return a
+    match a:
+        case ():
+            return a
+        case "quote", x:
+            return x
+        case "and", x, y:
+            return ev(env, x) and ev(env, y)
+        case "or", x, y:
+            return ev(env, x) or ev(env, y)
+        case "if", c, x, y:
+            return ev(env, x) if ev(env, c) else ev(env, y)
+        case "lambda", params, body:
+            return Closure(env, params, body)
+    f, *s = a
+    f = ev(env, f)
+    s = [ev(env, a) for a in s]
+    return f(*s)
 
 
 def test(a, y, x=None):
-    env = Env(None, ["x"], [x])
+    env = Env(genv, ["x"], [x])
     z = ev(env, a)
+    if y != z:
+        print(a)
+        print(x)
+        print(y)
+        print(z)
     assert y == z
 
 
@@ -74,8 +99,8 @@ if __name__ == "__main__":
     test(("+", "x", "x"), 6, 3)
     test(("*", 8, 3), 24)
     test(("/", 3, 4), 0.75)
-    test(("div", 8, 4), 2)
-    test(("mod", 10, 3), 1)
+    test(("//", 8, 4), 2)
+    test(("%", 10, 3), 1)
     test(("pow", 10, 3), 1000)
 
     test(("==", 3, 3), True)
@@ -98,31 +123,27 @@ if __name__ == "__main__":
     test(("and", False, True), False)
     test(("and", True, False), False)
     test(("and", True, True), True)
-    test(("and", False, ("==", ("div", 1, 0), 99)), False)
+    test(("and", False, ("==", ("//", 1, 0), 99)), False)
 
     test(("or", False, False), False)
     test(("or", False, True), True)
     test(("or", True, False), True)
     test(("or", True, True), True)
-    test(("or", True, ("==", ("div", 1, 0), 99)), True)
+    test(("or", True, ("==", ("//", 1, 0), 99)), True)
 
-    test(("if", True, 1, ("div", 1, 0)), 1)
+    test(("if", True, 1, ("//", 1, 0)), 1)
     test(("if", False, 1, 2), 2)
 
     test((), ())
-    test(("cons", 1, ()), (1,))
-    test(("cons", 1, ("cons", 2, ())), (1, 2))
-    test(("car", "x"), 1, (1, 2, 3))
-    test(("cdr", "x"), (2, 3), (1, 2, 3))
     test(("len", "x"), 3, (1, 2, 3))
 
-    s = ("cons", 1, ("cons", 2, ("cons", 3, ())))
-    test(("at", s, 0), 1)
-    test(("at", s, 1), 2)
-    test(("at", s, 2), 3)
+    s = "quote", (1, 2, 3)
+    test(("getitem", s, 0), 1)
+    test(("getitem", s, 1), 2)
+    test(("getitem", s, 2), 3)
 
     square = ("lambda", ("x",), ("*", "x", "x"))
-    test(("call", square, ("+", 1, 2)), 9)
+    test((square, ("+", 1, 2)), 9)
     test(("map", square, s), (1, 4, 9))
 
     print("ok")
