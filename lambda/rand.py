@@ -61,7 +61,7 @@ if __name__ == "__main__":
     random.seed(0)
 
     seen = set()
-    for i in range(1000000):
+    for i in range(10000000):
         try:
             a = expr(0, 5)
             b = simplify(a)
@@ -69,12 +69,7 @@ if __name__ == "__main__":
             consistent(a, b, xs)
             if trivial(b, xs):
                 continue
-            if a in seen:
-                continue
             seen.add(a)
-            print(a)
-            print(b)
-            print()
         except (IndexError, TypeError, ValueError, ZeroDivisionError):
             pass
 
