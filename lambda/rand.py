@@ -36,7 +36,7 @@ def consistent(a, b, xs):
     for x in xs:
         y = interpreter.eval1(a, x)
         z = interpreter.eval1(b, x)
-        if isinstance(y, interpreter.Closure) and isinstance(z, interpreter.Closure):
+        if not isConcrete(y) and not isConcrete(z):
             raise TypeError()
         if y != z:
             print(a)
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     random.seed(0)
 
     seen = set()
-    for i in range(100000):
+    for i in range(1000000):
         try:
             a = expr(0, 5)
             b = simplify(a)

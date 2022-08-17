@@ -31,6 +31,14 @@ class Env(dict):
         return s
 
 
+def isConcrete(a):
+    match a:
+        case float() | int() | str():
+            return 1
+        case *_,:
+            return all(map(isConcrete, a))
+
+
 def isConst(a):
     match a:
         case str():
@@ -55,5 +63,12 @@ if __name__ == "__main__":
     assert isConst(())
     assert isConst(("quote", "a"))
     assert not isConst(("not", "a"))
+
+    assert isConcrete(1)
+    assert isConcrete(1.0)
+    assert isConcrete(True)
+    assert isConcrete("a")
+    assert isConcrete((1, 2, 3))
+    assert not isConcrete((1, 2, len))
 
     print("ok")
