@@ -49,7 +49,7 @@ def consistent(a, b, xs):
 
 def trivial(a, xs):
     if not isinstance(a, tuple):
-        return True
+        return 1
     ys = set()
     for x in xs:
         y = interpreter.eval1(a, x)

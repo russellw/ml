@@ -52,22 +52,6 @@ def simplify(a):
 
     # mathematical shortcuts
     match a:
-        case "or", x, False:
-            return x
-        case "or", False, x:
-            return x
-        case "or", _, True:
-            return True
-        case "or", True, _:
-            return True
-        case "and", x, True:
-            return x
-        case "and", True, x:
-            return x
-        case "and", _, False:
-            return False
-        case "and", False, _:
-            return False
         case "+", x, 0:
             return x
         case "+", 0, x:
@@ -83,22 +67,22 @@ def simplify(a):
             return x
         case "/", x, 1:
             return x
-        case "if", True, x, _:
+        case "if", 1, x, _:
             return x
-        case "if", False, _, x:
+        case "if", 0, _, x:
             return x
         case "if", _, x, y:
             if x == y:
                 return x
         case "==", x, y:
             if x == y:
-                return True
+                return 1
         case "<=", x, y:
             if x == y:
-                return True
+                return 1
         case "<", x, y:
             if x == y:
-                return False
+                return 0
         case "map", _, ():
             return ()
         case "map", ("lambda", (x,), y), s:

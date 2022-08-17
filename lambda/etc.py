@@ -36,12 +36,12 @@ def const(a):
         case str():
             return
         case ():
-            return True
+            return 1
         case "quote", _:
-            return True
+            return 1
         case *_,:
             return
-    return True
+    return 1
 
 
 def dbg(a):
