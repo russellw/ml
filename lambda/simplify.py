@@ -19,8 +19,13 @@ def len1(a):
 
 
 def quote(a):
-    if not const(a):
-        return "quote", a
+    match a:
+        case str():
+            return "quote", a
+        case ():
+            return a
+        case *_,:
+            return "quote", a
     return a
 
 
@@ -39,9 +44,7 @@ def simplify(a):
     # special form whose arguments cannot be recursively simplified
     match a:
         case "quote", x:
-            if const(x):
-                return x
-            return a
+            return quote(x)
 
     # recur on arguments
     a = tuple(map(simplify, a))
@@ -73,10 +76,6 @@ def simplify(a):
         case "-", x, y:
             if x == y:
                 return 0
-        case "*", _, 0:
-            return 0
-        case "*", 0, _:
-            return 0
         case "*", x, 1:
             return x
         case "*", 1, x:
@@ -116,25 +115,13 @@ def simplify(a):
 
     # if so, we can evaluate the term immediately
     match a:
-        case "not", x:
+        case ("bool" | "int" | "len" | "not"), x:
+            x = unquote(x)
             return eval(f"{a[0]} ({x})")
         case (
-            "and" | "or" | "==" | "<" | "<=" | "+" | "-" | "*" | "/" | "//" | "%" | "**"
+            "and" | "or" | "==" | "!=" | "<" | "<=" | "+" | "-" | "*" | "/" | "//" | "%"
         ), x, y:
             x = unquote(x)
             y = unquote(y)
             return eval(f"({x}) {a[0]} ({y})")
-        case "cons", x, s:
-            x = unquote(x)
-            s = unquote(s)
-            return quote((x,) + s)
-        case "car", s:
-            s = unquote(s)
-            return quote(s[0])
-        case "cdr", s:
-            s = unquote(s)
-            return quote(s[1:])
-        case "len", s:
-            s = unquote(s)
-            return len(s)
     return a
