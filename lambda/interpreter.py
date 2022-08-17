@@ -35,7 +35,7 @@ ops = (
     ("getitem", 2, operator.getitem),
     ("if", 3, None),
     ("int", 1, int),
-    ("lambda", 2, None),
+    ("lambda", None, None),
     ("len", 1, len),
     ("map", 2, lambda f, s: tuple(map(f, s))),
     ("max", 2, max),
@@ -53,8 +53,8 @@ ops = (
 )
 
 genv = Env()
-for name, _, f in ops:
-    genv[name] = f
+for o, _, f in ops:
+    genv[o] = f
 
 
 def ev(env, a):
@@ -81,9 +81,13 @@ def ev(env, a):
     return f(*s)
 
 
-def test(a, y, x=None):
+def eval1(a, x):
     env = Env(genv, ["x"], [x])
-    z = ev(env, a)
+    return ev(env, a)
+
+
+def test(a, y, x=None):
+    z = eval1(a, x)
     if y != z:
         print(a)
         print(x)
