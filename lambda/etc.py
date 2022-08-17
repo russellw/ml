@@ -31,7 +31,7 @@ class Env(dict):
         return s
 
 
-def const(a):
+def isConst(a):
     match a:
         case str():
             return
@@ -50,10 +50,10 @@ def dbg(a):
 
 
 if __name__ == "__main__":
-    assert const(1)
-    assert not const("a")
-    assert const(())
-    assert const(("quote", "a"))
-    assert not const(("not", "a"))
+    assert isConst(1)
+    assert not isConst("a")
+    assert isConst(())
+    assert isConst(("quote", "a"))
+    assert not isConst(("not", "a"))
 
     print("ok")

@@ -95,7 +95,7 @@ def simplify(a):
                 pass
 
     # are all the arguments constant?
-    if not all(map(const, a[1:])):
+    if not all(map(isConst, a[1:])):
         return a
 
     # if so, we can evaluate the term immediately
