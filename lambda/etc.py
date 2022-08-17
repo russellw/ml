@@ -36,6 +36,8 @@ def isConcrete(a):
         case float() | int() | str():
             return 1
         case *_,:
+            if len(a) >= 1000000:
+                return
             return all(map(isConcrete, a))
 
 
