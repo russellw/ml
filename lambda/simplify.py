@@ -46,6 +46,8 @@ def simplify(a):
     match a:
         case "quote", x:
             return quote(x)
+        case "lambda", params, body:
+            return "lambda", params, simplify(body)
 
     # recur on arguments
     a = tuple(map(simplify, a))
