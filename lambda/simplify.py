@@ -2,23 +2,6 @@ from etc import *
 import interpreter
 
 
-class Unknown(Exception):
-    pass
-
-
-def len1(a):
-    match a:
-        case ():
-            return 0
-        case "quote", s:
-            return len(s)
-        case "cons", x, s:
-            return 1 + len1(s)
-        case "cdr", s:
-            return max(len1(s) - 1, 0)
-    raise Unknown()
-
-
 def quote(a):
     match a:
         case str():
@@ -87,11 +70,6 @@ def simplify(a):
         case "map", ("lambda", (x,), y), s:
             if x == y:
                 return s
-        case "len", s:
-            try:
-                return len1(s)
-            except Unknown:
-                pass
 
     # are all the arguments constant?
     if not all(map(isConst, a[1:])):
