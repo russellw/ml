@@ -1,6 +1,23 @@
 import inspect
 
 
+def compose(a):
+    s = []
+
+    def rec(a):
+        match a:
+            case *_,:
+                s.append("(")
+                for b in a:
+                    rec(b)
+                s.append(")")
+            case _:
+                s.append(a)
+
+    rec(a)
+    return s
+
+
 def size(a):
     match a:
         case *_,:
@@ -53,5 +70,8 @@ if __name__ == "__main__":
     assert size(5) == 1
     assert size("abc") == 1
     assert size(["abc", "def"]) == 2
+
+    assert compose(3) == [3]
+    assert compose(("+", 3, "x")) == ["(", "+", 3, "x", ")"]
 
     print("ok")
