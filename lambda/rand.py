@@ -54,6 +54,7 @@ def trivial(a, xs):
     for x in xs:
         y = interpreter.eval1(a, x)
         ys.add(y)
+        # TODO: early check?
     return len(ys) == 1
 
 
@@ -74,5 +75,22 @@ if __name__ == "__main__":
             seen.add(a)
         except (IndexError, TypeError, ValueError, ZeroDivisionError):
             pass
+    print(len(seen))
 
+    seen = set()
+    for i in range(100000000):
+        if i % 100000 == 0:
+            print(i)
+        try:
+            a = expr(0, 5)
+            b = simplify(a)
+            xs = []
+            for i in range(20):
+                xs.append(tuple(randint(2) for j in range(10)))
+            consistent(a, b, xs)
+            if trivial(b, xs):
+                continue
+            seen.add(a)
+        except (IndexError, TypeError, ValueError, ZeroDivisionError):
+            pass
     print(len(seen))
