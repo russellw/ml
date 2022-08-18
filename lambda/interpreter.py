@@ -100,8 +100,6 @@ def ev(env, a):
     if isinstance(a, str):
         return env.get(a)
     match a:
-        case ():
-            return a
         case "quote", x:
             return x
         case "and", x, y:

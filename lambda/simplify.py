@@ -38,19 +38,16 @@ def unquote(a):
 
 
 def simplify(a):
-    # an atom is already in simplest form
-    if not isinstance(a, tuple) or not a:
-        return a
-
-    # special form whose arguments cannot be recursively simplified
+    # special case or recur
     match a:
         case "quote", x:
             return quote(x)
         case "lambda", params, body:
             return "lambda", params, simplify(body)
-
-    # recur on arguments
-    a = tuple(map(simplify, a))
+        case o, *_:
+            a = tuple(map(simplify, a))
+        case _:
+            return a
 
     # mathematical shortcuts
     match a:
