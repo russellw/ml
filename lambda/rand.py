@@ -61,7 +61,9 @@ if __name__ == "__main__":
     random.seed(0)
 
     seen = set()
-    for i in range(10000000):
+    for i in range(100000000):
+        if i % 100000 == 0:
+            print(i)
         try:
             a = expr(0, 5)
             b = simplify(a)
