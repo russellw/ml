@@ -61,6 +61,7 @@ def trivial(a, xs):
 if __name__ == "__main__":
     random.seed(0)
 
+    xs = range(10)
     seen = set()
     for i in range(100000000):
         if i % 100000 == 0:
@@ -68,7 +69,6 @@ if __name__ == "__main__":
         try:
             a = expr(0, 5)
             b = simplify(a)
-            xs = range(10)
             consistent(a, b, xs)
             if trivial(b, xs):
                 continue
@@ -77,6 +77,9 @@ if __name__ == "__main__":
             pass
     print(len(seen))
 
+    xs = []
+    for i in range(20):
+        xs.append(tuple(randint(2) for j in range(10)))
     seen = set()
     for i in range(100000000):
         if i % 100000 == 0:
@@ -84,9 +87,6 @@ if __name__ == "__main__":
         try:
             a = expr(0, 5)
             b = simplify(a)
-            xs = []
-            for i in range(20):
-                xs.append(tuple(randint(2) for j in range(10)))
             consistent(a, b, xs)
             if trivial(b, xs):
                 continue

@@ -47,6 +47,12 @@ class Closure:
         raise TypeError()
 
 
+def pow1(a, b):
+    if b > 1000:
+        raise ValueError()
+    return a**b
+
+
 ops = (
     ("!=", 2, operator.ne),
     ("%", 2, operator.mod),
@@ -76,7 +82,7 @@ ops = (
     ("neg", 1, operator.neg),
     ("not", 1, operator.not_),
     ("or", 2, None),
-    ("pow", 2, pow),
+    ("pow", 2, pow1),
     ("quote", 1, None),
     ("range", 2, range),
     ("round", 1, round),
