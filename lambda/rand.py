@@ -82,7 +82,7 @@ if __name__ == "__main__":
     if args.b:
         xs = []
         for i in range(10):
-            xs.append(tuple(randint(2) for j in range(10)))
+            xs.append(tuple(random.randrange(2) for j in range(10)))
 
     interval = args.c / 10
     seen = set()

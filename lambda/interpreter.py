@@ -99,8 +99,6 @@ for o, _, f in ops:
 def ev(env, a):
     if isinstance(a, str):
         return env.get(a)
-    if not isinstance(a, tuple):
-        return a
     match a:
         case ():
             return a
@@ -114,10 +112,11 @@ def ev(env, a):
             return ev(env, x) if ev(env, c) else ev(env, y)
         case "lambda", params, body:
             return Closure(env, params, body)
-    f, *s = a
-    f = ev(env, f)
-    s = [ev(env, a) for a in s]
-    return f(*s)
+        case f, *s:
+            f = ev(env, f)
+            s = [ev(env, a) for a in s]
+            return f(*s)
+    return a
 
 
 def eval1(a, x):
