@@ -1,6 +1,13 @@
 import inspect
 
 
+def size(a):
+    match a:
+        case *_,:
+            return sum(map(size, a))
+    return 1
+
+
 def isConcrete(a):
     match a:
         case float() | int() | str():
@@ -42,5 +49,9 @@ if __name__ == "__main__":
     assert isConcrete("a")
     assert isConcrete((1, 2, 3))
     assert not isConcrete((1, 2, len))
+
+    assert size(5) == 1
+    assert size("abc") == 1
+    assert size(["abc", "def"]) == 2
 
     print("ok")

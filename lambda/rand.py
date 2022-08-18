@@ -49,13 +49,13 @@ def consistent(a, b, xs):
 
 
 def trivial(a, xs):
-    if not isinstance(a, tuple):
-        return 1
     ys = set()
-    for x in xs:
-        y = interpreter.eval1(a, x)
-        ys.add(y)
-    return len(ys) == 1
+    match a:
+        case *_,:
+            for x in xs:
+                y = interpreter.eval1(a, x)
+                ys.add(y)
+    return len(ys) <= 1
 
 
 if __name__ == "__main__":
@@ -66,7 +66,11 @@ if __name__ == "__main__":
         help="expression args are bit strings instead of numbers",
     )
     parser.add_argument(
-        "-c", metavar="count", type=int, default=1000000, help="number of iterations"
+        "-c",
+        metavar="count",
+        type=int,
+        default=100,
+        help="number of iterations x 1,000",
     )
     parser.add_argument(
         "-d", metavar="depth", type=int, default=5, help="depth of expressions"
@@ -75,6 +79,7 @@ if __name__ == "__main__":
         "-s", metavar="seed", help="random seed, default is current time"
     )
     args = parser.parse_args()
+    args.c *= 1000
 
     random.seed(args.s)
 
@@ -99,3 +104,11 @@ if __name__ == "__main__":
         except (IndexError, TypeError, ValueError, ZeroDivisionError):
             pass
     print(len(seen))
+    n = 0
+    m = 0
+    for a in seen:
+        b = simplify(a)
+        n += size(a)
+        m += size(b)
+    print(n / len(seen))
+    print(m / len(seen))
