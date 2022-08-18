@@ -55,7 +55,6 @@ def trivial(a, xs):
     for x in xs:
         y = interpreter.eval1(a, x)
         ys.add(y)
-        # TODO: early check?
     return len(ys) == 1
 
 
