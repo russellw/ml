@@ -1,3 +1,4 @@
+import argparse
 import random
 
 from etc import *
@@ -59,33 +60,38 @@ def trivial(a, xs):
 
 
 if __name__ == "__main__":
-    random.seed(0)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-b",
+        action="store_true",
+        help="expression args are bit strings instead of numbers",
+    )
+    parser.add_argument(
+        "-c", metavar="count", type=int, default=1000000, help="number of iterations"
+    )
+    parser.add_argument(
+        "-d", metavar="depth", type=int, default=5, help="depth of expressions"
+    )
+    parser.add_argument(
+        "-s", metavar="seed", help="random seed, default is current time"
+    )
+    args = parser.parse_args()
+
+    random.seed(args.s)
 
     xs = range(10)
-    seen = set()
-    for i in range(100000000):
-        if i % 100000 == 0:
-            print(i)
-        try:
-            a = expr(0, 5)
-            b = simplify(a)
-            consistent(a, b, xs)
-            if trivial(b, xs):
-                continue
-            seen.add(a)
-        except (IndexError, TypeError, ValueError, ZeroDivisionError):
-            pass
-    print(len(seen))
+    if args.b:
+        xs = []
+        for i in range(10):
+            xs.append(tuple(randint(2) for j in range(10)))
 
-    xs = []
-    for i in range(20):
-        xs.append(tuple(randint(2) for j in range(10)))
+    interval = args.c / 10
     seen = set()
-    for i in range(100000000):
-        if i % 100000 == 0:
+    for i in range(args.c):
+        if i % interval == 0:
             print(i)
         try:
-            a = expr(0, 5)
+            a = expr(0, args.d)
             b = simplify(a)
             consistent(a, b, xs)
             if trivial(b, xs):
