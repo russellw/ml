@@ -1,3 +1,4 @@
+# TODO: reports loss 0 but accuracy < 1
 import random
 
 import torch
