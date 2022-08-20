@@ -3,50 +3,6 @@ import operator
 from etc import *
 
 
-class Env(dict):
-    def __init__(self, outer=None, params=(), args=()):
-        self.outer = outer
-        self.update(zip(params, args))
-
-    def count(self):
-        n = 0
-        env = self
-        while env:
-            n += len(env)
-            env = env.outer
-        return n
-
-    def get(self, k):
-        env = self
-        while env:
-            if k in env:
-                return env[k]
-            env = env.outer
-        raise ValueError(k)
-
-    def keys1(self):
-        s = set()
-        env = self
-        while env:
-            s.update(env.keys())
-            env = env.outer
-        return s
-
-
-class Closure:
-    def __init__(self, env, params, body):
-        self.env = env
-        self.params = params
-        self.body = body
-
-    def __call__(self, *args):
-        env = Env(self.env, self.params, args)
-        return ev(env, self.body)
-
-    def __eq__(self, other):
-        raise TypeError()
-
-
 def pow1(a, b):
     if b > 1000:
         raise ValueError()
@@ -91,37 +47,45 @@ ops = (
     ("zip", 2, lambda *s: tuple(zip(*s))),
 )
 
-genv = Env()
+genv = {}
 for o, _, f in ops:
     genv[o] = f
 
 
-def ev(env, a):
+def ev(a, env):
+    # global variable
     if isinstance(a, str):
-        return env.get(a)
+        return genv.get(a)
+
+    # atom
     if not isinstance(a, tuple) or not a:
         return a
+
+    # special form
     o = a[0]
     if o == "and":
-        return ev(env, a[1]) and ev(env, a[2])
+        return ev(a[1], env) and ev(a[2], env)
+    if o == "arg":
+        return env[a[1]]
     if o == "if":
-        return ev(env, a[2]) if ev(env, a[1]) else ev(env, a[3])
+        return ev(a[2], env) if ev(a[1], env) else ev(a[3], env)
     if o == "lambda":
-        return Closure(env, a[1], a[2])
+        body = a[1]
+        return lambda x: ev(body, (x,) + env)
     if o == "or":
-        return ev(env, a[1]) or ev(env, a[2])
+        return ev(a[1], env) or ev(a[2], env)
     if o == "quote":
         return a[1]
-    return ev(env, o)(*[ev(env, x) for x in a[1:]])
+
+    # function call
+    return ev(o, env)(*[ev(x, env) for x in a[1:]])
 
 
-def eval1(a, x):
-    env = Env(genv, ["x"], [x])
-    return ev(env, a)
-
-
-def test(a, y, x=None):
-    z = eval1(a, x)
+def test(a, x, y=None):
+    a = deBruijn(a, ("x",))
+    if y is None:
+        y, x = x, None
+    z = ev(a, (x,))
     if y != z:
         print(a)
         print(x)
@@ -134,7 +98,7 @@ if __name__ == "__main__":
     test(2, 2)
     test("x", 3, 3)
 
-    test(("+", "x", "x"), 6, 3)
+    test(("+", "x", "x"), 3, 6)
     test(("*", 8, 3), 24)
     test(("/", 3, 4), 0.75)
     test(("//", 8, 4), 2)
@@ -173,7 +137,7 @@ if __name__ == "__main__":
     test(("if", 0, 1, 2), 2)
 
     test((), ())
-    test(("len", "x"), 3, (1, 2, 3))
+    test(("len", "x"), (1, 2, 3), 3)
 
     s = "quote", (1, 2, 3)
     test(("getitem", s, 0), 1)
