@@ -11,10 +11,10 @@ for o, n, _ in interpreter.ops:
     arity[o] = n
 
 
-def expr(xdepth, depth):
+def expr(depth, xdepth=1):
     if not depth or not random.randrange(0, 16):
         s = [0, 1, (), "x"]
-        for i in range(xdepth):
+        for i in range(1, xdepth):
             s.append(f"x{i}")
         return random.choice(s)
     depth -= 1
@@ -24,11 +24,11 @@ def expr(xdepth, depth):
         params = []
         for i in range(n):
             params.append(f"x{xdepth+i}")
-        body = expr(xdepth + n, depth)
+        body = expr(depth, xdepth + n)
         return "lambda", tuple(params), body
     s = [o]
     for i in range(arity[o]):
-        s.append(expr(xdepth, depth))
+        s.append(expr(depth, xdepth))
     return tuple(s)
 
 
@@ -79,8 +79,8 @@ if __name__ == "__main__":
         if i % interval == 0:
             print(i)
         try:
-            a = expr(0, args.d)
-            a = deBruijn(a, ("x",))
+            a = expr(args.d)
+            a = deBruijn(a)
             if good(a, xs):
                 seen.add(a)
         except (IndexError, TypeError, ValueError, ZeroDivisionError):
