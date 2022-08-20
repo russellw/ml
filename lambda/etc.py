@@ -60,16 +60,22 @@ def dbg(a):
     print(f"{info.filename}:{info.function}:{info.lineno}: {repr(a)}")
 
 
+def bitLen(n):
+    assert n >= 0
+    bits = 0
+    while n:
+        n >>= 1
+        bits += 1
+    return bits
+
+
 def composeBits(a, vocab, bits=0):
     # symbol designating an integer
     int1 = len(vocab)
 
     # number of bits per word
     if not bits:
-        n = int1
-        while n:
-            n >>= 1
-            bits += 1
+        bits = bitLen(int1)
 
     # output numbers are limited to the range that fits in a word
     unsignedBits = bits - 1
@@ -127,6 +133,10 @@ if __name__ == "__main__":
         "lambda",
         ("lambda", ("+", ("arg", 2), ("*", ("arg", 1), ("arg", 0)))),
     )
+
+    assert bitLen(1) == 1
+    assert bitLen(2) == 2
+    assert bitLen(3) == 2
 
     assert composeBits(3, (), 4) == [0, 0, 0, 0, 0, 0, 1, 1]
     assert composeBits(7, (), 4) == [0, 0, 0, 0, 0, 1, 1, 1]
