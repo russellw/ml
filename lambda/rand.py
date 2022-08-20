@@ -32,27 +32,10 @@ def expr(xdepth, depth):
     return tuple(s)
 
 
-def consistent(a, b, xs):
-    for x in xs:
-        y = interpreter.eval1(a, x)
-        z = interpreter.eval1(b, x)
-        if not isConcrete(y) and not isConcrete(z):
-            raise TypeError()
-        if y != z:
-            print(a)
-            print(b)
-            print(x)
-            print(y)
-            print(z)
-        assert y == z
-
-
 def trivial(a, xs):
-    if not isinstance(a, tuple):
-        return 1
     ys = set()
     for x in xs:
-        y = interpreter.eval1(a, x)
+        y = interpreter.ev(a, (x,))
         ys.add(y)
     return len(ys) == 1
 
@@ -95,19 +78,13 @@ if __name__ == "__main__":
             print(i)
         try:
             a = expr(0, args.d)
-            b = simplify(a)
-            consistent(a, b, xs)
-            if trivial(b, xs):
+            if trivial(a, xs):
                 continue
             seen.add(a)
         except (IndexError, TypeError, ValueError, ZeroDivisionError):
             pass
     print(len(seen))
     n = 0
-    m = 0
     for a in seen:
-        b = simplify(a)
         n += size(a)
-        m += size(b)
     print(n / len(seen))
-    print(m / len(seen))
