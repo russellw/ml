@@ -60,6 +60,54 @@ def dbg(a):
     print(f"{info.filename}:{info.function}:{info.lineno}: {repr(a)}")
 
 
+def toBits(a, vocab, bits=0):
+    # symbol designating an integer
+    int1 = len(vocab)
+
+    # number of bits per word
+    if not bits:
+        n = int1
+        while n:
+            n >>= 1
+            bits += 1
+
+    # output numbers are limited to the range that fits in a word
+    unsignedBits = bits - 1
+    max1 = (1 << unsignedBits) - 1
+
+    # twos complement
+    min1 = -max1 - 1
+
+    # output bit stream
+    s = []
+
+    # write one word as bits
+    def write(n):
+        t = []
+        for i in range(bits):
+            t.append(n & 1)
+            n >>= 1
+
+        # big endian for easier debugging
+        s.extend(reversed(t))
+
+    # tokenize and write words
+    for a in compose(a):
+        if isinstance(a, str):
+            write(vocab.index(a))
+            continue
+        if isinstance(a, int):
+            write(int1)
+            a = max(a, min1)
+            a = min(a, max1)
+            write(a)
+            continue
+        raise ValueError(a)
+
+    assert len(s) % bits == 0
+    return s
+
+
 if __name__ == "__main__":
     assert isConcrete(1)
     assert isConcrete(True)
@@ -79,5 +127,13 @@ if __name__ == "__main__":
         "lambda",
         ("lambda", ("+", ("arg", 2), ("*", ("arg", 1), ("arg", 0)))),
     )
+
+    assert toBits(3, (), 4) == [0, 0, 0, 0, 0, 0, 1, 1]
+    assert toBits(7, (), 4) == [0, 0, 0, 0, 0, 1, 1, 1]
+    assert toBits(8, (), 4) == [0, 0, 0, 0, 0, 1, 1, 1]
+    assert toBits(-1, (), 4) == [0, 0, 0, 0, 1, 1, 1, 1]
+    assert toBits(-8, (), 4) == [0, 0, 0, 0, 1, 0, 0, 0]
+    assert toBits(-9, (), 4) == [0, 0, 0, 0, 1, 0, 0, 0]
+    assert toBits(3, ("a", "b"), 4) == [0, 0, 1, 0, 0, 0, 1, 1]
 
     print("ok")
