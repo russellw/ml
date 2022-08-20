@@ -55,7 +55,7 @@ for o, _, f in ops:
 def ev(a, env):
     # global variable
     if isinstance(a, str):
-        return genv.get(a)
+        return genv[a]
 
     # atom
     if not isinstance(a, tuple) or not a:

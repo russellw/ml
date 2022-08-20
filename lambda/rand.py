@@ -78,6 +78,7 @@ if __name__ == "__main__":
             print(i)
         try:
             a = expr(0, args.d)
+            a = deBruijn(a, ("x",))
             if trivial(a, xs):
                 continue
             seen.add(a)
