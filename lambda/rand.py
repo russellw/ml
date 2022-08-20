@@ -32,12 +32,14 @@ def expr(xdepth, depth):
     return tuple(s)
 
 
-def trivial(a, xs):
+def good(a, xs):
     ys = set()
     for x in xs:
         y = interpreter.ev(a, (x,))
+        if not isConcrete(y):
+            return
         ys.add(y)
-    return len(ys) == 1
+    return len(ys) > 1
 
 
 if __name__ == "__main__":
@@ -79,9 +81,8 @@ if __name__ == "__main__":
         try:
             a = expr(0, args.d)
             a = deBruijn(a, ("x",))
-            if trivial(a, xs):
-                continue
-            seen.add(a)
+            if good(a, xs):
+                seen.add(a)
         except (IndexError, TypeError, ValueError, ZeroDivisionError):
             pass
     print(len(seen))

@@ -1,6 +1,16 @@
 import inspect
 
 
+def isConcrete(a):
+    if isinstance(a, int) or isinstance(a, str):
+        return 1
+    if not isinstance(a, tuple):
+        return
+    if len(a) >= 1000000:
+        return
+    return all(map(isConcrete, a))
+
+
 def compose(a):
     s = []
 
@@ -51,6 +61,12 @@ def dbg(a):
 
 
 if __name__ == "__main__":
+    assert isConcrete(1)
+    assert isConcrete(True)
+    assert isConcrete("a")
+    assert isConcrete((1, 2, 3))
+    assert not isConcrete((1, 2, len))
+
     assert size(5) == 1
     assert size("abc") == 1
     assert size(("abc", "def")) == 2
