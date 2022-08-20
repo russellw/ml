@@ -2,7 +2,6 @@ import argparse
 import random
 
 from etc import *
-from simplify import simplify
 import interpreter
 
 ops = []
@@ -49,13 +48,13 @@ def consistent(a, b, xs):
 
 
 def trivial(a, xs):
+    if not isinstance(a, tuple):
+        return 1
     ys = set()
-    match a:
-        case *_,:
-            for x in xs:
-                y = interpreter.eval1(a, x)
-                ys.add(y)
-    return len(ys) <= 1
+    for x in xs:
+        y = interpreter.eval1(a, x)
+        ys.add(y)
+    return len(ys) == 1
 
 
 if __name__ == "__main__":

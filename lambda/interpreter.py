@@ -50,7 +50,7 @@ class Closure:
 def pow1(a, b):
     if b > 1000:
         raise ValueError()
-    return a**b
+    return a ** b
 
 
 ops = (
@@ -99,22 +99,20 @@ for o, _, f in ops:
 def ev(env, a):
     if isinstance(a, str):
         return env.get(a)
-    match a:
-        case "quote", x:
-            return x
-        case "and", x, y:
-            return ev(env, x) and ev(env, y)
-        case "or", x, y:
-            return ev(env, x) or ev(env, y)
-        case "if", c, x, y:
-            return ev(env, x) if ev(env, c) else ev(env, y)
-        case "lambda", params, body:
-            return Closure(env, params, body)
-        case f, *s:
-            f = ev(env, f)
-            s = [ev(env, a) for a in s]
-            return f(*s)
-    return a
+    if not isinstance(a, tuple) or not a:
+        return a
+    o = a[0]
+    if o == "and":
+        return ev(env, a[1]) and ev(env, a[2])
+    if o == "if":
+        return ev(env, a[2]) if ev(env, a[1]) else ev(env, a[3])
+    if o == "lambda":
+        return Closure(env, a[1], a[2])
+    if o == "or":
+        return ev(env, a[1]) or ev(env, a[2])
+    if o == "quote":
+        return a[1]
+    return ev(env, o)(*[ev(env, x) for x in a[1:]])
 
 
 def eval1(a, x):
