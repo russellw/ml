@@ -60,6 +60,10 @@ def dbg(a):
     print(f"{info.filename}:{info.function}:{info.lineno}: {repr(a)}")
 
 
+def fixLen(s, n):
+    return s[:n] + [0] * (n - len(s))
+
+
 def bitLen(n):
     assert n >= 0
     bits = 0
@@ -145,5 +149,8 @@ if __name__ == "__main__":
     assert composeBits(-8, (), 4) == [0, 0, 0, 0, 1, 0, 0, 0]
     assert composeBits(-9, (), 4) == [0, 0, 0, 0, 1, 0, 0, 0]
     assert composeBits(3, ("a", "b"), 4) == [0, 0, 1, 0, 0, 0, 1, 1]
+
+    assert fixLen([1, 2, 3], 5) == [1, 2, 3, 0, 0]
+    assert fixLen([1, 2, 3], 2) == [1, 2]
 
     print("ok")
