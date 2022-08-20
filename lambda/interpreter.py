@@ -71,34 +71,34 @@ def ev(a, env):
         return ev(a[2], env) if ev(a[1], env) else ev(a[3], env)
     if o == "lambda":
         body = a[1]
-        return lambda x: ev(body, (x,) + env)
+        return lambda b: ev(body, (b,) + env)
     if o == "or":
         return ev(a[1], env) or ev(a[2], env)
     if o == "quote":
         return a[1]
 
     # function call
-    return ev(o, env)(*[ev(x, env) for x in a[1:]])
+    return ev(o, env)(*[ev(b, env) for b in a[1:]])
 
 
-def test(a, x, y=None):
-    a = deBruijn(a, ("x",))
-    if y is None:
-        y, x = x, None
-    z = ev(a, (x,))
-    if y != z:
+def test(a, x0, y0=None):
+    a = deBruijn(a)
+    if y0 is None:
+        y0, x0 = x0, None
+    y1 = ev(a, (x0,))
+    if y0 != y1:
         print(a)
-        print(x)
-        print(y)
-        print(z)
-    assert y == z
+        print(x0)
+        print(y0)
+        print(y1)
+    assert y0 == y1
 
 
 if __name__ == "__main__":
     test(2, 2)
-    test("x", 3, 3)
+    test("x0", 3, 3)
 
-    test(("+", "x", "x"), 3, 6)
+    test(("+", "x0", "x0"), 3, 6)
     test(("*", 8, 3), 24)
     test(("/", 3, 4), 0.75)
     test(("//", 8, 4), 2)
@@ -137,7 +137,7 @@ if __name__ == "__main__":
     test(("if", 0, 1, 2), 2)
 
     test((), ())
-    test(("len", "x"), (1, 2, 3), 3)
+    test(("len", "x0"), (1, 2, 3), 3)
 
     s = "quote", (1, 2, 3)
     test(("getitem", s, 0), 1)

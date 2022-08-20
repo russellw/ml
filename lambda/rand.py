@@ -13,8 +13,8 @@ for o, n, _ in interpreter.ops:
 
 def expr(depth, xdepth=1):
     if not depth or not random.randrange(0, 16):
-        s = [0, 1, (), "x"]
-        for i in range(1, xdepth):
+        s = [0, 1, ()]
+        for i in range(xdepth):
             s.append(f"x{i}")
         return random.choice(s)
     depth -= 1
@@ -34,11 +34,11 @@ def expr(depth, xdepth=1):
 
 def good(a, xs):
     ys = set()
-    for x in xs:
-        y = interpreter.ev(a, (x,))
-        if not isConcrete(y):
+    for x0 in xs:
+        y0 = interpreter.ev(a, (x0,))
+        if not isConcrete(y0):
             return
-        ys.add(y)
+        ys.add(y0)
     return len(ys) > 1
 
 

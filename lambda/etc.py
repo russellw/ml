@@ -33,7 +33,7 @@ def size(a):
     return sum(map(size, a))
 
 
-def deBruijn(a, env=("x",)):
+def deBruijn(a, env=("x0",)):
     # local variable
     if a in env:
         return "arg", env.index(a)
@@ -52,7 +52,7 @@ def deBruijn(a, env=("x",)):
         return a
 
     # function call or other special form
-    return tuple(deBruijn(x, env) for x in a)
+    return tuple(deBruijn(b, env) for b in a)
 
 
 def dbg(a):
@@ -120,10 +120,10 @@ if __name__ == "__main__":
     assert size(("abc", "def")) == 2
 
     assert compose(3) == [3]
-    assert compose(("+", 3, "x")) == ["(", "+", 3, "x", ")"]
+    assert compose(("+", 3, "x0")) == ["(", "+", 3, "x0", ")"]
 
-    assert deBruijn(("+", 3, "x")) == ("+", 3, ("arg", 0))
-    assert deBruijn(("lambda", ("x0", "x1"), ("+", "x", ("*", "x0", "x1")))) == (
+    assert deBruijn(("+", 3, "x0")) == ("+", 3, ("arg", 0))
+    assert deBruijn(("lambda", ("x1", "x2"), ("+", "x0", ("*", "x1", "x2")))) == (
         "lambda",
         ("lambda", ("+", ("arg", 2), ("*", ("arg", 1), ("arg", 0)))),
     )

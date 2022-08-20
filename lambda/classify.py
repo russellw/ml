@@ -43,13 +43,13 @@ def rands(n):
 
 class Dataset1(Dataset):
     def __init__(self, n):
-        self.w = rands(n)
+        self.s = rands(n)
 
     def __len__(self):
-        return len(self.w)
+        return len(self.s)
 
     def __getitem__(self, i):
-        return self.w[i]
+        return self.s[i]
 
 
 batch_size = 64
