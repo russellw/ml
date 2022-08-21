@@ -16,10 +16,14 @@ size = 5 * bitLen(len(vocab))
 
 
 def rands(n):
+    seen = set()
     pos = []
     neg = []
     while len(pos) < n / 2 or len(neg) < n / 2:
         a = rand.expr(5)
+        if a in seen:
+            continue
+        seen.add(a)
         a = deBruijn(a)
 
         try:
@@ -64,16 +68,12 @@ train_dl = DataLoader(train_ds, batch_size=batch_size)
 test_dl = DataLoader(test_ds, batch_size=batch_size)
 
 for x, y in train_dl:
-    print(x)
     print(x.shape)
-    print(x.dtype)
-    print(y)
     print(y.shape)
-    print(y.dtype)
     break
 
 hidden_size = 100
-epochs = 1000
+epochs = 200
 
 
 class Net(nn.Module):
@@ -111,6 +111,7 @@ def accuracy(model, ds):
     return n / len(ds)
 
 
+interval = epochs // 10
 for epoch in range(epochs):
     for bi, (x, y) in enumerate(train_dl):
         x = x.to(device)
@@ -122,7 +123,7 @@ for epoch in range(epochs):
         loss.backward()
         optimizer.step()
 
-        if epoch % (epochs / 20) == 0 and not bi:
+        if epoch % interval == 0 and not bi:
             print(
                 "%f\t%f\t%f"
                 % (loss, accuracy(model, train_ds), accuracy(model, test_ds))

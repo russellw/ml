@@ -81,6 +81,16 @@ def ev(a, env):
     return ev(o, env)(*[ev(b, env) for b in a[1:]])
 
 
+def good(a, x0s):
+    y0s = set()
+    for x0 in x0s:
+        y0 = ev(a, (x0,))
+        if not isConcrete(y0):
+            return
+        y0s.add(y0)
+    return len(y0s) > 1
+
+
 def test(a, x0, y0=None):
     a = deBruijn(a)
     if y0 is None:

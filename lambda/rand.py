@@ -32,16 +32,6 @@ def expr(depth, xdepth=1):
     return tuple(s)
 
 
-def good(a, xs):
-    ys = set()
-    for x0 in xs:
-        y0 = interpreter.ev(a, (x0,))
-        if not isConcrete(y0):
-            return
-        ys.add(y0)
-    return len(ys) > 1
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -67,13 +57,13 @@ if __name__ == "__main__":
 
     random.seed(args.s)
 
-    xs = range(10)
+    x0s = range(10)
     if args.b:
-        xs = []
+        x0s = []
         for i in range(10):
-            xs.append(tuple(random.randrange(2) for j in range(10)))
+            x0s.append(tuple(random.randrange(2) for j in range(10)))
 
-    interval = args.c / 10
+    interval = args.c // 10
     seen = set()
     for i in range(args.c):
         if i % interval == 0:
@@ -81,7 +71,7 @@ if __name__ == "__main__":
         try:
             a = expr(args.d)
             a = deBruijn(a)
-            if good(a, xs):
+            if interpreter.good(a, x0s):
                 seen.add(a)
         except (IndexError, TypeError, ValueError, ZeroDivisionError):
             pass
