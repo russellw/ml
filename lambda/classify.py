@@ -73,7 +73,7 @@ for x, y in train_dl:
     break
 
 hidden_size = 100
-epochs = 200
+epochs = 10000
 
 
 class Net(nn.Module):
