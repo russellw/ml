@@ -9,37 +9,39 @@ from etc import *
 import interpreter
 import rand
 
-size = 5
+vocab = ["(", ")", "arg"]
+for o, _, _ in interpreter.ops:
+    vocab.append(o)
+assert bitLen(len(vocab)) == 6
+
+size = 30
 
 
-def good(v):
-    return statistics.fmean(v) > 0.5
-
-
-def rand():
-    v = []
-    while len(v) < size:
-        v.append(random.uniform(0.0, 1.0))
-    return v
+def result(x):
+    return statistics.fmean(x) > 0.2
 
 
 def rands(n):
     pos = []
     neg = []
     while len(pos) < n / 2 or len(neg) < n / 2:
-        v = rand()
-        y = good(v)
+        a = rand.expr(5)
+        a = deBruijn(a)
+        x = composeBits(a, vocab)
+        x = fixLen(x, size)
+        x = list(map(float, x))
+        y = result(x)
         if y:
-            w = pos
+            s = pos
         else:
-            w = neg
-        if len(w) < n / 2:
-            v = torch.as_tensor(v)
+            s = neg
+        if len(s) < n / 2:
+            x = torch.as_tensor(x)
             y = torch.as_tensor([float(y)])
-            w.append((v, y))
-    w = pos + neg
-    random.shuffle(w)
-    return w
+            s.append((x, y))
+    s = pos + neg
+    random.shuffle(s)
+    return s
 
 
 class Dataset1(Dataset):
@@ -53,7 +55,7 @@ class Dataset1(Dataset):
         return self.s[i]
 
 
-batch_size = 64
+batch_size = 20
 
 train_ds = Dataset1(800)
 test_ds = Dataset1(200)
