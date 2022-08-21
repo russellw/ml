@@ -1,4 +1,3 @@
-import statistics
 import random
 
 import torch
@@ -12,13 +11,8 @@ import rand
 vocab = ["(", ")", "arg"]
 for o, _, _ in interpreter.ops:
     vocab.append(o)
-assert bitLen(len(vocab)) == 6
 
-size = 30
-
-
-def result(x):
-    return statistics.fmean(x) > 0.2
+size = 5 * bitLen(len(vocab))
 
 
 def rands(n):
@@ -27,10 +21,16 @@ def rands(n):
     while len(pos) < n / 2 or len(neg) < n / 2:
         a = rand.expr(5)
         a = deBruijn(a)
+
+        try:
+            y = bool(interpreter.ev(a, (0,)))
+        except (IndexError, TypeError, ValueError, ZeroDivisionError):
+            continue
+
         x = composeBits(a, vocab)
         x = fixLen(x, size)
         x = list(map(float, x))
-        y = result(x)
+
         if y:
             s = pos
         else:
