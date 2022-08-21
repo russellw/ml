@@ -13,6 +13,7 @@ for o, _, _ in interpreter.ops:
     vocab.append(o)
 
 size = 5 * bitLen(len(vocab))
+x0s = range(10)
 
 
 class Dataset1(Dataset):
@@ -28,7 +29,9 @@ class Dataset1(Dataset):
             a = deBruijn(a)
 
             try:
-                y = bool(interpreter.ev(a, (0,)))
+                if not interpreter.good(a, x0s):
+                    continue
+                y = bool(interpreter.ev(a, (x0s[0],)))
             except (IndexError, TypeError, ValueError, ZeroDivisionError):
                 continue
 
@@ -44,6 +47,7 @@ class Dataset1(Dataset):
                 x = torch.as_tensor(x)
                 y = torch.as_tensor([float(y)])
                 s.append((x, y))
+        print(len(seen))
         s = pos + neg
         random.shuffle(s)
         self.s = s
