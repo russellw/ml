@@ -15,42 +15,38 @@ for o, _, _ in interpreter.ops:
 size = 5 * bitLen(len(vocab))
 
 
-def rands(n):
-    seen = set()
-    pos = []
-    neg = []
-    while len(pos) < n / 2 or len(neg) < n / 2:
-        a = rand.expr(5)
-        if a in seen:
-            continue
-        seen.add(a)
-        a = deBruijn(a)
-
-        try:
-            y = bool(interpreter.ev(a, (0,)))
-        except (IndexError, TypeError, ValueError, ZeroDivisionError):
-            continue
-
-        x = composeBits(a, vocab)
-        x = fixLen(x, size)
-        x = list(map(float, x))
-
-        if y:
-            s = pos
-        else:
-            s = neg
-        if len(s) < n / 2:
-            x = torch.as_tensor(x)
-            y = torch.as_tensor([float(y)])
-            s.append((x, y))
-    s = pos + neg
-    random.shuffle(s)
-    return s
-
-
 class Dataset1(Dataset):
     def __init__(self, n):
-        self.s = rands(n)
+        seen = set()
+        pos = []
+        neg = []
+        while len(pos) < n / 2 or len(neg) < n / 2:
+            a = rand.expr(5)
+            if a in seen:
+                continue
+            seen.add(a)
+            a = deBruijn(a)
+
+            try:
+                y = bool(interpreter.ev(a, (0,)))
+            except (IndexError, TypeError, ValueError, ZeroDivisionError):
+                continue
+
+            x = composeBits(a, vocab)
+            x = fixLen(x, size)
+            x = list(map(float, x))
+
+            if y:
+                s = pos
+            else:
+                s = neg
+            if len(s) < n / 2:
+                x = torch.as_tensor(x)
+                y = torch.as_tensor([float(y)])
+                s.append((x, y))
+        s = pos + neg
+        random.shuffle(s)
+        self.s = s
 
     def __len__(self):
         return len(self.s)
