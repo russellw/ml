@@ -44,7 +44,7 @@ def mul():
 def div():
     y = stack.pop()
     x = stack.pop()
-    stack.append(x * y)
+    stack.append(x / y)
 
 
 def floordiv():
