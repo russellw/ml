@@ -35,7 +35,7 @@ def bitLen(n):
     return bits
 
 
-def composeBits(a, vocab, bits=0):
+def toBits(s, vocab, bits=0):
     # symbol designating an integer
     int1 = len(vocab)
 
@@ -51,7 +51,7 @@ def composeBits(a, vocab, bits=0):
     min1 = -max1 - 1
 
     # output bit stream
-    s = []
+    r = []
 
     # write one word as bits
     def write(n):
@@ -61,10 +61,10 @@ def composeBits(a, vocab, bits=0):
             n >>= 1
 
         # big endian for easier debugging
-        s.extend(reversed(t))
+        r.extend(reversed(t))
 
     # tokenize and write words
-    for a in compose(a):
+    for a in s:
         if isinstance(a, str):
             write(vocab.index(a))
             continue
@@ -76,8 +76,8 @@ def composeBits(a, vocab, bits=0):
             continue
         raise ValueError(a)
 
-    assert len(s) % bits == 0
-    return s
+    assert len(r) % bits == 0
+    return r
 
 
 if __name__ == "__main__":
@@ -88,13 +88,13 @@ if __name__ == "__main__":
     assert bitLen(2) == 2
     assert bitLen(3) == 2
 
-    assert composeBits(3, (), 4) == [0, 0, 0, 0, 0, 0, 1, 1]
-    assert composeBits(7, (), 4) == [0, 0, 0, 0, 0, 1, 1, 1]
-    assert composeBits(8, (), 4) == [0, 0, 0, 0, 0, 1, 1, 1]
-    assert composeBits(-1, (), 4) == [0, 0, 0, 0, 1, 1, 1, 1]
-    assert composeBits(-8, (), 4) == [0, 0, 0, 0, 1, 0, 0, 0]
-    assert composeBits(-9, (), 4) == [0, 0, 0, 0, 1, 0, 0, 0]
-    assert composeBits(3, ("a", "b"), 4) == [0, 0, 1, 0, 0, 0, 1, 1]
+    assert toBits(3, (), 4) == [0, 0, 0, 0, 0, 0, 1, 1]
+    assert toBits(7, (), 4) == [0, 0, 0, 0, 0, 1, 1, 1]
+    assert toBits(8, (), 4) == [0, 0, 0, 0, 0, 1, 1, 1]
+    assert toBits(-1, (), 4) == [0, 0, 0, 0, 1, 1, 1, 1]
+    assert toBits(-8, (), 4) == [0, 0, 0, 0, 1, 0, 0, 0]
+    assert toBits(-9, (), 4) == [0, 0, 0, 0, 1, 0, 0, 0]
+    assert toBits(3, ("a", "b"), 4) == [0, 0, 1, 0, 0, 0, 1, 1]
 
     assert fixLen([1, 2, 3], 5) == [1, 2, 3, 0, 0]
     assert fixLen([1, 2, 3], 2) == [1, 2]

@@ -27,7 +27,7 @@ class Dataset1(Dataset):
             except (IndexError, TypeError, ValueError, ZeroDivisionError):
                 continue
 
-            x = composeBits(f, rand.vocab)
+            x = toBits(f, rand.vocab)
             x = fixLen(x, maxBits)
             x = list(map(float, x))
 
