@@ -49,7 +49,8 @@ if __name__ == "__main__":
             print(i)
         try:
             f = mk(args.m, args.n)
-            fs.append(f)
+            if interpreter.good(f, xs):
+                fs.append(f)
         except (IndexError, TypeError, ValueError, ZeroDivisionError):
             pass
     print(len(fs))
