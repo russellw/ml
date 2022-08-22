@@ -126,7 +126,7 @@ def good(f, xs):
     # and it is nontrivial i.e. does not return the same value for every input
     ys = set()
     for x in xs:
-        y = run(f, (x,))
+        y = run(f, x)
         ys.add(y)
     return len(ys) > 1
 
