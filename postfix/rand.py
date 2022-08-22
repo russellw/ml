@@ -15,18 +15,16 @@ def mk(m, n):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-b",
-        action="store_true",
-        help="args are bit strings instead of numbers",
+        "-b", action="store_true", help="args are bit strings instead of numbers"
     )
     parser.add_argument(
         "-c",
         metavar="count",
         type=int,
-        default=100,
+        default=1000,
         help="number of iterations x 1,000",
     )
-    parser.add_argument("-m", type=int, default=1, help="min length")
+    parser.add_argument("-m", type=int, default=2, help="min length")
     parser.add_argument("-n", type=int, default=10, help="max length")
     parser.add_argument(
         "-s", metavar="seed", help="random seed, default is current time"
