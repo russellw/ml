@@ -7,6 +7,14 @@ def sub():
     stack.append(a - b)
 
 
+def pow1():
+    b = stack.pop()
+    if b > 1000:
+        raise ValueError()
+    a = stack.pop()
+    stack.append(a ** b)
+
+
 def mul():
     b = stack.pop()
     a = stack.pop()
@@ -90,6 +98,7 @@ def swap():
 
 ops = {
     "%": mod,
+    "pow": pow1,
     "*": mul,
     "+": add,
     "-": sub,
