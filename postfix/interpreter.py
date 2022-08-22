@@ -121,6 +121,9 @@ def run(f, x):
 
 
 def good(f, xs):
+    # a program is considered good for a set of inputs,
+    # if it handles all the inputs without crashing,
+    # and it is nontrivial i.e. does not return the same value for every input
     ys = set()
     for x in xs:
         y = run(f, (x,))
@@ -134,6 +137,12 @@ def test(f, x, y):
 
 if __name__ == "__main__":
     test(("not",), 1, 0)
+    test(("dup", "not"), 1, 0)
     test(("one", "one", "+"), 0, 2)
     test(("zero", "one", "-"), 0, -1)
+
+    xs = range(10)
+    assert good(("dup",), xs)
+    assert good(("dup", "not"), xs)
+
     print("ok")
