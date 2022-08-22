@@ -64,8 +64,7 @@ def le():
 
 
 def not1():
-    a = stack.pop()
-    stack.append(not a)
+    stack[-1] = not stack[-1]
 
 
 def and1():
@@ -80,15 +79,6 @@ def or1():
     stack.append(a or b)
 
 
-def dup():
-    a = stack[-1]
-    stack.append(a)
-
-
-def pop():
-    stack.pop()
-
-
 def swap():
     b = stack.pop()
     a = stack.pop()
@@ -98,7 +88,6 @@ def swap():
 
 ops = {
     "%": mod,
-    "pow": pow1,
     "*": mul,
     "+": add,
     "-": sub,
@@ -108,20 +97,20 @@ ops = {
     "<=": le,
     "=": eq,
     "and": and1,
-    "dup": dup,
+    "dup": lambda: stack.append(stack[-1]),
     "not": not1,
+    "one": lambda: stack.append(1),
     "or": or1,
-    "pop": pop,
+    "pop": lambda: stack.pop(),
+    "pow": pow1,
     "swap": swap,
+    "zero": lambda: stack.append(0),
 }
 
 
 def call(f):
     for a in f:
-        if type(a) is str:
-            ops[a]()
-            continue
-        stack.append(a)
+        ops[a]()
 
 
 def run(f, x):
@@ -145,6 +134,6 @@ def test(f, x, y):
 
 if __name__ == "__main__":
     test(("not",), 1, 0)
-    test((1, 2, "+"), 0, 3)
-    test((1, 2, "-"), 0, -1)
+    test(("one", "one", "+"), 0, 2)
+    test(("zero", "one", "-"), 0, -1)
     print("ok")

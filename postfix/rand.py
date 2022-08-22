@@ -4,7 +4,7 @@ import random
 from etc import *
 import interpreter
 
-vocab = tuple(interpreter.ops.keys()) + (0, 1)
+vocab = tuple(interpreter.ops.keys())
 
 
 def mk(m, n):
