@@ -131,28 +131,20 @@ def run(f, x):
     return stack[-1]
 
 
+def good(f, xs):
+    ys = set()
+    for x in xs:
+        y = run(f, (x,))
+        ys.add(y)
+    return len(ys) > 1
+
+
 def test(f, x, y):
     assert run(f, x) == y
 
 
 if __name__ == "__main__":
     test(("not",), 1, 0)
-    test(
-        (
-            1,
-            2,
-            "+",
-        ),
-        0,
-        3,
-    )
-    test(
-        (
-            1,
-            2,
-            "-",
-        ),
-        0,
-        -1,
-    )
+    test((1, 2, "+"), 0, 3)
+    test((1, 2, "-"), 0, -1)
     print("ok")
