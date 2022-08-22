@@ -12,20 +12,18 @@ vocab = ["(", ")", "arg"]
 for o, _, _ in interpreter.ops:
     vocab.append(o)
 
-size = 5 * bitLen(len(vocab))
+size = 40 * bitLen(len(vocab))
 x0s = range(10)
 
 
 class Dataset1(Dataset):
     def __init__(self, n):
-        seen = set()
         pos = []
         neg = []
         while len(pos) < n / 2 or len(neg) < n / 2:
             a = rand.expr(5)
-            if a in seen:
+            if atomCount(a) < 5:
                 continue
-            seen.add(a)
             a = deBruijn(a)
 
             try:
@@ -47,7 +45,6 @@ class Dataset1(Dataset):
                 x = torch.as_tensor(x)
                 y = torch.as_tensor([float(y)])
                 s.append((x, y))
-        print(len(seen))
         s = pos + neg
         random.shuffle(s)
         self.s = s
@@ -61,8 +58,8 @@ class Dataset1(Dataset):
 
 batch_size = 20
 
-train_ds = Dataset1(800)
-test_ds = Dataset1(200)
+train_ds = Dataset1(80000)
+test_ds = Dataset1(20000)
 
 train_dl = DataLoader(train_ds, batch_size=batch_size)
 test_dl = DataLoader(test_ds, batch_size=batch_size)
@@ -112,7 +109,7 @@ def accuracy(model, ds):
 
 
 interval = epochs // 10
-for epoch in range(epochs):
+for epoch in range(epochs + 1):
     for bi, (x, y) in enumerate(train_dl):
         x = x.to(device)
         y = y.to(device)
@@ -125,6 +122,5 @@ for epoch in range(epochs):
 
         if epoch % interval == 0 and not bi:
             print(
-                "%f\t%f\t%f"
-                % (loss, accuracy(model, train_ds), accuracy(model, test_ds))
+                f"{epoch}\t{loss}\t{accuracy(model, train_ds)}\t{accuracy(model, test_ds)}"
             )

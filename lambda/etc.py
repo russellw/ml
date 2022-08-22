@@ -27,10 +27,10 @@ def compose(a):
     return s
 
 
-def size(a):
+def atomCount(a):
     if not isinstance(a, tuple):
         return 1
-    return sum(map(size, a))
+    return sum(map(atomCount, a))
 
 
 def deBruijn(a, env=("x0",)):
@@ -125,9 +125,9 @@ if __name__ == "__main__":
     assert isConcrete((1, 2, 3))
     assert not isConcrete((1, 2, len))
 
-    assert size(5) == 1
-    assert size("abc") == 1
-    assert size(("abc", "def")) == 2
+    assert atomCount(5) == 1
+    assert atomCount("abc") == 1
+    assert atomCount(("abc", "def")) == 2
 
     assert compose(3) == [3]
     assert compose(("+", 3, "x0")) == ["(", "+", 3, "x0", ")"]
