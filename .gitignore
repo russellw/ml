@@ -9,6 +9,8 @@ data/
 obj/
 bin/
 *.class
+*.csv
+*.dot
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

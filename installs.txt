@@ -4,8 +4,8 @@ conda install scikit-learn
 conda install scikit-optimize
 conda install -c pytorch torchtext
 conda install spacy
-
 conda install gym
+conda install pydot
 
 https://stackoverflow.com/questions/61296202/install-pygame-with-anaconda
 pip install pygame
