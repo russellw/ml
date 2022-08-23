@@ -24,7 +24,13 @@ class Dataset1(Dataset):
                 if not interpreter.good(f, xs1):
                     continue
                 y = bool(interpreter.run(f, xs1[1]))
-            except (IndexError, TypeError, ValueError, ZeroDivisionError):
+            except (
+                IndexError,
+                OverflowError,
+                TypeError,
+                ValueError,
+                ZeroDivisionError,
+            ):
                 continue
 
             x = toBits(f, rand.vocab)
@@ -50,7 +56,7 @@ class Dataset1(Dataset):
         return self.s[i]
 
 
-ds = 1000
+ds = 10000
 trainDs = Dataset1(ds * 10 // 8)
 testDs = Dataset1(ds * 10 // 2)
 
