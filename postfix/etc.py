@@ -23,7 +23,7 @@ def dbg(a):
 
 
 def fixLen(s, n):
-    return s[:n] + [0] * (n - len(s))
+    return s[:n] + (0,) * (n - len(s))
 
 
 def bitLen(n):
@@ -77,7 +77,7 @@ def toBits(s, vocab, bits=0):
         raise ValueError(a)
 
     assert len(r) % bits == 0
-    return r
+    return tuple(r)
 
 
 if __name__ == "__main__":
