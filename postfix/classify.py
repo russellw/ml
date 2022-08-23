@@ -23,7 +23,7 @@ class Dataset1(Dataset):
             try:
                 if not interpreter.good(f, xs1):
                     continue
-                y = bool(interpreter.run(f, xs1[1]))
+                y = bool(interpreter.run(f, xs1[0]))
             except (
                 IndexError,
                 OverflowError,

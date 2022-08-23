@@ -40,7 +40,7 @@ while len(neg) < n / 2 or len(pos) < n / 2:
     try:
         if not interpreter.good(f, xs):
             continue
-        y = bool(interpreter.run(f, xs[1]))
+        y = bool(interpreter.run(f, xs[0]))
     except (
         IndexError,
         OverflowError,
