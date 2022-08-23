@@ -22,8 +22,8 @@ def dbg(a):
     print(f"{info.filename}:{info.function}:{info.lineno}: {repr(a)}")
 
 
-def fixLen(s, n):
-    return s[:n] + (0,) * (n - len(s))
+def fixLen(s, n, a=0):
+    return s[:n] + (a,) * (n - len(s))
 
 
 def bitLen(n):
