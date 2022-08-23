@@ -87,22 +87,22 @@ def swap():
 
 
 ops = {
-    "%": mod,
-    "*": mul,
-    "+": add,
-    "-": sub,
-    "/": div,
-    "//": floordiv,
-    "<": lt,
-    "<=": le,
-    "=": eq,
+    "add": add,
     "and": and1,
+    "div": div,
     "dup": lambda: stack.append(stack[-1]),
+    "eq": eq,
+    "floordiv": floordiv,
+    "le": le,
+    "lt": lt,
+    "mod": mod,
+    "mul": mul,
     "not": not1,
     "one": lambda: stack.append(1),
     "or": or1,
     "pop": lambda: stack.pop(),
     "pow": pow1,
+    "sub": sub,
     "swap": swap,
     "zero": lambda: stack.append(0),
 }
@@ -138,8 +138,8 @@ def test(f, x, y):
 if __name__ == "__main__":
     test(("not",), 1, 0)
     test(("dup", "not"), 1, 0)
-    test(("one", "one", "+"), 0, 2)
-    test(("zero", "one", "-"), 0, -1)
+    test(("one", "one", "add"), 0, 2)
+    test(("zero", "one", "sub"), 0, -1)
 
     xs = range(10)
     assert good(("dup",), xs)
