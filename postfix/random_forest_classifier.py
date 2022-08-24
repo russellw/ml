@@ -1,3 +1,7 @@
+# results for 10,000 records, one-hot:
+# RandomForestClassifier: 93% accuracy
+# MLP                   : 95% accuracy
+
 import argparse
 import os
 import sys
