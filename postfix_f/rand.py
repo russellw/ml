@@ -4,15 +4,31 @@ import random
 from etc import *
 import interpreter
 
-vocab = tuple(interpreter.ops.keys())
+
+def fname(i):
+    return chr(ord("a") + i)
 
 
-def mk(m, n):
+fcount = 10
+vocab = tuple(interpreter.ops.keys()) + tuple(map(fname, range(fcount)))
+
+
+def mkf(m, n):
     n = random.randint(m, n)
     return tuple(random.choice(vocab) for i in range(n))
 
 
+def mk(m, n):
+    p = {}
+    for i in range(fcount):
+        p[fname(i)] = mkf(m, n)
+    return p
+
+
 if __name__ == "__main__":
+    assert fname(0) == "a"
+    assert fname(1) == "b"
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-b", action="store_true", help="args are bit strings instead of numbers"
@@ -41,19 +57,36 @@ if __name__ == "__main__":
             xs.append(tuple(random.randrange(2) for j in range(10)))
 
     interval = args.c // 10
-    fs = []
+    ps = []
     for i in range(args.c):
         if i % interval == 0:
             print(i)
         try:
-            f = mk(args.m, args.n)
-            if interpreter.good(f, xs):
-                fs.append(f)
-        except (IndexError, OverflowError, TypeError, ValueError, ZeroDivisionError):
+            p = mk(args.m, args.n)
+            if interpreter.good(p, xs):
+                ps.append(p)
+        except (
+            IndexError,
+            OverflowError,
+            RecursionError,
+            TypeError,
+            ValueError,
+            ZeroDivisionError,
+        ):
             pass
-    print(len(fs))
-    print(len(set(fs)))
+
+    # number of good programs
+    print(len(ps))
+
+    # number of distinct good programs
+    s = set()
+    for p in ps:
+        s.add(frozenset(p.items()))
+    print(len(s))
+
+    # average program size
     n = 0
-    for f in fs:
-        n += len(f)
-    print(n / len(fs))
+    for p in ps:
+        for f in p.values():
+            n += len(f)
+    print(n / len(ps))
