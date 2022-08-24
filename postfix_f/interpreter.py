@@ -115,6 +115,8 @@ def call(f):
             call(g)
             continue
         ops[a]()
+        if len(stack) > 1000:
+            raise OverflowError()
 
 
 def run(p, x):
