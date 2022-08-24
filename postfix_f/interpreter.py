@@ -110,29 +110,41 @@ ops = {
 
 def call(f):
     for a in f:
+        g = program.get(a)
+        if g is not None:
+            call(g)
+            continue
         ops[a]()
 
 
-def run(f, x):
+def run(p, x):
+    global program
     global stack
+    program = p
     stack = [x]
-    call(f)
+    call(p["a"])
     return stack[-1]
 
 
-def good(f, xs):
+def good(p, xs):
     # a program is considered good for a set of inputs,
     # if it handles all the inputs without crashing,
     # and it is nontrivial i.e. does not return the same value for every input
     ys = set()
     for x in xs:
-        y = run(f, x)
+        y = run(p, x)
         ys.add(y)
     return len(ys) > 1
 
 
 def test(f, x, y):
-    assert run(f, x) == y
+    p = {"a": f}
+    assert run(p, x) == y
+
+
+def test_good(f, xs):
+    p = {"a": f}
+    assert good(p, xs)
 
 
 if __name__ == "__main__":
@@ -142,7 +154,7 @@ if __name__ == "__main__":
     test(("zero", "one", "sub"), 0, -1)
 
     xs = range(10)
-    assert good(("dup",), xs)
-    assert good(("dup", "not"), xs)
+    test_good(("dup",), xs)
+    test_good(("dup", "not"), xs)
 
     print("ok")
