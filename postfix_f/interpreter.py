@@ -9,8 +9,6 @@ def sub():
 
 def pow1():
     b = stack.pop()
-    if b > 1000:
-        raise ValueError()
     a = stack.pop()
     stack.append(a ** b)
 
@@ -42,7 +40,7 @@ def mod():
 def eq():
     b = stack.pop()
     a = stack.pop()
-    stack.append(a == b)
+    stack.append(float(a == b))
 
 
 def add():
@@ -54,29 +52,29 @@ def add():
 def lt():
     b = stack.pop()
     a = stack.pop()
-    stack.append(a < b)
+    stack.append(float(a < b))
 
 
 def le():
     b = stack.pop()
     a = stack.pop()
-    stack.append(a <= b)
+    stack.append(float(a <= b))
 
 
 def not1():
-    stack[-1] = not stack[-1]
+    stack[-1] = float(not stack[-1])
 
 
 def and1():
     b = stack.pop()
     a = stack.pop()
-    stack.append(a and b)
+    stack.append(float(a and b))
 
 
 def or1():
     b = stack.pop()
     a = stack.pop()
-    stack.append(a or b)
+    stack.append(float(a or b))
 
 
 def swap():
@@ -98,13 +96,13 @@ ops = {
     "mod": mod,
     "mul": mul,
     "not": not1,
-    "one": lambda: stack.append(1),
+    "one": lambda: stack.append(1.0),
     "or": or1,
     "pop": lambda: stack.pop(),
     "pow": pow1,
     "sub": sub,
     "swap": swap,
-    "zero": lambda: stack.append(0),
+    "zero": lambda: stack.append(0.0),
 }
 
 
@@ -119,11 +117,21 @@ def call(f):
             raise OverflowError()
 
 
+def norm(a):
+    if isinstance(a, str):
+        return a
+    if isinstance(a, list):
+        a = tuple(a)
+    if isinstance(a, tuple):
+        return tuple(map(norm, a))
+    return float(a)
+
+
 def run(p, x):
     global program
     global stack
     program = p
-    stack = [x]
+    stack = [norm(x)]
     call(p["a"])
     return stack[-1]
 
