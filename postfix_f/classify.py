@@ -66,7 +66,7 @@ class Dataset1(Dataset):
         return self.s[i]
 
 
-ds = 1000
+ds = 10000
 trainDs = Dataset1(ds * 10 // 8)
 testDs = Dataset1(ds * 10 // 2)
 
@@ -119,7 +119,7 @@ def accuracy(model, ds):
 
 criterion = nn.BCELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
-epochs = 10000
+epochs = 100
 interval = epochs // 10
 for epoch in range(epochs + 1):
     for bi, (x, y) in enumerate(trainDl):
