@@ -16,8 +16,6 @@ def pow1():
 def mul():
     b = stack.pop()
     a = stack.pop()
-    if isinstance(a, str):
-        raise TypeError()
     stack.append(a * b)
 
 
@@ -91,8 +89,8 @@ def swap():
 ops = {
     "quote": None,
     "if": None,
-    "else": None,
-    "nop": lambda: 0,
+    "else": lambda: 0,
+    "end": lambda: 0,
     "add": add,
     "and": and1,
     "div": div,
@@ -137,18 +135,18 @@ def call(f):
             i += 1
         elif a == "if":
             if stack.pop():
-                while i < n and f[i] != "else" and f[i] != "nop":
+                while i < n and f[i] != "else" and f[i] != "end":
                     step()
                 if i < n and f[i] == "else":
                     i += 1
-                    while i < n and f[i] != "nop":
+                    while i < n and f[i] != "end":
                         i += 1
             else:
-                while i < n and f[i] != "else" and f[i] != "nop":
+                while i < n and f[i] != "else" and f[i] != "end":
                     i += 1
                 if i < n and f[i] == "else":
                     i += 1
-                    while i < n and f[i] != "nop":
+                    while i < n and f[i] != "end":
                         step()
         else:
             # primitive function
