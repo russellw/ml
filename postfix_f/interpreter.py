@@ -86,6 +86,9 @@ def swap():
 
 ops = {
     "quote": None,
+    "if": None,
+    "else": None,
+    "nop": lambda: 0,
     "add": add,
     "and": and1,
     "div": div,
@@ -110,7 +113,11 @@ ops = {
 def call(f):
     i = 0
     n = len(f)
-    while i < n:
+
+    def step():
+        nonlocal i
+
+        # fetch instruction
         a = f[i]
         i += 1
 
@@ -118,18 +125,36 @@ def call(f):
         g = program.get(a)
         if g is not None:
             call(g)
-            continue
+            return
 
         # special syntax
         if a == "quote":
             stack.append(f[i])
             i += 1
+        elif a == "if":
+            if stack.pop():
+                while i < n and f[i] != "else" and f[i] != "nop":
+                    step()
+                if i < n and f[i] == "else":
+                    i += 1
+                    while i < n and f[i] != "nop":
+                        i += 1
+            else:
+                while i < n and f[i] != "else" and f[i] != "nop":
+                    i += 1
+                if i < n and f[i] == "else":
+                    i += 1
+                    while i < n and f[i] != "nop":
+                        step()
         else:
             # primitive function
             ops[a]()
 
         if len(stack) > 1000:
             raise OverflowError()
+
+    while i < n:
+        step()
 
 
 def norm(a):
@@ -182,5 +207,30 @@ if __name__ == "__main__":
     xs = range(10)
     test_good(("dup",), xs)
     test_good(("dup", "not"), xs)
+
+    p = {
+        "a": ("s",),
+        "s": ("dup", "mul"),
+    }
+    assert run(p, 9) == 81
+
+    p = {
+        "a": ("f",),
+        "f": (
+            "dup",
+            "one",
+            "le",
+            "if",
+            "pop",
+            "one",
+            "else",
+            "dup",
+            "one",
+            "sub",
+            "f",
+            "mul",
+        ),
+    }
+    assert run(p, 5) == 120
 
     print("ok")
