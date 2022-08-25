@@ -1,5 +1,17 @@
 import inspect
 
+trace = 0
+
+
+def tron():
+    global trace
+    trace = 1
+
+
+def troff():
+    global trace
+    trace = 0
+
 
 def compose(a):
     s = []

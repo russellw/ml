@@ -16,6 +16,8 @@ def pow1():
 def mul():
     b = stack.pop()
     a = stack.pop()
+    if isinstance(a, str):
+        raise TypeError()
     stack.append(a * b)
 
 
@@ -46,6 +48,8 @@ def eq():
 def add():
     b = stack.pop()
     a = stack.pop()
+    if isinstance(a, str):
+        raise TypeError()
     stack.append(a + b)
 
 
