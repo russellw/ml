@@ -25,6 +25,28 @@ def mk(m, n):
     return p
 
 
+def getLive(p):
+    s = set()
+
+    def rec(k):
+        if k in s:
+            return
+        s.add(k)
+        for a in p[k]:
+            if a in p:
+                rec(a)
+
+    rec("a")
+    return s
+
+
+def rmDead(p):
+    q = {}
+    for k in sorted(getLive(p)):
+        q[k] = p[k]
+    return q
+
+
 if __name__ == "__main__":
     assert fname(0) == "a"
     assert fname(1) == "b"
@@ -63,6 +85,7 @@ if __name__ == "__main__":
             print(i)
         try:
             p = mk(args.m, args.n)
+            p = rmDead(p)
             if interpreter.good(p, xs):
                 ps.append(p)
         except (
