@@ -85,6 +85,7 @@ def swap():
 
 
 ops = {
+    "quote": None,
     "add": add,
     "and": and1,
     "div": div,
@@ -107,12 +108,26 @@ ops = {
 
 
 def call(f):
-    for a in f:
+    i = 0
+    n = len(f)
+    while i < n:
+        a = f[i]
+        i += 1
+
+        # defined function
         g = program.get(a)
         if g is not None:
             call(g)
             continue
-        ops[a]()
+
+        # special syntax
+        if a == "quote":
+            stack.append(f[i])
+            i += 1
+        else:
+            # primitive function
+            ops[a]()
+
         if len(stack) > 1000:
             raise OverflowError()
 
@@ -162,6 +177,7 @@ if __name__ == "__main__":
     test(("dup", "not"), 1, 0)
     test(("one", "one", "add"), 0, 2)
     test(("zero", "one", "sub"), 0, -1)
+    test(("quote", "sub"), 0, "sub")
 
     xs = range(10)
     test_good(("dup",), xs)
