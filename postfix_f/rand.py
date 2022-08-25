@@ -5,10 +5,6 @@ from etc import *
 import interpreter
 
 
-def fname(i):
-    return chr(ord("a") + i)
-
-
 fcount = 10
 vocab = tuple(interpreter.ops.keys()) + tuple(map(fname, range(fcount)))
 
@@ -56,19 +52,9 @@ if __name__ == "__main__":
         "-b", action="store_true", help="args are bit strings instead of numbers"
     )
     parser.add_argument(
-        "-c",
-        metavar="count",
-        type=int,
-        default=1000,
-        help="number of iterations x 1,000",
-    )
-    parser.add_argument("-m", type=int, default=2, help="min length")
-    parser.add_argument("-n", type=int, default=10, help="max length")
-    parser.add_argument(
         "-s", metavar="seed", help="random seed, default is current time"
     )
     args = parser.parse_args()
-    args.c *= 1000
 
     random.seed(args.s)
 
@@ -78,13 +64,14 @@ if __name__ == "__main__":
         for i in range(10):
             xs.append(tuple(random.randrange(2) for j in range(10)))
 
-    interval = args.c // 10
+    iterations = 1000000
+    interval = iterations // 10
     ps = []
-    for i in range(args.c):
-        if i % interval == 0:
-            print(i)
+    for iteration in range(iterations):
+        if iteration % interval == 0:
+            print(iteration)
         try:
-            p = mk(args.m, args.n)
+            p = mk(2, 10)
             p = rmDead(p)
             if interpreter.good(p, xs):
                 ps.append(p)

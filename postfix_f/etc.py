@@ -13,6 +13,10 @@ def troff():
     trace = 0
 
 
+def fname(i):
+    return chr(ord("a") + i)
+
+
 def compose(a):
     s = []
 
