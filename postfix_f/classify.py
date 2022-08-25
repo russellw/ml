@@ -40,8 +40,8 @@ class Dataset1(Dataset):
 
             x = []
             for f in p.values():
+                f = fixLen(f, flen, "end")
                 for a in f:
-                    f = fixLen(f, flen, "end")
                     i = rand.vocab.index(a)
                     for j in range(len(rand.vocab)):
                         x.append(float(i == j))
@@ -80,7 +80,7 @@ for x, y in trainDl:
     print(y.shape)
     break
 
-inputSize = flen * len(rand.vocab)
+inputSize = rand.fcount * flen * len(rand.vocab)
 hiddenSize = 100
 
 
