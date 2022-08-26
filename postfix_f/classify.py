@@ -11,7 +11,11 @@ import rand
 random.seed(0)
 
 flen = 10
-xs1 = range(10)
+
+# xs1 = range(10)
+xs1 = []
+for i in range(10):
+    xs1.append(tuple(random.randrange(2) for j in range(10)))
 
 
 class Dataset1(Dataset):
