@@ -88,6 +88,13 @@ def swap():
     stack.append(a)
 
 
+def len1():
+    s = stack.pop()
+    if not isinstance(s, tuple):
+        raise TypeError()
+    stack.append(float(len(s)))
+
+
 def hd():
     s = stack.pop()
     if not isinstance(s, tuple):
@@ -117,32 +124,33 @@ def at():
 
 
 ops = {
-    "quote": None,
-    "if": None,
-    "else": lambda: 0,
-    "end": lambda: 0,
     "add": add,
-    "hd": hd,
-    "tl": tl,
-    "cons": cons,
-    "at": at,
     "and": and1,
+    "at": at,
+    "cons": cons,
     "div": div,
     "dup": lambda: stack.append(stack[-1]),
+    "else": lambda: 0,
+    "end": lambda: 0,
     "eq": eq,
     "floordiv": floordiv,
+    "hd": hd,
+    "if": None,
     "le": le,
+    "len": len1,
     "lt": lt,
     "mod": mod,
     "mul": mul,
-    "not": lambda: stack.append(float(not stack.pop())),
     "nil": lambda: stack.append(()),
+    "not": lambda: stack.append(float(not stack.pop())),
     "one": lambda: stack.append(1.0),
     "or": or1,
     "pop": lambda: stack.pop(),
     "pow": pow1,
+    "quote": None,
     "sub": sub,
     "swap": swap,
+    "tl": tl,
     "zero": lambda: stack.append(0.0),
 }
 
@@ -241,6 +249,7 @@ if __name__ == "__main__":
     test(("zero", "one", "sub"), 0, -1)
     test(("quote", "sub"), 0, "sub")
     test(("nil",), 0, ())
+    test(("len",), ("a", "b", "c"), 3)
     test(("hd",), ("a", "b", "c"), "a")
     test(("tl",), ("a", "b", "c"), ("b", "c"))
     test(("one", "at"), ("a", "b", "c"), "b")
