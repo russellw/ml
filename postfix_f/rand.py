@@ -44,6 +44,8 @@ def rmDead(p):
 
 
 if __name__ == "__main__":
+    random.seed(0)
+
     assert fname(0) == "a"
     assert fname(1) == "b"
 
@@ -51,12 +53,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-b", action="store_true", help="args are bit strings instead of numbers"
     )
-    parser.add_argument(
-        "-s", metavar="seed", help="random seed, default is current time"
-    )
     args = parser.parse_args()
-
-    random.seed(args.s)
 
     xs = range(10)
     if args.b:

@@ -1,5 +1,7 @@
 from etc import *
 
+maxLen = 1000000
+
 
 def sub():
     b = stack.pop()
@@ -48,6 +50,9 @@ def add():
     a = stack.pop()
     if isinstance(a, str):
         raise TypeError()
+    if isinstance(a, tuple):
+        if len(a) + len(b) > maxLen:
+            raise OverflowError()
     stack.append(a + b)
 
 

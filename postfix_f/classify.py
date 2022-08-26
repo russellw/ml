@@ -1,4 +1,3 @@
-import argparse
 import random
 
 import torch
@@ -9,10 +8,7 @@ from etc import *
 import interpreter
 import rand
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-s", metavar="seed", help="random seed, default is current time")
-args = parser.parse_args()
-random.seed(args.s)
+random.seed(0)
 
 flen = 10
 xs1 = range(10)
