@@ -27,6 +27,7 @@ class Dataset1(Dataset):
             try:
                 if not interpreter.good(p, xs1):
                     continue
+                p = rand.rmDead(p)
                 y = bool(interpreter.run(p, xs1[0]))
             except (
                 IndexError,
@@ -39,7 +40,12 @@ class Dataset1(Dataset):
                 continue
 
             x = []
-            for f in p.values():
+            for i in range(rand.fcount):
+                k = fname(i)
+                if k in p:
+                    f = p[k]
+                else:
+                    f = ()
                 f = fixLen(f, flen, "end")
                 for a in f:
                     i = rand.vocab.index(a)
