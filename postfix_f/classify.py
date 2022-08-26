@@ -8,6 +8,7 @@ from etc import *
 import interpreter
 import rand
 
+printTime()
 random.seed(0)
 
 flen = 10
@@ -73,8 +74,8 @@ class Dataset1(Dataset):
 
 
 ds = 10000
-trainDs = Dataset1(ds * 10 // 8)
-testDs = Dataset1(ds * 10 // 2)
+trainDs = Dataset1(ds * 8 // 10)
+testDs = Dataset1(ds * 2 // 10)
 
 batchSize = 20
 
@@ -123,9 +124,10 @@ def accuracy(model, ds):
     return n / len(ds)
 
 
+printTime()
 criterion = nn.BCELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
-epochs = 100
+epochs = 1000
 interval = epochs // 10
 for epoch in range(epochs + 1):
     for bi, (x, y) in enumerate(trainDl):
@@ -141,3 +143,4 @@ for epoch in range(epochs + 1):
             print(
                 f"{epoch}\t{loss}\t{accuracy(model, trainDs)}\t{accuracy(model, testDs)}"
             )
+printTime()

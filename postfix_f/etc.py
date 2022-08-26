@@ -1,4 +1,5 @@
 import inspect
+import time
 
 trace = 0
 
@@ -15,6 +16,10 @@ def troff():
 
 def fname(i):
     return chr(ord("a") + i)
+
+
+def printTime():
+    print(time.strftime("%A, %B %d, %Y, %H:%M:%S", time.localtime()))
 
 
 def compose(a):
