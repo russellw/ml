@@ -18,6 +18,7 @@ def pow1():
 def mul():
     b = stack.pop()
     a = stack.pop()
+    # in tests, pop and append turned out to be as fast as an apparently more direct update of stack[-1]
     stack.append(a * b)
 
 
@@ -68,10 +69,6 @@ def le():
     stack.append(float(a <= b))
 
 
-def not1():
-    stack[-1] = float(not stack[-1])
-
-
 def and1():
     b = stack.pop()
     a = stack.pop()
@@ -91,12 +88,44 @@ def swap():
     stack.append(a)
 
 
+def hd():
+    s = stack.pop()
+    if not isinstance(s, tuple):
+        raise TypeError()
+    stack.append(s[0])
+
+
+def tl():
+    s = stack.pop()
+    if not isinstance(s, tuple):
+        raise TypeError()
+    stack.append(s[1:])
+
+
+def cons():
+    s = stack.pop()
+    a = stack.pop()
+    stack.append((a,) + s)
+
+
+def at():
+    i = stack.pop()
+    s = stack.pop()
+    if not isinstance(s, tuple):
+        raise TypeError()
+    stack.append(s[int(i)])
+
+
 ops = {
     "quote": None,
     "if": None,
     "else": lambda: 0,
     "end": lambda: 0,
     "add": add,
+    "hd": hd,
+    "tl": tl,
+    "cons": cons,
+    "at": at,
     "and": and1,
     "div": div,
     "dup": lambda: stack.append(stack[-1]),
@@ -106,7 +135,8 @@ ops = {
     "lt": lt,
     "mod": mod,
     "mul": mul,
-    "not": not1,
+    "not": lambda: stack.append(float(not stack.pop())),
+    "nil": lambda: stack.append(()),
     "one": lambda: stack.append(1.0),
     "or": or1,
     "pop": lambda: stack.pop(),
@@ -210,6 +240,11 @@ if __name__ == "__main__":
     test(("one", "one", "add"), 0, 2)
     test(("zero", "one", "sub"), 0, -1)
     test(("quote", "sub"), 0, "sub")
+    test(("nil",), 0, ())
+    test(("hd",), ("a", "b", "c"), "a")
+    test(("tl",), ("a", "b", "c"), ("b", "c"))
+    test(("one", "at"), ("a", "b", "c"), "b")
+    test(("one", "nil", "cons"), 0, (1.0,))
 
     xs = range(10)
     test_good(("dup",), xs)
