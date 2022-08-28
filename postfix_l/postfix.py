@@ -441,4 +441,14 @@ if __name__ == "__main__":
         except (IndexError, TypeError, ZeroDivisionError):
             pass
 
+    xs = []
+    for i in range(10):
+        xs.append(tuple(random.randrange(2) for j in range(10)))
+    for i in range(1000):
+        a = rand()
+        try:
+            good(a, xs)
+        except (IndexError, RecursionError, TypeError, ZeroDivisionError):
+            pass
+
     print("ok")
