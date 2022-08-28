@@ -323,8 +323,13 @@ def rand(m, n):
 
 
 # compose to list of tokens
-vocab = list(ops.keys())
-vocab.append("(")
+outputVocab = list(ops.keys())
+outputVocab.append("(")
+outputVocab.append(")")
+outputVocab.append("0")
+outputVocab.append("1")
+outputVocab.append("{")
+outputVocab.append("}")
 
 
 def compose(a):
@@ -349,7 +354,7 @@ def compose(a):
         raise TypeError()
 
     rec(a)
-    return s
+    return tuple(s)
 
 
 # a program is considered good for a set of inputs,
