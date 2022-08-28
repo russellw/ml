@@ -25,7 +25,7 @@ def mul():
     b = stack.pop()
     a = stack.pop()
     if isinstance(a, str):
-        raise TypeError()
+        raise TypeError(a)
     if isinstance(a, tuple):
         check(len(a) * b)
         a *= b
@@ -59,7 +59,7 @@ def add():
     b = stack.pop()
     a = stack.pop()
     if isinstance(a, str):
-        raise TypeError()
+        raise TypeError(a)
     if isinstance(a, tuple):
         check(len(a) + len(b))
         a += b
@@ -103,21 +103,21 @@ def swap():
 def len1():
     s = stack.pop()
     if not isinstance(s, tuple):
-        raise TypeError()
+        raise TypeError(s)
     stack.append(len(s))
 
 
 def hd():
     s = stack.pop()
     if not isinstance(s, tuple):
-        raise TypeError()
+        raise TypeError(s)
     stack.append(s[0])
 
 
 def tl():
     s = stack.pop()
     if not isinstance(s, tuple):
-        raise TypeError()
+        raise TypeError(s)
     stack.append(s[1:])
 
 
@@ -133,7 +133,7 @@ def at():
     i = stack.pop()
     s = stack.pop()
     if not isinstance(s, tuple):
-        raise TypeError()
+        raise TypeError(s)
     stack.append(s[i])
 
 
@@ -352,6 +352,17 @@ def compose(a):
     return s
 
 
+# a program is considered good for a set of inputs,
+# if it handles all the inputs without crashing,
+# and it is nontrivial i.e. does not return the same value for every input
+def good(a, xs):
+    ys = set()
+    for x in xs:
+        y = run(a, x)
+        ys.add(y)
+    return len(ys) > 1
+
+
 # unit tests
 def test(a, x, y):
     y1 = run(a, x)
@@ -418,8 +429,16 @@ if __name__ == "__main__":
         (2, 3, 4),
     )
 
-    for i in range(10):
+    fac = (("not",), ("pop", 1), ("dup", 1, "-"), ("*",), "linrec")
+    xs = range(5)
+    assert good(fac, xs)
+
+    xs = range(10)
+    for i in range(1000):
         a = rand()
-        print(a)
+        try:
+            good(a, xs)
+        except (IndexError, TypeError, ZeroDivisionError):
+            pass
 
     print("ok")
