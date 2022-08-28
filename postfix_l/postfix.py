@@ -1,4 +1,7 @@
+import random
+
 from etc import *
+import balanced_dpv
 
 maxSize = 1000
 
@@ -276,6 +279,11 @@ def run(a, x):
 
 
 # parse from list of tokens
+inputVocab = list(ops.keys())
+inputVocab.append(0)
+inputVocab.append(1)
+
+
 def parse(s):
     i = 0
 
@@ -287,8 +295,8 @@ def parse(s):
         i += 1
 
         # number
-        if a[0].isdigit():
-            return int(a)
+        if not isinstance(a, str):
+            return a
 
         # string
         if a not in ("(", "["):
@@ -305,6 +313,13 @@ def parse(s):
     while i < len(s):
         r.append(expr())
     return tuple(r)
+
+
+# generate a random program
+def rand():
+    n = random.randint(2, 10)
+    s = balanced_dpv.balanced_dp(n, inputVocab).random()
+    return parse(s)
 
 
 # compose to list of tokens
@@ -350,8 +365,10 @@ def test(a, x, y):
 
 
 if __name__ == "__main__":
-    assert parse(("3", "dup", "*")) == (3, "dup", "*")
-    assert parse(("3", "[", "dup", "]", "*")) == (3, ("dup",), "*")
+    random.seed(0)
+
+    assert parse((3, "dup", "*")) == (3, "dup", "*")
+    assert parse((3, "[", "dup", "]", "*")) == (3, ("dup",), "*")
 
     assert compose(3) == ["{", "1", "1", "}"]
     assert compose(("+", 3, "x0")) == ["(", "+", "{", "1", "1", "}", "x0", ")"]
@@ -400,5 +417,9 @@ if __name__ == "__main__":
         None,
         (2, 3, 4),
     )
+
+    for i in range(10):
+        a = rand()
+        print(a)
 
     print("ok")
