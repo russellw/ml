@@ -316,8 +316,8 @@ def parse(s):
 
 
 # generate a random program
-def rand():
-    n = random.randint(2, 10)
+def rand(m, n):
+    n = random.randint(m, n)
     s = balanced_dpv.balanced_dp(n, inputVocab).random()
     return parse(s)
 
@@ -357,9 +357,12 @@ def compose(a):
 # and it is nontrivial i.e. does not return the same value for every input
 def good(a, xs):
     ys = set()
-    for x in xs:
-        y = run(a, x)
-        ys.add(y)
+    try:
+        for x in xs:
+            y = run(a, x)
+            ys.add(y)
+    except (IndexError, RecursionError, TypeError, ZeroDivisionError):
+        return
     return len(ys) > 1
 
 
@@ -433,22 +436,21 @@ if __name__ == "__main__":
     xs = range(5)
     assert good(fac, xs)
 
+    def testGood():
+        n = 10000
+        s = []
+        for i in range(n):
+            a = rand(2, 10)
+            if good(a, xs):
+                s.append(a)
+        print(f"{len(set(s))}\t{len(s)}\t{n}")
+
     xs = range(10)
-    for i in range(1000):
-        a = rand()
-        try:
-            good(a, xs)
-        except (IndexError, TypeError, ZeroDivisionError):
-            pass
+    testGood()
 
     xs = []
     for i in range(10):
         xs.append(tuple(random.randrange(2) for j in range(10)))
-    for i in range(1000):
-        a = rand()
-        try:
-            good(a, xs)
-        except (IndexError, RecursionError, TypeError, ZeroDivisionError):
-            pass
+    testGood()
 
     print("ok")
