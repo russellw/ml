@@ -180,8 +180,8 @@ def filter1():
 
 def fold():
     f = stack.pop()
-    a = stack.pop()
     s = stack.pop()
+    a = stack.pop()
     stack.append(a)
     for a in s:
         stack.append(a)
@@ -205,7 +205,7 @@ def linrec():
     c = stack.pop()
 
     def rec():
-        dup()
+        stack.append(stack[-1])
         if eval1(c):
             ev(then)
             return
@@ -254,11 +254,11 @@ ops = {
 
 # interpreter
 def ev(a):
-    if type(a) != list:
+    if not isinstance(a, tuple):
         stack.append(a)
         return
     for b in a:
-        if type(b) is str:
+        if isinstance(b, str):
             ops[b]()
             continue
         stack.append(b)
@@ -305,8 +305,65 @@ def compose(a):
     return s
 
 
+# unit tests
+def test(a, x, y):
+    y1 = run(a, x)
+    if y != y1:
+        print(a)
+        print(x)
+        print(stack)
+        print(y)
+        print(y1)
+    assert y == y1
+
+
 if __name__ == "__main__":
     assert compose(3) == ["{", "1", "1", "}"]
     assert compose(("+", 3, "x0")) == ["(", "+", "{", "1", "1", "}", "x0", ")"]
+
+    test((1, 10, "-"), 0, -9)
+    test((20, 6, "//"), 0, 3)
+    test((20, 6, "%"), 0, 2)
+    test((3, "dup", "*"), 0, 9)
+    test(("dup", "*"), 3, 9)
+    test(("dup", "+"), 3, 6)
+    test((("dup", "*"), "map"), (1, 2, 3, 4), (1, 4, 9, 16))
+    test(((2, "swap", "<"), "filter"), (1, 2, 3, 4), (3, 4))
+    test((0, (2, 5, 3), ("+",), "fold"), None, 10)
+    test(
+        (
+            0,
+            (2, 5, 3),
+            (
+                "dup",
+                "*",
+                "+",
+            ),
+            "fold",
+        ),
+        None,
+        38,
+    )
+    test(((1, 1, 1, "+", "+"), "eval"), None, 3)
+    test((1, 2, 3, "if"), None, 2)
+    test((0, 2, 3, "if"), None, 3)
+    test((0, (1, 0, "/"), (3,), "if"), None, 3)
+    test((("not",), ("pop", 1), ("dup", 1, "-"), ("*",), "linrec"), 4, 24)
+    test((("not",), ("pop", 1), ("dup", 1, "-"), ("*",), "linrec"), 5, 120)
+    test(
+        (0, 1, 2, 3, 4, (), "cons", "cons", "cons", "cons", "cons"),
+        None,
+        (0, 1, 2, 3, 4),
+    )
+    test(
+        (0, 1, 2, 3, 4, (), "cons", "cons", "cons", "cons", "cons", 2, "take"),
+        None,
+        (0, 1),
+    )
+    test(
+        (0, 1, 2, 3, 4, (), "cons", "cons", "cons", "cons", "cons", 2, "drop"),
+        None,
+        (2, 3, 4),
+    )
 
     print("ok")
