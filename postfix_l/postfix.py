@@ -275,7 +275,39 @@ def run(a, x):
     return eval1(a)
 
 
-# compose value to list of strings
+# parse from list of tokens
+def parse(s):
+    i = 0
+
+    def expr():
+        nonlocal i
+
+        # next token
+        a = s[i]
+        i += 1
+
+        # number
+        if a[0].isdigit():
+            return int(a)
+
+        # string
+        if a not in ("(", "["):
+            return a
+
+        # list
+        r = []
+        while i < len(s) and s[i] not in (")", "]"):
+            r.append(expr())
+        i += 1
+        return tuple(r)
+
+    r = []
+    while i < len(s):
+        r.append(expr())
+    return tuple(r)
+
+
+# compose to list of tokens
 vocab = list(ops.keys())
 vocab.append("(")
 
@@ -318,6 +350,9 @@ def test(a, x, y):
 
 
 if __name__ == "__main__":
+    assert parse(("3", "dup", "*")) == (3, "dup", "*")
+    assert parse(("3", "[", "dup", "]", "*")) == (3, ("dup",), "*")
+
     assert compose(3) == ["{", "1", "1", "}"]
     assert compose(("+", 3, "x0")) == ["(", "+", "{", "1", "1", "}", "x0", ")"]
 
