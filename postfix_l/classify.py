@@ -94,7 +94,6 @@ class Net(nn.Module):
 
 device = torch.device("cpu")
 model = Net().to(device)
-print(sum(p.numel() for p in model.parameters() if p.requires_grad))
 print(sum(p.numel() for p in model.parameters()))
 
 
