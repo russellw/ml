@@ -17,36 +17,47 @@ xs1 = []
 for i in range(10):
     xs1.append(tuple(random.randrange(2) for j in range(10)))
 
+ways = 5
+
+
+def oneHot(n, i, s):
+    for j in range(n):
+        s.append(float(i == j))
+
 
 class Dataset1(Dataset):
     def __init__(self, n):
-        neg = []
-        pos = []
-        while len(neg) + len(pos) < n:
+        s = []
+        d = {}
+        for i in range(ways):
+            d[i] = 0
+        while len(s) < n:
             a = postfix.rand(2, xlen // 2)
             if not postfix.good(a, xs1):
                 continue
-            y = bool(postfix.run(a, xs1[0]))
+
+            try:
+                r = int(postfix.run(a, xs1[0]))
+            except TypeError:
+                continue
+            if not 0 <= r < ways:
+                continue
+            y = []
+            oneHot(ways, r, y)
+            d[r] += 1
 
             a = postfix.compose(a)
             a = fixLen(a, xlen, ")")
             x = []
             for b in a:
-                i = postfix.outputVocab.index(b)
-                for j in range(len(postfix.outputVocab)):
-                    x.append(float(i == j))
+                oneHot(len(postfix.outputVocab), postfix.outputVocab.index(b), x)
 
-            if y:
-                s = pos
-            else:
-                s = neg
             x = torch.as_tensor(x)
-            y = torch.as_tensor([float(y)])
+            y = torch.as_tensor(y)
             s.append((x, y))
-        print((len(neg), len(pos)))
-        s = neg + pos
         random.shuffle(s)
         self.s = s
+        print(d)
 
     def __len__(self):
         return len(self.s)
@@ -83,8 +94,8 @@ class Net(nn.Module):
             nn.Tanh(),
             nn.Linear(hiddenSize, hiddenSize),
             nn.ReLU(),
-            nn.Linear(hiddenSize, 1),
-            nn.Sigmoid(),
+            nn.Linear(hiddenSize, ways),
+            nn.Softmax(),
         )
 
     def forward(self, x):
@@ -99,10 +110,9 @@ print(sum(p.numel() for p in model.parameters()))
 def accuracy(model, ds):
     n = 0
     for x, y in ds:
-        y = y[0]
         with torch.no_grad():
-            z = model(x)[0]
-        if (y and z > 0.5) or (not y and z <= 0.5):
+            z = model(x)
+        if torch.argmax(y) == torch.argmax(z):
             n += 1
     return n / len(ds)
 

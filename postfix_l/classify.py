@@ -35,7 +35,6 @@ class Dataset1(Dataset):
                 i = postfix.outputVocab.index(b)
                 for j in range(len(postfix.outputVocab)):
                     x.append(float(i == j))
-                continue
 
             if y:
                 s = pos
