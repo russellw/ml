@@ -95,7 +95,7 @@ class Net(nn.Module):
             nn.Linear(hiddenSize, hiddenSize),
             nn.ReLU(),
             nn.Linear(hiddenSize, ways),
-            nn.Softmax(),
+            nn.Softmax(dim=-1),
         )
 
     def forward(self, x):
