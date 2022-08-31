@@ -1,4 +1,3 @@
-import random
 import torch
 from torch import nn
 from torch.utils.data import Dataset, DataLoader
@@ -22,7 +21,6 @@ class Dataset1(Dataset):
             x = torch.as_tensor(x)
             y = torch.as_tensor(y)
             s.append((x, y))
-        random.shuffle(s)
         self.s = s
 
     def __len__(self):
