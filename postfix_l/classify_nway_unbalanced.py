@@ -95,7 +95,7 @@ class Net(nn.Module):
             nn.Linear(hiddenSize, hiddenSize),
             nn.ReLU(),
             nn.Linear(hiddenSize, ways),
-            nn.Softmax(dim=-1),
+            nn.Softmax(dim=1),
         )
 
     def forward(self, x):
@@ -110,6 +110,8 @@ print(sum(p.numel() for p in model.parameters()))
 def accuracy(model, ds):
     n = 0
     for x, y in ds:
+        x = x.unsqueeze(0)
+        y = y.unsqueeze(0)
         with torch.no_grad():
             z = model(x)
         if torch.argmax(y) == torch.argmax(z):
