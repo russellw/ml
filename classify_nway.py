@@ -54,7 +54,7 @@ class Net(nn.Module):
             nn.Linear(hiddenSize, hiddenSize),
             nn.ReLU(),
             nn.Linear(hiddenSize, 1 << bits),
-            nn.Softmax(dim=-1),
+            nn.Softmax(dim=1),
         )
 
     def forward(self, x):
@@ -68,6 +68,9 @@ model = Net().to(device)
 def accuracy(model, ds):
     n = 0
     for x, y in ds:
+        # https://stackoverflow.com/questions/73561694/why-does-softmaxdim-0-produce-poor-results
+        x = x.unsqueeze(0)  # create a batch of size 1
+        y = y.unsqueeze(0)  # create a batch of size 1
         with torch.no_grad():
             z = model(x)
         if torch.argmax(y) == torch.argmax(z):
