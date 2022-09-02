@@ -36,14 +36,16 @@ class Dataset1(Dataset):
 
 
 trainDs = Dataset1()
+testDs = Dataset1()
 
 batchSize = 20
 trainDl = DataLoader(trainDs, batch_size=batchSize)
-
+testDl = DataLoader(testDs, batch_size=batchSize)
 for x, y in trainDl:
     print(x.shape)
     print(y.shape)
     break
+
 
 hiddenSize = 100
 
@@ -113,4 +115,6 @@ for epoch in range(epochs + 1):
         optimizer.step()
 
         if epoch % interval == 0 and not bi:
-            print(f"{epoch}\t{loss}\t{accuracy(model, trainDs)}")
+            print(
+                f"{epoch}\t{loss}\t{accuracy(model, trainDs)}\t{accuracy(model, testDs)}"
+            )
