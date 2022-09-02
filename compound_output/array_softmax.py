@@ -49,6 +49,17 @@ for x, y in trainDl:
     break
 
 
+class View(nn.Module):
+    def __init__(self, *shape):
+        super(View, self).__init__()
+        self.shape = shape
+
+    def forward(self, x):
+        batchSize = x.data.size(0)
+        shape = (batchSize,) + self.shape
+        return x.view(*shape)
+
+
 hiddenSize = 100
 
 
@@ -63,7 +74,8 @@ class Net(nn.Module):
             nn.Linear(hiddenSize, hiddenSize),
             nn.ReLU(),
             nn.Linear(hiddenSize, count * size),
-            nn.Softmax(dim=1),
+            View(count, size),
+            nn.Softmax(dim=2),
         )
 
     def forward(self, x):
