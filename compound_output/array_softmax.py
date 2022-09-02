@@ -108,8 +108,10 @@ def accuracy(model, ds):
         # we could use a simple argmax comparison
         # but it is an array thereof
         # which makes comparison a little more complex
-        for i in range(0, y.shape[0], size):
-            if torch.argmax(y[i : i + size]) == torch.argmax(z[i : i + size]):
+        assert y.shape[0] == count
+        assert z.shape[0] == count
+        for i in range(0, count):
+            if torch.argmax(y[i]) == torch.argmax(z[i]):
                 n += 1
     return n / (len(ds) * count)
 
