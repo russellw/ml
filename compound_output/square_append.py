@@ -106,7 +106,7 @@ def accuracy(model, ds):
     return n / len(ds)
 
 
-criterion = nn.BCELoss()
+criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
 epochs = 10000
 interval = epochs // 10
