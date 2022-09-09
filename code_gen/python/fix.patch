@@ -1,0 +1,36 @@
+diff --git a/Include/cpython/pytime.h b/Include/cpython/pytime.h
+index 754c7f4..ac47e22 100644
+--- a/Include/cpython/pytime.h
++++ b/Include/cpython/pytime.h
+@@ -123,6 +123,7 @@ PyAPI_FUNC(int) _PyTime_FromTimeval(_PyTime_t *tp, struct timeval *tv);
+    tv_usec is always positive.
+    Raise an exception and return -1 if the conversion overflowed,
+    return 0 on success. */
++struct timeval;
+ PyAPI_FUNC(int) _PyTime_AsTimeval(_PyTime_t t,
+     struct timeval *tv,
+     _PyTime_round_t round);
+diff --git a/Modules/_tracemalloc.c b/Modules/_tracemalloc.c
+index ba0eb73..3ed213d 100644
+--- a/Modules/_tracemalloc.c
++++ b/Modules/_tracemalloc.c
+@@ -53,7 +53,7 @@ static PyThread_type_lock tables_lock;
+ /* Pack the frame_t structure to reduce the memory footprint on 64-bit
+    architectures: 12 bytes instead of 16. */
+ typedef struct
+-#ifdef __GNUC__
++#if __clang__
+ __attribute__((packed))
+ #elif defined(_MSC_VER)
+ #pragma pack(push, 4)
+diff --git a/Python/getcompiler.c b/Python/getcompiler.c
+index a5d2623..1c7bdca 100644
+--- a/Python/getcompiler.c
++++ b/Python/getcompiler.c
+@@ -23,5 +23,5 @@
+ const char *
+ Py_GetCompiler(void)
+ {
+-    return COMPILER;
++    return "[C]";
+ }
