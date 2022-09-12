@@ -1,7 +1,7 @@
-black .
+clang-format -i -style=file *.h *.cc lo/*
 if %errorlevel% neq 0 goto :eof
 
-clang-format -i -style=file *.h *.cc
+black .
 if %errorlevel% neq 0 goto :eof
 
 git diff
