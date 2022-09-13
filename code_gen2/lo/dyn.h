@@ -1,8 +1,8 @@
 enum
 {
 	d_list,
-	d_sym,
 	d_num,
+	d_sym,
 };
 
 class dyn {
