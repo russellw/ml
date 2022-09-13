@@ -4,8 +4,8 @@
 void stackTrace();
 
 // Assert; unlike the standard library one, this one prints a stack trace.
-[[noreturn]] bool assertFail(const char* file, int line, const char* fn, const char* s);
-#define assert(a) (a) || assertFail(__FILE__, __LINE__, __fn__, #a)
+[[noreturn]] bool assertFail(const char* file, int line, const char* func, const char* s);
+#define assert(a) (a) || assertFail(__FILE__, __LINE__, __func__, #a)
 #define unreachable assert(0)
 
 #else
