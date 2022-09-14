@@ -37,5 +37,12 @@ void main() {
 		assert(keyword(a) >= end_s);
 	}
 
+	//numbers
+	{
+		auto a = new num(1.0);
+		assert(a->tag == t_num);
+		assert(a->x == 1.0);
+	}
+
 	puts("ok");
 }
