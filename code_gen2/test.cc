@@ -12,6 +12,9 @@ void main() {
 	assert(!isPow2(9));
 	assert(!isPow2(10));
 
+	assert(fnv("", 0) == fnv("", 0));
+	assert(fnv("abc", 3) == fnv("abc", 3));
+
 	dyn a(1.0);
 	assert(a.tag() == d_num);
 
