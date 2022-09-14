@@ -76,6 +76,7 @@ sym* intern(const char* s, size_t n) {
 
 	// Make a new symbol.
 	auto r = (sym*)new char[offsetof(sym, z) + n + 1];
+	r->tag = t_sym;
 	memcpy(r->z, s, n);
 	r->z[n] = 0;
 

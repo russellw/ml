@@ -15,8 +15,18 @@ void main() {
 	assert(fnv("", 0) == fnv("", 0));
 	assert(fnv("abc", 3) == fnv("abc", 3));
 
-	sym foo("foo");
-	assert(foo.tag == t_sym);
+	//symbols
+	{
+		sym foo("foo");
+		assert(foo.tag == t_sym);
+
+		auto a = intern("a");
+		assert(a->tag == t_sym);
+		assert(!strcmp(a->z, "a"));
+
+		auto a1 = intern("a");
+		assert(a == a1);
+	}
 
 	puts("ok");
 }
