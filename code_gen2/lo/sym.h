@@ -24,7 +24,6 @@ inline size_t keyword(const sym* s) {
 	return i / sizeof(sym);
 }
 
-
 sym* intern(const char* s, size_t n);
 
 inline sym* intern(const char* s) {

@@ -8,7 +8,7 @@ sym keywords[] = {
 
 namespace {
 // Compare a null terminated string with a counted one.
-bool eq(const char* z,const char* s, size_t n) {
+bool eq(const char* z, const char* s, size_t n) {
 	while (n--)
 		if (*z++ != *s++) return 0;
 	return !*z;
@@ -17,7 +17,7 @@ bool eq(const char* z,const char* s, size_t n) {
 size_t slot(sym** entries, size_t cap, const char* s, size_t n) {
 	size_t mask = cap - 1;
 	auto i = fnv(s, n) & mask;
-	while (entries[i] && !eq(entries[i]->z,s, n)) i = (i + 1) & mask;
+	while (entries[i] && !eq(entries[i]->z, s, n)) i = (i + 1) & mask;
 	return i;
 }
 
@@ -60,7 +60,6 @@ void expand() {
 	entries = entries1;
 }
 } // namespace
-
 
 sym* intern(const char* s, size_t n) {
 	auto i = slot(entries, cap, s, n);
