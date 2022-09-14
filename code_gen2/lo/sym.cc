@@ -1,9 +1,8 @@
 #include <olivine.h>
 
 sym keywords[] = {
-	// clang-format off
-sym(	"break"),
-	// clang-format on
+#define _(x) sym(#x),
+#include <lo/keywords.h>
 };
 
 namespace {

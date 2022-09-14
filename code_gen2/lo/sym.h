@@ -14,7 +14,8 @@ struct sym: val {
 // Keywords are symbols that are known to be important.
 enum
 {
-	s_break,
+#define _(x) s_##x,
+#include <lo/keywords.h>
 	end_s
 };
 

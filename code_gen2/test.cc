@@ -26,6 +26,15 @@ void main() {
 
 		auto a1 = intern("a");
 		assert(a == a1);
+
+		a = intern("if");
+		assert(keyword(a) == s_if);
+
+		a = intern("return");
+		assert(keyword(a) == s_return);
+
+		a = intern("qwertyuiop");
+		assert(keyword(a) >= end_s);
 	}
 
 	puts("ok");
