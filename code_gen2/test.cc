@@ -44,5 +44,22 @@ void main() {
 		assert(a->x == 1.0);
 	}
 
+	//lists
+	{
+		auto x = new num(1.0);
+		auto y = new num(2.0);
+
+		auto a = mk(x);
+		assert(a->tag == t_list);
+		assert(a->n == 1);
+		assert(a->v[0] == x);
+
+		a = mk(x, y);
+		assert(a->tag == t_list);
+		assert(a->n == 2);
+		assert(a->v[0] == x);
+		assert(a->v[1] == y);
+	}
+
 	puts("ok");
 }
