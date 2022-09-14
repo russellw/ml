@@ -1,10 +1,14 @@
 // Symbols are interned for fast comparison
-struct sym {
+struct sym: val {
 	// Although the allocated size of dynamically allocated strings will vary according to the number of characters needed, the
 	// declared size of the character array needs to be positive for the statically allocated array of known strings (keywords). It
 	// needs to be large enough to accommodate the longest keyword plus null terminator. And the size of the whole structure should
 	// be a power of 2 because keyword() needs to divide by that size.
-	char z[16];
+	char z[16 - 1];
+
+	explicit sym(const char* s): val(t_sym) {
+		strcpy(z, s);
+	}
 };
 
 // Keywords are symbols that are known to be important.

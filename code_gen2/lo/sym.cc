@@ -2,7 +2,7 @@
 
 sym keywords[] = {
 	// clang-format off
-	{"break"},
+sym(	"break"),
 	// clang-format on
 };
 

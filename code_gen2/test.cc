@@ -15,8 +15,8 @@ void main() {
 	assert(fnv("", 0) == fnv("", 0));
 	assert(fnv("abc", 3) == fnv("abc", 3));
 
-	dyn a(1.0);
-	assert(a.tag() == d_num);
+	sym foo("foo");
+	assert(foo.tag == t_sym);
 
 	puts("ok");
 }
