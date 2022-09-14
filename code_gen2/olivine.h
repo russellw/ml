@@ -7,5 +7,6 @@
 
 #include <lo/val.h>
 
+#include <lo/list.h>
 #include <lo/num.h>
 #include <lo/sym.h>

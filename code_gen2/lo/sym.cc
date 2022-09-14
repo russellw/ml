@@ -29,7 +29,7 @@ struct init {
 		static_assert(isPow2(sizeof(sym)));
 		assert(isPow2(cap));
 		assert(qty <= cap * 3 / 4);
-		entries = (sym**)calloc(cap, sizeof(sym*));
+		entries = (sym**)xcalloc(cap, sizeof(sym*));
 		for (int i = 0; i != sizeof keywords / sizeof *keywords; ++i) {
 			auto s = keywords + i;
 			auto n = strlen(s->z);
@@ -49,7 +49,7 @@ struct init {
 
 void expand() {
 	auto cap1 = cap * 2;
-	auto entries1 = (sym**)calloc(cap1, sizeof(sym*));
+	auto entries1 = (sym**)xcalloc(cap1, sizeof(sym*));
 	for (size_t i = 0; i != cap; ++i) {
 		auto s = entries[i];
 		if (s) entries1[slot(entries1, cap1, s->z, strlen(s->z))] = s;
@@ -74,7 +74,7 @@ sym* intern(const char* s, size_t n) {
 	}
 
 	// Make a new symbol.
-	auto r = (sym*)new char[offsetof(sym, z) + n + 1];
+	auto r = (sym*)xmalloc(offsetof(sym, z) + n + 1);
 	r->tag = t_sym;
 	memcpy(r->z, s, n);
 	r->z[n] = 0;
