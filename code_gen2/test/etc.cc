@@ -68,6 +68,10 @@ void main() {
 		assert(a->n == 2);
 		assert(a->v[0] == x);
 		assert(a->v[1] == y);
+
+		int n = 0;
+		for (auto b: a) ++n;
+		assert(n == 2);
 	}
 
 	//program output

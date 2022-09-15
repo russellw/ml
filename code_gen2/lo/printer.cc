@@ -4,4 +4,6 @@ namespace {}
 
 void printcc(val* program) {
 	puts("#include <olivine.h>");
+
+	//function declarations
 }

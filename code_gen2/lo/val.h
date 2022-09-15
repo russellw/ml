@@ -11,3 +11,6 @@ struct val {
 	val(int tag): tag(tag) {
 	}
 };
+
+val** begin(val* a);
+val** end(val* a);
