@@ -13,11 +13,11 @@ def call(*cmd):
         stderr=subprocess.PIPE,
     )
     stdout, stderr = p.communicate()
-    stdout = str(stdout, "utf-8")
-    stderr = str(stderr, "utf-8")
     if stderr:
+        stderr = str(stderr, "utf-8")
         raise Exception(stderr)
     if p.returncode:
+        stdout = str(stdout, "utf-8")
         print(stdout)
         raise Exception(str(p.returncode))
     return stdout
@@ -51,8 +51,8 @@ def do(f):
     shutil.copy2(f, "a.cpp")
     cc("a.cpp")
     s = call("a.exe")
-    print(repr(s))
-    open("a1.cpp", "w").write(s)
+    print(s)
+    open("a1.cpp", "wb").write(s)
     cc("a1.cpp")
 
 
