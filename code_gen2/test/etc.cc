@@ -72,6 +72,11 @@ void main() {
 		int n = 0;
 		for (auto b: a) ++n;
 		assert(n == 2);
+
+		assert(kw(a) != s_fn);
+
+		a = mk(intern("fn"), y);
+		assert(kw(a) == s_fn);
 	}
 
 	//program output

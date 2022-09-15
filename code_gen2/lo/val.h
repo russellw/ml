@@ -14,3 +14,5 @@ struct val {
 
 val** begin(val* a);
 val** end(val* a);
+
+size_t kw(val* a);
