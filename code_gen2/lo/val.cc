@@ -17,3 +17,19 @@ size_t kw(val* a) {
 	auto a1 = (list*)a;
 	return keyword(*a1->v);
 }
+
+void print(val* a) {
+	switch (a->tag) {
+	case t_list:
+		print((list*)a);
+		break;
+	case t_sym:
+		print((sym*)a);
+		break;
+	case t_num:
+		print((num*)a);
+		break;
+	default:
+		unreachable;
+	}
+}

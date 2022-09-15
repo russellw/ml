@@ -16,3 +16,4 @@ val** begin(val* a);
 val** end(val* a);
 
 size_t kw(val* a);
+void print(val* a);

@@ -34,3 +34,5 @@ sym* intern(const char* s, size_t n);
 inline sym* intern(const char* s) {
 	return intern(s, strlen(s));
 }
+
+void print(sym* a);

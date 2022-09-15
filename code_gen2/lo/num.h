@@ -4,3 +4,5 @@ struct num: val {
 	explicit num(double x): val(t_num), x(x) {
 	}
 };
+
+void print(num* a);

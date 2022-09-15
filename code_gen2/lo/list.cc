@@ -25,3 +25,14 @@ list* mk(const vector<val*>& v) {
 	memcpy(r->v, v.data(), v.size() * sizeof(val*));
 	return r;
 }
+
+void print(list* a) {
+	putchar('(');
+	bool more = 0;
+	for (auto b: a) {
+		if (more) putchar(' ');
+		more = 1;
+		print(b);
+	}
+	putchar(')');
+}

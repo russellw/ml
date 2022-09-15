@@ -82,3 +82,7 @@ sym* intern(const char* s, size_t n) {
 	// Add to hash table.
 	return entries[i] = r;
 }
+
+void print(sym* a) {
+	printf("%s", a->z);
+}
