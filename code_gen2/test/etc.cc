@@ -69,6 +69,4 @@ void main() {
 		assert(a->v[0] == x);
 		assert(a->v[1] == y);
 	}
-
-	puts("ok");
 }
