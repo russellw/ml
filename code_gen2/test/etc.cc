@@ -70,5 +70,6 @@ void main() {
 		assert(a->v[1] == y);
 	}
 
+	puts("#include <olivine.h>");
 	puts("void main() {}");
 }
