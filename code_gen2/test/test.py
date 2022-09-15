@@ -18,6 +18,7 @@ def call(*cmd):
     if stderr:
         raise Exception(stderr)
     if p.returncode:
+        print(stdout)
         raise Exception(str(p.returncode))
     return stdout
 
@@ -30,10 +31,7 @@ test_dir = os.path.dirname(os.path.realpath(__file__))
 main_dir = os.path.join(test_dir, "..")
 
 
-def do(f):
-    print(f)
-    shutil.copy2(f, "a.cpp")
-    v = []
+def cc(f):
     call(
         "cl",
         "/DDEBUG",
@@ -42,12 +40,20 @@ def do(f):
         "/WX",
         "/Zi",
         "/nologo",
-        "a.cpp",
+        f,
         os.path.join(main_dir, "lo", "*.cc"),
         "dbghelp.lib",
     )
+
+
+def do(f):
+    print(f)
+    shutil.copy2(f, "a.cpp")
+    cc("a.cpp")
     s = call("a.exe")
-    print(s)
+    print(repr(s))
+    open("a1.cpp", "w").write(s)
+    cc("a1.cpp")
 
 
 tests = [test_dir]
