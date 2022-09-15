@@ -70,6 +70,8 @@ void main() {
 		assert(a->v[1] == y);
 	}
 
-	puts("#include <olivine.h>");
+	//program output
+	vector<val*> program;
+	printcc(mk(program));
 	puts("void main() {}");
 }
