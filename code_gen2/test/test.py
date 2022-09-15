@@ -6,7 +6,7 @@ import subprocess
 import shutil
 
 
-def call(cmd):
+def call(*cmd):
     p = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
@@ -34,18 +34,17 @@ def do(f):
     print(f)
     shutil.copy2(f, "a.cpp")
     v = []
-    subprocess.check_call(
-        [
-            "cl",
-            "/DDEBUG",
-            "/EHsc",
-            "/I" + main_dir,
-            "/WX",
-            "/Zi",
-            "a.cpp",
-            os.path.join(main_dir, "lo", "*.cc"),
-            "dbghelp.lib",
-        ]
+    call(
+        "cl",
+        "/DDEBUG",
+        "/EHsc",
+        "/I" + main_dir,
+        "/WX",
+        "/Zi",
+        "/nologo",
+        "a.cpp",
+        os.path.join(main_dir, "lo", "*.cc"),
+        "dbghelp.lib",
     )
     s = call("a.exe")
     print(s)
