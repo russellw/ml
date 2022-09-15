@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <vector>
+using std::vector;
+
 #include <lo/debug.h>
 #include <lo/etc.h>
 

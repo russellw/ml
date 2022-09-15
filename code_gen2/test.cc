@@ -59,6 +59,15 @@ void main() {
 		assert(a->n == 2);
 		assert(a->v[0] == x);
 		assert(a->v[1] == y);
+
+		vector<val*> v;
+		v.push_back(x);
+		v.push_back(y);
+		a = mk(v);
+		assert(a->tag == t_list);
+		assert(a->n == 2);
+		assert(a->v[0] == x);
+		assert(a->v[1] == y);
 	}
 
 	puts("ok");

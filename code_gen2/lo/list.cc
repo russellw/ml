@@ -19,3 +19,9 @@ list* mk(val* a, val* b) {
 	r->v[1] = b;
 	return r;
 }
+
+list* mk(const vector<val*>& v) {
+	auto r = mk(v.size());
+	memcpy(r->v, v.data(), v.size() * sizeof(val*));
+	return r;
+}

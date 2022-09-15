@@ -5,3 +5,4 @@ struct list: val {
 
 list* mk(val* a);
 list* mk(val* a, val* b);
+list* mk(const vector<val*>& v);
