@@ -85,9 +85,10 @@ void main() {
 
 	f.clear();
 	f.push_back(intern("fn"));
-	f.push_back(intern("void"));
+	f.push_back(intern("int"));
 	f.push_back(intern("main"));
 	f.push_back(&empty);
+	f.push_back(mk(intern("return")));
 	program.push_back(mk(f));
 
 	printcc(mk(program));

@@ -50,10 +50,11 @@ def do(f):
     print(f)
     shutil.copy2(f, "a.cpp")
     cc("a.cpp")
-    s = call("a.exe")
+    s = call("a")
     print(s)
     open("a1.cpp", "wb").write(s)
     cc("a1.cpp")
+    subprocess.check_call('a1')
 
 
 tests = [test_dir]
