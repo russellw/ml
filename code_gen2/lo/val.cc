@@ -33,3 +33,10 @@ void print(val* a) {
 		unreachable;
 	}
 }
+
+val* at(val* a, size_t i) {
+	assert(a->tag == t_list);
+	auto a1 = (list*)a;
+	assert(i < a1->n);
+	return a1->v[i];
+}
