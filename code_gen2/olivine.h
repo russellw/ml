@@ -9,7 +9,7 @@ using std::vector;
 #include <lo/debug.h>
 #include <lo/etc.h>
 
-#include <lo/val.h>
+#include <lo/dyn.h>
 
 #include <lo/list.h>
 #include <lo/num.h>
