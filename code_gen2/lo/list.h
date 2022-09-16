@@ -1,6 +1,6 @@
 struct list: val {
 	unsigned n;
-	val* v[];
+	dyn v[];
 
 	list(): val(t_list) {
 	}
@@ -8,15 +8,15 @@ struct list: val {
 
 extern list empty;
 
-list* mk(val* a);
-list* mk(val* a, val* b);
-list* mk(const vector<val*>& v);
+list* mk(dyn a);
+list* mk(dyn a, dyn b);
+list* mk(const vector<dyn>& v);
 
-inline val** begin(list* a) {
+inline dyn* begin(list* a) {
 	return a->v;
 }
 
-inline val** end(list* a) {
+inline dyn* end(list* a) {
 	return a->v + a->n;
 }
 

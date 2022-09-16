@@ -22,7 +22,7 @@ enum
 // And statically allocated for fast lookup.
 extern sym keywords[];
 
-inline size_t keyword(const val* s) {
+inline size_t keyword(const dyn s) {
 	// Assign the difference to an unsigned variable and perform the division explicitly, because ptrdiff_t is a signed type, but
 	// unsigned division is slightly faster.
 	size_t i = (char*)s - (char*)keywords;

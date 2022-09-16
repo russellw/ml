@@ -54,7 +54,7 @@ def do(f):
     print(s)
     open("a1.cpp", "wb").write(s)
     cc("a1.cpp")
-    subprocess.check_call('a1')
+    subprocess.check_call("a1")
 
 
 tests = [test_dir]

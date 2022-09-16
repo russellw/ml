@@ -12,9 +12,11 @@ struct val {
 	}
 };
 
-val** begin(val* a);
-val** end(val* a);
+typedef val* dyn;
 
-size_t kw(val* a);
-void print(val* a);
-val* at(val* a, size_t i);
+dyn* begin(dyn a);
+dyn* end(dyn a);
+
+size_t kw(dyn a);
+void print(dyn a);
+dyn at(dyn a, size_t i);

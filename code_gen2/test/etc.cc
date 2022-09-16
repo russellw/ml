@@ -60,7 +60,7 @@ void main() {
 		assert(a->v[0] == x);
 		assert(a->v[1] == y);
 
-		vector<val*> v;
+		vector<dyn> v;
 		v.push_back(x);
 		v.push_back(y);
 		a = mk(v);
@@ -80,8 +80,8 @@ void main() {
 	}
 
 	//program output
-	vector<val*> program;
-	vector<val*> f;
+	vector<dyn> program;
+	vector<dyn> f;
 
 	f.clear();
 	f.push_back(intern("fn"));

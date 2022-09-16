@@ -1,24 +1,24 @@
 #include <olivine.h>
 
-val** begin(val* a) {
+dyn* begin(dyn a) {
 	assert(a->tag == t_list);
 	auto a1 = (list*)a;
 	return a1->v;
 }
 
-val** end(val* a) {
+dyn* end(dyn a) {
 	assert(a->tag == t_list);
 	auto a1 = (list*)a;
 	return a1->v + a1->n;
 }
 
-size_t kw(val* a) {
+size_t kw(dyn a) {
 	assert(a->tag == t_list);
 	auto a1 = (list*)a;
 	return keyword(*a1->v);
 }
 
-void print(val* a) {
+void print(dyn a) {
 	switch (a->tag) {
 	case t_list:
 		print((list*)a);
@@ -34,7 +34,7 @@ void print(val* a) {
 	}
 }
 
-val* at(val* a, size_t i) {
+dyn at(dyn a, size_t i) {
 	assert(a->tag == t_list);
 	auto a1 = (list*)a;
 	assert(i < a1->n);

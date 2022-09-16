@@ -1,1 +1,1 @@
-void printcc(val* program);
+void printcc(dyn program);

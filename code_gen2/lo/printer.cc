@@ -1,11 +1,11 @@
 #include <olivine.h>
 
 namespace {
-void name(val* a) {
+void name(dyn a) {
 	print(a);
 }
 
-void decl(val* f) {
+void decl(dyn f) {
 	assert(kw(f) == s_fn);
 	name(at(f, 1));
 	putchar(' ');
@@ -20,7 +20,7 @@ void decl(val* f) {
 }
 } // namespace
 
-void printcc(val* program) {
+void printcc(dyn program) {
 	puts("#include <olivine.h>");
 
 	//function declarations
