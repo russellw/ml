@@ -7,6 +7,8 @@ void name(val* a) {
 
 void decl(val* f) {
 	assert(kw(f) == s_fn);
+	name(at(f, 1));
+	putchar(' ');
 	name(at(f, 2));
 	putchar('(');
 	bool more = 0;

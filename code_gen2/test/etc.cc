@@ -84,9 +84,10 @@ void main() {
 	vector<val*> f;
 
 	f.clear();
+	f.push_back(intern("fn"));
 	f.push_back(intern("void"));
 	f.push_back(intern("main"));
-	f.push_back(mk());
+	f.push_back(&empty);
 	program.push_back(mk(f));
 
 	printcc(mk(program));

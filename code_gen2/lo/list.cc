@@ -1,5 +1,7 @@
 #include <olivine.h>
 
+list empty;
+
 static list* mk(int n) {
 	auto r = (list*)xmalloc(offsetof(list, v) + n * sizeof(val*));
 	r->tag = t_list;

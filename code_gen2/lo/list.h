@@ -1,7 +1,12 @@
 struct list: val {
 	unsigned n;
 	val* v[];
+
+	list(): val(t_list) {
+	}
 };
+
+extern list empty;
 
 list* mk(val* a);
 list* mk(val* a, val* b);
