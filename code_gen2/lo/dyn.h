@@ -5,14 +5,18 @@ enum
 	t_sym,
 };
 
-struct val {
-	unsigned char tag;
+class dyn {
+	size_t x;
 
-	val(int tag): tag(tag) {
+public:
+	dyn(void* p, size_t tag): x(size_t(p) + tag) {
+	}
+
+	size_t kw() const;
+	void* ptr() const {
+		return (void*)(x & ~size_t(3));
 	}
 };
-
-typedef val* dyn;
 
 dyn* begin(dyn a);
 dyn* end(dyn a);
