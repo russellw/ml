@@ -13,6 +13,5 @@ using std::vector;
 #include <lo/dyn.h>
 
 #include <lo/list.h>
-#include <lo/num.h>
 
 #include <lo/printer.h>
