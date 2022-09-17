@@ -2,7 +2,7 @@
 
 struct List {
 	size_t n;
-	dyn v[];
+	dyn v[9];
 };
 
 dyn::dyn(const char* s): x(size_t(intern(s)) | t_sym) {
