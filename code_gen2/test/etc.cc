@@ -18,65 +18,62 @@ void main() {
 	//symbols
 	{
 		dyn foo("foo");
-		assert(foo.tag == t_sym);
+		assert(foo.isSym());
 
-		auto a = intern("a");
-		assert(a->tag == t_sym);
-		assert(!strcmp(a->z, "a"));
+		dyn a("a");
+		assert(a.isSym());
+		assert(!strcmp(a.str(), "a"));
 
-		auto a1 = intern("a");
+		dyn a1("a");
 		assert(a == a1);
 
-		a = intern("if");
-		assert(keyword(a) == s_if);
+		a = dyn("if");
+		assert(a.kw() == s_if);
 
-		a = intern("return");
-		assert(keyword(a) == s_return);
+		a = dyn("return");
+		assert(a.kw() == s_return);
 
-		a = intern("qwertyuiop");
-		assert(keyword(a) >= end_s);
+		a = dyn("qwertyuiop");
+		assert(a.kw() >= end_s);
 	}
 
 	//numbers
 	{
-		auto a = new num(1.0);
-		assert(a->tag == t_num);
-		assert(a->x == 1.0);
+		dyn a(1.0);
+		assert(a.isNum());
+		assert(a.num() == 1.0);
 	}
 
 	//lists
 	{
-		auto x = new num(1.0);
-		auto y = new num(2.0);
+		auto x = dyn(1.0);
+		auto y = dyn(2.0);
 
 		auto a = list(x);
-		assert(a->tag == t_list);
-		assert(a->n == 1);
-		assert(a->v[0] == x);
+		assert(a.size() == 1);
+		assert(a[0] == x);
 
 		a = list(x, y);
-		assert(a->tag == t_list);
-		assert(a->n == 2);
-		assert(a->v[0] == x);
-		assert(a->v[1] == y);
+		assert(a.size() == 2);
+		assert(a[0] == x);
+		assert(a[1] == y);
 
 		vector<dyn> v;
 		v.push_back(x);
 		v.push_back(y);
 		a = list(v);
-		assert(a->tag == t_list);
-		assert(a->n == 2);
-		assert(a->v[0] == x);
-		assert(a->v[1] == y);
+		assert(a.size() == 2);
+		assert(a[0] == x);
+		assert(a[1] == y);
 
 		int n = 0;
 		for (auto b: a) ++n;
 		assert(n == 2);
 
-		assert(kw(a) != s_fn);
+		assert(a.kw() != s_fn);
 
-		a = list(intern("fn"), y);
-		assert(kw(a) == s_fn);
+		a = list(dyn("fn"), y);
+		assert(a.kw() == s_fn);
 	}
 
 	//program output
@@ -84,11 +81,11 @@ void main() {
 	vector<dyn> f;
 
 	f.clear();
-	f.push_back(intern("fn"));
-	f.push_back(intern("int"));
-	f.push_back(intern("main"));
+	f.push_back(dyn("fn"));
+	f.push_back(dyn("int"));
+	f.push_back(dyn("main"));
 	f.push_back(&empty);
-	f.push_back(list(intern("return")));
+	f.push_back(list(dyn("return")));
 	program.push_back(list(f));
 
 	printcc(list(program));
