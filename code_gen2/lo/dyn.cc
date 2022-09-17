@@ -58,7 +58,7 @@ void print(dyn a) {
 		return;
 	}
 	if (a.isNum()) {
-		printf("%f", a.num());
+		printf("%.999g", a.num());
 		return;
 	}
 	putchar('(');
