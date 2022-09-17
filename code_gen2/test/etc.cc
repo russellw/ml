@@ -111,11 +111,11 @@ void main() {
 	params.clear();
 	params.push_back(list(dyn("int"), dyn("n")));
 	f.push_back(list(params));
-	f.push_back(
-		list(s_if,
-			list(s_le, dyn("n"), dyn(1.0)),
-			list(s_return, dyn(1.0)),
-			list(s_return, list(s_mul, dyn("n"),list( dyn("factorial"),list(s_sub,dyn("n"),dyn(1.0)))))));
+	f.push_back(list(
+		s_if,
+		list(s_le, dyn("n"), dyn(1.0)),
+		list(s_return, dyn(1.0)),
+		list(s_return, list(s_mul, dyn("n"), list(dyn("factorial"), list(s_sub, dyn("n"), dyn(1.0)))))));
 	program.push_back(list(f));
 
 	f.clear();

@@ -66,6 +66,6 @@ dyn list(const vector<dyn>& v);
 
 dyn list(int a, dyn b);
 dyn list(int a, dyn b, dyn c);
-dyn list(int a, dyn b, dyn c,dyn d);
+dyn list(int a, dyn b, dyn c, dyn d);
 
 void print(dyn a);

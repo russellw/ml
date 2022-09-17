@@ -67,7 +67,7 @@ dyn list(int a, dyn b, dyn c) {
 	return dyn(r, t_list);
 }
 
-dyn list(int a, dyn b, dyn c,dyn d) {
+dyn list(int a, dyn b, dyn c, dyn d) {
 	auto r = list(4);
 	r->v[0] = sym(a);
 	r->v[1] = b;
