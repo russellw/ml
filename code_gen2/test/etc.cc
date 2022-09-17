@@ -107,12 +107,27 @@ void main() {
 	f.clear();
 	f.push_back(sym(s_fn));
 	f.push_back(dyn("int"));
+	f.push_back(dyn("factorial"));
+	params.clear();
+	params.push_back(list(dyn("int"), dyn("n")));
+	f.push_back(list(params));
+	f.push_back(
+		list(s_if,
+			list(s_le, dyn("n"), dyn(1.0)),
+			list(s_return, dyn(1.0)),
+			list(s_return, list(s_mul, dyn("n"),list( dyn("factorial"),list(s_sub,dyn("n"),dyn(1.0)))))));
+	program.push_back(list(f));
+
+	f.clear();
+	f.push_back(sym(s_fn));
+	f.push_back(dyn("int"));
 	f.push_back(dyn("main"));
 	params.clear();
 	f.push_back(list(params));
 	f.push_back(list(dyn("assert"), dyn(1.0)));
 	f.push_back(list(dyn("assert"), list(s_eq, dyn(1.0), dyn(1.0))));
 	f.push_back(list(dyn("assert"), list(s_eq, list(dyn("square"), dyn(3.0)), dyn(9.0))));
+	f.push_back(list(dyn("assert"), list(s_eq, list(dyn("factorial"), dyn(5.0)), dyn(120.0))));
 	f.push_back(list(dyn("return"), list(s_sub, dyn(1.0), dyn(1.0))));
 	program.push_back(list(f));
 

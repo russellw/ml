@@ -67,6 +67,15 @@ dyn list(int a, dyn b, dyn c) {
 	return dyn(r, t_list);
 }
 
+dyn list(int a, dyn b, dyn c,dyn d) {
+	auto r = list(4);
+	r->v[0] = sym(a);
+	r->v[1] = b;
+	r->v[2] = c;
+	r->v[3] = d;
+	return dyn(r, t_list);
+}
+
 void print(dyn a) {
 	if (a.isSym()) {
 		printf("%s", a.str());

@@ -66,6 +66,17 @@ void stmt(dyn a) {
 			expr(a[1]);
 		}
 		break;
+	case s_if:
+		print(a[0]);
+			putchar('(');
+			expr(a[1]);
+			puts(")");
+			stmt(a[2]);
+			if(a.size()>3){
+				puts("else");
+			stmt(a[3]);
+			}
+		break;
 	default:
 		expr(a);
 		break;
