@@ -50,8 +50,37 @@ void expr(dyn a) {
 		putchar('%');
 		expr(a[2]);
 		break;
+	case s_eq:
+		expr(a[1]);
+		printf("==");
+		expr(a[2]);
+		break;
+	case s_ne:
+		expr(a[1]);
+		printf("!=");
+		expr(a[2]);
+		break;
+	case s_lt:
+		expr(a[1]);
+		printf("<");
+		expr(a[2]);
+		break;
+	case s_le:
+		expr(a[1]);
+		printf("<=");
+		expr(a[2]);
+		break;
 	default:
-		unreachable;
+		name(a[0]);
+		putchar('(');
+		bool more = 0;
+		for (auto b: a.from(1)) {
+			if (more) putchar(',');
+			more = 1;
+			expr(b);
+		}
+		putchar(')');
+		break;
 	}
 }
 

@@ -7,6 +7,10 @@ _(sub)
 _(mul)
 _(div)
 _(rem)
+_(eq)
+_(ne)
+_(lt)
+_(le)
 ///
 
 #undef _
