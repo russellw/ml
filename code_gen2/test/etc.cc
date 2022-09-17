@@ -75,7 +75,7 @@ void main() {
 
 		assert(a.kw() != s_fn);
 
-		a = list(dyn("fn"), y);
+		a = list(sym(s_fn), y);
 		assert(a.kw() == s_fn);
 
 		assert(x != list(x, x));
@@ -95,7 +95,7 @@ void main() {
 	vector<dyn> params;
 
 	f.clear();
-	f.push_back(dyn("fn"));
+	f.push_back(sym(s_fn));
 	f.push_back(dyn("int"));
 	f.push_back(dyn("square"));
 	params.clear();
@@ -105,7 +105,7 @@ void main() {
 	program.push_back(list(f));
 
 	f.clear();
-	f.push_back(dyn("fn"));
+	f.push_back(sym(s_fn));
 	f.push_back(dyn("int"));
 	f.push_back(dyn("main"));
 	params.clear();

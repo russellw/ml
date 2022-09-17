@@ -54,6 +54,10 @@ public:
 	dyn from(size_t i) const;
 };
 
+inline dyn sym(int k) {
+	return dyn(keywords[k], t_sym);
+}
+
 dyn list();
 dyn list(dyn a);
 dyn list(dyn a, dyn b);

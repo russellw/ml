@@ -54,14 +54,14 @@ dyn list(const vector<dyn>& v) {
 
 dyn list(int a, dyn b) {
 	auto r = list(2);
-	r->v[0] = dyn(keywords[a], t_sym);
+	r->v[0] = sym(a);
 	r->v[1] = b;
 	return dyn(r, t_list);
 }
 
 dyn list(int a, dyn b, dyn c) {
 	auto r = list(3);
-	r->v[0] = dyn(keywords[a], t_sym);
+	r->v[0] = sym(a);
 	r->v[1] = b;
 	r->v[2] = c;
 	return dyn(r, t_list);

@@ -3,11 +3,11 @@
 // SORT
 k(if)
 k(return )
-k(fn)
 ///
 #undef k
 
 // SORT
+o(fn, ".fn")
 o(add, "+")
 o(sub, "-")
 o(mul, "*")
