@@ -40,7 +40,7 @@ void stackTrace() {
 #endif
 }
 
-bool assertFail(const char* file, int line, const char* func, const char* s) {
+void assertFail(const char* file, int line, const char* func, const char* s) {
 	fprintf(stderr, "%s:%d: %s: Assert failed: %s\n", file, line, func, s);
 	stackTrace();
 	exit(1);
