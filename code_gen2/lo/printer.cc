@@ -6,13 +6,13 @@ void name(dyn a) {
 }
 
 void decl(dyn f) {
-	assert(kw(f) == s_fn);
-	name(at(f, 1));
+	assert(f.kw() == s_fn);
+	name(f[1]);
 	putchar(' ');
-	name(at(f, 2));
+	name(f[2]);
 	putchar('(');
 	bool more = 0;
-	for (auto x: at(f, 3)) {
+	for (auto x: f[3]) {
 		if (more) putchar(',');
 		more = 1;
 	}
@@ -25,14 +25,14 @@ void printcc(dyn program) {
 
 	//function declarations
 	for (auto a: program)
-		if (kw(a) == s_fn) {
+		if (a.kw() == s_fn) {
 			decl(a);
 			puts(";");
 		}
 
 	//function definitions
 	for (auto a: program)
-		if (kw(a) == s_fn) {
+		if (a.kw() == s_fn) {
 			decl(a);
 			puts("{");
 			puts("}");

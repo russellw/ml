@@ -5,6 +5,9 @@ struct List {
 	dyn v[];
 };
 
+dyn::dyn(const char* s): x(size_t(intern(s)) | t_sym) {
+}
+
 dyn::dyn(double a) {
 	auto p = new double;
 	*p = a;
@@ -42,6 +45,14 @@ dyn list(const vector<dyn>& v) {
 }
 
 void print(dyn a) {
+	if (a.isSym()) {
+		printf("%s", a.str());
+		return;
+	}
+	if (a.isNum()) {
+		printf("%f", a.num());
+		return;
+	}
 	putchar('(');
 	bool more = 0;
 	for (auto b: a) {
@@ -70,25 +81,9 @@ size_t dyn::kw() const {
 	return keyword((void*)a.x);
 }
 
-void print(dyn a) {
-	switch (a->tag) {
-	case t_list:
-		print((List*)a);
-		break;
-	case t_sym:
-		print((sym*)a);
-		break;
-	case t_num:
-		print((num*)a);
-		break;
-	default:
-		unreachable;
-	}
-}
-
 const char* dyn::str() const {
-	assert(tag() == t_str);
-	return (const char*)(x - t_str);
+	assert(tag() == t_sym);
+	return (const char*)(x - t_sym);
 }
 
 bool dyn::operator==(dyn b) const {
@@ -103,13 +98,13 @@ bool dyn::operator==(dyn b) const {
 
 size_t dyn::size() const {
 	assert(tag() == t_list);
-	auto p = (list*)(x - t_list);
+	auto p = (List*)(x - t_list);
 	return p->n;
 }
 
 dyn dyn::operator[](size_t i) const {
 	assert(tag() == t_list);
-	auto p = (list*)(x - t_list);
+	auto p = (List*)(x - t_list);
 	assert(i < p->n);
 	return p->v[i];
 }

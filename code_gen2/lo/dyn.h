@@ -15,10 +15,7 @@ class dyn {
 public:
 	dyn(void* p, size_t tag): x(size_t(p) + tag) {
 	}
-
-	explicit dyn(const char* s): x(size_t(s) + t_sym) {
-	}
-
+	explicit dyn(const char* s);
 	explicit dyn(double a);
 
 	dyn* begin() const;

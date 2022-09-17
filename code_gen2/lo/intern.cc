@@ -31,7 +31,7 @@ struct init {
 		assert(qty <= cap * 3 / 4);
 		entries = (char**)xcalloc(cap, sizeof(char*));
 		for (int i = 0; i != sizeof keywords / sizeof *keywords; ++i) {
-			auto s = keywords + i;
+			auto s = keywords[i];
 			auto n = strlen(s);
 
 			// C++ allows the edge case where a string literal exactly fills an array, leaving no room for a null terminator. This
