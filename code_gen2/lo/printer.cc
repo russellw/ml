@@ -31,48 +31,16 @@ void expr(dyn a) {
 	}
 	switch (a.kw()) {
 	case s_add:
-		expr(a[1]);
-		putchar('+');
-		expr(a[2]);
-		break;
 	case s_sub:
-		expr(a[1]);
-		putchar('-');
-		expr(a[2]);
-		break;
 	case s_mul:
-		expr(a[1]);
-		putchar('*');
-		expr(a[2]);
-		break;
 	case s_div:
-		expr(a[1]);
-		putchar('/');
-		expr(a[2]);
-		break;
 	case s_rem:
-		expr(a[1]);
-		putchar('%');
-		expr(a[2]);
-		break;
 	case s_eq:
-		expr(a[1]);
-		printf("==");
-		expr(a[2]);
-		break;
 	case s_ne:
-		expr(a[1]);
-		printf("!=");
-		expr(a[2]);
-		break;
 	case s_lt:
-		expr(a[1]);
-		printf("<");
-		expr(a[2]);
-		break;
 	case s_le:
 		expr(a[1]);
-		printf("<=");
+		print(a[0]);
 		expr(a[2]);
 		break;
 	default:
