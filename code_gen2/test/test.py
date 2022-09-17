@@ -6,7 +6,7 @@ import subprocess
 import shutil
 
 
-def call(*cmd):
+def call(cmd, limit=0):
     p = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
@@ -17,7 +17,9 @@ def call(*cmd):
         stderr = str(stderr, "utf-8")
         raise Exception(stderr)
     if p.returncode:
-        stdout = str(stdout, "utf-8")
+        stdout = str(stdout, "utf-8").replace("\r\n", "\n")
+        if limit:
+            stdout = "\n".join(stdout.split("\n")[:limit])
         print(stdout)
         raise Exception(str(p.returncode))
     return stdout
@@ -33,16 +35,19 @@ main_dir = os.path.join(test_dir, "..")
 
 def cc(f):
     call(
-        "cl",
-        "/DDEBUG",
-        "/EHsc",
-        "/I" + main_dir,
-        "/WX",
-        "/Zi",
-        "/nologo",
-        f,
-        os.path.join(main_dir, "lo", "*.cc"),
-        "dbghelp.lib",
+        (
+            "cl",
+            "/DDEBUG",
+            "/EHsc",
+            "/I" + main_dir,
+            "/WX",
+            "/Zi",
+            "/nologo",
+            f,
+            os.path.join(main_dir, "lo", "*.cc"),
+            "dbghelp.lib",
+        ),
+        20,
     )
 
 

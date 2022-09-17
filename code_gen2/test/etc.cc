@@ -17,7 +17,7 @@ void main() {
 
 	//symbols
 	{
-		sym foo("foo");
+		dyn foo("foo");
 		assert(foo.tag == t_sym);
 
 		auto a = intern("a");
@@ -49,12 +49,12 @@ void main() {
 		auto x = new num(1.0);
 		auto y = new num(2.0);
 
-		auto a = mk(x);
+		auto a = list(x);
 		assert(a->tag == t_list);
 		assert(a->n == 1);
 		assert(a->v[0] == x);
 
-		a = mk(x, y);
+		a = list(x, y);
 		assert(a->tag == t_list);
 		assert(a->n == 2);
 		assert(a->v[0] == x);
@@ -63,7 +63,7 @@ void main() {
 		vector<dyn> v;
 		v.push_back(x);
 		v.push_back(y);
-		a = mk(v);
+		a = list(v);
 		assert(a->tag == t_list);
 		assert(a->n == 2);
 		assert(a->v[0] == x);
@@ -75,7 +75,7 @@ void main() {
 
 		assert(kw(a) != s_fn);
 
-		a = mk(intern("fn"), y);
+		a = list(intern("fn"), y);
 		assert(kw(a) == s_fn);
 	}
 
@@ -88,8 +88,8 @@ void main() {
 	f.push_back(intern("int"));
 	f.push_back(intern("main"));
 	f.push_back(&empty);
-	f.push_back(mk(intern("return")));
-	program.push_back(mk(f));
+	f.push_back(list(intern("return")));
+	program.push_back(list(f));
 
-	printcc(mk(program));
+	printcc(list(program));
 }
