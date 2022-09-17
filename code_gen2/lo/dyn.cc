@@ -91,7 +91,17 @@ bool dyn::operator==(dyn b) const {
 	if (tag() != b.tag()) return 0;
 	switch (tag()) {
 	case t_num:
-		return *(double*)ptr() == *(double*)ptr();
+		return *(double*)(x - t_num) == *(double*)(b.x - t_num);
+	case t_list:
+	{
+		auto p = (List*)(x - t_list);
+		auto n = p->n;
+		auto q = (List*)(b.x - t_list);
+		if (n != q->n) return 0;
+		for (size_t i = 0; i != n; ++i)
+			if (p->v[i] != q->v[i]) return 0;
+		return 1;
+	}
 	}
 	return 0;
 }

@@ -26,6 +26,7 @@ void main() {
 
 		dyn a1("a");
 		assert(a == a1);
+		assert(a != foo);
 
 		a = dyn("if");
 		assert(a.kw() == s_if);
@@ -48,6 +49,7 @@ void main() {
 	{
 		auto x = dyn(1.0);
 		auto y = dyn(2.0);
+		assert(x != y);
 
 		auto a = list(x);
 		assert(a.size() == 1);
@@ -74,6 +76,10 @@ void main() {
 
 		a = list(dyn("fn"), y);
 		assert(a.kw() == s_fn);
+
+		assert(x != list(x, x));
+		assert(list(x, x) == list(x, x));
+		assert(list(x, x) != list(x, y));
 	}
 
 	//program output
