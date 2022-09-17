@@ -1,20 +1,25 @@
 #include <olivine.h>
 
 namespace {
-void name(dyn a) {
+void pname(dyn a) {
 	print(a);
+}
+
+void ptype(dyn type, dyn name) {
+	print(type);
+	putchar(' ');
+	pname(name);
 }
 
 void decl(dyn f) {
 	assert(f.kw() == s_fn);
-	name(f[1]);
-	putchar(' ');
-	name(f[2]);
+	ptype(f[1], f[2]);
 	putchar('(');
 	bool more = 0;
 	for (auto x: f[3]) {
 		if (more) putchar(',');
 		more = 1;
+		ptype(x[0], x[1]);
 	}
 	putchar(')');
 }
@@ -71,7 +76,7 @@ void expr(dyn a) {
 		expr(a[2]);
 		break;
 	default:
-		name(a[0]);
+		pname(a[0]);
 		putchar('(');
 		bool more = 0;
 		for (auto b: a.from(1)) {

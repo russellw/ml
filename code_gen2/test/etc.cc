@@ -92,14 +92,27 @@ void main() {
 	//program output
 	vector<dyn> program;
 	vector<dyn> f;
+	vector<dyn> params;
+
+	f.clear();
+	f.push_back(dyn("fn"));
+	f.push_back(dyn("int"));
+	f.push_back(dyn("square"));
+	params.clear();
+	params.push_back(list(dyn("int"), dyn("x")));
+	f.push_back(list(params));
+	f.push_back(list(dyn("return"), list(dyn("mul"), dyn("x"), dyn("x"))));
+	program.push_back(list(f));
 
 	f.clear();
 	f.push_back(dyn("fn"));
 	f.push_back(dyn("int"));
 	f.push_back(dyn("main"));
-	f.push_back(list());
+	params.clear();
+	f.push_back(list(params));
 	f.push_back(list(dyn("assert"), dyn(1.0)));
 	f.push_back(list(dyn("assert"), list(dyn("eq"), dyn(1.0), dyn(1.0))));
+	f.push_back(list(dyn("assert"), list(dyn("eq"), list(dyn("square"), dyn(3.0)), dyn(9.0))));
 	f.push_back(list(dyn("return"), list(dyn("sub"), dyn(1.0), dyn(1.0))));
 	program.push_back(list(f));
 

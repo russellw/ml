@@ -40,7 +40,7 @@ def cc(f):
             "/DDEBUG",
             "/EHsc",
             "/I" + main_dir,
-            "/W4",
+            "/W3",
             "/WX",
             "/Zi",
             "/nologo",
