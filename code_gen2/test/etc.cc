@@ -49,6 +49,7 @@ void main() {
 	{
 		auto x = dyn(1.0);
 		auto y = dyn(2.0);
+		auto z = dyn(3.0);
 		assert(x != y);
 
 		auto a = list(x);
@@ -80,6 +81,12 @@ void main() {
 		assert(x != list(x, x));
 		assert(list(x, x) == list(x, x));
 		assert(list(x, x) != list(x, y));
+
+		assert(list(x, y, z).from(0) == list(x, y, z));
+		assert(list(x, y, z).from(1) == list(y, z));
+		assert(list(x, y, z).from(2) == list(z));
+		assert(list(x, y, z).from(3) == list());
+		assert(list(x, y, z).from(4) == list());
 	}
 
 	//program output
@@ -91,7 +98,7 @@ void main() {
 	f.push_back(dyn("int"));
 	f.push_back(dyn("main"));
 	f.push_back(list());
-	f.push_back(list(dyn("return")));
+	f.push_back(list(dyn("return"), dyn(0.0)));
 	program.push_back(list(f));
 
 	printcc(list(program));

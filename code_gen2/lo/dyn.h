@@ -28,13 +28,13 @@ public:
 	}
 
 	//extract
-	double num() const {
-		assert(isNum());
-		return *((double*)(x - t_num));
-	}
 	const char* str() const {
 		assert(isSym());
 		return (const char*)(x - t_sym);
+	}
+	double num() const {
+		assert(isNum());
+		return *((double*)(x - t_num));
 	}
 
 	//compare
@@ -51,10 +51,12 @@ public:
 	size_t kw() const;
 	size_t size() const;
 	dyn operator[](size_t i) const;
+	dyn from(size_t i) const;
 };
 
 dyn list();
 dyn list(dyn a);
 dyn list(dyn a, dyn b);
+dyn list(dyn a, dyn b, dyn c);
 dyn list(const vector<dyn>& v);
 void print(dyn a);

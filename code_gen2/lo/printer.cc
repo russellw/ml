@@ -18,6 +18,29 @@ void decl(dyn f) {
 	}
 	putchar(')');
 }
+
+void expr(dyn a) {
+	if (a.size() < 2) {
+		print(a);
+		return;
+	}
+}
+
+void stmt(dyn a) {
+	switch (a.kw()) {
+	case s_return:
+		print(a[0]);
+		if (a.size() > 1) {
+			putchar(' ');
+			expr(a[1]);
+		}
+		break;
+	default:
+		expr(a);
+		break;
+	}
+	puts(";");
+}
 } // namespace
 
 void printcc(dyn program) {
@@ -35,6 +58,7 @@ void printcc(dyn program) {
 		if (a.kw() == s_fn) {
 			decl(a);
 			puts("{");
+			for (auto b: a.from(4)) stmt(b);
 			puts("}");
 		}
 }

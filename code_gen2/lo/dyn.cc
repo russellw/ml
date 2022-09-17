@@ -38,6 +38,14 @@ dyn list(dyn a, dyn b) {
 	return dyn(r, t_list);
 }
 
+dyn list(dyn a, dyn b, dyn c) {
+	auto r = list(3);
+	r->v[0] = a;
+	r->v[1] = b;
+	r->v[2] = c;
+	return dyn(r, t_list);
+}
+
 dyn list(const vector<dyn>& v) {
 	auto r = list(v.size());
 	memcpy(r->v, v.data(), v.size() * sizeof(dyn));
@@ -102,7 +110,7 @@ bool dyn::operator==(dyn b) const {
 }
 
 size_t dyn::size() const {
-	assert(tag() == t_list);
+	if (tag() != t_list) return 1;
 	auto p = (List*)(x - t_list);
 	return p->n;
 }
@@ -112,4 +120,13 @@ dyn dyn::operator[](size_t i) const {
 	auto p = (List*)(x - t_list);
 	assert(i < p->n);
 	return p->v[i];
+}
+
+dyn dyn::from(size_t i) const {
+	assert(tag() == t_list);
+	auto p = (List*)(x - t_list);
+	if (i > p->n) i = p->n;
+	auto r = list(p->n - i);
+	memcpy(r->v, p->v + i, (p->n - i) * sizeof(dyn));
+	return dyn(r, t_list);
 }
