@@ -101,7 +101,7 @@ void main() {
 	params.clear();
 	params.push_back(list(dyn("int"), dyn("x")));
 	f.push_back(list(params));
-	f.push_back(list(dyn("return"), list(dyn("mul"), dyn("x"), dyn("x"))));
+	f.push_back(list(dyn("return"), list(s_mul, dyn("x"), dyn("x"))));
 	program.push_back(list(f));
 
 	f.clear();
@@ -111,9 +111,9 @@ void main() {
 	params.clear();
 	f.push_back(list(params));
 	f.push_back(list(dyn("assert"), dyn(1.0)));
-	f.push_back(list(dyn("assert"), list(dyn("eq"), dyn(1.0), dyn(1.0))));
-	f.push_back(list(dyn("assert"), list(dyn("eq"), list(dyn("square"), dyn(3.0)), dyn(9.0))));
-	f.push_back(list(dyn("return"), list(dyn("sub"), dyn(1.0), dyn(1.0))));
+	f.push_back(list(dyn("assert"), list(s_eq, dyn(1.0), dyn(1.0))));
+	f.push_back(list(dyn("assert"), list(s_eq, list(dyn("square"), dyn(3.0)), dyn(9.0))));
+	f.push_back(list(dyn("return"), list(s_sub, dyn(1.0), dyn(1.0))));
 	program.push_back(list(f));
 
 	printcc(list(program));

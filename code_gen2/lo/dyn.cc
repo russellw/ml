@@ -52,6 +52,21 @@ dyn list(const vector<dyn>& v) {
 	return dyn(r, t_list);
 }
 
+dyn list(int a, dyn b) {
+	auto r = list(2);
+	r->v[0] = dyn(keywords[a], t_sym);
+	r->v[1] = b;
+	return dyn(r, t_list);
+}
+
+dyn list(int a, dyn b, dyn c) {
+	auto r = list(3);
+	r->v[0] = dyn(keywords[a], t_sym);
+	r->v[1] = b;
+	r->v[2] = c;
+	return dyn(r, t_list);
+}
+
 void print(dyn a) {
 	if (a.isSym()) {
 		printf("%s", a.str());

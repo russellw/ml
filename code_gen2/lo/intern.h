@@ -1,7 +1,8 @@
 // Keywords are strings that are known to be important.
 enum
 {
-#define _(x) s_##x,
+#define k(x) s_##x,
+#define o(x, s) s_##x,
 #include <lo/keywords.h>
 	end_s
 };

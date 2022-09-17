@@ -1,16 +1,21 @@
-// SORT
-_(if)
-_(return )
-_(fn)
-_(add)
-_(sub)
-_(mul)
-_(div)
-_(rem)
-_(eq)
-_(ne)
-_(lt)
-_(le)
-///
+// clang-format off
 
-#undef _
+// SORT
+k(if)
+k(return )
+k(fn)
+///
+#undef k
+
+// SORT
+o(add, "+")
+o(sub, "-")
+o(mul, "*")
+o(div, "/")
+o(rem, "%")
+o(eq, "==")
+o(ne, "!=")
+o(lt, "<")
+o(le, "<=")
+///
+#undef o
