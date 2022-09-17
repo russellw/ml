@@ -21,8 +21,8 @@ public:
 
 	explicit dyn(double a);
 
-	dyn* begin();
-	dyn* end();
+	dyn* begin() const;
+	dyn* end() const;
 
 	size_t kw() const;
 	size_t size() const;
@@ -44,6 +44,7 @@ public:
 	dyn operator[](size_t i) const;
 };
 
+dyn list();
 dyn list(dyn a);
 dyn list(dyn a, dyn b);
 dyn list(const vector<dyn>& v);

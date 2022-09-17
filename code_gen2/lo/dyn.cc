@@ -5,41 +5,43 @@ struct List {
 	dyn v[];
 };
 
-List empty;
-
-dyn::dyn(double a): x(size_t(s) + t_sym) {
+dyn::dyn(double a) {
 	auto p = new double;
 	*p = a;
 	x = size_t(p) + t_num;
 }
 
-static List* list(int n) {
+static List* list(size_t n) {
 	auto r = (List*)xmalloc(offsetof(List, v) + n * sizeof(dyn));
-	r->tag = t_list;
 	r->n = n;
 	return r;
 }
 
-List* list(dyn a) {
-	auto r = list(1);
-	r->v[0] = a;
-	return r;
+dyn list() {
+	auto r = list(0);
+	return dyn(r, t_list);
 }
 
-List* list(dyn a, dyn b) {
+dyn list(dyn a) {
+	auto r = list(1);
+	r->v[0] = a;
+	return dyn(r, t_list);
+}
+
+dyn list(dyn a, dyn b) {
 	auto r = list(2);
 	r->v[0] = a;
 	r->v[1] = b;
-	return r;
+	return dyn(r, t_list);
 }
 
-List* list(const vector<dyn>& v) {
+dyn list(const vector<dyn>& v) {
 	auto r = list(v.size());
 	memcpy(r->v, v.data(), v.size() * sizeof(dyn));
-	return r;
+	return dyn(r, t_list);
 }
 
-void print(List* a) {
+void print(dyn a) {
 	putchar('(');
 	bool more = 0;
 	for (auto b: a) {
@@ -50,22 +52,22 @@ void print(List* a) {
 	putchar(')');
 }
 
-dyn* begin(dyn a) {
-	assert(a->tag == t_list);
-	auto a1 = (List*)a;
-	return a1->v;
+dyn* dyn::begin() const {
+	assert(tag() == t_list);
+	auto p = (List*)(x - t_list);
+	return p->v;
 }
 
-dyn* end(dyn a) {
-	assert(a->tag == t_list);
-	auto a1 = (List*)a;
-	return a1->v + a1->n;
+dyn* dyn::end() const {
+	assert(tag() == t_list);
+	auto p = (List*)(x - t_list);
+	return p->v + p->n;
 }
 
-size_t kw(dyn a) {
-	assert(a->tag == t_list);
-	auto a1 = (List*)a;
-	return keyword(*a1->v);
+size_t dyn::kw() const {
+	auto a = *this;
+	if (tag() == t_list) a = a[0];
+	return keyword((void*)a.x);
 }
 
 void print(dyn a) {
@@ -82,13 +84,6 @@ void print(dyn a) {
 	default:
 		unreachable;
 	}
-}
-
-dyn at(dyn a, size_t i) {
-	assert(a->tag == t_list);
-	auto a1 = (List*)a;
-	assert(i < a1->n);
-	return a1->v[i];
 }
 
 const char* dyn::str() const {

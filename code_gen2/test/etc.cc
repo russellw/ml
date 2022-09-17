@@ -84,7 +84,7 @@ void main() {
 	f.push_back(dyn("fn"));
 	f.push_back(dyn("int"));
 	f.push_back(dyn("main"));
-	f.push_back(&empty);
+	f.push_back(list());
 	f.push_back(list(dyn("return")));
 	program.push_back(list(f));
 
