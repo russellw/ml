@@ -81,11 +81,6 @@ size_t dyn::kw() const {
 	return keyword((void*)a.x);
 }
 
-const char* dyn::str() const {
-	assert(tag() == t_sym);
-	return (const char*)(x - t_sym);
-}
-
 bool dyn::operator==(dyn b) const {
 	if (x == b.x) return 1;
 	if (tag() != b.tag()) return 0;

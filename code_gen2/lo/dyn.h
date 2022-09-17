@@ -32,7 +32,10 @@ public:
 		assert(isNum());
 		return *((double*)(x - t_num));
 	}
-	const char* str() const;
+	const char* str() const {
+		assert(isSym());
+		return (const char*)(x - t_sym);
+	}
 
 	//compare
 	bool operator==(dyn b) const;
