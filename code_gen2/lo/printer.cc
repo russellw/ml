@@ -24,6 +24,35 @@ void expr(dyn a) {
 		print(a);
 		return;
 	}
+	switch (a.kw()) {
+	case s_add:
+		expr(a[1]);
+		putchar('+');
+		expr(a[2]);
+		break;
+	case s_sub:
+		expr(a[1]);
+		putchar('-');
+		expr(a[2]);
+		break;
+	case s_mul:
+		expr(a[1]);
+		putchar('*');
+		expr(a[2]);
+		break;
+	case s_div:
+		expr(a[1]);
+		putchar('/');
+		expr(a[2]);
+		break;
+	case s_rem:
+		expr(a[1]);
+		putchar('%');
+		expr(a[2]);
+		break;
+	default:
+		unreachable;
+	}
 }
 
 void stmt(dyn a) {
