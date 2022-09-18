@@ -59,7 +59,12 @@ void expr(dyn a) {
 
 void stmt(dyn a) {
 	switch (a.kw()) {
+	case s_label:
+		expr(a[1]);
+		puts(":");
+		return;
 	case s_return:
+	case s_goto:
 		print(a[0]);
 		if (a.size() > 1) {
 			putchar(' ');

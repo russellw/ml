@@ -2,12 +2,14 @@
 
 // SORT
 k(if)
-k(return )
+k(return)
+k(goto)
 ///
 #undef k
 
 // SORT
 o(fn, ".fn")
+o(label, ".label")
 o(add, "+")
 o(sub, "-")
 o(mul, "*")

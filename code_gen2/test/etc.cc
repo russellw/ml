@@ -101,6 +101,8 @@ void main() {
 	params.clear();
 	params.push_back(list(dyn("int"), dyn("x")));
 	f.push_back(list(params));
+	f.push_back(list(s_goto, dyn("foo")));
+	f.push_back(list(s_label, dyn("foo")));
 	f.push_back(list(dyn("return"), list(s_mul, dyn("x"), dyn("x"))));
 	program.push_back(list(f));
 
