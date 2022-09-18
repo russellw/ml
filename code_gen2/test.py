@@ -3,7 +3,7 @@ import os
 import random
 import re
 import subprocess
-import shutil
+import tempfile
 
 
 def call(cmd, limit=0):
@@ -29,8 +29,7 @@ parser = argparse.ArgumentParser(description="Run test cases")
 parser.add_argument("files", nargs="*")
 args = parser.parse_args()
 
-test_dir = os.path.dirname(os.path.realpath(__file__))
-main_dir = os.path.join(test_dir, "..")
+main_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 def cc(f):
@@ -39,13 +38,13 @@ def cc(f):
             "cl",
             "/DDEBUG",
             "/EHsc",
-            "/I" + os.path.join(main_dir, "src"),
+            "/I" + os.path.join(main_dir, "lib"),
             "/W3",
             "/WX",
             "/Zi",
             "/nologo",
             f,
-            os.path.join(main_dir, "src", "*.cc"),
+            os.path.join(main_dir, "lib", "*.cc"),
             "dbghelp.lib",
         ),
         20,
@@ -54,27 +53,17 @@ def cc(f):
 
 def do(f):
     print(f)
-    shutil.copy2(f, "a.cpp")
-    cc("a.cpp")
-    s = call("a")
+    cc(f)
+    s = call("test")
     print(s)
-    open("a1.cpp", "wb").write(s)
-    cc("a1.cpp")
-    subprocess.check_call("a1")
+
+    f=os.path.join(tempfile.gettempdir(),'a.cc')
+    open(f, "wb").write(s)
+    cc(f)
+    subprocess.check_call("a")
 
 
-tests = [test_dir]
-if args.files:
-    tests = args.files
-for test in tests:
-    if os.path.isfile(test):
-        do(test)
-        continue
-    if not os.path.isdir(test):
-        print(test + ": not found")
-        exit(1)
-    for root, dirs, files in os.walk(test):
-        for f in files:
-            ext = os.path.splitext(f)[1]
-            if ext in (".cc", ".cpp"):
-                do(os.path.join(root, f))
+for root, dirs, files in os.walk(main_dir):
+    for f in files:
+        if f=='test.cc':
+            do(os.path.join(root, f))
