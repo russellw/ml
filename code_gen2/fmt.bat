@@ -1,4 +1,4 @@
-clang-format -i -style=file *.cc src\*.h src\*.cc test\*.cc
+clang-format -i -style=file lib\*.h lib\*.cc compiler\*.cc
 if %errorlevel% neq 0 goto :eof
 
 black .

@@ -57,7 +57,7 @@ def do(f):
     s = call("test")
     print(s)
 
-    f=os.path.join(tempfile.gettempdir(),'a.cc')
+    f = os.path.join(tempfile.gettempdir(), "a.cc")
     open(f, "wb").write(s)
     cc(f)
     subprocess.check_call("a")
@@ -65,5 +65,5 @@ def do(f):
 
 for root, dirs, files in os.walk(main_dir):
     for f in files:
-        if f=='test.cc':
+        if f == "test.cc":
             do(os.path.join(root, f))
