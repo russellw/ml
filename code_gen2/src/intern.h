@@ -3,7 +3,7 @@ enum
 {
 #define k(x) s_##x,
 #define o(x, s) s_##x,
-#include <lo/keywords.h>
+#include "keywords.h"
 	end_s
 };
 

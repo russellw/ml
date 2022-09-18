@@ -3,7 +3,7 @@
 char keywords[][16] = {
 #define k(x) #x,
 #define o(x, s) s,
-#include <lo/keywords.h>
+#include "keywords.h"
 };
 
 namespace {

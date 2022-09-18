@@ -6,10 +6,10 @@
 #include <vector>
 using std::vector;
 
-#include <lo/debug.h>
-#include <lo/etc.h>
-#include <lo/intern.h>
+#include "debug.h"
+#include "etc.h"
+#include "intern.h"
 
-#include <lo/dyn.h>
+#include "dyn.h"
 
-#include <lo/printer.h>
+#include "printer.h"
