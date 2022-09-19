@@ -99,8 +99,7 @@ int main(int argc, char** argv) {
 	snprintf(buf, bufsz, "%s/test.cc", here);
 	vector<char> text;
 	readFile(buf, text);
-
-	//	assert(!memcmp(text.data(),"#include",8));
+	assert(!memcmp(text.data(), "#include", 8));
 
 	//program output
 	vector<dyn> program;

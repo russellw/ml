@@ -25,7 +25,7 @@ size_t fnv(const void* p, size_t bytes) {
 	return h;
 }
 
-void readFile(const char* file, vector<char> text) {
+void readFile(const char* file, vector<char>& text) {
 	auto f = open(file, O_BINARY | O_RDONLY);
 	struct stat st;
 	if (f < 0 || fstat(f, &st)) {
