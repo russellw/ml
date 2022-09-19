@@ -8,6 +8,30 @@ void* xcalloc(size_t n, size_t size);
 void* xmalloc(size_t bytes);
 ///
 
+inline bool isDigit(int c) {
+	return '0' <= c && c <= '9';
+}
+
+inline bool isLower(int c) {
+	return 'a' <= c && c <= 'z';
+}
+
+inline bool isUpper(int c) {
+	return 'A' <= c && c <= 'Z';
+}
+
+inline bool isAlpha(int c) {
+	return isLower(c) || isUpper(c);
+}
+
+inline bool isAlnum(int c) {
+	return isAlpha(c) || isDigit(c);
+}
+
+inline bool isId(int c) {
+	return isAlnum(c) || c == '_';
+}
+
 constexpr bool isPow2(size_t n) {
 	assert(n);
 	return !(n & (n - 1));
