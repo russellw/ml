@@ -133,6 +133,6 @@ int main() {
 	f.push_back(list(dyn("return"), list(s_sub, dyn(1.0), dyn(1.0))));
 	program.push_back(list(f));
 
-	printcc(list(program));
+	ccprint(list(program));
 	return 0;
 }

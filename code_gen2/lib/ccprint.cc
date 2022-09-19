@@ -90,7 +90,7 @@ void stmt(dyn a) {
 }
 } // namespace
 
-void printcc(dyn program) {
+void ccprint(dyn program) {
 	puts("#include <olivine.h>");
 
 	//function declarations

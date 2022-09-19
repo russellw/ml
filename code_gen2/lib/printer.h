@@ -1,1 +1,0 @@
-void printcc(dyn program);
