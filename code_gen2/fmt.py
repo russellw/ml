@@ -18,7 +18,7 @@ def read_lines(filename):
 
 
 def write_lines(filename, lines):
-    with open(filename, "w", newline='\n') as f:
+    with open(filename, "w", newline="\n") as f:
         for s in lines:
             f.write(s + "\n")
 
@@ -363,7 +363,7 @@ def do():
     lines = read_lines(filename)
     old = lines[:]
 
-    comments()
+    # comments()
     sort_case_blocks()
     sort_single()
     sort_multi()

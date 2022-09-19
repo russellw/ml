@@ -31,14 +31,14 @@ void expr(dyn a) {
 	}
 	switch (a.kw()) {
 	case s_add:
-	case s_sub:
-	case s_mul:
 	case s_div:
-	case s_rem:
 	case s_eq:
-	case s_ne:
-	case s_lt:
 	case s_le:
+	case s_lt:
+	case s_mul:
+	case s_ne:
+	case s_rem:
+	case s_sub:
 		expr(a[1]);
 		print(a[0]);
 		expr(a[2]);
@@ -59,12 +59,8 @@ void expr(dyn a) {
 
 void stmt(dyn a) {
 	switch (a.kw()) {
-	case s_label:
-		expr(a[1]);
-		puts(":");
-		return;
-	case s_return:
 	case s_goto:
+	case s_return:
 		print(a[0]);
 		if (a.size() > 1) {
 			putchar(' ');
@@ -82,6 +78,10 @@ void stmt(dyn a) {
 			stmt(a[3]);
 		}
 		break;
+	case s_label:
+		expr(a[1]);
+		puts(":");
+		return;
 	default:
 		expr(a);
 		break;

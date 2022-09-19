@@ -1,23 +1,23 @@
 // clang-format off
 
 // SORT
+k(goto)
 k(if)
 k(return)
-k(goto)
 ///
 #undef k
 
 // SORT
+o(add, "+")
+o(div, "/")
+o(eq, "==")
 o(fn, ".fn")
 o(label, ".label")
-o(add, "+")
-o(sub, "-")
-o(mul, "*")
-o(div, "/")
-o(rem, "%")
-o(eq, "==")
-o(ne, "!=")
-o(lt, "<")
 o(le, "<=")
+o(lt, "<")
+o(mul, "*")
+o(ne, "!=")
+o(rem, "%")
+o(sub, "-")
 ///
 #undef o

@@ -117,8 +117,6 @@ bool dyn::operator==(dyn b) const {
 	if (x == b.x) return 1;
 	if (tag() != b.tag()) return 0;
 	switch (tag()) {
-	case t_num:
-		return *(double*)(x - t_num) == *(double*)(b.x - t_num);
 	case t_list:
 	{
 		auto p = (List*)(x - t_list);
@@ -129,6 +127,8 @@ bool dyn::operator==(dyn b) const {
 			if (p->v[i] != q->v[i]) return 0;
 		return 1;
 	}
+	case t_num:
+		return *(double*)(x - t_num) == *(double*)(b.x - t_num);
 	}
 	return 0;
 }

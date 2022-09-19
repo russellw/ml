@@ -70,7 +70,7 @@ int main() {
 		assert(a[1] == y);
 
 		size_t n = 0;
-		for (auto b: a) n+=b.size();
+		for (auto b: a) n += b.size();
 		assert(n == 2);
 
 		assert(a.kw() != s_fn);
