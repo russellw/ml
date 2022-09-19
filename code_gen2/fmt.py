@@ -18,7 +18,7 @@ def read_lines(filename):
 
 
 def write_lines(filename, lines):
-    with open(filename, "w") as f:
+    with open(filename, "w", newline='\n') as f:
         for s in lines:
             f.write(s + "\n")
 
@@ -358,8 +358,7 @@ def comment_blank_lines():
 def do():
     global lines
 
-    subprocess.check_call(('clang-format',filename))
-    return
+    subprocess.check_call(("clang-format", "-i", "-style=file", filename))
 
     lines = read_lines(filename)
     old = lines[:]
