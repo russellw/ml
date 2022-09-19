@@ -16,6 +16,7 @@ inline size_t keyword(const void* p) {
 	return i / sizeof *keywords;
 }
 
+//TODO: const
 char* intern(const char* s, size_t n);
 
 inline char* intern(const char* s) {

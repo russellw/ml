@@ -5,9 +5,6 @@ struct List {
 	dyn v[9];
 };
 
-dyn::dyn(const char* s): x(size_t(intern(s)) | t_sym) {
-}
-
 dyn::dyn(double a) {
 	auto p = new double;
 	*p = a;

@@ -16,7 +16,10 @@ public:
 	//construct
 	dyn(void* p, size_t tag): x(size_t(p) + tag) {
 	}
-	explicit dyn(const char* s);
+	explicit dyn(const char* s): x(size_t(intern(s)) | t_sym) {
+	}
+	dyn(const char* s, size_t n): x(size_t(intern(s, n)) | t_sym) {
+	}
 	explicit dyn(double a);
 
 	//classify
