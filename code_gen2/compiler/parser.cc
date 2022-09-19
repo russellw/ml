@@ -34,12 +34,15 @@ void lex() {
 				return;
 			}
 			break;
+		case '#':
+		eol:
+			do ++txt;
+			while (*txt != '\n' && *txt);
+			continue;
 		case '/':
 			switch (txt[1]) {
 			case '/':
-				do ++txt;
-				while (*txt != '\n' && *txt);
-				continue;
+				goto eol;
 			}
 			break;
 		case '<':
