@@ -1,4 +1,14 @@
-#include <olivine.h>
+#include "olivine.h"
+
+#include <fcntl.h>
+#include <sys/stat.h>
+
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#define O_BINARY 0
+#endif
 
 // SORT
 size_t fnv(const void* p, size_t bytes) {
@@ -11,6 +21,23 @@ size_t fnv(const void* p, size_t bytes) {
 		h *= 16777619;
 	}
 	return h;
+}
+
+void readFile(const char* file, vector<char> text) {
+	auto f = open(file, O_BINARY | O_RDONLY);
+	struct stat st;
+	if (f < 0 || fstat(f, &st)) {
+		perror(file);
+		exit(1);
+	}
+	auto n = st.st_size;
+	text.resize(n + 1);
+	if (read(f, text.data(), n) != n) {
+		perror(file);
+		exit(1);
+	}
+	close(f);
+	text[n] = 0;
 }
 
 void* xcalloc(size_t n, size_t size) {

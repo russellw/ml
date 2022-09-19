@@ -1,5 +1,6 @@
 // SORT
 size_t fnv(const void* p, size_t bytes);
+void readFile(const char* file, vector<char> text);
 void* xcalloc(size_t n, size_t size);
 void* xmalloc(size_t bytes);
 ///

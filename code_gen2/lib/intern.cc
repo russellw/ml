@@ -1,4 +1,4 @@
-#include <olivine.h>
+#include "olivine.h"
 
 char keywords[][16] = {
 #define k(x) #x,

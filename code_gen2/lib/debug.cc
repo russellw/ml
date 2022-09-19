@@ -1,4 +1,4 @@
-#include <olivine.h>
+#include "olivine.h"
 
 #ifdef DEBUG
 #ifdef _WIN32
