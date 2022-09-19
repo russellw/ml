@@ -1,6 +1,4 @@
-import argparse
 import os
-import re
 import subprocess
 import tempfile
 
@@ -50,7 +48,6 @@ def cc(f):
 f = os.path.join(here, "test.cc")
 cc(f)
 s = call("test")
-print(s)
 
 f = os.path.join(tempfile.gettempdir(), "a.cc")
 open(f, "wb").write(s)
