@@ -8,6 +8,7 @@ def call(cmd, limit=0):
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        shell=True,
     )
     stdout, stderr = p.communicate()
     if stderr:
@@ -27,22 +28,37 @@ lib = os.path.join(here, "..", "lib")
 
 
 def cc(f):
-    call(
-        (
-            "cl",
-            "/DDEBUG",
-            "/EHsc",
-            "/I" + lib,
-            "/W3",
-            "/WX",
-            "/Zi",
-            "/nologo",
-            f,
-            os.path.join(lib, "*.cc"),
-            "dbghelp.lib",
-        ),
-        20,
-    )
+    if os.name == "nt":
+        call(
+            (
+                "cl",
+                "/DDEBUG",
+                "/EHsc",
+                "/I" + lib,
+                "/W3",
+                "/WX",
+                "/Zi",
+                "/nologo",
+                f,
+                os.path.join(lib, "*.cc"),
+                "dbghelp.lib",
+            ),
+            20,
+        )
+    else:
+        call(
+            (
+                "g++",
+                "-DDEBUG",
+                "-I" + lib,
+                "-Wall",
+                "-Werror",
+                "-Wextra",
+                f,
+                os.path.join(lib, "*.cc"),
+            ),
+            20,
+        )
 
 
 f = os.path.join(here, "test.cc")

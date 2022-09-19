@@ -1,6 +1,6 @@
 #include <olivine.h>
 
-void main() {
+int main() {
 	assert(isPow2(1));
 	assert(isPow2(2));
 	assert(isPow2(4));
@@ -70,7 +70,7 @@ void main() {
 		assert(a[1] == y);
 
 		int n = 0;
-		for (auto b: a) ++n;
+		for (auto b: a) n+=b.size();
 		assert(n == 2);
 
 		assert(a.kw() != s_fn);
@@ -134,4 +134,5 @@ void main() {
 	program.push_back(list(f));
 
 	printcc(list(program));
+	return 0;
 }
