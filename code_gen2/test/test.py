@@ -11,11 +11,11 @@ def call(cmd, limit=0):
         stderr=subprocess.PIPE,
     )
     stdout, stderr = p.communicate()
+    stdout = str(stdout, "utf-8").replace("\r\n", "\n")
+    stderr = str(stderr, "utf-8").replace("\r\n", "\n")
     if stderr:
-        stderr = str(stderr, "utf-8")
         raise Exception(stderr)
     if p.returncode:
-        stdout = str(stdout, "utf-8").replace("\r\n", "\n")
         if limit:
             stdout = "\n".join(stdout.split("\n")[:limit])
         print(stdout)
@@ -63,6 +63,6 @@ cc(f)
 s = call(exe)
 
 f = os.path.join(tempfile.gettempdir(), "a.cc")
-open(f, "wb").write(s)
+open(f, "w", newline="\n").write(s)
 cc(f)
 subprocess.check_call(exe)
