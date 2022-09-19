@@ -14,6 +14,7 @@ enum
 namespace {
 const char* txt;
 int tok;
+const char* tokStr;
 
 //tokenizer
 void lex() {
@@ -123,6 +124,7 @@ void lex() {
 			do ++txt;
 			while (isId(*txt));
 			tok = k_id;
+			tokStr = intern(s, txt - s);
 			return;
 		}
 		}
