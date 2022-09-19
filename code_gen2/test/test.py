@@ -25,6 +25,7 @@ def call(cmd, limit=0):
 
 
 here = os.path.dirname(os.path.realpath(__file__))
+project = os.path.join(here, "..")
 
 
 def cc(f):
@@ -33,32 +34,25 @@ def cc(f):
             "cl",
             "/DDEBUG",
             "/EHsc",
-            "/I" + os.path.join(here, "lib"),
+            "/I" + os.path.join(project, "lib"),
             "/W3",
             "/WX",
             "/Zi",
             "/nologo",
             f,
-            os.path.join(here, "lib", "*.cc"),
+            os.path.join(project, "lib", "*.cc"),
             "dbghelp.lib",
         ),
         20,
     )
 
 
-def do(f):
-    print(f)
-    cc(f)
-    s = call("test")
-    print(s)
+f = os.path.join(here, "test.cc")
+cc(f)
+s = call("test")
+print(s)
 
-    f = os.path.join(tempfile.gettempdir(), "a.cc")
-    open(f, "wb").write(s)
-    cc(f)
-    subprocess.check_call("a")
-
-
-for root, dirs, files in os.walk(here):
-    for f in files:
-        if f == "test.cc":
-            do(os.path.join(root, f))
+f = os.path.join(tempfile.gettempdir(), "a.cc")
+open(f, "wb").write(s)
+cc(f)
+subprocess.check_call("a")
