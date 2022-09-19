@@ -18,7 +18,4 @@ inline size_t keyword(const void* p) {
 
 //TODO: const
 char* intern(const char* s, size_t n);
-
-inline char* intern(const char* s) {
-	return intern(s, strlen(s));
-}
+inline char* intern(const char* s) { return intern(s, strlen(s)); }

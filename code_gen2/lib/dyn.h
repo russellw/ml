@@ -8,27 +8,18 @@ enum
 class dyn {
 	size_t x;
 
-	size_t tag() const {
-		return x & 3;
-	}
+	size_t tag() const { return x & 3; }
 
 public:
 	//construct
-	dyn(void* p, size_t tag): x(size_t(p) + tag) {
-	}
-	explicit dyn(const char* s): x(size_t(intern(s)) | t_sym) {
-	}
-	dyn(const char* s, size_t n): x(size_t(intern(s, n)) | t_sym) {
-	}
+	dyn(void* p, size_t tag): x(size_t(p) + tag) {}
+	explicit dyn(const char* s): x(size_t(intern(s)) | t_sym) {}
+	dyn(const char* s, size_t n): x(size_t(intern(s, n)) | t_sym) {}
 	explicit dyn(double a);
 
 	//classify
-	bool isSym() const {
-		return tag() == t_sym;
-	}
-	bool isNum() const {
-		return tag() == t_num;
-	}
+	bool isSym() const { return tag() == t_sym; }
+	bool isNum() const { return tag() == t_num; }
 
 	//extract
 	const char* str() const {
@@ -42,9 +33,7 @@ public:
 
 	//compare
 	bool operator==(dyn b) const;
-	bool operator!=(dyn b) const {
-		return !(*this == b);
-	}
+	bool operator!=(dyn b) const { return !(*this == b); }
 
 	//iterate
 	dyn* begin() const;
@@ -57,9 +46,7 @@ public:
 	dyn from(size_t i) const;
 };
 
-inline dyn sym(int k) {
-	return dyn(keywords[k], t_sym);
-}
+inline dyn sym(int k) { return dyn(keywords[k], t_sym); }
 
 dyn list();
 dyn list(dyn a);

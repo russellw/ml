@@ -1,9 +1,7 @@
 #include "olivine.h"
 
 namespace {
-void pname(dyn a) {
-	print(a);
-}
+void pname(dyn a) { print(a); }
 
 void ptype(dyn type, dyn name) {
 	print(type);
