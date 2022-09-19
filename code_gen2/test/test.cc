@@ -69,7 +69,7 @@ int main() {
 		assert(a[0] == x);
 		assert(a[1] == y);
 
-		int n = 0;
+		size_t n = 0;
 		for (auto b: a) n+=b.size();
 		assert(n == 2);
 

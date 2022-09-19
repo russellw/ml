@@ -1,3 +1,4 @@
+import glob
 import os
 import subprocess
 import tempfile
@@ -8,7 +9,6 @@ def call(cmd, limit=0):
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        shell=True,
     )
     stdout, stderr = p.communicate()
     if stderr:
@@ -25,47 +25,44 @@ def call(cmd, limit=0):
 
 here = os.path.dirname(os.path.realpath(__file__))
 lib = os.path.join(here, "..", "lib")
+exe = os.path.join(tempfile.gettempdir(), "a")
 
 
 def cc(f):
     if os.name == "nt":
-        call(
-            (
-                "cl",
-                "/DDEBUG",
-                "/EHsc",
-                "/I" + lib,
-                "/W3",
-                "/WX",
-                "/Zi",
-                "/nologo",
-                f,
-                os.path.join(lib, "*.cc"),
-                "dbghelp.lib",
-            ),
-            20,
-        )
+        cmd = [
+            "cl",
+            "/DDEBUG",
+            "/EHsc",
+            "/Fe" + exe,
+            "/I" + lib,
+            "/W3",
+            "/WX",
+            "/Zi",
+            "/nologo",
+            f,
+            os.path.join(lib, "*.cc"),
+            "dbghelp.lib",
+        ]
     else:
-        call(
-            (
-                "g++",
-                "-DDEBUG",
-                "-I" + lib,
-                "-Wall",
-                "-Werror",
-                "-Wextra",
-                f,
-                os.path.join(lib, "*.cc"),
-            ),
-            20,
-        )
+        cmd = [
+            "g++",
+            "-DDEBUG",
+            "-I" + lib,
+            "-Wall",
+            "-Werror",
+            "-Wextra",
+            "-o" + exe,
+            f,
+        ] + list(glob.glob(os.path.join(lib, "*.cc")))
+    call(cmd, 20)
 
 
 f = os.path.join(here, "test.cc")
 cc(f)
-s = call("test")
+s = call(exe)
 
 f = os.path.join(tempfile.gettempdir(), "a.cc")
 open(f, "wb").write(s)
 cc(f)
-subprocess.check_call("a")
+subprocess.check_call(exe)
