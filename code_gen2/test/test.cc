@@ -139,7 +139,6 @@ int main(int argc, char** argv) {
 	params.clear();
 	f.push_back(list(params));
 	f.push_back(list(dyn("assert"), dyn(1.0)));
-	f.push_back(list(dyn("assert"), list(s_eq, dyn(1.0), dyn(1.0))));
 	f.push_back(list(dyn("assert"), list(s_eq, list(dyn("square"), dyn(3.0)), dyn(9.0))));
 	f.push_back(list(dyn("assert"), list(s_eq, list(dyn("factorial"), dyn(5.0)), dyn(120.0))));
 	f.push_back(list(dyn("return"), list(s_sub, dyn(1.0), dyn(1.0))));

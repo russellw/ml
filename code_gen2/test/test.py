@@ -36,7 +36,7 @@ def cc(f):
             "/EHsc",
             "/Fe" + exe,
             "/I" + lib,
-            "/W3",
+            "/W4",
             "/WX",
             "/Zi",
             "/nologo",
