@@ -1,7 +1,7 @@
-clang-format -i -style=file lib\*.h lib\*.cc compiler\*.cc
+black .
 if %errorlevel% neq 0 goto :eof
 
-black .
+python fmt.py
 if %errorlevel% neq 0 goto :eof
 
 git diff

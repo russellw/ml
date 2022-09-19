@@ -355,8 +355,12 @@ def comment_blank_lines():
 # top level
 
 
-def act():
+def do():
     global lines
+
+    subprocess.check_call(('clang-format',filename))
+    return
+
     lines = read_lines(filename)
     old = lines[:]
 
@@ -375,7 +379,7 @@ def act():
 for arg in args.files:
     if os.path.isfile(arg):
         filename = arg
-        act()
+        do()
         continue
     for root, dirs, files in os.walk(arg):
         for filename in files:
@@ -383,4 +387,4 @@ for arg in args.files:
             if ext not in (".cc", ".cpp", ".h"):
                 continue
             filename = os.path.join(root, filename)
-            act()
+            do()
