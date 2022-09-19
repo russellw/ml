@@ -1,6 +1,5 @@
 import argparse
 import os
-import random
 import re
 import subprocess
 import tempfile
@@ -25,11 +24,7 @@ def call(cmd, limit=0):
     return stdout
 
 
-parser = argparse.ArgumentParser(description="Run test cases")
-parser.add_argument("files", nargs="*")
-args = parser.parse_args()
-
-main_dir = os.path.dirname(os.path.realpath(__file__))
+here = os.path.dirname(os.path.realpath(__file__))
 
 
 def cc(f):
@@ -38,13 +33,13 @@ def cc(f):
             "cl",
             "/DDEBUG",
             "/EHsc",
-            "/I" + os.path.join(main_dir, "lib"),
+            "/I" + os.path.join(here, "lib"),
             "/W3",
             "/WX",
             "/Zi",
             "/nologo",
             f,
-            os.path.join(main_dir, "lib", "*.cc"),
+            os.path.join(here, "lib", "*.cc"),
             "dbghelp.lib",
         ),
         20,
@@ -63,7 +58,7 @@ def do(f):
     subprocess.check_call("a")
 
 
-for root, dirs, files in os.walk(main_dir):
+for root, dirs, files in os.walk(here):
     for f in files:
         if f == "test.cc":
             do(os.path.join(root, f))
