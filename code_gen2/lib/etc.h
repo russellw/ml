@@ -1,3 +1,6 @@
+const size_t bufsz = 0x1000;
+extern char buf[];
+
 // SORT
 size_t fnv(const void* p, size_t bytes);
 void readFile(const char* file, vector<char> text);

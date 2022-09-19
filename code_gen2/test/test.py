@@ -60,7 +60,7 @@ def cc(f):
 
 f = os.path.join(here, "test.cc")
 cc(f)
-s = call(exe)
+s = call((exe, here))
 
 f = os.path.join(tempfile.gettempdir(), "a.cc")
 open(f, "w", newline="\n").write(s)

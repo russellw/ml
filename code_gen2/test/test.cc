@@ -1,6 +1,11 @@
 #include <olivine.h>
 
-int main() {
+int main(int argc, char** argv) {
+	if (argc < 2) {
+		fprintf(stderr, "Usage: %s path\n", argv[0]);
+		return 1;
+	}
+
 	assert(isPow2(1));
 	assert(isPow2(2));
 	assert(isPow2(4));
@@ -88,6 +93,14 @@ int main() {
 		assert(list(x, y, z).from(3) == list());
 		assert(list(x, y, z).from(4) == list());
 	}
+
+	//readFile
+	auto here = argv[1];
+	snprintf(buf, bufsz, "%s/test.cc", here);
+	vector<char> text;
+	readFile(buf, text);
+
+	//	assert(!memcmp(text.data(),"#include",8));
 
 	//program output
 	vector<dyn> program;

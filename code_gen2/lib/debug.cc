@@ -20,7 +20,6 @@ void stackTrace() {
 	auto nframes = CaptureStackBackTrace(1, maxFrames, stack, 0);
 
 	// Symbol.
-	char buf[0x1000];
 	auto si = (SYMBOL_INFO*)buf;
 	si->MaxNameLen = 0x100;
 	si->SizeOfStruct = sizeof(SYMBOL_INFO);
