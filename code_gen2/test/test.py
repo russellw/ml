@@ -23,7 +23,7 @@ def call(cmd, limit=0):
 
 
 here = os.path.dirname(os.path.realpath(__file__))
-project = os.path.join(here, "..")
+lib = os.path.join(here, "..", "lib")
 
 
 def cc(f):
@@ -32,13 +32,13 @@ def cc(f):
             "cl",
             "/DDEBUG",
             "/EHsc",
-            "/I" + os.path.join(project, "lib"),
+            "/I" + lib,
             "/W3",
             "/WX",
             "/Zi",
             "/nologo",
             f,
-            os.path.join(project, "lib", "*.cc"),
+            os.path.join(lib, "*.cc"),
             "dbghelp.lib",
         ),
         20,

@@ -10,4 +10,4 @@ for root, dirs, files in os.walk(here):
         if f == "test.py":
             f = os.path.join(root, f)
             subprocess.check_call(("python", f))
-print('ok')
+print("ok")
