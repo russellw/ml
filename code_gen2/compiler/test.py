@@ -54,8 +54,8 @@ def cc(f):
             "-Wextra",
             "-o" + exe,
         ]
-        f.extend(list(glob.glob(f)))
-        f.extend(list(glob.glob(os.path.join(lib, "*.cc"))))
+        cmd.extend(list(glob.glob(f)))
+        cmd.extend(list(glob.glob(os.path.join(lib, "*.cc"))))
     call(cmd, 20)
 
 
