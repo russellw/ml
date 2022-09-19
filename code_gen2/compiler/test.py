@@ -53,13 +53,17 @@ def cc(f):
             "-Werror",
             "-Wextra",
             "-o" + exe,
-            f,
-        ] + list(glob.glob(os.path.join(lib, "*.cc")))
+        ]
+        f.extend(list(glob.glob(f)))
+        f.extend(list(glob.glob(os.path.join(lib, "*.cc"))))
     call(cmd, 20)
 
 
-f = os.path.join(here, "test.cc")
+f = os.path.join(here, "*.cc")
 cc(f)
+subprocess.check_call(exe)
+exit(0)
+
 s = call((exe, here))
 
 f = os.path.join(tempfile.gettempdir(), "a.cc")

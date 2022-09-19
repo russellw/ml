@@ -28,5 +28,21 @@ int main(int argc, const char** argv) {
 #ifdef _WIN32
 	AddVectoredExceptionHandler(0, handler);
 #endif
+	vector<const char*> files;
+	for (int i = 1; i != argc; ++i) {
+		auto s = argv[i];
+		if (*s == '-') {
+			while (*s == '-') ++s;
+			switch (*s) {
+			case 'h':
+				puts("-h  Show help\n"
+					 "-V  Show version");
+				return 0;
+			}
+			fprintf(stderr, "%s: unknown option\n", argv[i]);
+			return 1;
+		}
+		files.push_back(s);
+	}
 	return 0;
 }
