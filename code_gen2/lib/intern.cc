@@ -74,7 +74,7 @@ char* intern(const char* s, size_t n) {
 		assert(!entries[i]);
 	}
 
-	// Make a new symbol.
+	// Make a new string
 	auto r = new char[n + 1];
 	memcpy(r, s, n);
 	r[n] = 0;

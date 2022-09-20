@@ -22,24 +22,24 @@ int main(int argc, char** argv) {
 
 	//symbols
 	{
-		dyn foo("foo");
+		auto foo = sym("foo");
 		assert(foo.isSym());
 
-		dyn a("a");
+		auto a = sym("a");
 		assert(a.isSym());
 		assert(!strcmp(a.str(), "a"));
 
-		dyn a1("a");
+		auto a1 = sym("a");
 		assert(a == a1);
 		assert(a != foo);
 
-		a = dyn("if");
+		a = sym("if");
 		assert(a.kw() == s_if);
 
-		a = dyn("return");
+		a = sym("return");
 		assert(a.kw() == s_return);
 
-		a = dyn("qwertyuiop");
+		a = sym("qwertyuiop");
 		assert(a.kw() >= end_s);
 	}
 
@@ -108,40 +108,40 @@ int main(int argc, char** argv) {
 
 	f.clear();
 	f.push_back(sym(s_fn));
-	f.push_back(dyn("int"));
-	f.push_back(dyn("square"));
+	f.push_back(sym("int"));
+	f.push_back(sym("square"));
 	params.clear();
-	params.push_back(list(dyn("int"), dyn("x")));
+	params.push_back(list(sym("int"), sym("x")));
 	f.push_back(list(params));
-	f.push_back(list(s_goto, dyn("foo")));
-	f.push_back(list(s_label, dyn("foo")));
-	f.push_back(list(dyn("return"), list(s_mul, dyn("x"), dyn("x"))));
+	f.push_back(list(s_goto, sym("foo")));
+	f.push_back(list(s_label, sym("foo")));
+	f.push_back(list(sym("return", 6), list(s_mul, sym("x"), sym("x"))));
 	program.push_back(list(f));
 
 	f.clear();
 	f.push_back(sym(s_fn));
-	f.push_back(dyn("int"));
-	f.push_back(dyn("factorial"));
+	f.push_back(sym("int"));
+	f.push_back(sym("factorial"));
 	params.clear();
-	params.push_back(list(dyn("int"), dyn("n")));
+	params.push_back(list(sym("int"), sym("n")));
 	f.push_back(list(params));
 	f.push_back(list(
 		s_if,
-		list(s_le, dyn("n"), dyn(1.0)),
+		list(s_le, sym("n"), dyn(1.0)),
 		list(s_return, dyn(1.0)),
-		list(s_return, list(s_mul, dyn("n"), list(dyn("factorial"), list(s_sub, dyn("n"), dyn(1.0)))))));
+		list(s_return, list(s_mul, sym("n"), list(sym("factorial"), list(s_sub, sym("n"), dyn(1.0)))))));
 	program.push_back(list(f));
 
 	f.clear();
 	f.push_back(sym(s_fn));
-	f.push_back(dyn("int"));
-	f.push_back(dyn("main"));
+	f.push_back(sym("int"));
+	f.push_back(sym("main"));
 	params.clear();
 	f.push_back(list(params));
-	f.push_back(list(dyn("assert"), dyn(1.0)));
-	f.push_back(list(dyn("assert"), list(s_eq, list(dyn("square"), dyn(3.0)), dyn(9.0))));
-	f.push_back(list(dyn("assert"), list(s_eq, list(dyn("factorial"), dyn(5.0)), dyn(120.0))));
-	f.push_back(list(dyn("return"), list(s_sub, dyn(1.0), dyn(1.0))));
+	f.push_back(list(sym("assert"), dyn(1.0)));
+	f.push_back(list(sym("assert"), list(s_eq, list(sym("square"), dyn(3.0)), dyn(9.0))));
+	f.push_back(list(sym("assert"), list(s_eq, list(sym("factorial"), dyn(5.0)), dyn(120.0))));
+	f.push_back(list(sym("return"), list(s_sub, dyn(1.0), dyn(1.0))));
 	program.push_back(list(f));
 
 	ccprint(list(program));

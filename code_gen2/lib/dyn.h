@@ -13,8 +13,6 @@ class dyn {
 public:
 	//construct
 	dyn(void* p, size_t tag): x(size_t(p) + tag) {}
-	explicit dyn(const char* s): x(size_t(intern(s)) | t_sym) {}
-	dyn(const char* s, size_t n): x(size_t(intern(s, n)) | t_sym) {}
 	explicit dyn(double a);
 
 	//classify
@@ -46,6 +44,9 @@ public:
 	dyn from(size_t i) const;
 };
 
+//a symbol is a dynamic wrapper around an interned string
+inline dyn sym(const char* s) { return dyn(intern(s), t_sym); }
+inline dyn sym(const char* s, size_t n) { return dyn(intern(s, n), t_sym); }
 inline dyn sym(int k) { return dyn(keywords[k], t_sym); }
 
 dyn list();
