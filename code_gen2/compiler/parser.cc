@@ -257,6 +257,13 @@ dyn stmt() {
 	if (tok == k_id) {
 		auto k = keyword(tokStr);
 		switch (k) {
+		case '{':
+		{
+			lex();
+			vector<dyn> v(1, sym(s_block));
+			while (!eat('}')) v.push_back(stmt());
+			return list(v);
+		}
 		case s_return:
 		{
 			lex();

@@ -9,6 +9,7 @@ k(return)
 
 // SORT
 o(add, "+")
+o(block, "{")
 o(div, "/")
 o(eq, "==")
 o(fn, ".fn")
