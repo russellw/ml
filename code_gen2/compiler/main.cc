@@ -20,7 +20,7 @@ LONG WINAPI handler(struct _EXCEPTION_POINTERS* ExceptionInfo) {
 #include <unistd.h>
 #endif
 
-int main(int argc, const char** argv) {
+int main(int argc, char** argv) {
 	std::set_new_handler([]() {
 		perror("new");
 		exit(1);
@@ -28,7 +28,7 @@ int main(int argc, const char** argv) {
 #ifdef _WIN32
 	AddVectoredExceptionHandler(0, handler);
 #endif
-	vector<const char*> files;
+	vector<char*> files;
 	for (int i = 1; i != argc; ++i) {
 		auto s = argv[i];
 		if (*s == '-') {
@@ -44,5 +44,6 @@ int main(int argc, const char** argv) {
 		}
 		files.push_back(s);
 	}
+	for (auto file: files) puts(file);
 	return 0;
 }

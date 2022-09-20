@@ -25,8 +25,15 @@ def call(cmd, limit=0):
 
 here = os.path.dirname(os.path.realpath(__file__))
 lib = os.path.join(here, "..", "lib")
-test = os.path.join(here, "test")
 exe = os.path.join(tempfile.gettempdir(), "a")
+
+tests = []
+for root, dirs, files in os.walk(os.path.join(here, "test")):
+    for f in files:
+        ext = os.path.splitext(f)[1]
+        if ext == ".cpp":
+            f = os.path.join(root, f)
+            tests.append(f)
 
 
 def cco(f):
@@ -58,12 +65,8 @@ def cco(f):
 
 # Compile all test files with the C++ compiler (without linking)
 # to make sure they are valid C++
-for root, dirs, files in os.walk(test):
-    for f in files:
-        ext = os.path.splitext(f)[1]
-        if ext == ".cpp":
-            f = os.path.join(root, f)
-            cco(f)
+for f in tests:
+    cco(f)
 
 
 def cc(f):
@@ -101,10 +104,14 @@ def cc(f):
 f = os.path.join(here, "*.cc")
 cc(f)
 
-
 # Smoke test
 s = call((exe, "-h"))
 assert s
+
+# Run the Olivine compiler on all test files
+for f in tests:
+    s = call((exe, f))
+    print(s)
 exit(0)
 
 s = call((exe, here))
