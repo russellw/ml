@@ -13,6 +13,14 @@
 char buf[bufsz];
 
 // SORT
+void err(const char* file, const char* s, const char* t, const char* msg) {
+	size_t line = 1;
+	for (; s != t; ++s)
+		if (*s == '\n') ++line;
+	fprintf(stderr, "%s:%zu: %s\n", file, line, msg);
+	exit(1);
+}
+
 size_t fnv(const void* p, size_t bytes) {
 	// Fowler-Noll-Vo-1a is slower than more sophisticated hash algorithms for large chunks of data, but faster for tiny ones, so it
 	// still sees use.

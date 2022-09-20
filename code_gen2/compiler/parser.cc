@@ -14,11 +14,14 @@ enum
 };
 
 namespace {
+const char* file;
+vector<char> text;
+
+//tokenizer
 const char* txt;
 int tok;
 const char* tokStr;
 
-//tokenizer
 void lex() {
 	for (;;) {
 		switch (*txt) {
@@ -162,11 +165,17 @@ bool eat(int k) {
 	}
 	return 0;
 }
+
+void expect(int k) {
+	if (eat(k)) return;
+	sprintf(buf, "expected '%c'", k);
+	err(file, text.data(), txt, buf);
+}
 } // namespace
 
-void parse(const char* file) {
-	vector<char> text;
-	readFile(file, text);
+void parse(const char* f) {
+	file = f;
+	readFile(f, text);
 	txt = text.data();
 	lex();
 }

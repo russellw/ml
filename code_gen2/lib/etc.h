@@ -2,6 +2,7 @@ const size_t bufsz = 0x1000;
 extern char buf[];
 
 // SORT
+[[noreturn]] void err(const char* file, const char* s, const char* t, const char* msg);
 size_t fnv(const void* p, size_t bytes);
 void readFile(const char* file, vector<char>& text);
 void* xcalloc(size_t n, size_t size);
