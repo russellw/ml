@@ -175,6 +175,13 @@ void expect(int k) {
 	err(buf);
 }
 
+dyn id() {
+	if (tok != k_id) err("expected identifier");
+	dyn a(tokStr, t_sym);
+	lex();
+	return a;
+}
+
 //types
 dyn typ() {
 	if (tok != k_id) return list();
@@ -202,11 +209,7 @@ dyn primary() {
 		return a;
 	}
 	case k_id:
-	{
-		dyn a(tokStr, t_sym);
-		lex();
-		return a;
-	}
+		return id();
 	}
 	err("expected expression");
 }
@@ -264,6 +267,20 @@ dyn stmt() {
 	dyn a = expr();
 	expect(';');
 	return a;
+}
+
+//declarations
+dyn decl() {
+	dyn t = type();
+	dyn name = id();
+	expect('(');
+	vector<dyn> params;
+	if (tok != ')') do {
+			dyn u = type();
+			params.push_back(list(u, id()));
+		} while (eat(','));
+	expect(')');
+	return list(s_fn, t, name, list(params), stmt());
 }
 } // namespace
 
