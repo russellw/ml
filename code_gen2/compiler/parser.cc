@@ -3,11 +3,13 @@
 enum
 {
 	// SORT
+	k_and,
 	k_eq,
 	k_ge,
 	k_id,
 	k_le,
 	k_ne,
+	k_or,
 	///
 };
 
@@ -39,6 +41,14 @@ void lex() {
 			do ++txt;
 			while (*txt != '\n' && *txt);
 			continue;
+		case '&':
+			switch (txt[1]) {
+			case '&':
+				txt += 2;
+				tok = k_and;
+				return;
+			}
+			break;
 		case '/':
 			switch (txt[1]) {
 			case '/':
@@ -130,10 +140,27 @@ void lex() {
 			tokStr = intern(s, txt - s);
 			return;
 		}
+		case '|':
+			switch (txt[1]) {
+			case '|':
+				txt += 2;
+				tok = k_or;
+				return;
+			}
+			break;
 		}
 		tok = *txt++;
 		return;
 	}
+}
+
+//parser
+bool eat(int k) {
+	if (tok == k) {
+		lex();
+		return 1;
+	}
+	return 0;
 }
 } // namespace
 
