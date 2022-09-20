@@ -25,7 +25,45 @@ def call(cmd, limit=0):
 
 here = os.path.dirname(os.path.realpath(__file__))
 lib = os.path.join(here, "..", "lib")
+test = os.path.join(here, "test")
 exe = os.path.join(tempfile.gettempdir(), "a")
+
+
+def cco(f):
+    if os.name == "nt":
+        cmd = [
+            "cl",
+            "/EHsc",
+            "/Fo" + exe,
+            "/I" + lib,
+            "/W4",
+            "/WX",
+            "/c",
+            "/nologo",
+            f,
+        ]
+    else:
+        cmd = [
+            "g++",
+            "-I" + lib,
+            "-Wall",
+            "-Werror",
+            "-Wextra",
+            "-c",
+            "-o" + exe,
+        ]
+        cmd.extend(list(glob.glob(f)))
+    call(cmd, 20)
+
+
+# Compile all test files with the C++ compiler (without linking)
+# to make sure they are valid C++
+for root, dirs, files in os.walk(test):
+    for f in files:
+        ext = os.path.splitext(f)[1]
+        if ext == ".cpp":
+            f = os.path.join(root, f)
+            cco(f)
 
 
 def cc(f):
@@ -59,6 +97,7 @@ def cc(f):
     call(cmd, 20)
 
 
+# Compile the Olivine compiler
 f = os.path.join(here, "*.cc")
 cc(f)
 subprocess.check_call(exe)
