@@ -190,8 +190,17 @@ dyn type() {
 }
 
 // Expressions.
+dyn expr();
+
 dyn primary() {
 	switch (tok) {
+	case '(':
+	{
+		lex();
+		dyn a = expr();
+		expect(')');
+		return a;
+	}
 	case k_id:
 	{
 		dyn a(tokStr, t_sym);
@@ -201,6 +210,32 @@ dyn primary() {
 	}
 	err("expected expression");
 }
+
+dyn postfix() {
+	dyn a = primary();
+	for (;;) switch (tok) {
+		case '[':
+			lex();
+			a = list(s_subscript, a, expr());
+			expect(']');
+			break;
+		case '(':
+		{
+			lex();
+			vector<dyn> v(1, a);
+			if (tok != ')') do
+					v.push_back(expr());
+				while (eat(','));
+			expect(')');
+			a = list(v);
+			break;
+		}
+		default:
+			return a;
+		}
+}
+
+dyn expr() { return primary(); }
 } // namespace
 
 void parse(const char* f) {
