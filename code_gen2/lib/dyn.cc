@@ -49,27 +49,37 @@ dyn list(const vector<dyn>& v) {
 	return dyn(r, t_list);
 }
 
-dyn list(size_t a, dyn b) {
+dyn list(size_t op, dyn a) {
 	auto r = list(2);
-	r->v[0] = sym(a);
-	r->v[1] = b;
+	r->v[0] = sym(op);
+	r->v[1] = a;
 	return dyn(r, t_list);
 }
 
-dyn list(size_t a, dyn b, dyn c) {
+dyn list(size_t op, dyn a, dyn b) {
 	auto r = list(3);
-	r->v[0] = sym(a);
-	r->v[1] = b;
-	r->v[2] = c;
+	r->v[0] = sym(op);
+	r->v[1] = a;
+	r->v[2] = b;
 	return dyn(r, t_list);
 }
 
-dyn list(size_t a, dyn b, dyn c, dyn d) {
+dyn list(size_t op, dyn a, dyn b, dyn c) {
 	auto r = list(4);
-	r->v[0] = sym(a);
-	r->v[1] = b;
-	r->v[2] = c;
-	r->v[3] = d;
+	r->v[0] = sym(op);
+	r->v[1] = a;
+	r->v[2] = b;
+	r->v[3] = c;
+	return dyn(r, t_list);
+}
+
+dyn list(size_t op, dyn a, dyn b, dyn c, dyn d) {
+	auto r = list(5);
+	r->v[0] = sym(op);
+	r->v[1] = a;
+	r->v[2] = b;
+	r->v[3] = c;
+	r->v[4] = d;
 	return dyn(r, t_list);
 }
 

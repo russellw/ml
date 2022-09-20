@@ -23,7 +23,7 @@ char* txt;
 int tok;
 char* tokStr;
 
-void err(const char* msg) { ::err(file, text.data(), txt, msg); }
+[[noreturn]] void err(const char* msg) { ::err(file, text.data(), txt, msg); }
 
 void lex() {
 	for (;;) {
@@ -154,6 +154,9 @@ void lex() {
 				return;
 			}
 			break;
+		case 0:
+			tok = 0;
+			return;
 		}
 		tok = *txt++;
 		return;
@@ -289,4 +292,6 @@ void parse(const char* f) {
 	readFile(f, text);
 	txt = text.data();
 	lex();
+	vector<dyn> v;
+	while (tok) v.push_back(decl());
 }
