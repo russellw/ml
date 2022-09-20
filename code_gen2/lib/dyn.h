@@ -47,7 +47,7 @@ public:
 //a symbol is a dynamic wrapper around an interned string
 inline dyn sym(const char* s) { return dyn(intern(s), t_sym); }
 inline dyn sym(const char* s, size_t n) { return dyn(intern(s, n), t_sym); }
-inline dyn sym(int k) { return dyn(keywords[k], t_sym); }
+inline dyn sym(size_t k) { return dyn(keywords[k], t_sym); }
 
 dyn list();
 dyn list(dyn a);
@@ -55,8 +55,8 @@ dyn list(dyn a, dyn b);
 dyn list(dyn a, dyn b, dyn c);
 dyn list(const vector<dyn>& v);
 
-dyn list(int a, dyn b);
-dyn list(int a, dyn b, dyn c);
-dyn list(int a, dyn b, dyn c, dyn d);
+dyn list(size_t a, dyn b);
+dyn list(size_t a, dyn b, dyn c);
+dyn list(size_t a, dyn b, dyn c, dyn d);
 
 void print(dyn a);

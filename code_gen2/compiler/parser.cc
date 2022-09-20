@@ -235,7 +235,36 @@ dyn postfix() {
 		}
 }
 
-dyn expr() { return primary(); }
+dyn prefix() {
+	switch (tok) {
+	case '!':
+		lex();
+		return list(s_not, prefix());
+	}
+	return postfix();
+}
+
+dyn expr() { return prefix(); }
+
+//statements
+dyn stmt() {
+	if (tok == k_id) {
+		auto k = keyword(tokStr);
+		switch (k) {
+		case s_return:
+		{
+			lex();
+			if (eat(';')) return sym(k);
+			dyn a = expr();
+			expect(';');
+			return list(k, a);
+		}
+		}
+	}
+	dyn a = expr();
+	expect(';');
+	return a;
+}
 } // namespace
 
 void parse(const char* f) {
