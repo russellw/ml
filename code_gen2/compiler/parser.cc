@@ -171,6 +171,14 @@ void expect(int k) {
 	sprintf(buf, "expected '%c'", k);
 	err(file, text.data(), txt, buf);
 }
+
+//types
+dyn typ() {
+	if (tok != k_id) return list();
+	dyn t(tokStr, t_sym);
+	lex();
+	return t;
+}
 } // namespace
 
 void parse(const char* f) {
