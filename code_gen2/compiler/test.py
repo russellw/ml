@@ -100,7 +100,11 @@ def cc(f):
 # Compile the Olivine compiler
 f = os.path.join(here, "*.cc")
 cc(f)
-subprocess.check_call(exe)
+
+
+# Smoke test
+s = call((exe, "-h"))
+assert s
 exit(0)
 
 s = call((exe, here))
