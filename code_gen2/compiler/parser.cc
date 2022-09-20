@@ -18,9 +18,12 @@ const char* file;
 vector<char> text;
 
 //tokenizer
-const char* txt;
+char* txt;
+
 int tok;
-const char* tokStr;
+char* tokStr;
+
+void err(const char* msg) { ::err(file, text.data(), txt, msg); }
 
 void lex() {
 	for (;;) {
@@ -169,7 +172,7 @@ bool eat(int k) {
 void expect(int k) {
 	if (eat(k)) return;
 	sprintf(buf, "expected '%c'", k);
-	err(file, text.data(), txt, buf);
+	err(buf);
 }
 
 //types
@@ -178,6 +181,25 @@ dyn typ() {
 	dyn t(tokStr, t_sym);
 	lex();
 	return t;
+}
+
+dyn type() {
+	dyn t = typ();
+	if (t == list()) err("expected type");
+	return t;
+}
+
+// Expressions.
+dyn primary() {
+	switch (tok) {
+	case k_id:
+	{
+		dyn a(tokStr, t_sym);
+		lex();
+		return a;
+	}
+	}
+	err("expected expression");
 }
 } // namespace
 
