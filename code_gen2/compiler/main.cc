@@ -1,5 +1,7 @@
 #include <olivine.h>
 
+#include "main.h"
+
 #include <new>
 
 #ifdef _WIN32
