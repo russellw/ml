@@ -3,7 +3,7 @@
 enum
 {
 	// SORT
-	k_and,
+	k_and = 127,
 	k_eq,
 	k_ge,
 	k_id,
@@ -214,6 +214,8 @@ dyn primary() {
 	case k_id:
 		return id();
 	}
+	//TODO: clean
+	fprintf(stderr, "%d\n", tok);
 	err("expected expression");
 }
 
@@ -254,16 +256,18 @@ dyn expr() { return prefix(); }
 
 //statements
 dyn stmt() {
-	if (tok == k_id) {
+	switch (tok) {
+	case '{':
+	{
+		lex();
+		vector<dyn> v(1, sym(s_block));
+		while (!eat('}')) v.push_back(stmt());
+		return list(v);
+	}
+	case k_id:
+	{
 		auto k = keyword(tokStr);
 		switch (k) {
-		case '{':
-		{
-			lex();
-			vector<dyn> v(1, sym(s_block));
-			while (!eat('}')) v.push_back(stmt());
-			return list(v);
-		}
 		case s_return:
 		{
 			lex();
@@ -273,6 +277,7 @@ dyn stmt() {
 			return list(k, a);
 		}
 		}
+	}
 	}
 	dyn a = expr();
 	expect(';');
