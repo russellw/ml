@@ -21,6 +21,7 @@ LONG WINAPI handler(struct _EXCEPTION_POINTERS* ExceptionInfo) {
 #endif
 
 int main(int argc, char** argv) {
+	//init
 	std::set_new_handler([]() {
 		perror("new");
 		exit(1);
@@ -29,6 +30,7 @@ int main(int argc, char** argv) {
 	AddVectoredExceptionHandler(0, handler);
 #endif
 
+	//command line
 	bool dump = 0;
 	vector<char*> files;
 	for (int i = 1; i != argc; ++i) {
@@ -51,7 +53,18 @@ int main(int argc, char** argv) {
 		files.push_back(s);
 	}
 
-	if (dump)
-		for (auto file: files) puts(file);
+	//dump AST
+	if (dump) {
+		for (auto file: files) {
+			vector<dyn> v;
+			parse(file, v);
+			puts("[");
+			for (dyn a: v) {
+				print(a);
+				putchar('\n');
+			}
+			puts("]");
+		}
+	}
 	return 0;
 }

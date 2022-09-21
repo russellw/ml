@@ -294,11 +294,10 @@ dyn decl() {
 }
 } // namespace
 
-void parse(const char* f) {
+void parse(const char* f, vector<dyn>& v) {
 	file = f;
 	readFile(f, text);
 	txt = text.data();
 	lex();
-	vector<dyn> v;
 	while (tok) v.push_back(decl());
 }

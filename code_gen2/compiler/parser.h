@@ -1,1 +1,1 @@
-void parse(const char* file);
+void parse(const char* f, vector<dyn>& v);
