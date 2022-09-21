@@ -110,7 +110,7 @@ assert s
 
 # Run the Olivine compiler on all test files
 for f in tests:
-    s = call((exe, f))
+    s = call((exe, "-x", f))
     print(s)
 exit(0)
 

@@ -28,6 +28,8 @@ int main(int argc, char** argv) {
 #ifdef _WIN32
 	AddVectoredExceptionHandler(0, handler);
 #endif
+
+	bool dumpMode = 0;
 	vector<char*> files;
 	for (int i = 1; i != argc; ++i) {
 		auto s = argv[i];
@@ -36,14 +38,20 @@ int main(int argc, char** argv) {
 			switch (*s) {
 			case 'h':
 				puts("-h  Show help\n"
-					 "-V  Show version");
+					 "-V  Show version"
+					 "-x  Dump AST");
 				return 0;
+			case 'x':
+				dumpMode = 1;
+				continue;
 			}
 			fprintf(stderr, "%s: unknown option\n", argv[i]);
 			return 1;
 		}
 		files.push_back(s);
 	}
-	for (auto file: files) puts(file);
+
+	if (dumpMode)
+		for (auto file: files) puts(file);
 	return 0;
 }

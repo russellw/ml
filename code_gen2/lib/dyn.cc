@@ -5,6 +5,7 @@ struct List {
 	dyn v[9];
 };
 
+//TODO: rearrange
 dyn::dyn(double a) {
 	auto p = new double;
 	*p = a;
@@ -83,25 +84,6 @@ dyn list(size_t op, dyn a, dyn b, dyn c, dyn d) {
 	return dyn(r, t_list);
 }
 
-void print(dyn a) {
-	if (a.isSym()) {
-		printf("%s", a.str());
-		return;
-	}
-	if (a.isNum()) {
-		printf("%.999g", a.num());
-		return;
-	}
-	putchar('(');
-	bool more = 0;
-	for (auto b: a) {
-		if (more) putchar(' ');
-		more = 1;
-		print(b);
-	}
-	putchar(')');
-}
-
 dyn* dyn::begin() const {
 	assert(tag() == t_list);
 	auto p = (List*)(x - t_list);
@@ -160,4 +142,37 @@ dyn dyn::from(size_t i) const {
 	auto r = list(p->n - i);
 	memcpy(r->v, p->v + i, (p->n - i) * sizeof(dyn));
 	return dyn(r, t_list);
+}
+
+static void quote(int q, const char* s) {
+	putchar(q);
+	for (; *s; ++s) {
+		auto c = *s;
+		if (c == q || c == '\\') putchar('\\');
+		putchar(c);
+	}
+	putchar(q);
+}
+
+void print(dyn a) {
+	if (a.isSym()) {
+		printf("%s", a.str());
+		return;
+	}
+	if (a.isNum()) {
+		printf("%.999g", a.num());
+		return;
+	}
+	putchar('[');
+	bool more = 0;
+	for (auto b: a) {
+		if (more) printf(", ");
+		more = 1;
+		if (b.isSym()) {
+			quote('\'', b.str());
+			continue;
+		}
+		print(b);
+	}
+	putchar(']');
 }
