@@ -144,6 +144,6 @@ int main(int argc, char** argv) {
 	f.push_back(list(sym("return"), list(s_sub, dyn(1.0), dyn(1.0))));
 	program.push_back(list(f));
 
-	ccprint(list(program));
+	printcc(list(program));
 	return 0;
 }

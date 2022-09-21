@@ -1,1 +1,0 @@
-void ccprint(dyn program);

@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 	AddVectoredExceptionHandler(0, handler);
 #endif
 
-	bool dumpMode = 0;
+	bool dump = 0;
 	vector<char*> files;
 	for (int i = 1; i != argc; ++i) {
 		auto s = argv[i];
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 					 "-x  Dump AST");
 				return 0;
 			case 'x':
-				dumpMode = 1;
+				dump = 1;
 				continue;
 			}
 			fprintf(stderr, "%s: unknown option\n", argv[i]);
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
 		files.push_back(s);
 	}
 
-	if (dumpMode)
+	if (dump)
 		for (auto file: files) puts(file);
 	return 0;
 }
