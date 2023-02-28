@@ -42,8 +42,18 @@ def get_file(filename):
     return encodes(s)
 
 
+def chop(v, size):
+    r = []
+    for i in range(0, len(v) - (size - 1), size):
+        r.append(v[i : i + size])
+    return r
+
+
 # unit tests
 assert len(encodes("\r")) == 0
 assert len(encodes("\n")) == 1
 assert encodes("\t") == encodes(" ")
 assert encodes("\t") != encodes("a")
+
+assert chop("abcd", 2) == ["ab", "cd"]
+assert chop("abcd", 3) == ["abc"]
