@@ -38,6 +38,10 @@ test_d.extend([(v, 0) for v in test_bad])
 
 
 class Dataset1(Dataset):
+    def __getitem__(self, i):
+        return self.v[i]
+
+
     def __init__(self, v):
         self.v = []
         for x, y in v:
@@ -48,10 +52,6 @@ class Dataset1(Dataset):
 
     def __len__(self):
         return len(self.v)
-
-    def __getitem__(self, i):
-        return self.v[i]
-
 
 train_ds = Dataset1(train_d)
 test_ds = Dataset1(test_d)

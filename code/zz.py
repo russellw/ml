@@ -6,25 +6,16 @@ import torch
 alphabet_size = 126 - 31 + 1
 
 
-def split_train_test(v):
-    i = len(v) * 80 // 100
-    return v[:i], v[i:]
-
-
-def get_chunks(exts, src_dir, size):
+def chop(v, size):
     r = []
-    for filename in get_filenames(exts, src_dir):
-        r.extend(chop(get_file(filename), size))
+    for i in range(0, len(v) - (size - 1), size):
+        r.append(v[i : i + size])
     return r
 
 
-def get_filenames(exts, src_dir):
-    v = []
-    for root, dirs, files in os.walk(src_dir):
-        for filename in files:
-            if os.path.splitext(filename)[1] in exts:
-                v.append(os.path.join(root, filename))
-    return v
+def dbg(a):
+    info = inspect.getframeinfo(inspect.currentframe().f_back)
+    sys.stderr.write(f"{info.filename}:{info.function}:{info.lineno}: {a}\n")
 
 
 def encode1(v, c):
@@ -54,29 +45,31 @@ def encodes(s):
     return v
 
 
+def get_chunks(exts, src_dir, size):
+    r = []
+    for filename in get_filenames(exts, src_dir):
+        r.extend(chop(get_file(filename), size))
+    return r
+
+
 def get_file(filename):
     s = open(filename, "rb").read()
     return encodes(s)
 
 
-def chop(v, size):
-    r = []
-    for i in range(0, len(v) - (size - 1), size):
-        r.append(v[i : i + size])
-    return r
+def get_filenames(exts, src_dir):
+    v = []
+    for root, dirs, files in os.walk(src_dir):
+        for filename in files:
+            if os.path.splitext(filename)[1] in exts:
+                v.append(os.path.join(root, filename))
+    return v
 
 
 def one_hot(a):
     v = [0.0] * alphabet_size
     v[a] = 1.0
     return v
-
-
-def tensor(v):
-    r = []
-    for a in v:
-        r.extend(one_hot(a))
-    return torch.as_tensor(r)
 
 
 def print_dl(dl):
@@ -101,6 +94,18 @@ def scramble(v, n):
         k = random.randrange(len(v))
         v[j], v[k] = v[k], v[j]
     return v
+
+
+def split_train_test(v):
+    i = len(v) * 80 // 100
+    return v[:i], v[i:]
+
+
+def tensor(v):
+    r = []
+    for a in v:
+        r.extend(one_hot(a))
+    return torch.as_tensor(r)
 
 
 # unit tests
