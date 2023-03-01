@@ -45,25 +45,15 @@ def encodes(s):
     return v
 
 
-def get_chunks(exts, src_dir, size):
+def get_filenames(exts, s):
     r = []
-    for filename in get_filenames(exts, src_dir):
-        r.extend(chop(get_file(filename), size))
+    if os.path.splitext(s)[1] in exts:
+        r.append(s)
+    for root, dirs, files in os.walk(s):
+        for file in files:
+            if os.path.splitext(file)[1] in exts:
+                r.append(os.path.join(root, file))
     return r
-
-
-def get_file(filename):
-    s = open(filename, "rb").read()
-    return encodes(s)
-
-
-def get_filenames(exts, src_dir):
-    v = []
-    for root, dirs, files in os.walk(src_dir):
-        for filename in files:
-            if os.path.splitext(filename)[1] in exts:
-                v.append(os.path.join(root, filename))
-    return v
 
 
 def one_hot(a):
@@ -85,6 +75,15 @@ def print_dl(dl):
         print(y.shape)
         print(y.dtype)
         break
+
+
+def read_chunks(file, size):
+    return chop(read_file(file), size)
+
+
+def read_file(file):
+    s = open(file, "rb").read()
+    return encodes(s)
 
 
 def scramble(v, n):

@@ -10,19 +10,31 @@ import zz
 exts = set()
 exts.add(".java")
 
+# command line
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "-r", "--scramble", help="amount of scrambling", type=int, default=10
+    "-r", "--scramble", help="amount of scrambling", type=int, default=50
 )
 parser.add_argument("-s", "--seed", help="random number seed")
 parser.add_argument("-z", "--size", help="chunk size", type=int, default=100)
-parser.add_argument("src_dir")
+parser.add_argument("files", nargs="+")
 args = parser.parse_args()
 
+# options
 if args.seed is not None:
     random.seed(options.seed)
 
-good = zz.get_chunks(exts, args.src_dir, args.size)
+# Files
+files = []
+for s in args.files:
+    files.extend(zz.get_filenames(exts, s))
+
+# Read the data
+good = []
+for file in files:
+    good.extend(zz.read_chunks(file, args.size))
+
+# Prepare the data
 bad = [zz.scramble(v, args.scramble) for v in good]
 
 train_good, test_good = zz.split_train_test(good)
@@ -61,6 +73,7 @@ batch_size = 8
 train_dl = DataLoader(train_ds, batch_size=batch_size)
 test_dl = DataLoader(test_ds, batch_size=batch_size)
 
+# Define the network
 hidden_size = 100
 epochs = 1000
 
