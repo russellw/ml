@@ -113,6 +113,6 @@ for epoch in range(epochs):
 
         if epoch % (epochs / 20) == 0 and not bi:
             print(
-                "%f\t%f\t%f"
-                % (loss, accuracy(model, train_ds), accuracy(model, test_ds))
+                "%d\t%f\t%f\t%f"
+                % (epoch, loss, accuracy(model, train_ds), accuracy(model, test_ds))
             )
