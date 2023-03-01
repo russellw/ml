@@ -113,6 +113,7 @@ def accuracy(model, ds):
     return n / len(ds)
 
 
+# train the network
 for epoch in range(epochs):
     for bi, (x, y) in enumerate(train_dl):
         x = x.to(device)
