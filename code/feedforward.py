@@ -24,17 +24,17 @@ args = parser.parse_args()
 if args.seed is not None:
     random.seed(options.seed)
 
-# Files
+# files
 files = []
 for s in args.files:
     files.extend(zz.get_filenames(exts, s))
 
-# Read the data
+# read the data
 good = []
 for file in files:
     good.extend(zz.read_chunks(file, args.size))
 
-# Prepare the data
+# prepare the data
 bad = [zz.scramble(v, args.scramble) for v in good]
 
 train_good, test_good = zz.split_train_test(good)
@@ -73,7 +73,7 @@ batch_size = 8
 train_dl = DataLoader(train_ds, batch_size=batch_size)
 test_dl = DataLoader(test_ds, batch_size=batch_size)
 
-# Define the network
+# define the network
 hidden_size = 100
 epochs = 1000
 
