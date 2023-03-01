@@ -6,6 +6,11 @@ import torch
 alphabet_size = 126 - 31 + 1
 
 
+def split_train_test(v):
+    i = len(v) * 80 // 100
+    return v[:i], v[i:]
+
+
 def get_chunks(exts, src_dir, size):
     r = []
     for filename in get_filenames(exts, src_dir):
@@ -72,6 +77,21 @@ def tensor(v):
     for a in v:
         r.extend(one_hot(a))
     return torch.as_tensor(r)
+
+
+def print_dl(dl):
+    for x, y in dl:
+        print("x:")
+        print(x)
+        print(x.shape)
+        print(x.dtype)
+        print()
+
+        print("y:")
+        print(y)
+        print(y.shape)
+        print(y.dtype)
+        break
 
 
 def scramble(v, n):
