@@ -1,5 +1,7 @@
 import os
 
+alphabet_size = 126 - 31 + 1
+
 
 def get_filenames(exts, src_dir):
     v = []
@@ -23,9 +25,9 @@ def encode1(v, c):
         v.append(1)
         return
 
-    # printable char
-    assert c >= 32
-    v.append(c - 31)
+    c -= 31
+    if c < alphabet_size:
+        v.append(c)
 
 
 def encodes(s):
@@ -54,6 +56,7 @@ assert len(encodes("\r")) == 0
 assert len(encodes("\n")) == 1
 assert encodes("\t") == encodes(" ")
 assert encodes("\t") != encodes("a")
+assert encodes("~")[0] == alphabet_size - 1
 
 assert chop("abcd", 2) == ["ab", "cd"]
 assert chop("abcd", 3) == ["abc"]
