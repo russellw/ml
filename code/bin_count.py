@@ -12,6 +12,16 @@ def dbg(a):
     sys.stderr.write(f"{info.filename}:{info.function}:{info.lineno}: {a}\n")
 
 
+def make(i):
+    d = 0
+    v = [0] * args.size
+    while i < len(v):
+        v[i] = 1
+        d += 1
+        i += d
+    return v
+
+
 def print_dl(dl):
     for x, y in dl:
         print("x:")
@@ -41,20 +51,14 @@ def split_train_test(v):
     return v[:i], v[i:]
 
 
-def tensor(v):
-    r = []
-    for a in v:
-        r.extend(one_hot(a))
-    return torch.as_tensor(r)
-
-
 # command line
 parser = argparse.ArgumentParser()
+parser.add_argument("-n", "--count", help="number of samples", type=int, default=20)
 parser.add_argument(
     "-r", "--scramble", help="amount of scrambling", type=int, default=30
 )
 parser.add_argument("-s", "--seed", help="random number seed", type=int)
-parser.add_argument("-z", "--size", help="chunk size", type=int, default=100)
+parser.add_argument("-z", "--size", help="array size", type=int, default=100)
 args = parser.parse_args()
 
 # options
@@ -64,9 +68,8 @@ if args.seed is not None:
 
 # generate the data
 good = []
-for file in files:
-    good.extend(read_chunks(file, args.size))
-print(f"input {len(good) * args.size} characters")
+for i in range(args.count):
+    good.append(make(random.randrange(args.size)))
 
 # prepare the data
 bad = [scramble(v, args.scramble) for v in good]
@@ -90,9 +93,8 @@ class Dataset1(Dataset):
     def __init__(self, v):
         self.v = []
         for x, y in v:
-            x = tensor(x)
-            y = float(y)
-            y = torch.as_tensor([y])
+            x = torch.as_tensor(x, dtype=torch.float32)
+            y = torch.as_tensor([y], dtype=torch.float32)
             self.v.append((x, y))
 
     def __len__(self):
@@ -107,6 +109,8 @@ batch_size = 8
 train_dl = DataLoader(train_ds, batch_size=batch_size)
 test_dl = DataLoader(test_ds, batch_size=batch_size)
 
+print_dl(train_dl)
+
 # define the network
 hidden_size = 100
 epochs = 1000
@@ -116,7 +120,7 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.layers = nn.Sequential(
-            nn.Linear(args.size * alphabet_size, hidden_size),
+            nn.Linear(args.size, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, hidden_size),
             nn.Tanh(),
