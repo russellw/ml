@@ -6,6 +6,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 
+size = 100
 alphabet_size = 126 - 31 + 1
 
 
@@ -124,33 +125,21 @@ assert chop("abcd", 3) == ["abc"]
 exts = set()
 exts.add(".java")
 
-# command line
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-r", "--scramble", help="amount of scrambling", type=int, default=30
-)
-parser.add_argument("-s", "--seed", help="random number seed")
-parser.add_argument("-z", "--size", help="chunk size", type=int, default=100)
-parser.add_argument("files", nargs="+")
-args = parser.parse_args()
-
 # options
-if args.seed is not None:
-    random.seed(options.seed)
+random.seed(0)
 
 # files
 files = []
-for s in args.files:
-    files.extend(get_filenames(exts, s))
+files.extend(get_filenames(exts, "C:\\olivine"))
 
 # read the data
 good = []
 for file in files:
-    good.extend(read_chunks(file, args.size))
-print(f"input {len(good) * args.size} characters")
+    good.extend(read_chunks(file, size))
+print(f"input {len(good) * size} characters")
 
 # prepare the data
-bad = [scramble(v, args.scramble) for v in good]
+bad = [scramble(v, 30) for v in good]
 
 train_good, test_good = split_train_test(good)
 train_bad, test_bad = split_train_test(bad)
@@ -197,7 +186,7 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.layers = nn.Sequential(
-            nn.Linear(args.size * alphabet_size, hidden_size),
+            nn.Linear(size * alphabet_size, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, hidden_size),
             nn.Tanh(),
@@ -241,7 +230,4 @@ for epoch in range(epochs):
         optimizer.step()
 
         if epoch % (epochs / 20) == 0 and not bi:
-            print(
-                "%d\t%f\t%f\t%f"
-                % (epoch, loss, accuracy(model, train_ds), accuracy(model, test_ds))
-            )
+            print("%d\t%f\t%f" % (epoch, loss, accuracy(model, train_ds)))
