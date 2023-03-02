@@ -126,8 +126,9 @@ exts = set()
 exts.add(".java")
 
 # options
-random.seed(1)
-torch.manual_seed(1)
+seed = 1
+random.seed(seed)
+torch.manual_seed(seed)
 
 # files
 files = []
@@ -149,10 +150,6 @@ train_d = []
 train_d.extend([(v, 1) for v in train_good])
 train_d.extend([(v, 0) for v in train_bad])
 
-test_d = []
-test_d.extend([(v, 1) for v in test_good])
-test_d.extend([(v, 0) for v in test_bad])
-
 
 class Dataset1(Dataset):
     def __getitem__(self, i):
@@ -171,12 +168,10 @@ class Dataset1(Dataset):
 
 
 train_ds = Dataset1(train_d)
-test_ds = Dataset1(test_d)
 
 batch_size = 8
 
 train_dl = DataLoader(train_ds, batch_size=batch_size)
-test_dl = DataLoader(test_ds, batch_size=batch_size)
 
 # define the network
 hidden_size = 100
@@ -231,4 +226,4 @@ for epoch in range(epochs):
         optimizer.step()
 
         if epoch % (epochs / 20) == 0 and not bi:
-            print("%d\t%f\t%f" % (epoch, loss, accuracy(model, train_ds)))
+            print("    %f    %f" % (loss, accuracy(model, train_ds)))
