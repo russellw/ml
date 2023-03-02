@@ -33,6 +33,7 @@ for s in args.files:
 good = []
 for file in files:
     good.extend(zz.read_chunks(file, args.size))
+print(f"input {len(good) * args.size} characters")
 
 # prepare the data
 bad = [zz.scramble(v, args.scramble) for v in good]
