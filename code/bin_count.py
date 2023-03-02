@@ -7,18 +7,23 @@ from torch import nn
 from torch.utils.data import DataLoader, Dataset
 
 
+def bits(n):
+    s = bin(n)[2:]
+    s = s[-args.bits :]
+    s = "0" * (args.bits - len(s)) + s
+    return [int(c == "1") for c in s]
+
+
 def dbg(a):
     info = inspect.getframeinfo(inspect.currentframe().f_back)
     sys.stderr.write(f"{info.filename}:{info.function}:{info.lineno}: {a}\n")
 
 
 def make(i):
-    d = 0
-    v = [0] * args.size
-    while i < len(v):
-        v[i] = 1
-        d += 1
-        i += d
+    v = []
+    for j in range(args.size):
+        v.extend(bits(i))
+        i += 1
     return v
 
 
@@ -53,12 +58,13 @@ def split_train_test(v):
 
 # command line
 parser = argparse.ArgumentParser()
-parser.add_argument("-n", "--count", help="number of samples", type=int, default=20)
+parser.add_argument("-b", "--bits", help="bit width", type=int, default=8)
+parser.add_argument("-n", "--count", help="number of samples", type=int, default=100)
 parser.add_argument(
     "-r", "--scramble", help="amount of scrambling", type=int, default=30
 )
 parser.add_argument("-s", "--seed", help="random number seed", type=int)
-parser.add_argument("-z", "--size", help="array size", type=int, default=100)
+parser.add_argument("-z", "--size", help="array size", type=int, default=10)
 args = parser.parse_args()
 
 # options
@@ -69,7 +75,7 @@ if args.seed is not None:
 # generate the data
 good = []
 for i in range(args.count):
-    good.append(make(random.randrange(args.size)))
+    good.append(make(random.randrange(1 << args.bits)))
 
 # prepare the data
 bad = [scramble(v, args.scramble) for v in good]
@@ -104,12 +110,12 @@ class Dataset1(Dataset):
 train_ds = Dataset1(train_d)
 test_ds = Dataset1(test_d)
 
-batch_size = 8
+batch_size = 20
 
 train_dl = DataLoader(train_ds, batch_size=batch_size)
 test_dl = DataLoader(test_ds, batch_size=batch_size)
 
-print_dl(train_dl)
+# print_dl(train_dl)
 
 # define the network
 hidden_size = 100
@@ -120,7 +126,7 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.layers = nn.Sequential(
-            nn.Linear(args.size, hidden_size),
+            nn.Linear(args.size * args.bits, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, hidden_size),
             nn.Tanh(),
