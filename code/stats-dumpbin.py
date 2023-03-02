@@ -17,7 +17,7 @@ def do(file):
     out = os.path.join(tempfile.gettempdir(), "a.asm")
     cmd = "dumpbin", "/disasm", file, "/nologo", "/out:" + out
     subprocess.check_call(cmd)
-    print("%s\t%d\t%d" % (file, os.stat(file).st_size, os.stat(out).st_size))
+    print("%-40s %12d %12d" % (file, os.stat(file).st_size, os.stat(out).st_size))
 
 
 for s in args.files:
