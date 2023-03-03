@@ -150,7 +150,7 @@ test_dl = DataLoader(test_ds, batch_size=batch_size)
 
 # define the network
 hidden_size = 100
-epochs = 1000
+epochs = 2000
 
 
 class Net(nn.Module):
