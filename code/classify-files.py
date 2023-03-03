@@ -137,7 +137,6 @@ for x, y in train_dl:
 exit(0)
 # define the network
 hidden_size = 100
-epochs = 2000
 
 
 class Net(nn.Module):
@@ -176,6 +175,7 @@ def accuracy(model, ds):
 
 
 # train the network
+epochs = 2000
 for epoch in range(epochs):
     for bi, (x, y) in enumerate(train_dl):
         x = x.to(device)
