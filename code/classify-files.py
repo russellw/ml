@@ -135,6 +135,11 @@ batch_size = 8
 train_dl = DataLoader(train, batch_size=batch_size)
 test_dl = DataLoader(test, batch_size=batch_size)
 
+for x, y in train_dl:
+    print(x.shape)
+    print(y.shape)
+    break
+exit(0)
 # define the network
 hidden_size = 100
 epochs = 2000
@@ -150,7 +155,7 @@ class Net(nn.Module):
             nn.Tanh(),
             nn.Linear(hidden_size, hidden_size),
             nn.ReLU(),
-            nn.Linear(hidden_size, 1),
+            nn.Linear(hidden_size, len(types)),
             nn.Sigmoid(),
         )
 
