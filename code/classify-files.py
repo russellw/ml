@@ -9,11 +9,9 @@ from torch.utils.data import DataLoader, Dataset
 # command line
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", "--seed", help="random number seed", type=int)
-parser.add_argument("-z", "--size", help="chunk size", type=int, default=100)
 parser.add_argument("files", nargs="+")
 args = parser.parse_args()
 
-# options
 if args.seed is not None:
     random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -68,24 +66,21 @@ for t in types:
 print()
 
 # read the data
+size = 100
 data = []
 
 
-def chop(v, size):
+def chop(v):
     r = []
     for i in range(0, len(v) - (size - 1), size):
         r.append(v[i : i + size])
     return r
 
 
-def read_chunks(file, size):
-    return chop(open(file, "rb").read(), size)
-
-
 for file in files:
-    for v in read_chunks(file, args.size):
+    for v in chop(open(file, "rb").read()):
         data.append((v, types[os.path.splitext(file)[1]]))
-print("read %d bytes" % (len(data) * args.size))
+print("read %d bytes" % (len(data) * size))
 
 # prepare the data
 random.shuffle(data)
@@ -149,7 +144,7 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.layers = nn.Sequential(
-            nn.Linear(args.size * 256, hidden_size),
+            nn.Linear(size * 256, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, hidden_size),
             nn.Tanh(),
