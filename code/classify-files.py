@@ -79,8 +79,7 @@ def chop(v, size):
 
 
 def read_chunks(file, size):
-    # TODO need list?
-    return chop(list(open(file, "rb").read()), size)
+    return chop(open(file, "rb").read(), size)
 
 
 for file in files:
