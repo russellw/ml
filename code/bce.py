@@ -14,21 +14,25 @@ class Net(nn.Module):
 device = torch.device("cpu")
 model = Net().to(device)
 criterion = nn.BCELoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 
-for i in range(2):
-    for j in range(2):
-        for k in range(2):
-            x = torch.as_tensor([i, j, k], dtype=torch.float32)
-            y = torch.as_tensor([int(i + j + k > 1.5)], dtype=torch.float32)
-            print(x)
-            print(y)
-            print(model(x))
+for epoch in range(100):
+    for i in range(2):
+        for j in range(2):
+            for k in range(2):
+                x = torch.as_tensor([i, j, k], dtype=torch.float32)
+                y = torch.as_tensor([int(i + j + k > 1.5)], dtype=torch.float32)
+                print(x)
+                print(y)
+                print(model(x))
 
-            loss = criterion(model(x), y)
-            print(loss)
+                loss = criterion(model(x), y)
+                print(loss)
 
-            loss.backward()
-            for p in model.parameters():
-                print(p)
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                for p in model.parameters():
+                    print(p)
 
-            print()
+                print()
