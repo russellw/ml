@@ -14,5 +14,9 @@ class Net(nn.Module):
 device = torch.device("cpu")
 model = Net().to(device)
 
+for p in model.parameters():
+    print(p)
+print()
+
 print(model(torch.as_tensor([1, 1, 1], dtype=torch.float32)))
 print(model(torch.as_tensor([[1, 1, 1]], dtype=torch.float32)))
