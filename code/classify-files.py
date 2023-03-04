@@ -134,7 +134,7 @@ for x, y in train_dl:
     print(x.shape)
     print(y.shape)
     break
-exit(0)
+
 # define the network
 hidden_size = 100
 
@@ -150,26 +150,23 @@ class Net(nn.Module):
             nn.Linear(hidden_size, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, len(types)),
-            nn.Sigmoid(),
         )
 
     def forward(self, x):
         return self.layers(x)
 
 
-device = torch.device("cpu")
-model = Net().to(device)
-criterion = nn.BCELoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+model = Net()
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
 
 def accuracy(model, ds):
     n = 0
     for x, y in ds:
-        y = y[0]
         with torch.no_grad():
-            z = model(x)[0]
-        if (y and z > 0.5) or (not y and z <= 0.5):
+            z = model(x)
+        if torch.argmax(y) == torch.argmax(z):
             n += 1
     return n / len(ds)
 
@@ -178,9 +175,6 @@ def accuracy(model, ds):
 epochs = 2000
 for epoch in range(epochs):
     for bi, (x, y) in enumerate(train_dl):
-        x = x.to(device)
-        y = y.to(device)
-
         loss = criterion(model(x), y)
 
         optimizer.zero_grad()
