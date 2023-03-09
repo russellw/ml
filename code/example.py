@@ -25,13 +25,10 @@ import torch.nn as nn
 
 
 class PositionalEncoding(nn.Module):
-    def __init__(self, dim_model, dropout_p, max_len):
+    def __init__(self, dim_model, max_len):
         super().__init__()
         # Modified version from: https://pytorch.org/tutorials/beginner/transformer_tutorial.html
         # max_len determines how far the position can have an effect on a token (window)
-
-        # Info
-        self.dropout = nn.Dropout(dropout_p)
 
         # Encoding - From formula
         pos_encoding = torch.zeros(max_len, dim_model)
@@ -54,9 +51,7 @@ class PositionalEncoding(nn.Module):
 
     def forward(self, token_embedding: torch.tensor) -> torch.tensor:
         # Residual connection + pos encoding
-        return self.dropout(
-            token_embedding + self.pos_encoding[: token_embedding.size(0), :]
-        )
+        return token_embedding + self.pos_encoding[: token_embedding.size(0), :]
 
 
 class Transformer(nn.Module):
@@ -73,7 +68,6 @@ class Transformer(nn.Module):
         num_heads,
         num_encoder_layers,
         num_decoder_layers,
-        dropout_p,
     ):
         super().__init__()
 
@@ -83,7 +77,7 @@ class Transformer(nn.Module):
 
         # LAYERS
         self.positional_encoder = PositionalEncoding(
-            dim_model=dim_model, dropout_p=dropout_p, max_len=5000
+            dim_model=dim_model, max_len=5000
         )
         self.embedding = nn.Embedding(num_tokens, dim_model)
         self.transformer = nn.Transformer(
@@ -225,7 +219,6 @@ model = Transformer(
     num_heads=2,
     num_encoder_layers=3,
     num_decoder_layers=3,
-    dropout_p=0.1,
 ).to(device)
 opt = torch.optim.SGD(model.parameters(), lr=0.01)
 loss_fn = nn.CrossEntropyLoss()
