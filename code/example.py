@@ -72,7 +72,6 @@ class Transformer(nn.Module):
         super().__init__()
 
         # INFO
-        self.model_type = "Transformer"
         self.dim_model = dim_model
 
         # LAYERS
