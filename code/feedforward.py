@@ -16,11 +16,6 @@ def chop(v, size):
     return r
 
 
-def dbg(a):
-    info = inspect.getframeinfo(inspect.currentframe().f_back)
-    sys.stderr.write(f"{info.filename}:{info.function}:{info.lineno}: {a}\n")
-
-
 def encode1(v, c):
     # CR LF = LF
     if c == 10:
