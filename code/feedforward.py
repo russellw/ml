@@ -212,14 +212,14 @@ criterion = nn.BCELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 
 
-def accuracy(model, ds):
+def accuracy(ds):
     n = 0
-    for x, y in ds:
-        y = y[0]
-        with torch.no_grad():
+    with torch.no_grad():
+        for x, y in ds:
+            y = y[0]
             z = model(x)[0]
-        if (y and z > 0.5) or (not y and z <= 0.5):
-            n += 1
+            if (y and z > 0.5) or (not y and z <= 0.5):
+                n += 1
     return n / len(ds)
 
 
@@ -238,5 +238,5 @@ for epoch in range(epochs):
         if epoch % (epochs / 20) == 0 and not bi:
             print(
                 "%d\t%f\t%f\t%f"
-                % (epoch, loss, accuracy(model, train_ds), accuracy(model, test_ds))
+                % (epoch, loss, accuracy(train_ds), accuracy(test_ds))
             )
