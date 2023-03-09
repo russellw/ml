@@ -91,7 +91,6 @@ class Transformer(nn.Module):
             nhead=num_heads,
             num_encoder_layers=num_encoder_layers,
             num_decoder_layers=num_decoder_layers,
-            dropout=dropout_p,
         )
         self.out = nn.Linear(dim_model, num_tokens)
 
@@ -317,5 +316,5 @@ def fit(model, opt, loss_fn, train_dataloader, val_dataloader, epochs):
 
 
 train_loss_list, validation_loss_list = fit(
-    model, opt, loss_fn, train_dataloader, val_dataloader, 10
+    model, opt, loss_fn, train_dataloader, val_dataloader, 3
 )
