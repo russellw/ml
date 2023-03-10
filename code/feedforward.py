@@ -237,6 +237,5 @@ for epoch in range(epochs):
 
         if epoch % (epochs / 20) == 0 and not bi:
             print(
-                "%d\t%f\t%f\t%f"
-                % (epoch, loss, accuracy(train_ds), accuracy(test_ds))
+                "%d\t%f\t%f\t%f" % (epoch, loss, accuracy(train_ds), accuracy(test_ds))
             )

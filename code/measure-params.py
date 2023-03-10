@@ -62,12 +62,7 @@ class Transformer(nn.Module):
 
     # Constructor
     def __init__(
-        self,
-        num_tokens,
-        dim_model,
-        num_heads,
-        num_encoder_layers,
-        num_decoder_layers,
+        self, num_tokens, dim_model, num_heads, num_encoder_layers, num_decoder_layers,
     ):
         super().__init__()
 
@@ -75,9 +70,7 @@ class Transformer(nn.Module):
         self.dim_model = dim_model
 
         # LAYERS
-        self.positional_encoder = PositionalEncoding(
-            dim_model=dim_model, max_len=5000
-        )
+        self.positional_encoder = PositionalEncoding(dim_model=dim_model, max_len=5000)
         self.embedding = nn.Embedding(num_tokens, dim_model)
         self.transformer = nn.Transformer(
             d_model=dim_model,
@@ -213,10 +206,6 @@ val_dataloader = batchify_data(val_data)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model = Transformer(
-    num_tokens=4,
-    dim_model=8,
-    num_heads=2,
-    num_encoder_layers=3,
-    num_decoder_layers=3,
+    num_tokens=4, dim_model=8, num_heads=2, num_encoder_layers=3, num_decoder_layers=3,
 )
 print(sum(p.numel() for p in model.parameters() if p.requires_grad))
