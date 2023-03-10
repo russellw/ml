@@ -118,11 +118,11 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
 def accuracy(model, ds):
     n = 0
-    for x, y in ds:
-        with torch.no_grad():
+    with torch.no_grad():
+        for x, y in ds:
             z = model(x)
-        if torch.argmax(y) == torch.argmax(z):
-            n += 1
+            if torch.argmax(y) == torch.argmax(z):
+                n += 1
     return n / len(ds)
 
 

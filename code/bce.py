@@ -13,6 +13,7 @@ class Net(nn.Module):
 
 device = torch.device("cpu")
 model = Net().to(device)
+print(model)
 criterion = nn.BCELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 
