@@ -1,9 +1,10 @@
 import torch
 from torch import nn
 
-size=11
+size = 11
 hidden_size = 20
-actions=2
+actions = 2
+
 
 class Model(nn.Module):
     def __init__(self):
@@ -18,4 +19,3 @@ class Model(nn.Module):
 
     def forward(self, x):
         return self.layers(x)
- 
