@@ -1,7 +1,18 @@
+import argparse
 import random
 
 import numpy as np
 import torch
+
+# command line
+parser = argparse.ArgumentParser()
+parser.add_argument("-s", "--seed", help="random number seed", type=int)
+args = parser.parse_args()
+
+if args.seed is not None:
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
 
 size = 8
 start = 0, 0
@@ -36,6 +47,10 @@ def next(s, a):
     return i, j
 
 
+def successors(s):
+    return [next(s, a) for a in actions]
+
+
 def reward(s):
     assert maze[s] != 9
     return maze[s]
@@ -59,11 +74,17 @@ def select_action(s):
     return actions[np.random.choice(np.flatnonzero(v == v.max()))]
 
 
-episodes = 1
-for episode in range(episodes):
+discount = 0.9
+
+
+def update_Q(s):
+    Q[s] += discount * torch.tensor([estimated_reward(t) for t in successors(s)]).max()
+
+
+for episode in range(3):
     state = start
     while maze[state] == 0:
-        print(state)
+        update_Q(state)
         a = select_action(state)
-        s = next(state, a)
-        state = s
+        state = next(state, a)
+    print(Q)
