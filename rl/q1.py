@@ -43,7 +43,7 @@ episodes = 1
 for episode in range(episodes):
     state = 0
     while state != size - 1:
-        print(state)
+        print(Q)
         a = select_action(state)
         s = next(state, a)
         if s >= 0:
