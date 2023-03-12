@@ -78,10 +78,11 @@ discount = 0.9
 
 
 def update_Q(s):
-    Q[s] += discount * torch.tensor([estimated_reward(t) for t in successors(s)]).max()
+    r = torch.tensor([estimated_reward(t) for t in successors(s)]).max()
+    Q[s] += discount * (r - Q[s])
 
 
-for episode in range(3):
+for episode in range(100):
     state = start
     while maze[state] == 0:
         update_Q(state)
