@@ -18,6 +18,7 @@ print(
 )
 
 # Beam Search
+# 7 minutes, 9 seconds
 print(
     tokenizer.decode(
         model.generate(
