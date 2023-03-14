@@ -3,6 +3,7 @@ import torch
 import transformers
 from transformers import BloomForCausalLM, BloomTokenizerFast
 
+# 50.9 seconds
 model = BloomForCausalLM.from_pretrained("bigscience/bloom-3b")
 tokenizer = BloomTokenizerFast.from_pretrained("bigscience/bloom-3b")
 
