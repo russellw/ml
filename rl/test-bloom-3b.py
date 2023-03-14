@@ -32,6 +32,7 @@ print(
 )
 
 # Sampling Top-k + Top-p
+# 3 minutes, 57 seconds
 print(
     tokenizer.decode(
         model.generate(
