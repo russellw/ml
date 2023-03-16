@@ -9,7 +9,7 @@ model = BloomForCausalLM.from_pretrained("bigscience/bloom-7b1")
 tokenizer = BloomTokenizerFast.from_pretrained("bigscience/bloom-7b1")
 
 prompt = sys.argv[1]
-result_length = 50
+result_length = 200
 inputs = tokenizer(prompt, return_tensors="pt")
 
 # Greedy Search
