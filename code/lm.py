@@ -101,8 +101,6 @@ class Net(nn.Module):
             nn.Linear(window * 127, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, hidden_size),
-            nn.Tanh(),
-            nn.Linear(hidden_size, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, 127),
         )
