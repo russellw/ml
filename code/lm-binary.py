@@ -120,7 +120,7 @@ def accuracy(model, ds):
     n = 0
     with torch.no_grad():
         for x, y in ds:
-            z = model(x).round()
+            z = model(x).sigmoid().round()
             if y.equal(z):
                 n += 1
     return n / len(ds)
