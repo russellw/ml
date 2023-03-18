@@ -49,16 +49,16 @@ def split_train_test(v):
 train, test = split_train_test(data)
 
 
-def one_hot(b, n):
-    v = [0] * n
-    v[b] = 1
-    return v
+def bits(n):
+    s = bin(n)[2:]
+    s = "0" * (7 - len(s)) + s
+    return [int(c == "1") for c in s]
 
 
 def tensor_bytes(v):
     r = []
     for b in v:
-        r.extend(one_hot(b, 127))
+        r.extend(bits(b))
     return torch.as_tensor(r, dtype=torch.float32)
 
 
@@ -70,7 +70,7 @@ class Dataset1(Dataset):
         self.v = []
         for x, y in v:
             x = tensor_bytes(x)
-            y = torch.as_tensor(one_hot(y, 127), dtype=torch.float32)
+            y = torch.as_tensor(bits(y), dtype=torch.float32)
             self.v.append((x, y))
 
     def __len__(self):
@@ -98,13 +98,13 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.layers = nn.Sequential(
-            nn.Linear(window * 127, hidden_size),
+            nn.Linear(window * 7, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, hidden_size),
             nn.Tanh(),
             nn.Linear(hidden_size, hidden_size),
             nn.ReLU(),
-            nn.Linear(hidden_size, 127),
+            nn.Linear(hidden_size, 7),
         )
 
     def forward(self, x):
@@ -112,7 +112,7 @@ class Net(nn.Module):
 
 
 model = Net()
-criterion = nn.CrossEntropyLoss()
+criterion = nn.BCEWithLogitsLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
 
@@ -120,14 +120,14 @@ def accuracy(model, ds):
     n = 0
     with torch.no_grad():
         for x, y in ds:
-            z = model(x)
-            if torch.argmax(y) == torch.argmax(z):
+            z = model(x).round()
+            if y.equal(z):
                 n += 1
     return n / len(ds)
 
 
 # train the network
-epochs = 2000
+epochs = 1000
 for epoch in range(epochs):
     for bi, (x, y) in enumerate(train_dl):
         loss = criterion(model(x), y)

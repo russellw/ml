@@ -127,7 +127,7 @@ def accuracy(model, ds):
 
 
 # train the network
-epochs = 2000
+epochs = 1000
 for epoch in range(epochs):
     for bi, (x, y) in enumerate(train_dl):
         loss = criterion(model(x), y)
