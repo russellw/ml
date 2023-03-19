@@ -1,8 +1,9 @@
 # partial implementation of chess with adjustable board size
 # limits:
-# check is not implemented; taking the King wins the game
+# check is not implemented; taking the king wins the game
 # castling is not implemented
 # en passant is not implemented
+# promotion is always to queen
 # the code is optimized for simplicity rather than performance
 import argparse
 import math
