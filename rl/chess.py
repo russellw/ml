@@ -1,4 +1,4 @@
-# chess with adjustable board size
+# partial implementation of chess with adjustable board size
 import random
 
 size = 8
@@ -66,6 +66,8 @@ class Board:
             v.append(r.copy())
         p, color = v[i][j]
         v[i][j] = blank
+        if p == "p" and i1 == size - 1:
+            p = "q"
         v[i1][j1] = p, color
         return Board(v)
 
@@ -216,10 +218,29 @@ def valid_moves(board):
     return v
 
 
+def live(board):
+    kings = [0, 0]
+    for i in range(size):
+        for j in range(size):
+            p, color = board[i, j]
+            if p == "k":
+                kings[color] = 1
+    return kings[0] and kings[1]
+
+
 board = Board()
-for move in range(5):
-    if move % 2 == 0:
-        print_board(board)
+for move in range(1000):
+    print(move)
+    print_board(board)
+
     m = random.choice(valid_moves(board))
     board = board.move(*m)
+    if not live(board):
+        break
+    board = board.flip()
+
+    m = random.choice(valid_moves(board))
+    board = board.move(*m)
+    if not live(board):
+        break
     board = board.flip()
