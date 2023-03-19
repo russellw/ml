@@ -300,7 +300,9 @@ def minimax(board, depth, alpha, beta):
         return static_val(board)
 
     val = -math.inf
-    for m in valid_moves(board):
+    moves = valid_moves(board)
+    moves.sort(key=lambda m: static_val(board.move(*m)), reverse=True)
+    for m in moves:
         val = max(val, -minimax(board.move(*m).flip(), depth - 1, -beta, -alpha))
         alpha = max(alpha, val)
         if alpha >= beta:
