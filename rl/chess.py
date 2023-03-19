@@ -9,8 +9,9 @@ import math
 import random
 
 parser = argparse.ArgumentParser()
+parser.add_argument("-d", "--depth", help="minimax search depth", type=int, default=1)
 parser.add_argument("-s", "--seed", help="random number seed", type=int)
-parser.add_argument("-z", "--size", help="random number seed", type=int, default=8)
+parser.add_argument("-z", "--size", help="board size", type=int, default=8)
 args = parser.parse_args()
 
 if args.seed is not None:
@@ -278,7 +279,7 @@ def live(board):
     return kings[0] and kings[1]
 
 
-def val(board):
+def static_val(board):
     r = 0.0
     for i in range(size):
         for j in range(size):
@@ -291,17 +292,26 @@ def val(board):
     return r
 
 
+def minimax(board, depth):
+    if depth == 0 or not live(board):
+        return static_val(board)
+
+    r = -math.inf
+    for m in valid_moves(board):
+        r = max(r, -minimax(board.move(*m).flip(), depth - 1))
+    return r
+
+
 def play(board):
     assert live(board)
     best = []
     best_val = -math.inf
     for m in valid_moves(board):
-        b = board.move(*m)
-        v = val(b)
-        if v > best_val:
+        val = -minimax(board.move(*m).flip(), args.depth - 1)
+        if val > best_val:
             best = [m]
-            best_val = v
-        elif v == best_val:
+            best_val = val
+        elif val == best_val:
             best.append(m)
     assert best
     return random.choice(best)
