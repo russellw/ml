@@ -14,10 +14,10 @@ parser.add_argument("-l", "--limit", help="move number limit", type=int, default
 parser.add_argument("-s", "--seed", help="random number seed", type=int)
 parser.add_argument("-z", "--size", help="board size", type=int, default=8)
 args = parser.parse_args()
-
+print(args)
+print()
 if args.seed is not None:
     random.seed(args.seed)
-
 size = args.size
 
 blank = None, 0
