@@ -10,6 +10,7 @@ import random
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--depth", help="minimax search depth", type=int, default=1)
+parser.add_argument("-l", "--limit", help="move number limit", type=int, default=100)
 parser.add_argument("-s", "--seed", help="random number seed", type=int)
 parser.add_argument("-z", "--size", help="board size", type=int, default=8)
 args = parser.parse_args()
@@ -234,8 +235,9 @@ def valid_moves(board):
 
             # own pieces
             if p == "p":
-                if not board[i + 1, j][0]:
-                    add(i + 1, j)
+                if board[i + 1, j][0]:
+                    continue
+                add(i + 1, j)
                 if i == 1:
                     for i1 in range(i + 2, size // 2):
                         if board[i1, j][0]:
@@ -319,7 +321,7 @@ def play(board):
 
 board = Board()
 move = 0
-while live(board):
+while live(board) and move < args.limit:
     move += 1
     print(move, end=". ")
 
