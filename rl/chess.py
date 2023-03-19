@@ -1,4 +1,5 @@
 # partial implementation of chess with adjustable board size
+import math
 import random
 
 size = 8
@@ -228,19 +229,46 @@ def live(board):
     return kings[0] and kings[1]
 
 
+def val(board):
+    r = 0
+    for i in range(size):
+        for j in range(size):
+            p, color = board[i, j]
+            if p in vals:
+                if color:
+                    r -= vals[p]
+                else:
+                    r += vals[p]
+    return r
+
+
+def play(board):
+    assert live(board)
+    best = []
+    best_val = -math.inf
+    for m in valid_moves(board):
+        b = board.move(*m)
+        v = val(b)
+        if v > best_val:
+            best = [b]
+            best_val = v
+        elif v == best_val:
+            best.append(b)
+    assert best
+    return random.choice(best)
+
+
 board = Board()
 for move in range(1000):
     print(move)
     print_board(board)
 
-    m = random.choice(valid_moves(board))
-    board = board.move(*m)
+    board = play(board)
     if not live(board):
         break
     board = board.flip()
 
-    m = random.choice(valid_moves(board))
-    board = board.move(*m)
+    board = play(board)
     if not live(board):
         break
     board = board.flip()
