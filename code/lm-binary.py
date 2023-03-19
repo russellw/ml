@@ -91,7 +91,7 @@ for x, y in train_dl:
     break
 
 # define the network
-hidden_size = 100
+hidden_size = 500
 
 
 class Net(nn.Module):
@@ -101,7 +101,7 @@ class Net(nn.Module):
             nn.Linear(window * 7, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, hidden_size),
-            nn.Tanh(),
+            nn.ReLU(),
             nn.Linear(hidden_size, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, 7),
