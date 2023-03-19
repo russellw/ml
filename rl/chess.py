@@ -4,10 +4,19 @@
 # castling is not implemented
 # en passant is not implemented
 # the code is optimized for simplicity rather than performance
+import argparse
 import math
 import random
 
-size = 8
+parser = argparse.ArgumentParser()
+parser.add_argument("-s", "--seed", help="random number seed", type=int)
+parser.add_argument("-z", "--size", help="random number seed", type=int, default=8)
+args = parser.parse_args()
+
+if args.seed is not None:
+    random.seed(args.seed)
+
+size = args.size
 
 blank = None, 0
 vals = {
@@ -16,7 +25,7 @@ vals = {
     "b": 3.5,
     "r": 5.0,
     "q": 9.0,
-    "k": 1e12,
+    "k": 1e6,
 }
 
 
