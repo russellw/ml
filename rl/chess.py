@@ -14,7 +14,11 @@ vals = {
 
 
 class Board:
-    def __init__(self):
+    def __init__(self, v=None):
+        if v:
+            self.v = v
+            return
+
         v = []
         for i in range(size):
             v.append([blank] * size)
@@ -46,6 +50,25 @@ class Board:
         i, j = ij
         return self.v[i][j]
 
+    def flip(self):
+        v = []
+        for i in range(size - 1, -1, -1):
+            r = []
+            for j in range(size):
+                p, color = self[i, j]
+                r.append((p, 1 - color))
+            v.append(r)
+        return Board(v)
+
+    def move(self, i, j, i1, j1):
+        v = []
+        for r in self.v:
+            v.append(r.copy())
+        p, color = v[i][j]
+        v[i][j] = blank
+        v[i1][j1] = p, color
+        return Board(v)
+
 
 def print_board(board):
     for i in range(size - 1, -1, -1):
@@ -59,10 +82,11 @@ def print_board(board):
                 print(p, end="")
             print(" ", end="")
         print()
+    print()
 
 
 def valid_moves(board):
-    r = []
+    v = []
 
     def add(i1, j1):
         # outside the board
@@ -75,7 +99,7 @@ def valid_moves(board):
             return
 
         # valid move
-        r.append((i, j, i1, j1))
+        v.append((i, j, i1, j1))
 
     def rook():
         # north
@@ -189,9 +213,13 @@ def valid_moves(board):
                 for i1 in range(i - 1, i + 2):
                     for j1 in range(j - 1, j + 2):
                         add(i1, j1)
-    return r
+    return v
 
 
 board = Board()
-print_board(board)
-print(valid_moves(board))
+for move in range(5):
+    if move % 2 == 0:
+        print_board(board)
+    m = random.choice(valid_moves(board))
+    board = board.move(*m)
+    board = board.flip()
