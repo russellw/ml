@@ -294,14 +294,17 @@ def static_val(board):
     return r
 
 
-def minimax(board, depth):
+def minimax(board, depth, alpha, beta):
     if depth == 0 or not live(board):
         return static_val(board)
 
-    r = -math.inf
+    val = -math.inf
     for m in valid_moves(board):
-        r = max(r, -minimax(board.move(*m).flip(), depth - 1))
-    return r
+        val = max(val, -minimax(board.move(*m).flip(), depth - 1, -beta, -alpha))
+        alpha = max(alpha, val)
+        if alpha >= beta:
+            break
+    return val
 
 
 def play(board):
@@ -309,7 +312,7 @@ def play(board):
     best = []
     best_val = -math.inf
     for m in valid_moves(board):
-        val = -minimax(board.move(*m).flip(), args.depth - 1)
+        val = -minimax(board.move(*m).flip(), args.depth - 1, -math.inf, math.inf)
         if val > best_val:
             best = [m]
             best_val = val
