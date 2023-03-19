@@ -1,4 +1,9 @@
 # partial implementation of chess with adjustable board size
+# limits:
+# check is not implemented; taking the King wins the game
+# castling is not implemented
+# en passant is not implemented
+# the code is optimized for simplicity rather than performance
 import math
 import random
 
@@ -6,11 +11,12 @@ size = 8
 
 blank = None, 0
 vals = {
-    "p": 1,
-    "n": 3,
-    "b": 3,
-    "r": 5,
-    "q": 9,
+    "p": 1.0,
+    "n": 3.0,
+    "b": 3.5,
+    "r": 5.0,
+    "q": 9.0,
+    "k": 1e12,
 }
 
 
@@ -65,16 +71,50 @@ class Board:
         v = []
         for r in self.v:
             v.append(r.copy())
+
         p, color = v[i][j]
         v[i][j] = blank
+
         if p == "p" and i1 == size - 1:
             p = "q"
+
         v[i1][j1] = p, color
         return Board(v)
 
 
+def print_row(flipped, i):
+    if flipped:
+        i = size - 1 - i
+    print(i + 1, end="")
+
+
+def print_column(j):
+    print(chr(97 + j), end="")
+
+
+def print_move(board, flipped, i, j, i1, j1):
+    p, color = board[i, j]
+    assert p
+    if p != "p":
+        print(p.upper(), end="")
+    print_column(j)
+    print_row(flipped, i)
+    if board[i1, j1][0]:
+        print("x", end="")
+    else:
+        print("-", end="")
+    print_column(j1)
+    print_row(flipped, i1)
+
+
 def print_board(board):
+    print("   ", end="")
+    for j in range(size):
+        print_column(j)
+        print(" ", end="")
+    print()
     for i in range(size - 1, -1, -1):
+        print("%2d " % (i + 1), end="")
         for j in range(size):
             p, color = board[i, j]
             if not p:
@@ -230,11 +270,11 @@ def live(board):
 
 
 def val(board):
-    r = 0
+    r = 0.0
     for i in range(size):
         for j in range(size):
             p, color = board[i, j]
-            if p in vals:
+            if p:
                 if color:
                     r -= vals[p]
                 else:
@@ -250,25 +290,33 @@ def play(board):
         b = board.move(*m)
         v = val(b)
         if v > best_val:
-            best = [b]
+            best = [m]
             best_val = v
         elif v == best_val:
-            best.append(b)
+            best.append(m)
     assert best
     return random.choice(best)
 
 
 board = Board()
-for move in range(1000):
-    print(move)
+move = 0
+while live(board):
+    move += 1
+    print(move, end=". ")
+
+    m = play(board)
+    print_move(board, 0, *m)
+    board = board.move(*m)
+
+    if live(board):
+        board = board.flip()
+
+        m = play(board)
+        print(" ", end="")
+        print_move(board, 1, *m)
+        board = board.move(*m)
+
+        board = board.flip()
+
+    print()
     print_board(board)
-
-    board = play(board)
-    if not live(board):
-        break
-    board = board.flip()
-
-    board = play(board)
-    if not live(board):
-        break
-    board = board.flip()
