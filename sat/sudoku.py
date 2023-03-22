@@ -1,5 +1,5 @@
 # https://stackoverflow.com/questions/45471152/how-to-create-a-sudoku-puzzle-in-python
-base = 3
+base = 4
 side = base * base
 
 # pattern for a baseline valid solution
