@@ -1,3 +1,5 @@
+import random
+
 from unify import unify
 
 op_types = {
@@ -27,6 +29,9 @@ class Node:
         self.op = op
         self.args = args
 
+    def __repr__(self):
+        return self.op + str(self.args)
+
 
 def typeof(a):
     if isinstance(a, bool):
@@ -53,8 +58,20 @@ nodes = [
     const(()),
 ]
 
+
+def mk(t):
+    r = []
+    for a in nodes:
+        d = {}
+        if unify(a.t, t, d):
+            r.append(a)
+    return random.choice(r)
+
+
 if __name__ == "__main__":
     assert typeof(False) == "bool"
     assert typeof(True) == "bool"
 
     print("ok")
+for i in range(10):
+    print(mk("num"))
