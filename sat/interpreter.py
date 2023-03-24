@@ -49,3 +49,4 @@ def const(val):
 if __name__ == "__main__":
     test(const(1), 1)
     test(Node("+", const(1), const(2)), 3)
+    print("ok")
