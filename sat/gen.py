@@ -1,5 +1,6 @@
 import random
 
+from interpreter import ev
 from unify import replace, unify
 
 op_types = {
@@ -62,6 +63,12 @@ nodes = [
 ]
 
 
+def simplify(a):
+    if all([isinstance(b, Const) for b in a.args]):
+        return ev(a)
+    return a
+
+
 def mk(t, depth=3):
     # existing node
     r = []
@@ -84,7 +91,7 @@ def mk(t, depth=3):
     d = {}
     unify(op_types[op], t, d)
     args = [mk(u, depth - 1) for u in replace(op_types[op], d)[1:]]
-    return Node(op, *args)
+    return simplify(Node(op, *args))
 
 
 if __name__ == "__main__":
@@ -102,6 +109,10 @@ if __name__ == "__main__":
     assert d[a] == 1
     assert d[b] == 2
 
+    for i in range(10):
+        try:
+            print(mk("num"))
+        except (IndexError, ZeroDivisionError):
+            pass
+
     print("ok")
-for i in range(10):
-    print(mk("num"))

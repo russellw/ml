@@ -3,6 +3,7 @@ import operator
 # https://docs.python.org/3/library/operator.html
 ops = {
     "*": operator.mul,
+    "neg": operator.neg,
     "+": operator.add,
     "-": operator.sub,
     "<": operator.lt,
