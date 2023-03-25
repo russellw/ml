@@ -1,6 +1,6 @@
 import random
 
-from unify import unify
+from unify import replace, unify
 
 op_types = {
     "<": ("bool", "num", "num"),
@@ -30,7 +30,7 @@ class Node:
         self.args = args
 
     def __repr__(self):
-        return self.op + str(self.args)
+        return self.op + str(list(self.args))
 
 
 def typeof(a):
@@ -43,29 +43,48 @@ def typeof(a):
     raise Exception(a)
 
 
-def const(val):
-    a = Node("const")
-    a.val = val
-    a.t = typeof(val)
-    return a
+class Const:
+    def __init__(self, val):
+        self.op = "const"
+        self.val = val
+        self.t = typeof(val)
+
+    def __repr__(self):
+        return str(self.val)
 
 
 nodes = [
-    const(False),
-    const(True),
-    const(0),
-    const(1),
-    const(()),
+    Const(False),
+    Const(True),
+    Const(0),
+    Const(1),
+    Const(()),
 ]
 
 
-def mk(t):
+def mk(t, depth=3):
+    # existing node
     r = []
     for a in nodes:
-        d = {}
-        if unify(a.t, t, d):
+        if unify(a.t, t, {}):
             r.append(a)
-    return random.choice(r)
+    if r and (depth == 0 or random.random() < 0.5):
+        return random.choice(r)
+
+    # choose op
+    ops = []
+    for op in op_types:
+        if unify(op_types[op][0], t, {}):
+            ops.append(op)
+    if not ops:
+        raise Exception(t)
+    op = random.choice(ops)
+
+    # make subexpression
+    d = {}
+    unify(op_types[op], t, d)
+    args = [mk(u, depth - 1) for u in replace(op_types[op], d)[1:]]
+    return Node(op, *args)
 
 
 if __name__ == "__main__":
