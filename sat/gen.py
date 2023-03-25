@@ -65,7 +65,7 @@ nodes = [
 
 def simplify(a):
     if all([isinstance(b, Const) for b in a.args]):
-        return ev(a)
+        return Const(ev(a))
     return a
 
 
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     assert d[a] == 1
     assert d[b] == 2
 
-    for i in range(10):
+    for i in range(50):
         try:
             print(mk("num"))
         except (IndexError, ZeroDivisionError):
