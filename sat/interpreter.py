@@ -22,16 +22,16 @@ ops = {
 }
 
 
-def eva(a):
+def ev(a):
     if a.op == "const":
         return a.val
     f = ops[a.op]
-    args = [eva(b) for b in a.args]
+    args = [ev(b) for b in a.args]
     return f(*args)
 
 
 def test(a, b):
-    assert eva(a) == b
+    assert ev(a) == b
 
 
 class Node:
