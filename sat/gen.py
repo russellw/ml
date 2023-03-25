@@ -91,6 +91,17 @@ if __name__ == "__main__":
     assert typeof(False) == "bool"
     assert typeof(True) == "bool"
 
+    d = {}
+    a = Const(1)
+    b = Const(2)
+    d[a] = 1
+    d[b] = 2
+    assert len(d) == 2
+    assert a in d
+    assert b in d
+    assert d[a] == 1
+    assert d[b] == 2
+
     print("ok")
 for i in range(10):
     print(mk("num"))
