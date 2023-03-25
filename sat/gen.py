@@ -64,7 +64,7 @@ nodes = [
 
 
 def simplify(a):
-    if all([isinstance(b, Const) for b in a.args]):
+    if all([b.op == "const" for b in a.args]):
         return Const(ev(a))
     return a
 
