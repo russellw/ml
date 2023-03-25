@@ -95,6 +95,8 @@ def mk(t, depth=3):
 
 
 if __name__ == "__main__":
+    random.seed(0)
+
     assert typeof(False) == "bool"
     assert typeof(True) == "bool"
 
