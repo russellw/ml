@@ -33,25 +33,25 @@ ops = {
 }
 
 
-def ev(a):
+def ev(a, env):
     if a.o == "const":
         return a.val
 
     if a.o == "and":
-        return ev(a.args[0]) and ev(a.args[1])
+        return ev(a.args[0], env) and ev(a.args[1], env)
     if a.o == "or":
-        return ev(a.args[0]) or ev(a.args[1])
+        return ev(a.args[0], env) or ev(a.args[1], env)
 
     if a.o == "if":
-        return ev(a.args[1]) if ev(a.args[0]) else ev(a.args[2])
+        return ev(a.args[1], env) if ev(a.args[0], env) else ev(a.args[2], env)
 
     f = ops[a.o].f
-    args = [ev(b) for b in a.args]
+    args = [ev(b, env) for b in a.args]
     return f(*args)
 
 
-def test(a, b):
-    assert ev(a) == b
+def test(a, env, b):
+    assert ev(a, env) == b
 
 
 class Node:
@@ -60,13 +60,13 @@ class Node:
         self.args = args
 
 
-def const(val):
-    a = Node("const")
-    a.val = val
-    return a
+class Const:
+    def __init__(self, val):
+        self.o = "const"
+        self.val = val
 
 
 if __name__ == "__main__":
-    test(const(1), 1)
-    test(Node("+", const(1), const(2)), 3)
+    test(Const(1), {}, 1)
+    test(Node("+", Const(1), Const(2)), {}, 3)
     print("ok")
