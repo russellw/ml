@@ -13,27 +13,28 @@ defs = {
     "1": Def("num", 1),
     "false": Def("bool", False),
     "true": Def("bool", True),
-    "*": Def(("num", "num", "num"), operator.mul),
-    "neg": Def(("num", "num"), operator.neg),
-    "+": Def(("num", "num", "num"), operator.add),
-    "-": Def(("num", "num", "num"), operator.sub),
-    "<": Def(("bool", "num", "num"), operator.lt),
-    "<=": Def(("bool", "num", "num"), operator.le),
-    "=": Def(("bool", "$t", "$t"), operator.eq),
-    "div": Def(("num", "num", "num"), operator.floordiv),
-    "mod": Def(("num", "num", "num"), operator.mod),
-    "pow": Def(("num", "num", "num"), operator.pow),
-    "at": Def(("$t", ("list", "$t"), "num"), lambda a, b: a[b]),
-    "cons": Def((("list", "$t"), "$t", ("list", "$t")), lambda a, b: (a,) + b),
-    "hd": Def(("$t", ("list", "$t")), lambda a: a[0]),
-    "len": Def(("num", ("list", "$t")), lambda a: len(a)),
+    "nil": Def(("list", "$t"), ()),
+    "*": Def(("fn", "num", "num", "num"), operator.mul),
+    "neg": Def(("fn", "num", "num"), operator.neg),
+    "+": Def(("fn", "num", "num", "num"), operator.add),
+    "-": Def(("fn", "num", "num", "num"), operator.sub),
+    "<": Def(("fn", "bool", "num", "num"), operator.lt),
+    "<=": Def(("fn", "bool", "num", "num"), operator.le),
+    "=": Def(("fn", "bool", "$t", "$t"), operator.eq),
+    "div": Def(("fn", "num", "num", "num"), operator.floordiv),
+    "mod": Def(("fn", "num", "num", "num"), operator.mod),
+    "pow": Def(("fn", "num", "num", "num"), operator.pow),
+    "at": Def(("fn", "$t", ("list", "$t"), "num"), lambda a, b: a[b]),
+    "cons": Def(("fn", ("list", "$t"), "$t", ("list", "$t")), lambda a, b: (a,) + b),
+    "hd": Def(("fn", "$t", ("list", "$t")), lambda a: a[0]),
+    "len": Def(("fn", "num", ("list", "$t")), lambda a: len(a)),
     # "map": Def((),lambda f, a: tuple(map(f, a))),
-    "and": Def(("bool", "bool", "bool"), None),
-    "or": Def(("bool", "bool", "bool"), None),
-    "if": Def(("$t", "bool", "$t", "$t"), None),
-    "not": Def(("bool", "bool"), operator.not_),
-    "tl": Def((("list", "$t"), ("list", "$t")), lambda a: a[1:]),
-    "/": Def(("num", "num", "num"), operator.truediv),
+    "and": Def(("fn", "bool", "bool", "bool"), None),
+    "or": Def(("fn", "bool", "bool", "bool"), None),
+    "if": Def(("fn", "$t", "bool", "$t", "$t"), None),
+    "not": Def(("fn", "bool", "bool"), operator.not_),
+    "tl": Def(("fn", ("list", "$t"), ("list", "$t")), lambda a: a[1:]),
+    "/": Def(("fn", "num", "num", "num"), operator.truediv),
 }
 
 
@@ -41,11 +42,9 @@ def ev(a, env):
     # atom
     if isinstance(a, str):
         return env[a]
-    assert isinstance(a, tuple) or isinstance(a, list)
 
-    # empty list
-    if not a:
-        return ()
+    # compound
+    assert isinstance(a, tuple) or isinstance(a, list)
     o = a[0]
 
     # special form
@@ -62,9 +61,9 @@ def ev(a, env):
     return f(*args)
 
 
-def run(a):
-    env = {}
+def run(a, env):
     for o in defs:
+        assert o not in env
         d = defs[o]
         if d.val is not None:
             env[o] = d.val
@@ -72,7 +71,7 @@ def run(a):
 
 
 def test(a, b):
-    assert run(a) == b
+    assert run(a, {}) == b
 
 
 if __name__ == "__main__":

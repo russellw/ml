@@ -1,76 +1,62 @@
 import random
 
-from interpreter import defs, run
+from interpreter import defs
 from unify import replace, unify
 
 
-def typeof(a):
-    if isinstance(a, bool):
-        return "bool"
-    if isinstance(a, int) or isinstance(a, float):
-        return "num"
-    if isinstance(a, tuple):
-        return "list", "$t"
-    raise Exception(a)
-
-
-nodes = [
-    False,
-    True,
-    0,
-    1,
-    (),
-]
-
-
-def is_const(a):
-    if isinstance(a, str):
-        return
-    if isinstance(a, tuple):
-        return a == ()
-    return 1
+def is_fn(t):
+    return isinstance(t, tuple) and t[0] == "fn"
 
 
 def simplify(a):
-    if all([is_const(b) for b in a.args]):
-        return run(a)
     return a
 
 
-def mk(t, depth=3):
-    # existing node
-    v = []
-    for a in nodes:
-        if unify(a.t, t, {}):
-            v.append(a)
-    if v and (depth == 0 or random.random() < 0.5):
+def mk1(t, env, depth):
+    # atom
+    if depth == 0 or random.random() < 0.5:
+        v = []
+        for o in env:
+            if not is_fn(env[o]) and unify(env[o], t, {}):
+                v.append(o)
+        if not v:
+            raise Exception(t)
         return random.choice(v)
 
     # choose op
     v = []
-    for o in ops:
-        if unify(ops[o].t[0], t, {}):
+    for o in env:
+        if is_fn(env[o]) and unify(env[o], t, {}):
             v.append(o)
     if not v:
         raise Exception(t)
     o = random.choice(v)
 
-    # make subexpression
+    # arg types
     d = {}
-    unify(ops[o].t, t, d)
-    args = [mk(u, depth - 1) for u in replace(ops[o].t, d)[1:]]
-    return simplify(Node(o, *args))
+    unify(env[o], t, d)
+
+    # make subexpression
+    v = [o]
+    for u in replace(env[o], d)[1:]:
+        v.append(mk1(u, env, depth - 1))
+    return simplify(v)
+
+
+def mk(t, env):
+    for o in defs:
+        assert o not in env
+        d = defs[o]
+        env[o] = d.t
+    return mk1(t, env, 3)
 
 
 if __name__ == "__main__":
     random.seed(0)
 
-    assert typeof(False) == "bool"
-    assert typeof(True) == "bool"
-
     for i in range(50):
         try:
-            print(mk("num"))
+            print(mk("num", {"x": "num"}))
         except (IndexError, ZeroDivisionError):
             pass
 
