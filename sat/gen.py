@@ -1,37 +1,16 @@
 import random
 
-from interpreter import ev
+from interpreter import ev, ops
 from unify import replace, unify
-
-op_types = {
-    "<": ("bool", "num", "num"),
-    "<=": ("bool", "num", "num"),
-    "not": ("bool", "bool"),
-    "and": ("bool", "bool", "bool"),
-    "or": ("bool", "bool", "bool"),
-    "if": ("$t", "bool", "$t", "$t"),
-    "=": ("bool", "$t", "$t"),
-    "neg": ("num", "num"),
-    "+": ("num", "num", "num"),
-    "-": ("num", "num", "num"),
-    "*": ("num", "num", "num"),
-    "/": ("num", "num", "num"),
-    "div": ("num", "num", "num"),
-    "mod": ("num", "num", "num"),
-    "pow": ("num", "num", "num"),
-    "at": ("$t", ("list", "$t"), "num"),
-    "hd": ("$t", ("list", "$t")),
-    "tl": (("list", "$t"), ("list", "$t")),
-}
 
 
 class Node:
-    def __init__(self, op, *args):
-        self.op = op
+    def __init__(self, o, *args):
+        self.o = o
         self.args = args
 
     def __repr__(self):
-        return self.op + str(list(self.args))
+        return self.o + str(list(self.args))
 
 
 def typeof(a):
@@ -46,7 +25,7 @@ def typeof(a):
 
 class Const:
     def __init__(self, val):
-        self.op = "const"
+        self.o = "const"
         self.val = val
         self.t = typeof(val)
 
@@ -64,34 +43,34 @@ nodes = [
 
 
 def simplify(a):
-    if all([b.op == "const" for b in a.args]):
+    if all([b.o == "const" for b in a.args]):
         return Const(ev(a))
     return a
 
 
 def mk(t, depth=3):
     # existing node
-    r = []
+    v = []
     for a in nodes:
         if unify(a.t, t, {}):
-            r.append(a)
-    if r and (depth == 0 or random.random() < 0.5):
-        return random.choice(r)
+            v.append(a)
+    if v and (depth == 0 or random.random() < 0.5):
+        return random.choice(v)
 
     # choose op
-    ops = []
-    for op in op_types:
-        if unify(op_types[op][0], t, {}):
-            ops.append(op)
-    if not ops:
+    v = []
+    for o in ops:
+        if unify(ops[o].t[0], t, {}):
+            v.append(o)
+    if not v:
         raise Exception(t)
-    op = random.choice(ops)
+    o = random.choice(v)
 
     # make subexpression
     d = {}
-    unify(op_types[op], t, d)
-    args = [mk(u, depth - 1) for u in replace(op_types[op], d)[1:]]
-    return simplify(Node(op, *args))
+    unify(ops[o].t, t, d)
+    args = [mk(u, depth - 1) for u in replace(ops[o].t, d)[1:]]
+    return simplify(Node(o, *args))
 
 
 if __name__ == "__main__":
