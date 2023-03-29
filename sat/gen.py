@@ -26,7 +26,7 @@ def mk1(t, env, depth):
     # choose op
     v = []
     for o in env:
-        if is_fn(env[o]) and unify(env[o], t, {}):
+        if is_fn(env[o]) and unify(env[o][1], t, {}):
             v.append(o)
     if not v:
         raise Exception(t)
@@ -34,11 +34,11 @@ def mk1(t, env, depth):
 
     # arg types
     d = {}
-    unify(env[o], t, d)
+    unify(env[o][1], t, d)
 
     # make subexpression
     v = [o]
-    for u in replace(env[o], d)[1:]:
+    for u in replace(env[o], d)[2:]:
         v.append(mk1(u, env, depth - 1))
     return simplify(v)
 
