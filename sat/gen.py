@@ -1,6 +1,6 @@
 import random
 
-from interpreter import defs
+from interpreter import defs, run
 from unify import replace, unify
 
 
@@ -40,7 +40,7 @@ def mk1(t, env, depth):
     v = [o]
     for u in replace(env[o], d)[2:]:
         v.append(mk1(u, env, depth - 1))
-    return simplify(v)
+    return simplify(tuple(v))
 
 
 def mk(t, env):
@@ -51,12 +51,26 @@ def mk(t, env):
     return mk1(t, env, 3)
 
 
+seen = set()
+
+
+def print_new(a):
+    if a not in seen:
+        print(a)
+        seen.add(a)
+
+
 if __name__ == "__main__":
     random.seed(0)
 
-    for i in range(50):
+    x = 10, 20, 30
+    for i in range(1000):
+        a = mk("num", {"x": ("list", "num")})
+        print_new(a)
         try:
-            print(mk("num", {"x": "num"}))
+            if run(a, {"x": x}) == 30:
+                print("***", i)
+                break
         except (IndexError, ZeroDivisionError):
             pass
 
