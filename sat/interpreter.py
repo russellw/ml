@@ -24,7 +24,7 @@ defs = {
     "div": Def(("fn", "num", "num", "num"), operator.floordiv),
     "mod": Def(("fn", "num", "num", "num"), operator.mod),
     "pow": Def(("fn", "num", "num", "num"), operator.pow),
-    "at": Def(("fn", "$t", ("list", "$t"), "num"), lambda a, b: a[b]),
+    "at": Def(("fn", "$t", ("list", "$t"), "num"), lambda a, b: a[int(b)]),
     "cons": Def(("fn", ("list", "$t"), "$t", ("list", "$t")), lambda a, b: (a,) + b),
     "hd": Def(("fn", "$t", ("list", "$t")), lambda a: a[0]),
     "len": Def(("fn", "num", ("list", "$t")), lambda a: len(a)),
@@ -44,7 +44,7 @@ def ev(a, env):
         return env[a]
 
     # compound
-    assert isinstance(a, tuple) or isinstance(a, list)
+    assert isinstance(a, tuple)
     o = a[0]
 
     # special form
