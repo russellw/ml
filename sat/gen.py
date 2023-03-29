@@ -14,7 +14,7 @@ def simplify(a):
 
 def mk1(t, env, depth):
     # atom
-    if depth == 0 or random.random() < 0.5:
+    if depth == 0 or random.random() < 0.10:
         v = []
         for o in env:
             if not is_fn(env[o]) and unify(env[o], t, {}):
