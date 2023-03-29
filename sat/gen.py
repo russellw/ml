@@ -4,15 +4,6 @@ from interpreter import ev, ops
 from unify import replace, unify
 
 
-class Node:
-    def __init__(self, o, *args):
-        self.o = o
-        self.args = args
-
-    def __repr__(self):
-        return self.o + str(list(self.args))
-
-
 def typeof(a):
     if isinstance(a, bool):
         return "bool"
@@ -23,28 +14,26 @@ def typeof(a):
     raise Exception(a)
 
 
-class Const:
-    def __init__(self, val):
-        self.o = "const"
-        self.val = val
-        self.t = typeof(val)
-
-    def __repr__(self):
-        return str(self.val)
-
-
 nodes = [
-    Const(False),
-    Const(True),
-    Const(0),
-    Const(1),
-    Const(()),
+    False,
+    True,
+    0,
+    1,
+    (),
 ]
 
 
+def is_const(a):
+    if isinstance(a, str):
+        return
+    if isinstance(a, tuple):
+        return a == ()
+    return 1
+
+
 def simplify(a):
-    if all([b.o == "const" for b in a.args]):
-        return Const(ev(a))
+    if all([is_const(b) for b in a.args]):
+        return run(a)
     return a
 
 
@@ -78,17 +67,6 @@ if __name__ == "__main__":
 
     assert typeof(False) == "bool"
     assert typeof(True) == "bool"
-
-    d = {}
-    a = Const(1)
-    b = Const(2)
-    d[a] = 1
-    d[b] = 2
-    assert len(d) == 2
-    assert a in d
-    assert b in d
-    assert d[a] == 1
-    assert d[b] == 2
 
     for i in range(50):
         try:

@@ -34,39 +34,36 @@ ops = {
 
 
 def ev(a, env):
-    if a.o == "const":
-        return a.val
-
-    if a.o == "and":
-        return ev(a.args[0], env) and ev(a.args[1], env)
-    if a.o == "or":
-        return ev(a.args[0], env) or ev(a.args[1], env)
-
-    if a.o == "if":
-        return ev(a.args[1], env) if ev(a.args[0], env) else ev(a.args[2], env)
-
-    f = ops[a.o].f
-    args = [ev(b, env) for b in a.args]
-    return f(*args)
-
-
-def test(a, env, b):
-    assert ev(a, env) == b
+    if isinstance(a, str):
+        return env[a]
+    if isinstance(a, tuple) and a:
+        o = a[0]
+        if o == "and":
+            return ev(a[1], env) and ev(a[2], env)
+        if o == "if":
+            return ev(a[2], env) if ev(a[1], env) else ev(a[3], env)
+        if o == "or":
+            return ev(a[1], env) or ev(a[2], env)
+        f = ev(o, env)
+        args = [ev(b, env) for b in a[1:]]
+        return f(*args)
+    return a
 
 
-class Node:
-    def __init__(self, o, *args):
-        self.o = o
-        self.args = args
+def run(a):
+    env = {}
+    for o in ops:
+        op = ops[o]
+        if op.f:
+            env[o] = op.f
+    return ev(a, env)
 
 
-class Const:
-    def __init__(self, val):
-        self.o = "const"
-        self.val = val
+def test(a, b):
+    assert run(a) == b
 
 
 if __name__ == "__main__":
-    test(Const(1), {}, 1)
-    test(Node("+", Const(1), Const(2)), {}, 3)
+    test(1, 1)
+    test(("+", 1, 2), 3)
     print("ok")
