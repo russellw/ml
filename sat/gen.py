@@ -1,6 +1,6 @@
 import random
 
-from interpreter import ev, ops
+from interpreter import defs, run
 from unify import replace, unify
 
 

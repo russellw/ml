@@ -38,14 +38,17 @@ defs = {
 
 
 def ev(a, env):
+    # atom
     if isinstance(a, str):
         return env[a]
     assert isinstance(a, tuple) or isinstance(a, list)
 
+    # empty list
     if not a:
         return ()
     o = a[0]
 
+    # special form
     if o == "and":
         return ev(a[1], env) and ev(a[2], env)
     if o == "if":
@@ -53,6 +56,7 @@ def ev(a, env):
     if o == "or":
         return ev(a[1], env) or ev(a[2], env)
 
+    # call
     f = ev(o, env)
     args = [ev(b, env) for b in a[1:]]
     return f(*args)
@@ -62,7 +66,7 @@ def run(a):
     env = {}
     for o in defs:
         d = defs[o]
-        if d.val:
+        if d.val is not None:
             env[o] = d.val
     return ev(a, env)
 
