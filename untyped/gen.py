@@ -13,6 +13,7 @@ def simplify(a):
 
 
 def mk1(t, env, depth):
+    t = "$"
     # atom
     if depth == 0 or random.random() < 0.10:
         v = []
