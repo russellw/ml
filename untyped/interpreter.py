@@ -28,7 +28,6 @@ defs = {
     "cons": Def(("fn", ("list", "$t"), "$t", ("list", "$t")), lambda a, b: (a,) + b),
     "hd": Def(("fn", "$t", ("list", "$t")), lambda a: a[0]),
     "len": Def(("fn", "num", ("list", "$t")), lambda a: len(a)),
-    # "map": Def((),lambda f, a: tuple(map(f, a))),
     "and": Def(("fn", "bool", "bool", "bool"), None),
     "or": Def(("fn", "bool", "bool", "bool"), None),
     "if": Def(("fn", "$t", "bool", "$t", "$t"), None),
@@ -39,26 +38,24 @@ defs = {
 
 
 def ev(a, env):
-    # atom
     if isinstance(a, str):
         return env[a]
+    if isinstance(a, tuple):
+        if not a:
+            return ()
+        o = a[0]
 
-    # compound
-    assert isinstance(a, tuple)
-    o = a[0]
+        if o == "and":
+            return ev(a[1], env) and ev(a[2], env)
+        if o == "if":
+            return ev(a[2], env) if ev(a[1], env) else ev(a[3], env)
+        if o == "or":
+            return ev(a[1], env) or ev(a[2], env)
 
-    # special form
-    if o == "and":
-        return ev(a[1], env) and ev(a[2], env)
-    if o == "if":
-        return ev(a[2], env) if ev(a[1], env) else ev(a[3], env)
-    if o == "or":
-        return ev(a[1], env) or ev(a[2], env)
-
-    # call
-    f = ev(o, env)
-    args = [ev(b, env) for b in a[1:]]
-    return f(*args)
+        f = ev(o, env)
+        args = [ev(b, env) for b in a[1:]]
+        return f(*args)
+    return a
 
 
 def run(a, env):
