@@ -1,8 +1,8 @@
 import argparse
 import random
 
+import interpreter
 from gen import mk
-from interpreter import ev
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--depth", help="expression depth", type=int, default=5)
@@ -29,7 +29,7 @@ def max1(a):
 
 def score1(program, x):
     try:
-        if ev(program, {"x": x}) == max1(x):
+        if interpreter.ev(program, {"x": x}) == max1(x):
             return 1
     except (IndexError, TypeError, ZeroDivisionError):
         pass
@@ -43,9 +43,18 @@ def score(program):
     return r
 
 
+cache = set()
+
 best_score = 0
 for i in range(args.epochs):
     program = mk(args.depth)
+    program = interpreter.simplify(program)
+
+    # this only speed things up by a few percent
+    if program in cache:
+        continue
+    cache.add(program)
+
     s = score(program)
     if s > best_score:
         print(i, s, program)

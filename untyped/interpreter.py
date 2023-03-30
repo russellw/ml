@@ -71,7 +71,10 @@ def simplify(a):
         if not a:
             return ()
         if all(map(is_const, a[1:])):
-            return ev(a, {})
+            try:
+                return ev(a, {})
+            except (IndexError, TypeError, ZeroDivisionError):
+                return 0
     return a
 
 
