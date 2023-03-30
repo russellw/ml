@@ -5,7 +5,7 @@ from gen import mk
 from interpreter import run
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-d", "--depth", help="expression depth", type=int, default=3)
+parser.add_argument("-d", "--depth", help="expression depth", type=int, default=5)
 parser.add_argument("-e", "--epochs", help="number of epochs", type=int, default=10000)
 parser.add_argument("-s", "--seed", help="random number seed", type=int)
 args = parser.parse_args()
@@ -48,5 +48,5 @@ for i in range(args.epochs):
     program = mk("num", {"x": ("list", "num")})
     s = score(program)
     if s > best_score:
-        print(s, program)
+        print(i, s, program)
         best_score = s
