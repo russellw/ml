@@ -23,7 +23,12 @@ defs = {
     "cons": Def(2, lambda a, b: (a,) + b),
     "hd": Def(1, lambda a: a[0]),
     "len": Def(1, lambda a: len(a)),
+    "list?": Def(1, lambda a: isinstance(a, tuple)),
+    "sym?": Def(1, lambda a: isinstance(a, str)),
+    "int?": Def(1, lambda a: isinstance(a, int)),
+    "float?": Def(1, lambda a: isinstance(a, float)),
     "and": Def(2, None),
+    "quote": Def(1, None),
     "or": Def(2, None),
     "if": Def(3, None),
     "not": Def(1, operator.not_),
@@ -36,13 +41,12 @@ def ev(a, env):
     if isinstance(a, str):
         if a in env:
             return env[a]
+
         r = defs[a].val
         if r is None:
             raise Exception(a)
         return r
     if isinstance(a, tuple):
-        if not a:
-            return ()
         o = a[0]
 
         if o == "and":
@@ -51,6 +55,8 @@ def ev(a, env):
             return ev(a[2], env) if ev(a[1], env) else ev(a[3], env)
         if o == "or":
             return ev(a[1], env) or ev(a[2], env)
+        if o == "quote":
+            return a[1]
 
         f = ev(o, env)
         args = [ev(b, env) for b in a[1:]]
@@ -62,17 +68,18 @@ def is_const(a):
     if isinstance(a, str):
         return
     if isinstance(a, tuple):
-        return not a
+        return a[0] == "quote"
     return 1
 
 
 def simplify(a):
     if isinstance(a, tuple):
-        if not a:
-            return ()
         if all(map(is_const, a[1:])):
             try:
-                return ev(a, {})
+                a = ev(a, {})
+                if isinstance(a, str) or isinstance(a, tuple):
+                    return "quote", a
+                return a
             except (IndexError, TypeError, ZeroDivisionError):
                 return 0
     return a
@@ -85,7 +92,9 @@ def test(a, b):
 if __name__ == "__main__":
     test(1, 1)
     test(("+", 1, 1), 2)
+    test(("quote", "a"), "a")
 
     assert simplify(("+", 1, 1)) == 2
+    assert simplify(("cons", 1, ("quote", ()))) == ("quote", (1,))
 
     print("ok")
