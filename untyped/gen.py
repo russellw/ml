@@ -1,6 +1,6 @@
 import random
 
-from interpreter import defs, run
+from interpreter import defs, ev
 
 
 def simplify(a):

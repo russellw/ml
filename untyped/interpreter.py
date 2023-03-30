@@ -34,7 +34,12 @@ defs = {
 
 def ev(a, env):
     if isinstance(a, str):
-        return env[a]
+        if a in env:
+            return env[a]
+        r = defs[a].val
+        if r is None:
+            raise Exception(a)
+        return r
     if isinstance(a, tuple):
         if not a:
             return ()
@@ -53,20 +58,11 @@ def ev(a, env):
     return a
 
 
-def run(a, env):
-    for o in defs:
-        assert o not in env
-        d = defs[o]
-        if d.val is not None:
-            env[o] = d.val
-    return ev(a, env)
-
-
 def test(a, b):
-    assert run(a, {}) == b
+    assert ev(a, {}) == b
 
 
 if __name__ == "__main__":
-    test("1", 1)
-    test(("+", "1", "1"), 2)
+    test(1, 1)
+    test(("+", 1, 1), 2)
     print("ok")

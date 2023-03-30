@@ -2,7 +2,7 @@ import argparse
 import random
 
 from gen import mk
-from interpreter import run
+from interpreter import ev
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--depth", help="expression depth", type=int, default=5)
@@ -29,7 +29,7 @@ def max1(a):
 
 def score1(program, x):
     try:
-        if run(program, {"x": x}) == max1(x):
+        if ev(program, {"x": x}) == max1(x):
             return 1
     except (IndexError, TypeError, ZeroDivisionError):
         pass
