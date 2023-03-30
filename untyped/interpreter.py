@@ -58,6 +58,10 @@ def ev(a, env):
     return a
 
 
+def simplify(a):
+    return a
+
+
 def test(a, b):
     assert ev(a, {}) == b
 

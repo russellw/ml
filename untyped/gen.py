@@ -1,10 +1,6 @@
 import random
 
-from interpreter import defs, ev
-
-
-def simplify(a):
-    return a
+from interpreter import defs
 
 
 def mk(depth):
@@ -14,4 +10,4 @@ def mk(depth):
     v = [o]
     for i in range(defs[o].arity):
         v.append(mk(depth - 1))
-    return simplify(tuple(v))
+    return tuple(v)
