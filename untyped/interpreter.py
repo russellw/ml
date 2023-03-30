@@ -58,7 +58,20 @@ def ev(a, env):
     return a
 
 
+def is_const(a):
+    if isinstance(a, str):
+        return
+    if isinstance(a, tuple):
+        return not a
+    return 1
+
+
 def simplify(a):
+    if isinstance(a, tuple):
+        if not a:
+            return ()
+        if all(map(is_const, a[1:])):
+            return ev(a, {})
     return a
 
 
@@ -69,4 +82,7 @@ def test(a, b):
 if __name__ == "__main__":
     test(1, 1)
     test(("+", 1, 1), 2)
+
+    assert simplify(("+", 1, 1)) == 2
+
     print("ok")
