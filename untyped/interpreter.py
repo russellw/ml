@@ -74,13 +74,17 @@ def is_const(a):
 
 def simplify(a):
     if isinstance(a, tuple):
+        o = a[0]
+        if o == "quote":
+            return a
+        a = tuple(map(simplify, a))
         if all(map(is_const, a[1:])):
             try:
                 a = ev(a, {})
                 if isinstance(a, str) or isinstance(a, tuple):
                     return "quote", a
                 return a
-            except (IndexError, TypeError, ZeroDivisionError):
+            except (IndexError, TypeError, ValueError, ZeroDivisionError):
                 return 0
     return a
 

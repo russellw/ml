@@ -31,7 +31,7 @@ def score1(program, x):
     try:
         if interpreter.ev(program, {"x": x}) == max1(x):
             return 1
-    except (IndexError, TypeError, ZeroDivisionError):
+    except (IndexError, TypeError, ValueError, ZeroDivisionError):
         pass
     return 0
 
