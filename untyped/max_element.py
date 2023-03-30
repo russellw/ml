@@ -45,7 +45,7 @@ def score(program):
 
 best_score = 0
 for i in range(args.epochs):
-    program = mk("num", {"x": ("list", "num")})
+    program = mk(args.depth)
     s = score(program)
     if s > best_score:
         print(i, s, program)

@@ -2,38 +2,33 @@ import operator
 
 
 class Def:
-    def __init__(self, t, val):
-        self.t = t
+    def __init__(self, arity, val):
+        self.arity = arity
         self.val = val
 
 
 # https://docs.python.org/3/library/operator.html
 defs = {
-    "0": Def("num", 0),
-    "1": Def("num", 1),
-    "false": Def("bool", False),
-    "true": Def("bool", True),
-    "nil": Def(("list", "$t"), ()),
-    "*": Def(("fn", "num", "num", "num"), operator.mul),
-    "neg": Def(("fn", "num", "num"), operator.neg),
-    "+": Def(("fn", "num", "num", "num"), operator.add),
-    "-": Def(("fn", "num", "num", "num"), operator.sub),
-    "<": Def(("fn", "bool", "num", "num"), operator.lt),
-    "<=": Def(("fn", "bool", "num", "num"), operator.le),
-    "=": Def(("fn", "bool", "$t", "$t"), operator.eq),
-    "div": Def(("fn", "num", "num", "num"), operator.floordiv),
-    "mod": Def(("fn", "num", "num", "num"), operator.mod),
-    "pow": Def(("fn", "num", "num", "num"), operator.pow),
-    "at": Def(("fn", "$t", ("list", "$t"), "num"), lambda a, b: a[int(b)]),
-    "cons": Def(("fn", ("list", "$t"), "$t", ("list", "$t")), lambda a, b: (a,) + b),
-    "hd": Def(("fn", "$t", ("list", "$t")), lambda a: a[0]),
-    "len": Def(("fn", "num", ("list", "$t")), lambda a: len(a)),
-    "and": Def(("fn", "bool", "bool", "bool"), None),
-    "or": Def(("fn", "bool", "bool", "bool"), None),
-    "if": Def(("fn", "$t", "bool", "$t", "$t"), None),
-    "not": Def(("fn", "bool", "bool"), operator.not_),
-    "tl": Def(("fn", ("list", "$t"), ("list", "$t")), lambda a: a[1:]),
-    "/": Def(("fn", "num", "num", "num"), operator.truediv),
+    "*": Def(2, operator.mul),
+    "neg": Def(1, operator.neg),
+    "+": Def(2, operator.add),
+    "-": Def(2, operator.sub),
+    "<": Def(2, operator.lt),
+    "<=": Def(2, operator.le),
+    "=": Def(2, operator.eq),
+    "div": Def(2, operator.floordiv),
+    "mod": Def(2, operator.mod),
+    "pow": Def(2, operator.pow),
+    "at": Def(2, lambda a, b: a[int(b)]),
+    "cons": Def(2, lambda a, b: (a,) + b),
+    "hd": Def(1, lambda a: a[0]),
+    "len": Def(1, lambda a: len(a)),
+    "and": Def(2, None),
+    "or": Def(2, None),
+    "if": Def(3, None),
+    "not": Def(1, operator.not_),
+    "tl": Def(1, lambda a: a[1:]),
+    "/": Def(2, operator.truediv),
 }
 
 
