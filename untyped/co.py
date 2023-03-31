@@ -82,7 +82,7 @@ def run(program, x):
         return 0
 
 
-# static simplifier
+# simplifier
 def is_const(a):
     if isinstance(a, str):
         return
@@ -135,6 +135,12 @@ def mk(depth):
     return tuple(v)
 
 
+def gen():
+    a = mk(args.depth)
+    a = simplify(a)
+    return a
+
+
 # evaluator
 def score(solver, target):
     x = run(solver, target)
@@ -152,8 +158,7 @@ def score_solver(solver, targets):
 
 targets = set()
 while len(targets) < 10000:
-    target = mk(args.depth)
-    target = simplify(target)
+    target = gen()
     targets.add(target)
 
 v = list(targets)
@@ -164,8 +169,7 @@ print()
 
 best_score = -1
 for i in range(args.epochs):
-    solver = mk(args.depth)
-    solver = simplify(solver)
+    solver = gen()
     s = score_solver(solver, targets)
     if s > best_score:
         best_score = s
