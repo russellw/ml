@@ -142,13 +142,16 @@ def gen():
             return a
         except (IndexError, TypeError, ValueError, ZeroDivisionError):
             pass
+
+
 def gens(n):
-    #use dict instead of set for deterministic order
+    # use dict instead of set for deterministic order
     v = {}
     while len(v) < 1000:
         target = gen()
-        v[target]=1
-    return list( v.keys())
+        v[target] = 1
+    return list(v.keys())
+
 
 # evaluator
 def score(solver, target):
@@ -165,8 +168,7 @@ def score_solver(solver, targets):
     return succeed
 
 
-
-targets=gens(1000)
+targets = gens(1000)
 for target in targets[:10]:
     print(target)
 print()
