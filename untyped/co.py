@@ -93,6 +93,27 @@ def is_const(a):
     return 1
 
 
+def typeof(a):
+    if isinstance(a, bool):
+        return "bool"
+    if isinstance(a, float):
+        return "float"
+    if isinstance(a, int):
+        return "int"
+    if isinstance(a, tuple):
+        o = a[0]
+        if o in ("<", "<=", "="):
+            return "bool"
+        if o.endswith("?"):
+            return "bool"
+        if o == "/":
+            return "float"
+        if o in ("div", "len", "mod"):
+            return "int"
+        if o in ("cons", "tl"):
+            return "list"
+
+
 def simplify(a):
     if isinstance(a, tuple):
         o = a[0]
@@ -120,6 +141,17 @@ def simplify(a):
                 return a[2] if x else a[3]
             if o == "or":
                 return a[1] if x else a[2]
+
+        t = typeof(a[1])
+        if t:
+            if o == "bool?":
+                return t == "bool"
+            if o == "float?":
+                return t == "float"
+            if o == "int?":
+                return t in ("bool", "int")
+            if o == "list?":
+                return t == "list"
     return a
 
 
