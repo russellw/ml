@@ -137,10 +137,18 @@ def gen():
         try:
             a = mk(args.depth)
             a = simplify(a)
+            if is_const(a):
+                continue
             return a
         except (IndexError, TypeError, ValueError, ZeroDivisionError):
             pass
-
+def gens(n):
+    #use dict instead of set for deterministic order
+    v = {}
+    while len(v) < 1000:
+        target = gen()
+        v[target]=1
+    return list( v.keys())
 
 # evaluator
 def score(solver, target):
@@ -157,14 +165,9 @@ def score_solver(solver, targets):
     return succeed
 
 
-targets = set()
-while len(targets) < 10000:
-    target = gen()
-    targets.add(target)
 
-v = list(targets)
-random.shuffle(v)
-for target in v[:10]:
+targets=gens(1000)
+for target in targets[:10]:
     print(target)
 print()
 
