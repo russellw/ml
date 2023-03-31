@@ -2,6 +2,8 @@ import argparse
 import operator
 import random
 
+from etc import *
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--depth", help="expression depth", type=int, default=8)
 parser.add_argument("-e", "--epochs", help="number of epochs", type=int, default=10000)
@@ -170,7 +172,7 @@ def score_solver(solver, targets):
 
 targets = gens(1000)
 for target in targets[:10]:
-    print(target)
+    pprint(target)
 print()
 
 best_score = -1
