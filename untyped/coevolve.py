@@ -71,5 +71,5 @@ scores = score_targets(solvers, targets)
 for s, target in scores[:5]:
     print(s, target)
 print()
-for s, target in scores[-5:]:
+for s, target in scores[-10:]:
     print(s, target)

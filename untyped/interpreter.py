@@ -75,9 +75,15 @@ def is_const(a):
 def simplify(a):
     if isinstance(a, tuple):
         o = a[0]
+
+        # different but equivalent terms are not equivalent when quoted
         if o == "quote":
             return a
+
+        # recursively simplify arguments
         a = tuple(map(simplify, a))
+
+        # if all the arguments are constant, evaluate immediately
         if all(map(is_const, a[1:])):
             try:
                 a = ev(a, {})
@@ -86,6 +92,16 @@ def simplify(a):
                 return a
             except (IndexError, TypeError, ValueError, ZeroDivisionError):
                 return 0
+
+        # simplify based on semantics of the operator
+        if is_const(a[1]):
+            x = ev(a[1], {})
+            if o == "and":
+                return a[1] if not x else a[2]
+            if o == "if":
+                return a[2] if x else a[3]
+            if o == "or":
+                return a[1] if x else a[2]
     return a
 
 
@@ -100,5 +116,6 @@ if __name__ == "__main__":
 
     assert simplify(("+", 1, 1)) == 2
     assert simplify(("cons", 1, ("quote", ()))) == ("quote", (1,))
+    assert simplify(("or", 1, 1)) == 1
 
     print("ok")
