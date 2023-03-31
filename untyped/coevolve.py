@@ -46,11 +46,30 @@ def score_target(solvers, target):
     return fail * succeed
 
 
+def score_solvers(solvers, targets):
+    v = []
+    for target in targets:
+        v.append((score_solver(solver, targets), target))
+    v.sort(key=lambda a: a[0], reverse=True)
+    return v
+
+
 def score_targets(solvers, targets):
     v = []
     for target in targets:
         v.append((score_target(solvers, target), target))
-    v.sort(key=lambda a: a[0])
+    v.sort(key=lambda a: a[0], reverse=True)
+    return v
+
+
+def improve_solvers(solvers, targets):
+    v = score_solvers(solvers, targets)
+    v = v[: len(v) * 100 // 90]
+    v = [a[1] for a in v]
+    v = set(v)
+    while len(v) < 100:
+        solver = mk(args.depth)
+        v.add(solver)
     return v
 
 
@@ -65,11 +84,22 @@ while len(targets) < 100:
     target = interpreter.simplify(target)
     targets.add(target)
 
+for s, solver in score_solvers(solvers, targets)[:10]:
+    print(solver)
+print()
+
+for i in range(1000):
+    solvers = improve_solvers(solvers, targets)
+
+for s, solver in score_solvers(solvers, targets)[:10]:
+    print(solver)
+print()
 
 scores = score_targets(solvers, targets)
 
-for s, target in scores[:5]:
+for s, target in scores[:10]:
     print(s, target)
 print()
-for s, target in scores[-10:]:
+
+for s, target in scores[-3:]:
     print(s, target)
