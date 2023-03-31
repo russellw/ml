@@ -181,4 +181,6 @@ for i in range(args.epochs):
     s = score_solver(solver, targets)
     if s > best_score:
         best_score = s
-        print(i, s, solver)
+        print(i, s)
+        pprint(solver)
+        print()
