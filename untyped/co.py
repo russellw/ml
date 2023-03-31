@@ -104,13 +104,10 @@ def simplify(a):
 
         # if all the arguments are constant, evaluate immediately
         if all(map(is_const, a[1:])):
-            try:
-                a = ev(a, {})
-                if isinstance(a, str) or isinstance(a, tuple):
-                    return "quote", a
-                return a
-            except (IndexError, TypeError, ValueError, ZeroDivisionError):
-                return 0
+            a = ev(a, {})
+            if isinstance(a, str) or isinstance(a, tuple):
+                return "quote", a
+            return a
 
         # simplify based on semantics of the operator
         if is_const(a[1]):
@@ -136,9 +133,13 @@ def mk(depth):
 
 
 def gen():
-    a = mk(args.depth)
-    a = simplify(a)
-    return a
+    while 1:
+        try:
+            a = mk(args.depth)
+            a = simplify(a)
+            return a
+        except (IndexError, TypeError, ValueError, ZeroDivisionError):
+            pass
 
 
 # evaluator
