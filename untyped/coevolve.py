@@ -39,7 +39,7 @@ def score1(solver, target):
     return y
 
 
-def score(target):
+def score_target(solvers, target):
     fail = 0
     succeed = 0
     for solver in solvers:
@@ -52,7 +52,7 @@ def score(target):
 
 scores = []
 for target in targets:
-    scores.append((score(target), target))
+    scores.append((score_target(solvers, target), target))
 scores.sort(key=lambda a: a[0])
 
 for s, target in scores[:5]:
