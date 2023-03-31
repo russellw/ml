@@ -11,7 +11,7 @@ args = parser.parse_args()
 if args.seed is not None:
     random.seed(args.seed)
 
-
+# global definitions
 class Def:
     def __init__(self, arity, val):
         self.arity = arity
@@ -47,7 +47,7 @@ defs = {
     "/": Def(2, operator.truediv),
 }
 
-
+# interpreter
 def ev(a, env):
     if isinstance(a, str):
         if a in env:
@@ -75,6 +75,14 @@ def ev(a, env):
     return a
 
 
+def run(program, x):
+    try:
+        return ev(program, {"x": x})
+    except (IndexError, TypeError, ValueError, ZeroDivisionError):
+        return 0
+
+
+# static simplifier
 def is_const(a):
     if isinstance(a, str):
         return
@@ -116,6 +124,7 @@ def simplify(a):
     return a
 
 
+# generator
 def mk(depth):
     if depth == 0 or random.random() < 0.10:
         return random.choice((0, 1, ("quote", ()), "x"))
@@ -126,13 +135,7 @@ def mk(depth):
     return tuple(v)
 
 
-def run(program, x):
-    try:
-        return ev(program, {"x": x})
-    except (IndexError, TypeError, ValueError, ZeroDivisionError):
-        return 0
-
-
+# evaluator
 def score(solver, target):
     x = run(solver, target)
     y = run(target, x)
@@ -153,7 +156,9 @@ while len(targets) < 10000:
     target = simplify(target)
     targets.add(target)
 
-for target in list(targets)[:10]:
+v = list(targets)
+random.shuffle(v)
+for target in v[:10]:
     print(target)
 print()
 
