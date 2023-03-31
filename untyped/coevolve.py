@@ -21,6 +21,39 @@ def run(program, x):
         return 0
 
 
+def score(solver, target):
+    x = run(solver, target)
+    y = run(target, x)
+    return y
+
+
+def score_solver(solver, targets):
+    succeed = 0
+    for target in targets:
+        if score(solver, target):
+            succeed += 1
+    return succeed
+
+
+def score_target(solvers, target):
+    fail = 0
+    succeed = 0
+    for solver in solvers:
+        if score(solver, target):
+            succeed += 1
+        else:
+            fail += 1
+    return fail * succeed
+
+
+def score_targets(solvers, targets):
+    v = []
+    for target in targets:
+        v.append((score_target(solvers, target), target))
+    v.sort(key=lambda a: a[0])
+    return v
+
+
 solvers = set()
 while len(solvers) < 100:
     solver = mk(args.depth)
@@ -33,27 +66,7 @@ while len(targets) < 100:
     targets.add(target)
 
 
-def score1(solver, target):
-    x = run(solver, target)
-    y = run(target, x)
-    return y
-
-
-def score_target(solvers, target):
-    fail = 0
-    succeed = 0
-    for solver in solvers:
-        if score1(solver, target):
-            succeed += 1
-        else:
-            fail += 1
-    return fail * succeed
-
-
-scores = []
-for target in targets:
-    scores.append((score_target(solvers, target), target))
-scores.sort(key=lambda a: a[0])
+scores = score_targets(solvers, targets)
 
 for s, target in scores[:5]:
     print(s, target)
