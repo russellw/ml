@@ -21,6 +21,7 @@ while len(solvers) < 100:
 targets = set()
 while len(targets) < 100:
     target = mk(args.depth)
+    target = interpreter.simplify(target)
     targets.add(target)
 
 
