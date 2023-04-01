@@ -102,16 +102,55 @@ def typeof(a):
         return "int"
     if isinstance(a, tuple):
         o = a[0]
-        if o in ("<", "<=", "="):
+
+        if o == "quote":
+            a = a[1]
+            if isinstance(a, str):
+                return "sym"
+            if isinstance(a, tuple):
+                return "list"
+            return typeof(a)
+
+        if o in ("<", "<=", "=", "not"):
             return "bool"
         if o.endswith("?"):
             return "bool"
+
         if o == "/":
             return "float"
+
         if o in ("div", "len", "mod"):
             return "int"
+
         if o in ("cons", "tl"):
             return "list"
+
+        if o == "neg":
+            return typeof(a[1])
+        if o in ("*", "+", "and", "or"):
+            t = typeof(a[1])
+            if t == typeof(a[2]):
+                return t
+
+
+def typecheck(a):
+    if isinstance(a, tuple):
+        o = a[0]
+        if o == "quote":
+            return
+
+        for b in a[1:]:
+            typecheck(b)
+
+        if o in ("-", "/", "div", "mod", "neg", "pow"):
+            for b in a[1:]:
+                t = typeof(b)
+                if t and t not in ("bool", "int", "float"):
+                    raise TypeError(a)
+        if o in ("hd", "tl", "len", "cons"):
+            t = typeof(a[-1])
+            if t and t != "list":
+                raise TypeError(a)
 
 
 def simplify(a):
@@ -163,7 +202,9 @@ def mk(depth):
     v = [o]
     for i in range(defs[o].arity):
         v.append(mk(depth - 1))
-    return tuple(v)
+    a = tuple(v)
+    typecheck(a)
+    return a
 
 
 def gen():
@@ -203,7 +244,7 @@ def score_solver(solver, targets):
 
 
 targets = gens(1000)
-for target in targets[:10]:
+for target in targets[:20]:
     pprint(target)
 print()
 
