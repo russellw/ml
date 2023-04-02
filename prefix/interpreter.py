@@ -92,7 +92,7 @@ def ev(a, env):
             return env["result"]
         if o == "and":
             return ev(a[1], env) and ev(a[2], env)
-        if o == "lambda":
+        if o == "\\":
             params = a[1]
             body = a[2]
 

@@ -15,7 +15,7 @@ tok = None
 def constituent(c):
     if c.isalnum():
         return 1
-    return c in "_+-*/?=<>"
+    return c in "_+-*/?=<>\\"
 
 
 def lex():
