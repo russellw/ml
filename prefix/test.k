@@ -9,3 +9,16 @@
 ;assignment
 (= x 5)
 (assert(== x 5))
+;do
+(do
+	(= a 1)
+	(= b 2))
+(assert(== a 1))
+(assert(== b 2))
+;when
+(when 1
+	(= a 10)
+	(= b 20))
+(assert(== a 10))
+(assert(== b 20))
+;search

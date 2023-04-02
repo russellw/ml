@@ -64,6 +64,8 @@ def ev(a, env):
             val = ev(a[2], env)
             env[a[1]] = val
             return val
+        if o == "do":
+            return evs(a[1:], env)
         if o == "and":
             return ev(a[1], env) and ev(a[2], env)
         if o == "fn":

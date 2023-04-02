@@ -80,13 +80,16 @@ def expr():
         while not eat(")"):
             v.append(expr())
         a = tuple(v)
+
         if a[0] == "assert":
-            a = (
+            return (
                 "if",
                 a[1],
                 0,
                 ("err", ("quote", ("%s:%d: assert failed" % (filename, line1)))),
             )
+        if a[0] == "when":
+            return "if", a[1], (("do",) + a[1:]), 0
         return a
     if tok[0].isdigit():
         a = int(tok)
