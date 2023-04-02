@@ -1,3 +1,5 @@
+from etc import *
+
 __all__ = [
     "parse",
 ]
@@ -34,6 +36,16 @@ def lex():
         if text[ti] == ";":
             while text[ti] != "\n":
                 ti += 1
+            continue
+        if text[ti : ti + 2] == "/*":
+            lin = line
+            while text[ti : ti + 2] != "*/":
+                if ti == len(text):
+                    raise Exception("%s:%d: unclosed block comment" % (filename, lin))
+                if text[ti] == "\n":
+                    line += 1
+                ti += 1
+            ti += 2
             continue
 
         # number
@@ -84,10 +96,19 @@ def pairwise(a):
     if len(a) <= 3:
         return a
     o = a[0]
+
+    u = ["do"]
+    b = [0]
+    for i in range(1, len(a)):
+        b.append(gensym())
+        u.append(("=", b[i], a[i]))
+
     v = ["and"]
     for i in range(1, len(a) - 1):
-        v.append((o, a[i], a[i + 1]))
-    return tuple(v)
+        v.append((o, b[i], b[i + 1]))
+    u.append(tuple(v))
+
+    return tuple(u)
 
 
 def expr():

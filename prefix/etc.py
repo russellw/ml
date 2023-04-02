@@ -1,5 +1,14 @@
 import inspect
 
+symi = 0
+
+
+def gensym():
+    global symi
+    a = "_" + str(symi)
+    symi += 1
+    return a
+
 
 def dbg(a):
     info = inspect.getframeinfo(inspect.currentframe().f_back)

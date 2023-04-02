@@ -43,3 +43,15 @@
 		2
 	)
 )
+/*
+(assert
+	(<=
+		0
+		(rnd-search
+			(lambda()(rnd-int 5))
+			(lambda(a)(== a 2))
+		)
+		2
+	)
+)
+*/
