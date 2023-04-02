@@ -51,6 +51,16 @@ def ev(a, env):
 
         if o == "and":
             return ev(a[1], env) and ev(a[2], env)
+        if o == "fn":
+            name=a[1]
+            params=a[2]
+            body=a[3]
+            def f(*args):
+                env=env.copy()
+                for key,val in zip(params,args):
+                    env[key]=val
+                return ev(body,env)
+            return f
         if o == "if":
             return ev(a[2], env) if ev(a[1], env) else ev(a[3], env)
         if o == "or":
