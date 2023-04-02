@@ -1,6 +1,7 @@
 import operator
 import random
 
+from etc import *
 from parse import *
 
 
@@ -103,6 +104,8 @@ def ev(a, env):
             return f
         if o == "fn":
             name = a[1]
+            if name in env:
+                raise Exception(name)
             params = a[2]
             body = a[3]
 
