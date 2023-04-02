@@ -69,6 +69,10 @@ def expr():
 
 
 # printer
+def is_comment(a):
+    return isinstance(a, str) and a[0] in ";{"
+
+
 def list_depth(a):
     if isinstance(a, list):
         return max(map(list_depth, a), default=0) + 1
@@ -92,7 +96,7 @@ def indent(n):
 def want_vertical(a):
     # TODO rec
     if isinstance(a, list) and a:
-        if any_rec(lambda b: b.startswith(";"), a):
+        if any_rec(is_comment, a):
             return 1
         if a[0] in ("fn",):
             return 1
@@ -121,9 +125,16 @@ header_len = {
 }
 
 
+def blank_between(a, b):
+    if not is_comment(a) and (is_comment(b) or b[0] == "fn"):
+        return 1
+
+
 def verticals(a, dent):
     for i in range(len(a)):
         if i:
+            if blank_between(a[i - 1], a[i]):
+                out.append("\n")
             indent(dent)
         pprint1(a[i], dent)
 
