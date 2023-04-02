@@ -93,19 +93,6 @@ def want_vertical(a):
     return is_comment(a)
 
 
-def horizontal(a):
-    if isinstance(a, list):
-        out.append("(")
-        if a:
-            out.append(a[0])
-            for b in a[1:]:
-                out.append(" ")
-                horizontal(b)
-        out.append(")")
-        return
-    out.append(a)
-
-
 header_len = {
     "\\": 1,
     "fn": 2,
@@ -135,29 +122,24 @@ def verticals(a, dent):
         pprint(a[i], dent)
 
 
-def vertical(a, dent):
-    assert isinstance(a, list)
-    out.append("(")
-
-    n = 1 + header_len.get(a[0], 0)
-    pprint(a[0])
-    for b in a[1:n]:
-        out.append(" ")
-        pprint(b)
-
-    dent += 1
-    indent(dent)
-    verticals(a[n:], dent)
-
-    out.append(")")
-
-
 def pprint(a, dent=0):
     if isinstance(a, list):
-        if want_vertical(a):
-            vertical(a, dent)
-        else:
-            horizontal(a)
+        out.append("(")
+        if a:
+            n = len(a)
+            if want_vertical(a):
+                n = 1 + header_len.get(a[0], 0)
+
+            pprint(a[0])
+            for b in a[1:n]:
+                out.append(" ")
+                pprint(b)
+
+            if n < len(a):
+                dent += 1
+                indent(dent)
+                verticals(a[n:], dent)
+        out.append(")")
         return
     out.append(a)
 
