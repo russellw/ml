@@ -1,4 +1,4 @@
-;logic
+{logic}
 (assert 1)
 (assert (not 0))
 ;comparison

@@ -37,9 +37,9 @@ def lex():
             while text[ti] != "\n":
                 ti += 1
             continue
-        if text[ti : ti + 2] == "/*":
+        if text[ti] == "{":
             lin = line
-            while text[ti : ti + 2] != "*/":
+            while text[ti] != "}":
                 if ti == len(text):
                     raise Exception("%s:%d: unclosed block comment" % (filename, lin))
                 if text[ti] == "\n":
