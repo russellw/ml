@@ -162,12 +162,17 @@ def do(filename):
     while tok:
         a.append(expr())
 
-    # print
+    # print to string
     out = []
     vertical(a, 0)
     out.append("\n")
     out = "".join(out)
-    print(out, end="")
+
+    # write
+    if out == text:
+        return
+    print(filename)
+    open(file, "w", newline="\n").write(out)
 
 
 for f in args.files:
