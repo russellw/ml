@@ -84,11 +84,12 @@ def ev(a, env):
         if o == "break":
             raise Break()
         if o == "loop":
-            while 1:
+            for i in range(1000):
                 try:
                     evs(a[1:], env)
                 except Break:
-                    return env["result"]
+                    break
+            return env["result"]
         if o == "and":
             return ev(a[1], env) and ev(a[2], env)
         if o == "lambda":
@@ -107,7 +108,7 @@ def ev(a, env):
             if name in env:
                 raise Exception(name)
             params = a[2]
-            body = a[3]
+            body = ("do",) + a[3:]
 
             def f(*args):
                 e = env.copy()

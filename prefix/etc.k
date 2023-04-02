@@ -1,3 +1,9 @@
+(fn >(a b)
+	(< b a))
+(fn >=(a b)
+	(<= b a))
+(fn /=(a b)
+	(not(== b a)))
 (fn map (f s)
 	(if s
 		(cons (f(hd s))(map f(tl s)))
