@@ -172,7 +172,7 @@ def do(filename):
     if out == text:
         return
     print(filename)
-    open(file, "w", newline="\n").write(out)
+    open(filename, "w", newline="\n").write(out)
 
 
 for f in args.files:
