@@ -1,4 +1,5 @@
 import operator
+import random
 
 from parse import *
 
@@ -36,6 +37,9 @@ defs = {
     "not": Def(1, operator.not_),
     "tl": Def(1, lambda a: a[1:]),
     "/": Def(2, operator.truediv),
+    "rnd-float": Def(0, lambda: random.random()),
+    "rnd-int": Def(1, lambda n: random.randrange(n)),
+    "rnd-choice": Def(1, lambda s: random.choice(s)),
 }
 
 
