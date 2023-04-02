@@ -79,29 +79,18 @@ def list_depth(a):
     return 0
 
 
-def any_rec(f, a):
-    if isinstance(a, list):
-        for b in a:
-            if any_rec(f, b):
-                return 1
-        return
-    return f(a)
-
-
-def indent(n):
-    out.append("\n")
-    out.append("  " * n)
-
-
 def want_vertical(a):
-    # TODO rec
-    if isinstance(a, list) and a:
-        if any_rec(is_comment, a):
+    if isinstance(a, list):
+        if not a:
+            return
+        if a[0] in ("\\", "do", "fn", "loop", "when"):
             return 1
-        if a[0] in ("fn",):
+        if any(map(want_vertical, a)):
             return 1
         if list_depth(a) > 5:
             return 1
+        return
+    return is_comment(a)
 
 
 def horizontal(a):
@@ -132,6 +121,11 @@ def blank_between(a, b):
         return 1
 
 
+def indent(n):
+    out.append("\n")
+    out.append("  " * n)
+
+
 def verticals(a, dent):
     for i in range(len(a)):
         if i:
@@ -159,10 +153,13 @@ def vertical(a, dent):
 
 
 def pprint1(a, dent):
-    if want_vertical(a):
-        vertical(a, dent)
-    else:
-        horizontal(a)
+    if isinstance(a, list):
+        if want_vertical(a):
+            vertical(a, dent)
+        else:
+            horizontal(a)
+        return
+    out.append(a)
 
 
 def pprint(a):
