@@ -13,9 +13,11 @@ tok = None
 
 
 def constituent(c):
-    if c.isalnum():
-        return 1
-    return c in "_+-*/?=<>\\"
+    if c.isspace():
+        return
+    if c in "()[];{}":
+        return
+    return 1
 
 
 def lex():
@@ -45,7 +47,7 @@ def lex():
                 if text[ti] == "\n":
                     line += 1
                 ti += 1
-            ti += 2
+            ti += 1
             continue
 
         # number
