@@ -1,6 +1,13 @@
-;numbers
-(assert(== 10000 10000))
-(assert(< -1 0))
+;logic
+(assert 1)
+(assert (not 0))
+;comparison
+(assert(== 10000 10000 10000))
+(assert(not(== 10000 10000 10001)))
+(assert(not(== 10000 10001 10000)))
+(assert(not(== 10001 10000 10000)))
+(assert(< -1 0 1))
+(assert(not (< -1 0 0)))
 ;arithmetic
 (assert(==(+ 1 2)3))
 (assert(==(+ 1 2 3)6))

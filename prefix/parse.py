@@ -80,6 +80,16 @@ def assoc(a):
     return (o, a[1], assoc(((o,) + a[2:])))
 
 
+def pairwise(a):
+    if len(a) <= 3:
+        return a
+    o = a[0]
+    v = ["and"]
+    for i in range(1, len(a) - 1):
+        v.append((o, a[i], a[i + 1]))
+    return tuple(v)
+
+
 def expr():
     line1 = line
     if tok == "(":
@@ -93,6 +103,8 @@ def expr():
             return a
         if a[0] in ("+", "*", "and", "or"):
             return assoc(a)
+        if a[0] in ("==", "/=", "<", "<=", ">", ">="):
+            return pairwise(a)
         if a[0] == "assert":
             return (
                 "if",
