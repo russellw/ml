@@ -132,7 +132,7 @@ def verticals(a, dent):
             if blank_between(a[i - 1], a[i]):
                 out.append("\n")
             indent(dent)
-        pprint1(a[i], dent)
+        pprint(a[i], dent)
 
 
 def vertical(a, dent):
@@ -140,10 +140,10 @@ def vertical(a, dent):
     out.append("(")
 
     n = 1 + header_len.get(a[0], 0)
-    horizontal(a[0])
+    pprint(a[0])
     for b in a[1:n]:
         out.append(" ")
-        horizontal(b)
+        pprint(b)
 
     dent += 1
     indent(dent)
@@ -152,7 +152,7 @@ def vertical(a, dent):
     out.append(")")
 
 
-def pprint1(a, dent):
+def pprint(a, dent=0):
     if isinstance(a, list):
         if want_vertical(a):
             vertical(a, dent)
@@ -160,11 +160,6 @@ def pprint1(a, dent):
             horizontal(a)
         return
     out.append(a)
-
-
-def pprint(a):
-    pprint1(a, 0)
-    out.append("\n")
 
 
 # top level
@@ -175,12 +170,12 @@ def do(filename):
     global toks
 
     # read
-    toks = []
-    ti = 0
     text = open(filename).read()
-    lex()
+    ti = 0
+    toks = []
 
     # parse
+    lex()
     a = []
     while tok:
         a.append(expr())
