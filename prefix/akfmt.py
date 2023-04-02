@@ -9,7 +9,7 @@ args = parser.parse_args()
 def constituent(c):
     if c.isspace():
         return
-    if c in "()[];{}":
+    if c in "()[]{};":
         return
     return 1
 
@@ -75,12 +75,23 @@ def list_depth(a):
     return 0
 
 
+def any_rec(f, a):
+    if isinstance(a, list):
+        for b in a:
+            if any_rec(f, b):
+                return 1
+        return
+    return f(a)
+
+
 def indent(n):
     out.append("  " * n)
 
 
 def want_vertical(a):
     if isinstance(a, list) and a:
+        if any_rec(lambda b: b.startswith(";"), a):
+            return 1
         if list_depth(a) > 5:
             return 1
 
