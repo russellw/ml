@@ -126,6 +126,8 @@ header_len = {
 
 
 def blank_between(a, b):
+    if a[0] == "fn":
+        return 1
     if not is_comment(a) and (is_comment(b) or b[0] == "fn"):
         return 1
 
