@@ -113,7 +113,7 @@ def indent(n):
     out.append("  " * n)
 
 
-def verticals(a, dent):
+def vertical(a, dent):
     for i in range(len(a)):
         if i:
             if blank_between(a[i - 1], a[i]):
@@ -138,7 +138,7 @@ def pprint(a, dent=0):
             if n < len(a):
                 dent += 1
                 indent(dent)
-                verticals(a[n:], dent)
+                vertical(a[n:], dent)
         out.append(")")
         return
     out.append(a)
@@ -164,7 +164,7 @@ def do(filename):
 
     # print
     out = []
-    verticals(a, 0)
+    vertical(a, 0)
     out.append("\n")
     out = "".join(out)
     print(out, end="")
