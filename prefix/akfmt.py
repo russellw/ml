@@ -89,8 +89,11 @@ def indent(n):
 
 
 def want_vertical(a):
+    # TODO rec
     if isinstance(a, list) and a:
         if any_rec(lambda b: b.startswith(";"), a):
+            return 1
+        if a[0] in ("fn",):
             return 1
         if list_depth(a) > 5:
             return 1
@@ -109,14 +112,30 @@ def horizontal(a):
     out.append(a)
 
 
+header_len = {
+    "\\": 1,
+    "fn": 2,
+    "if": 1,
+    "when": 1,
+}
+
+
 def vertical(a, dent):
     assert isinstance(a, list)
     out.append("(")
+
+    n = 1 + header_len.get(a[0], 0)
+    horizontal(a[0])
+    for b in a[1:n]:
+        out.append(" ")
+        horizontal(b)
+
     dent += 1
-    for b in a[1:]:
+    for b in a[n:]:
         out.append("\n")
         indent(dent)
         pprint1(b, dent)
+
     out.append(")")
 
 
@@ -134,10 +153,10 @@ def pprint(a):
 
 # top level
 def do(filename):
-    global toks
+    global out
     global text
     global ti
-    global out
+    global toks
 
     # read
     toks = []
