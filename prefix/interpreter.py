@@ -83,17 +83,21 @@ def ev(a, env):
     return a
 
 
+def evs(s, env):
+    r = 0
+    for a in s:
+        r = ev(a, env)
+    return r
+
+
 def run(v):
     env = {}
     for key in defs:
         d = defs[key]
         if d.val is not None:
             env[key] = d.val
-    for a in parse("etc.k"):
-        ev(a, env)
-    for a in v:
-        ev(a, env)
-    return ev(("main",), env)
+    evs(parse("etc.k"), env)
+    return evs(v, env)
 
 
 def test(a, b):

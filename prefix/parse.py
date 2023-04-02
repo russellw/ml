@@ -3,25 +3,30 @@ __all__ = [
 ]
 
 # tokenizer
+filename = ""
 text = ""
 ti = 0
+line = 0
 tok = None
 
 
 def constituent(c):
     if c.isalnum():
         return 1
-    return c in "_+-*/?"
+    return c in "_+-*/?=<>"
 
 
 def lex():
     global ti
     global tok
+    global line
     while ti < len(text):
         i = ti
 
         # whitespace
         if text[ti].isspace():
+            if text[ti] == "\n":
+                line += 1
             ti += 1
             continue
 
@@ -56,7 +61,7 @@ def lex():
             return
 
         # none of the above
-        raise Exception("stray '%c' in program" % text[ti])
+        raise Exception("%s:%d: stray '%c' in program" % (filename, line, text[ti]))
     tok = None
 
 
@@ -83,11 +88,15 @@ def expr():
     return s
 
 
-def parse(filename):
+def parse(filename1):
     global text
+    global filename
+    global line
     global ti
+    filename = filename1
     text = open(filename).read() + "\n"
     ti = 0
+    line = 1
     lex()
     v = []
     while tok:

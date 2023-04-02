@@ -1,6 +1,3 @@
 (fn square(a)
 	(* a a))
-(fn main()
-;	(map square (quote (3 4)))
-	(rnd-float)
-)
+(assert(= (map square (quote (3 4))) (quote(9 16))))
