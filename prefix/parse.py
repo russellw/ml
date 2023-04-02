@@ -73,6 +73,13 @@ def eat(k):
         return 1
 
 
+def assoc(a):
+    if len(a) <= 3:
+        return a
+    o = a[0]
+    return (o, a[1], assoc(((o,) + a[2:])))
+
+
 def expr():
     line1 = line
     if tok == "(":
@@ -84,6 +91,8 @@ def expr():
 
         if not a:
             return a
+        if a[0] in ("+", "*", "and", "or"):
+            return assoc(a)
         if a[0] == "assert":
             return (
                 "if",

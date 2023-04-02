@@ -3,6 +3,7 @@
 (assert(< -1 0))
 ;arithmetic
 (assert(==(+ 1 2)3))
+(assert(==(+ 1 2 3)6))
 ;functions
 (fn square(a)
 	(* a a))

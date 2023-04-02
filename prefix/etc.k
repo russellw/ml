@@ -9,9 +9,10 @@
 			(= result a)
 			(break))))
 (fn rnd-search-best(mk ev)
-	(= best-score  -1)
+	(= best  -1)
 	(loop
 		(= a (mk))
-		(when (ev a)
+		(= score(ev a))
+		(when (> score best)
 			(= result a)
-			(break))))
+			(= best score))))
