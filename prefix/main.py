@@ -2,4 +2,5 @@ from etc import *
 from interpreter import *
 from parse import *
 
-print(run(parse("test.k")))
+run(parse("test.k"))
+print("ok")

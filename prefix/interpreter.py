@@ -22,7 +22,7 @@ defs = {
     "-": Def(2, operator.sub),
     "<": Def(2, operator.lt),
     "<=": Def(2, operator.le),
-    "=": Def(2, operator.eq),
+    "==": Def(2, operator.eq),
     "div": Def(2, operator.floordiv),
     "mod": Def(2, operator.mod),
     "pow": Def(2, operator.pow),
@@ -60,6 +60,10 @@ def ev(a, env):
     if isinstance(a, tuple):
         o = a[0]
 
+        if o == "=":
+            val = ev(a[2], env)
+            env[a[1]] = val
+            return val
         if o == "and":
             return ev(a[1], env) and ev(a[2], env)
         if o == "fn":
