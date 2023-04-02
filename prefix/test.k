@@ -1,4 +1,4 @@
 (fn square(a)
 	(* a a))
 (fn main()
-	(square 3))
+	(map square (quote (3 4))))

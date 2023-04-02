@@ -1,5 +1,7 @@
 import operator
 
+from parse import *
+
 
 class Def:
     def __init__(self, arity, val):
@@ -83,6 +85,8 @@ def run(v):
         d = defs[key]
         if d.val is not None:
             env[key] = d.val
+    for a in parse("etc.k"):
+        ev(a, env)
     for a in v:
         ev(a, env)
     return ev(("main",), env)
