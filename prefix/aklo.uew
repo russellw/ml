@@ -1,0 +1,35 @@
+/L13"Aklo" Line Comment = ; Block Comment On = { Block Comment Off = } Escape Char = \ String Chars = "' File Extensions = K
+/Delimiters = ()|{}[]:"' ,	;
+/Indent Strings = "fn" "if" "loop" "when" "\"
+/Open Brace Strings =  "(" "["
+/Close Brace Strings = ")" "]"
+/C1"blue"
+=
+\
+and
+assert
+break
+do
+fn
+if
+loop
+or
+quote
+when
+/C2"red"
+false
+true
+/C3"yellow"
+dbg
+troff
+tron
+/C4"green"
+/C5"brown"
+(
+)
+,
+:
+@
+[
+]
+|
