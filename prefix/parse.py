@@ -90,6 +90,7 @@ def expr():
             )
         if a[0] == "when":
             return "if", a[1], (("do",) + a[1:]), 0
+
         return a
     if tok[0].isdigit():
         a = int(tok)

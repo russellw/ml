@@ -68,6 +68,17 @@ def ev(a, env):
             return evs(a[1:], env)
         if o == "and":
             return ev(a[1], env) and ev(a[2], env)
+        if o == "lambda":
+            params = a[1]
+            body = a[2]
+
+            def f(*args):
+                e = env.copy()
+                for key, val in zip(params, args):
+                    e[key] = val
+                return ev(body, e)
+
+            return f
         if o == "fn":
             name = a[1]
             params = a[2]
