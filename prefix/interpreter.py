@@ -8,6 +8,14 @@ def err(s):
     raise Exception(s)
 
 
+def pr(a):
+    print(a, end="")
+
+
+def prn(a):
+    print(a)
+
+
 class Def:
     def __init__(self, arity, val):
         self.arity = arity
@@ -45,6 +53,8 @@ defs = {
     "rnd-float": Def(0, lambda: random.random()),
     "rnd-int": Def(1, lambda n: random.randrange(n)),
     "rnd-choice": Def(1, lambda s: random.choice(s)),
+    "pr": Def(1, pr),
+    "prn": Def(1, prn),
 }
 
 

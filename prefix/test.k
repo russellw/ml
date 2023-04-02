@@ -43,15 +43,13 @@
 		2
 	)
 )
-/*
 (assert
 	(<=
 		0
-		(rnd-search
+		(rnd-search-best
 			(lambda()(rnd-int 5))
-			(lambda(a)(== a 2))
+			(lambda(a)a)
 		)
-		2
+		4
 	)
 )
-*/
