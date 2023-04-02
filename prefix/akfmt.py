@@ -85,6 +85,7 @@ def any_rec(f, a):
 
 
 def indent(n):
+    out.append("\n")
     out.append("  " * n)
 
 
@@ -120,6 +121,13 @@ header_len = {
 }
 
 
+def verticals(a, dent):
+    for i in range(len(a)):
+        if i:
+            indent(dent)
+        pprint1(a[i], dent)
+
+
 def vertical(a, dent):
     assert isinstance(a, list)
     out.append("(")
@@ -131,10 +139,8 @@ def vertical(a, dent):
         horizontal(b)
 
     dent += 1
-    for b in a[n:]:
-        out.append("\n")
-        indent(dent)
-        pprint1(b, dent)
+    indent(dent)
+    verticals(a[n:], dent)
 
     out.append(")")
 
@@ -165,14 +171,14 @@ def do(filename):
     lex()
 
     # parse
-    v = []
+    a = []
     while tok:
-        v.append(expr())
+        a.append(expr())
 
     # print
     out = []
-    for a in v:
-        pprint(a)
+    verticals(a, 0)
+    out.append("\n")
     out = "".join(out)
     print(out, end="")
 
