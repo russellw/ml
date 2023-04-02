@@ -4,6 +4,10 @@ import random
 from parse import *
 
 
+def err(s):
+    raise Exception(s)
+
+
 class Def:
     def __init__(self, arity, val):
         self.arity = arity
@@ -35,6 +39,7 @@ defs = {
     "or": Def(2, None),
     "if": Def(3, None),
     "not": Def(1, operator.not_),
+    "err": Def(1, err),
     "tl": Def(1, lambda a: a[1:]),
     "/": Def(2, operator.truediv),
     "rnd-float": Def(0, lambda: random.random()),

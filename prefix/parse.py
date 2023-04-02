@@ -73,12 +73,21 @@ def eat(k):
 
 
 def expr():
+    line1 = line
     if tok == "(":
         v = []
         lex()
         while not eat(")"):
             v.append(expr())
-        return tuple(v)
+        a = tuple(v)
+        if a[0] == "assert":
+            a = (
+                "if",
+                a[1],
+                0,
+                ("err", ("quote", ("%s:%d: assert failed" % (filename, line1)))),
+            )
+        return a
     if tok[0].isdigit():
         a = int(tok)
         lex()
