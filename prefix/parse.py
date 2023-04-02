@@ -37,7 +37,8 @@ def lex():
             continue
 
         # number
-        if text[ti].isdigit():
+        if text[ti].isdigit() or (text[ti] == "-" and text[ti + 1].isdigit()):
+            ti += 1
             while text[ti].isalnum():
                 ti += 1
             if text[ti] == ".":
@@ -94,7 +95,7 @@ def expr():
             return "if", a[1], (("do",) + a[1:]), 0
 
         return a
-    if tok[0].isdigit():
+    if tok[0].isdigit() or (tok[0] == "-" and len(tok) > 1 and tok[1].isdigit()):
         a = int(tok)
         lex()
         return a

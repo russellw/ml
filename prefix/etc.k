@@ -8,3 +8,10 @@
 		(when (ev a)
 			(= result a)
 			(break))))
+(fn rnd-search-best(mk ev)
+	(= best-score  -1)
+	(loop
+		(= a (mk))
+		(when (ev a)
+			(= result a)
+			(break))))

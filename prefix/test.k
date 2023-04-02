@@ -1,3 +1,6 @@
+;numbers
+(assert(== 10000 10000))
+(assert(< -1 0))
 ;arithmetic
 (assert(==(+ 1 2)3))
 ;functions
