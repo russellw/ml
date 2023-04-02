@@ -162,6 +162,8 @@ def do(filename):
     while tok:
         a.append(expr())
 
+    # TODO sort fns
+
     # print to string
     out = []
     vertical(a, 0)
