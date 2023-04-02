@@ -57,21 +57,21 @@ def eat(k):
 
 def expr():
     if eat("("):
-        v = []
+        a = []
         while not eat(")"):
             if not tok:
                 raise Exception("unclosed '('")
-            v.append(expr())
-        return tuple(v)
-    s = tok
+            a.append(expr())
+        return a
+    a = tok
     lex()
-    return s
+    return a
 
 
 # printer
-def tuple_depth(a):
-    if isinstance(a, tuple):
-        return max(map(tuple_depth, a), default=0) + 1
+def list_depth(a):
+    if isinstance(a, list):
+        return max(map(list_depth, a), default=0) + 1
     return 0
 
 
@@ -79,24 +79,41 @@ def indent(n):
     out.append("  " * n)
 
 
-def pprint1(a, dent):
-    if isinstance(a, tuple):
+def want_vertical(a):
+    if isinstance(a, list) and a:
+        if list_depth(a) > 5:
+            return 1
+
+
+def horizontal(a):
+    if isinstance(a, list):
         out.append("(")
         if a:
             out.append(a[0])
-            if tuple_depth(a) <= 5:
-                for b in a[1:]:
-                    out.append(" ")
-                    pprint1(b, 0)
-            else:
-                dent += 1
-                for b in a[1:]:
-                    out.append("\n")
-                    indent(dent)
-                    pprint1(b, dent)
+            for b in a[1:]:
+                out.append(" ")
+                horizontal(b)
         out.append(")")
         return
     out.append(a)
+
+
+def vertical(a, dent):
+    assert isinstance(a, list)
+    out.append("(")
+    dent += 1
+    for b in a[1:]:
+        out.append("\n")
+        indent(dent)
+        pprint1(b, dent)
+    out.append(")")
+
+
+def pprint1(a, dent):
+    if want_vertical(a):
+        vertical(a, dent)
+    else:
+        horizontal(a)
 
 
 def pprint(a):
