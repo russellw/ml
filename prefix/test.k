@@ -23,3 +23,12 @@
 (assert(== a 10))
 (assert(== b 20))
 ;search
+(assert
+	(==
+		(rnd-search
+			(lambda()(rnd-int 5))
+			(lambda(a)(== a 2))
+		)
+		2
+	)
+)

@@ -81,6 +81,8 @@ def expr():
             v.append(expr())
         a = tuple(v)
 
+        if not a:
+            return a
         if a[0] == "assert":
             return (
                 "if",

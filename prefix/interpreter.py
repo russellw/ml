@@ -48,6 +48,10 @@ defs = {
 }
 
 
+class Break(Exception):
+    pass
+
+
 def ev(a, env):
     if isinstance(a, str):
         if a in env:
@@ -66,6 +70,14 @@ def ev(a, env):
             return val
         if o == "do":
             return evs(a[1:], env)
+        if o == "break":
+            raise Break()
+        if o == "loop":
+            while 1:
+                try:
+                    evs(a[1:], env)
+                except Break:
+                    return env["result"]
         if o == "and":
             return ev(a[1], env) and ev(a[2], env)
         if o == "lambda":
