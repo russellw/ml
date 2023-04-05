@@ -19,13 +19,6 @@ def gensym():
 
 
 # tokenizer
-filename = ""
-text = ""
-ti = 0
-line = 0
-tok = None
-
-
 def constituent(c):
     if c.isspace():
         return
@@ -35,9 +28,9 @@ def constituent(c):
 
 
 def lex():
+    global line
     global ti
     global tok
-    global line
     while ti < len(text):
         i = ti
 
@@ -54,10 +47,7 @@ def lex():
                 ti += 1
             continue
         if text[ti] == "{":
-            lin = line
             while text[ti] != "}":
-                if ti == len(text):
-                    raise Exception("%s:%d: unclosed block comment" % (filename, lin))
                 if text[ti] == "\n":
                     line += 1
                 ti += 1
@@ -103,13 +93,11 @@ def eat(k):
 
 def parse_expr():
     lin = line
-    if tok == "(":
-        v = []
-        lex()
+    if eat("("):
+        a = []
         while not eat(")"):
-            v.append(parse_expr())
-        a = tuple(v)
-
+            a.append(parse_expr())
+        a = tuple(a)
         if not a:
             return a
         if a[0] == "assert":
@@ -119,29 +107,28 @@ def parse_expr():
                 0,
                 ("err", ("quote", ("%s:%d: assert failed" % (filename, lin)))),
             )
-
         return a
     if tok[0].isdigit() or (tok[0] == "-" and len(tok) > 1 and tok[1].isdigit()):
         a = int(tok)
         lex()
         return a
-    s = tok
+    a = tok
     lex()
-    return s
+    return a
 
 
 def parse():
-    global text
     global line
+    global text
     global ti
     text = open(filename).read() + "\n"
     ti = 0
     line = 1
     lex()
-    v = []
+    a = []
     while tok:
-        v.append(parse_expr())
-    return v
+        a.append(parse_expr())
+    return a
 
 
 # compiler
