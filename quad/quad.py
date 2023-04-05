@@ -191,18 +191,18 @@ def comp_expr(a, code):
             r = gensym()
 
             # condition
-            cond = comp_expr(a[1])
+            cond = comp_expr(a[1], code)
             fixup_false = len(code)
             code.append(["if-not", cond])
 
             # true
-            code.append(["=", r, comp_expr(a[2])])
+            code.append(["=", r, comp_expr(a[2], code)])
             fixup_after = len(code)
             code.append(["goto"])
 
             # false
             code[fixup_false].append(len(code))
-            code.append(["=", r, comp_expr(a[3])])
+            code.append(["=", r, comp_expr(a[3], code)])
 
             # after
             code[fixup_after].append(len(code))
@@ -213,7 +213,7 @@ def comp_expr(a, code):
         # function args
         v = [a[0]]
         for b in a[1:]:
-            v.append(comp_expr(b))
+            v.append(comp_expr(b, code))
 
         # special form
         if a[0] == "do":
@@ -267,7 +267,8 @@ fns = {
 def comp(name, params, body):
     fn = Fn()
     fn.code = []
-    comp_expr(("do",) + body, fn.code)
+    r = comp_expr(("do",) + body, fn.code)
+    fn.code.append(("ret", r))
     fns[name] = fn
 
 
@@ -354,23 +355,14 @@ def ev(a, env):
     return a
 
 
-def evs(s, env):
-    r = 0
-    for a in s:
-        r = ev(a, env)
-    return r
-
-
-env = {}
-for key in defs:
-    d = defs[key]
-    if d.val is not None:
-        env[key] = d.val
-
-filename = "etc.k"
-evs(parse(), env)
-
-filename = "test.k"
-evs(parse(), env)
-
+main = []
+for filename in ("etc.k", "test.k"):
+    for a in parse():
+        if a[0] == "fn":
+            comp(a[1], [2], a[3:])
+            continue
+        main.append(a)
+main = tuple(main)
+main = comp("main", (), main)
+call(main, ())
 print("ok")
