@@ -266,10 +266,12 @@ fns = {
 
 def comp(name, params, body):
     fn = Fn()
+    fn.params = params
     fn.code = []
     r = comp_expr(("do",) + body, fn.code)
     fn.code.append(("ret", r))
     fns[name] = fn
+    return fn
 
 
 # interpreter
@@ -302,7 +304,7 @@ def call(fn, args):
             i = a[2] if get(env, a[1]) else i + 1
             continue
         if a[0] == "if-not":
-            i = i + 1 if nget(env, a[1]) else a[2]
+            i = i + 1 if get(env, a[1]) else a[2]
             continue
         if a[0] == "ret":
             return get(env, a[1])

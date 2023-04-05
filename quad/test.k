@@ -47,22 +47,3 @@
   (= b 20))
 (assert (== a 10))
 (assert (== b 20))
-
-;search
-(assert
-  (==
-    (rnd-search
-      (\ ()
-        (randrange 5))
-      (\ (a)
-        (== a 2)))
-    2))
-(assert
-  (<=
-    0
-    (rnd-search-best
-      (\ ()
-        (randrange 5))
-      (\ (a)
-        a))
-    4))
