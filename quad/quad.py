@@ -272,30 +272,48 @@ def comp(name, params, body):
 
 
 # interpreter
-class Break(Exception):
-    pass
+def get(env, a):
+    if isinstance(a, tuple):
+        assert a[0] == "quote"
+        return a[1]
+    return env[a]
+
+
+def call(fn, args):
+    if fn.prim:
+        return fn.prim(*args)
+
+    assert len(fn.params) == len(args)
+    env = {}
+    for key, val in zip(fn.params, args):
+        env[key] = val
+    i = 0
+    while 1:
+        a = fn.code[i]
+        if a[0] == "=":
+            env[a[1]] = get(env, a[2])
+            i += 1
+            continue
+        if a[0] == "goto":
+            i = a[1]
+            continue
+        if a[0] == "if":
+            i = a[2] if get(env, a[1]) else i + 1
+            continue
+        if a[0] == "if-not":
+            i = i + 1 if nget(env, a[1]) else a[2]
+            continue
+        if a[0] == "ret":
+            return get(env, a[1])
+        r = call(fns[a[0]], [get(env, b) for b in a[1:]])
+        env[i] = r
+        i += 1
 
 
 def ev(a, env):
-    if isinstance(a, str):
-        if a in env:
-            return env[a]
-
-        r = defs[a].val
-        if r is None:
-            raise Exception(a)
-        return r
     if isinstance(a, tuple):
         o = a[0]
 
-        if o == "=":
-            val = ev(a[2], env)
-            env[a[1]] = val
-            return val
-        if o == "do":
-            return evs(a[1:], env)
-        if o == "break":
-            raise Break()
         if o == "loop":
             for i in range(1000):
                 try:
@@ -303,8 +321,6 @@ def ev(a, env):
                 except Break:
                     break
             return env["result"]
-        if o == "and":
-            return ev(a[1], env) and ev(a[2], env)
         if o == "\\":
             params = a[1]
             body = a[2]
@@ -331,12 +347,6 @@ def ev(a, env):
 
             env[name] = f
             return
-        if o == "if":
-            return ev(a[2], env) if ev(a[1], env) else ev(a[3], env)
-        if o == "or":
-            return ev(a[1], env) or ev(a[2], env)
-        if o == "quote":
-            return a[1]
 
         f = ev(o, env)
         args = [ev(b, env) for b in a[1:]]
