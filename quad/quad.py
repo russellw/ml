@@ -163,17 +163,30 @@ def comp_expr(a, code):
         return "quote", a
     if isinstance(a, tuple):
         # expand syntax sugar
-        o = a[0]
-        if o == "when":
-            a = "if", a[1], (("do",) + a[1:]), 0
-        if o in ("+", "*", "and", "or"):
+        if a[0] in ("+", "*", "and", "or"):
             a = assoc(a)
-        if o in ("==", "/=", "<", "<=", ">", ">="):
+        elif a[0] in ("==", "/=", "<", "<=", ">", ">="):
             a = pairwise(a)
 
+        if a[0] == "and":
+            r = gensym()
+            a = (
+                "do",
+                ("=", r, a[1]),
+                ("if", r, a[2], r),
+            )
+        elif a[0] == "or":
+            r = gensym()
+            a = (
+                "do",
+                ("=", r, a[1]),
+                ("if", r, r, a[2]),
+            )
+        elif a[0] == "when":
+            a = "if", a[1], (("do",) + a[1:]), 0
+
         # special form
-        o = a[0]
-        if o == "if":
+        if a[0] == "if":
             r = gensym()
 
             # condition
@@ -193,16 +206,16 @@ def comp_expr(a, code):
             # after
             code[fixup_after].append(len(code))
             return r
-        if o == "quote":
+        elif a[0] == "quote":
             return a
 
         # function args
-        v = [o]
+        v = [a[0]]
         for b in a[1:]:
             v.append(comp_expr(b))
 
         # special form
-        if o == "do":
+        if a[0] == "do":
             return v[-1]
 
         # function call
@@ -243,25 +256,21 @@ defs = {
     "<": Def(2, operator.lt),
     "<=": Def(2, operator.le),
     "==": Def(2, operator.eq),
-    "and": Def(2, None),
     "at": Def(2, lambda a, b: a[int(b)]),
     "cons": Def(2, lambda a, b: (a,) + b),
     "div": Def(2, operator.floordiv),
     "err": Def(1, err),
     "float?": Def(1, lambda a: isinstance(a, float)),
     "hd": Def(1, lambda a: a[0]),
-    "if": Def(3, None),
     "int?": Def(1, lambda a: isinstance(a, int)),
     "len": Def(1, lambda a: len(a)),
     "list?": Def(1, lambda a: isinstance(a, tuple)),
     "mod": Def(2, operator.mod),
     "neg": Def(1, operator.neg),
     "not": Def(1, operator.not_),
-    "or": Def(2, None),
     "pow": Def(2, operator.pow),
     "pr": Def(1, pr),
     "prn": Def(1, prn),
-    "quote": Def(1, None),
     "rnd-choice": Def(1, lambda s: random.choice(s)),
     "rnd-float": Def(0, lambda: random.random()),
     "rnd-int": Def(1, lambda n: random.randrange(n)),
