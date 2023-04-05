@@ -21,6 +21,7 @@
 (assert (== (square 3) 9))
 
 ;higher-order functions
+{
 (assert (== (map square (quote (3 4))) (quote (9 16))))
 (assert
   (==
@@ -29,7 +30,7 @@
         (+ x 1))
       (quote (3 4)))
     (quote (4 5))))
-
+}
 ;assignment
 (= x 5)
 (assert (== x 5))

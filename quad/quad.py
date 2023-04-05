@@ -294,7 +294,9 @@ def call(fn, args):
     while 1:
         a = fn.code[i]
         if a[0] == "=":
-            env[a[1]] = get(env, a[2])
+            r = get(env, a[2])
+            env[a[1]] = r
+            env[i] = r
             i += 1
             continue
         if a[0] == "goto":
