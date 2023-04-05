@@ -101,56 +101,24 @@ def eat(k):
         return 1
 
 
-def assoc(a):
-    if len(a) <= 3:
-        return a
-    o = a[0]
-    return (o, a[1], assoc(((o,) + a[2:])))
-
-
-def pairwise(a):
-    if len(a) <= 3:
-        return a
-    o = a[0]
-
-    u = ["do"]
-    b = [0]
-    for i in range(1, len(a)):
-        b.append(gensym())
-        u.append(("=", b[i], a[i]))
-
-    v = ["and"]
-    for i in range(1, len(a) - 1):
-        v.append((o, b[i], b[i + 1]))
-    u.append(tuple(v))
-
-    return tuple(u)
-
-
-def expr():
-    line1 = line
+def parse_expr():
+    lin = line
     if tok == "(":
         v = []
         lex()
         while not eat(")"):
-            v.append(expr())
+            v.append(parse_expr())
         a = tuple(v)
 
         if not a:
             return a
-        if a[0] in ("+", "*", "and", "or"):
-            return assoc(a)
-        if a[0] in ("==", "/=", "<", "<=", ">", ">="):
-            return pairwise(a)
         if a[0] == "assert":
             return (
                 "if",
                 a[1],
                 0,
-                ("err", ("quote", ("%s:%d: assert failed" % (filename, line1)))),
+                ("err", ("quote", ("%s:%d: assert failed" % (filename, lin)))),
             )
-        if a[0] == "when":
-            return "if", a[1], (("do",) + a[1:]), 0
 
         return a
     if tok[0].isdigit() or (tok[0] == "-" and len(tok) > 1 and tok[1].isdigit()):
@@ -172,8 +140,92 @@ def parse():
     lex()
     v = []
     while tok:
-        v.append(expr())
+        v.append(parse_expr())
     return v
+
+
+# compiler
+def assoc(a):
+    if len(a) <= 3:
+        return a
+    o = a[0]
+    return (o, a[1], assoc(((o,) + a[2:])))
+
+
+def pairwise(a):
+    if len(a) == 3:
+        return a
+    o = a[0]
+
+    u = ["do"]
+    b = [0]
+    for i in range(1, len(a)):
+        b.append(gensym())
+        u.append(("=", b[i], a[i]))
+
+    v = ["and"]
+    for i in range(1, len(a) - 1):
+        v.append((o, b[i], b[i + 1]))
+    u.append(tuple(v))
+
+    return tuple(u)
+
+
+def comp_expr(a, code):
+    if isinstance(a, int):
+        return "quote", a
+    if isinstance(a, tuple):
+        # expand syntax sugar
+        o = a[0]
+        if o == "when":
+            a = "if", a[1], (("do",) + a[1:]), 0
+        if o in ("+", "*", "and", "or"):
+            a = assoc(a)
+        if o in ("==", "/=", "<", "<=", ">", ">="):
+            a = pairwise(a)
+
+        # special form
+        o = a[0]
+        if o == "if":
+            r = gensym()
+
+            # condition
+            cond = comp_expr(a[1])
+            fixup_false = len(code)
+            code.append(["if-not", cond])
+
+            # true
+            code.append(["=", r, comp_expr(a[2])])
+            fixup_after = len(code)
+            code.append(["goto"])
+
+            # false
+            code[fixup_false].append(len(code))
+            code.append(["=", r, comp_expr(a[3])])
+
+            # after
+            code[fixup_after].append(len(code))
+            return r
+        if o == "quote":
+            return a
+
+        # function args
+        v = [o]
+        for b in a[1:]:
+            v.append(comp_expr(b))
+
+        # special form
+        if o == "do":
+            return v[-1]
+
+        # function call
+        a = len(code)
+        code.append(v)
+    return a
+
+
+def comp():
+    pass
 
 
 # interpreter
@@ -198,36 +250,36 @@ class Def:
 # https://docs.python.org/3/library/operator.html
 defs = {
     "*": Def(2, operator.mul),
-    "neg": Def(1, operator.neg),
     "+": Def(2, operator.add),
     "-": Def(2, operator.sub),
+    "/": Def(2, operator.truediv),
     "<": Def(2, operator.lt),
     "<=": Def(2, operator.le),
     "==": Def(2, operator.eq),
-    "div": Def(2, operator.floordiv),
-    "mod": Def(2, operator.mod),
-    "pow": Def(2, operator.pow),
+    "and": Def(2, None),
     "at": Def(2, lambda a, b: a[int(b)]),
     "cons": Def(2, lambda a, b: (a,) + b),
+    "div": Def(2, operator.floordiv),
+    "err": Def(1, err),
+    "float?": Def(1, lambda a: isinstance(a, float)),
     "hd": Def(1, lambda a: a[0]),
+    "if": Def(3, None),
+    "int?": Def(1, lambda a: isinstance(a, int)),
     "len": Def(1, lambda a: len(a)),
     "list?": Def(1, lambda a: isinstance(a, tuple)),
-    "sym?": Def(1, lambda a: isinstance(a, str)),
-    "int?": Def(1, lambda a: isinstance(a, int)),
-    "float?": Def(1, lambda a: isinstance(a, float)),
-    "and": Def(2, None),
-    "quote": Def(1, None),
-    "or": Def(2, None),
-    "if": Def(3, None),
+    "mod": Def(2, operator.mod),
+    "neg": Def(1, operator.neg),
     "not": Def(1, operator.not_),
-    "err": Def(1, err),
-    "tl": Def(1, lambda a: a[1:]),
-    "/": Def(2, operator.truediv),
-    "rnd-float": Def(0, lambda: random.random()),
-    "rnd-int": Def(1, lambda n: random.randrange(n)),
-    "rnd-choice": Def(1, lambda s: random.choice(s)),
+    "or": Def(2, None),
+    "pow": Def(2, operator.pow),
     "pr": Def(1, pr),
     "prn": Def(1, prn),
+    "quote": Def(1, None),
+    "rnd-choice": Def(1, lambda s: random.choice(s)),
+    "rnd-float": Def(0, lambda: random.random()),
+    "rnd-int": Def(1, lambda n: random.randrange(n)),
+    "sym?": Def(1, lambda a: isinstance(a, str)),
+    "tl": Def(1, lambda a: a[1:]),
 }
 
 
