@@ -1,4 +1,5 @@
 import inspect
+import math
 import operator
 import random
 
@@ -224,61 +225,53 @@ def comp_expr(a, code):
     return a
 
 
-def comp():
-    pass
-
-
-# interpreter
 def err(s):
     raise Exception(s)
 
 
-def pr(a):
-    print(a, end="")
+class Fn:
+    def __init__(self, prim=None):
+        self.prim = prim
 
 
-def prn(a):
-    print(a)
-
-
-class Def:
-    def __init__(self, arity, val):
-        self.arity = arity
-        self.val = val
-
-
-# https://docs.python.org/3/library/operator.html
-defs = {
-    "*": Def(2, operator.mul),
-    "+": Def(2, operator.add),
-    "-": Def(2, operator.sub),
-    "/": Def(2, operator.truediv),
-    "<": Def(2, operator.lt),
-    "<=": Def(2, operator.le),
-    "==": Def(2, operator.eq),
-    "at": Def(2, lambda a, b: a[int(b)]),
-    "cons": Def(2, lambda a, b: (a,) + b),
-    "div": Def(2, operator.floordiv),
-    "err": Def(1, err),
-    "float?": Def(1, lambda a: isinstance(a, float)),
-    "hd": Def(1, lambda a: a[0]),
-    "int?": Def(1, lambda a: isinstance(a, int)),
-    "len": Def(1, lambda a: len(a)),
-    "list?": Def(1, lambda a: isinstance(a, tuple)),
-    "mod": Def(2, operator.mod),
-    "neg": Def(1, operator.neg),
-    "not": Def(1, operator.not_),
-    "pow": Def(2, operator.pow),
-    "pr": Def(1, pr),
-    "prn": Def(1, prn),
-    "rnd-choice": Def(1, lambda s: random.choice(s)),
-    "rnd-float": Def(0, lambda: random.random()),
-    "rnd-int": Def(1, lambda n: random.randrange(n)),
-    "sym?": Def(1, lambda a: isinstance(a, str)),
-    "tl": Def(1, lambda a: a[1:]),
+fns = {
+    "*": Fn(operator.mul),
+    "+": Fn(operator.add),
+    "-": Fn(operator.sub),
+    "/": Fn(operator.truediv),
+    "<": Fn(operator.lt),
+    "<=": Fn(operator.le),
+    "==": Fn(operator.eq),
+    "at": Fn(lambda a, b: a[int(b)]),
+    "cons": Fn(lambda a, b: (a,) + b),
+    "div": Fn(operator.floordiv),
+    "err": Fn(err),
+    "sqrt": Fn(math.sqrt),
+    "float?": Fn(lambda a: isinstance(a, float)),
+    "hd": Fn(lambda a: a[0]),
+    "int?": Fn(lambda a: isinstance(a, int)),
+    "len": Fn(lambda a: len(a)),
+    "list?": Fn(lambda a: isinstance(a, tuple)),
+    "mod": Fn(operator.mod),
+    "neg": Fn(operator.neg),
+    "not": Fn(operator.not_),
+    "pow": Fn(operator.pow),
+    "choice": Fn(random.choice),
+    "random": Fn(random.random),
+    "randrange": Fn(lambda n: random.randrange(int(n))),
+    "sym?": Fn(lambda a: isinstance(a, str)),
+    "tl": Fn(lambda a: a[1:]),
 }
 
 
+def comp(name, params, body):
+    fn = Fn()
+    fn.code = []
+    comp_expr(("do",) + body, fn.code)
+    fns[name] = fn
+
+
+# interpreter
 class Break(Exception):
     pass
 

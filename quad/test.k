@@ -53,7 +53,7 @@
   (==
     (rnd-search
       (\ ()
-        (rnd-int 5))
+        (randrange 5))
       (\ (a)
         (== a 2)))
     2))
@@ -62,7 +62,7 @@
     0
     (rnd-search-best
       (\ ()
-        (rnd-int 5))
+        (randrange 5))
       (\ (a)
         a))
     4))
