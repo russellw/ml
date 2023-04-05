@@ -361,7 +361,7 @@ main = []
 for filename in ("etc.k", "test.k"):
     for a in parse():
         if a[0] == "fn":
-            comp(a[1], [2], a[3:])
+            comp(a[1], a[2], a[3:])
             continue
         main.append(a)
 main = tuple(main)
