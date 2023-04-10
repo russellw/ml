@@ -33,20 +33,6 @@ class Grid:
     def popcount(self):
         return len(self.data)
 
-    def new_cell(self, x, y):
-        d = self.data
-        n = (
-            ((x - 1, y - 1) in d)
-            + ((x - 1, y) in d)
-            + ((x - 1, y + 1) in d)
-            + ((x, y - 1) in d)
-            + ((x, y + 1) in d)
-            + ((x + 1, y - 1) in d)
-            + ((x + 1, y) in d)
-            + ((x + 1, y + 1) in d)
-        )
-        return n == 3 or n == 2 and self[x, y]
-
     def __repr__(self):
         x0, y0, x1, y1 = self.bound()
         return f"{x0},{y0} -> {x1},{y1}"
@@ -70,10 +56,22 @@ class Grid:
             y0 -= 1
             x1 += 1
             y1 += 1
+
+            d = self.data
             new = set()
             for y in range(y0, y1):
                 for x in range(x0, x1):
-                    if self.new_cell(x, y):
+                    n = (
+                        ((x - 1, y - 1) in d)
+                        + ((x - 1, y) in d)
+                        + ((x - 1, y + 1) in d)
+                        + ((x, y - 1) in d)
+                        + ((x, y + 1) in d)
+                        + ((x + 1, y - 1) in d)
+                        + ((x + 1, y) in d)
+                        + ((x + 1, y + 1) in d)
+                    )
+                    if n == 3 or n == 2 and self[x, y]:
                         new.add((x, y))
             self.data = new
 
