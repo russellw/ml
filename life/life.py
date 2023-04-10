@@ -5,23 +5,23 @@ import random
 
 class Grid:
     def __init__(self):
-        self.data = set()
+        self.d = set()
 
     def __setitem__(self, xy, c):
         if c:
-            self.data.add(xy)
+            self.d.add(xy)
         else:
-            self.data.discard(xy)
+            self.d.discard(xy)
 
     def __getitem__(self, xy):
-        return xy in self.data
+        return xy in self.d
 
     def bound(self):
-        if not self.data:
+        if not self.d:
             return 0, 0, 0, 0
-        x0, y0 = next(iter(self.data))
+        x0, y0 = next(iter(self.d))
         x1, y1 = x0, y0
-        for x, y in self.data:
+        for x, y in self.d:
             x0 = min(x0, x)
             y0 = min(y0, y)
             x1 = max(x, x1)
@@ -31,13 +31,13 @@ class Grid:
         return x0, y0, x1, y1
 
     def popcount(self):
-        return len(self.data)
+        return len(self.d)
 
     def __repr__(self):
         x0, y0, x1, y1 = self.bound()
         return f"{x0},{y0} -> {x1},{y1}"
 
-    def get_data(self, *b):
+    def data(self, *b):
         if not b:
             b = self.bound()
         x0, y0, x1, y1 = b
@@ -57,7 +57,7 @@ class Grid:
             x1 += 1
             y1 += 1
 
-            d = self.data
+            d = self.d
 
             new = set()
             for y in range(y0, y1):
@@ -76,7 +76,7 @@ class Grid:
                     )
                     if n == 3 or n == 2 and (x, y) in d:
                         new.add((x, y))
-            self.data = new
+            self.d = new
 
 
 def read_rle(file):
@@ -202,8 +202,8 @@ if __name__ == "__main__":
     g.run()
     assert g.popcount() == 4
     assert g.bound() == (0, 0, 2, 2)
-    assert g.get_data() == [[1, 1], [1, 1]]
-    assert g.get_data(0, 0, 3, 3) == [[1, 1, 0], [1, 1, 0], [0, 0, 0]]
+    assert g.data() == [[1, 1], [1, 1]]
+    assert g.data(0, 0, 3, 3) == [[1, 1, 0], [1, 1, 0], [0, 0, 0]]
 
     parser = argparse.ArgumentParser()
     parser.add_argument(

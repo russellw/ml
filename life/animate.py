@@ -23,11 +23,17 @@ if args.seed is not None:
 size = args.size
 
 x0 = args.x
-if x0 is None:
-    x0 = -(size // 2)
 y0 = args.y
-if y0 is None:
-    y0 = -(size // 2)
+if args.rand is None:
+    if x0 is None:
+        x0 = -(size // 2)
+    if y0 is None:
+        y0 = -(size // 2)
+else:
+    if x0 is None:
+        x0 = 0
+    if y0 is None:
+        y0 = 0
 
 x1 = x0 + size
 y1 = y0 + size
@@ -41,11 +47,11 @@ if args.file:
 
 def update(frame):
     g.run()
-    img.set_data(g.get_data(x0, y0, x1, y1))
+    img.set_data(g.data(x0, y0, x1, y1))
     return img
 
 
 fig, ax = plt.subplots()
-img = ax.imshow(g.get_data(x0, y0, x1, y1), interpolation="nearest")
+img = ax.imshow(g.data(x0, y0, x1, y1), interpolation="nearest")
 ani = animation.FuncAnimation(fig, update, interval=0)
 plt.show()
