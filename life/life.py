@@ -35,7 +35,7 @@ class Grid:
         n = 0
         for y2 in range(y - 1, y + 2):
             for x2 in range(x - 1, x + 2):
-                if x2 or y2:
+                if x2 != x or y2 != y:
                     n += self[x2, y2]
         return n == 3 or n == 2 and self[x, y]
 
