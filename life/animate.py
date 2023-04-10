@@ -22,36 +22,34 @@ if args.seed is not None:
 
 size = args.size
 
+origin = -(size // 2)
+if args.rand:
+    origin = 0
 x0 = args.x
 y0 = args.y
-if args.rand is None:
-    if x0 is None:
-        x0 = -(size // 2)
-    if y0 is None:
-        y0 = -(size // 2)
-else:
-    if x0 is None:
-        x0 = 0
-    if y0 is None:
-        y0 = 0
+if x0 is None:
+    x0 = origin
+if y0 is None:
+    y0 = origin
 
 x1 = x0 + size
 y1 = y0 + size
 
-g = None
+a = None
 if args.rand is not None:
-    g = rand(size, args.density)
+    a = rand(size, args.density)
 if args.file:
-    g = read(args.file)
+    a = read(args.file)
 
 
 def update(frame):
-    g.run()
-    img.set_data(g.data(x0, y0, x1, y1))
+    global a
+    a = run(a)
+    img.set_data(matrix(a, x0, y0, x1, y1))
     return img
 
 
 fig, ax = plt.subplots()
-img = ax.imshow(g.data(x0, y0, x1, y1), interpolation="nearest")
+img = ax.imshow(matrix(a, x0, y0, x1, y1), interpolation="nearest")
 ani = animation.FuncAnimation(fig, update, interval=0)
 plt.show()
