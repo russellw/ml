@@ -1,77 +1,35 @@
 import random
 
 
-def idx(self, x0, y0, x1, y1, x, y):
-    x -= x0
-    y -= y0
-    width = x1 - x0
-    return y * width + x
-
-
 class Grid:
     def __init__(self):
-        self.x0 = 0
-        self.y0 = 0
-        self.x1 = 0
-        self.y1 = 0
-        self.data = []
-        self.check()
+        self.data = set()
+
+    def __setitem__(self, xy, c):
+        if c:
+            self.data.add(xy)
+        else:
+            self.data.discard(xy)
 
     def __getitem__(self, x, y):
-        if not (self.x0 <= x < self.x1) or not (self.y0 <= y < self.y1):
-            return 0
-        return self.data[idx(self.x0, self.y0, self.x1, self.y1, x, y)]
-
-    def occupied_y(self, y):
-        for x in range(self.x0, self.x1):
-            if self[x, y]:
-                return True
-
-    def occupied_x(self, x):
-        for y in range(self.y0, self.y1):
-            if self[x, y]:
-                return True
+        return (x, y) in self.data
 
     def bound(self):
-        x0 = self.x0
-        while x0 < self.x1 and not self.occupied_x(x0):
-            x0 += 1
-
-        x1 = self.x1
-        while x0 < x1 and not self.occupied_x(x1 - 1):
-            x1 -= 1
-
-        y0 = self.y0
-        while y0 < self.y1 and not self.occupied_y(y0):
-            y0 += 1
-
-        y1 = self.y1
-        while y0 < y1 and not self.occupied_y(y1 - 1):
-            y1 -= 1
-
+        if not self.data:
+            return 0, 0, 0, 0
+        x0, y0 = next(iter(self.data))
+        x1, y1 = x0, y0
+        for (x, y) in self.data:
+            x0 = min(x0, x)
+            y0 = min(y0, y)
+            x1 = max(x, x1)
+            y1 = max(y, y1)
+        x1 += 1
+        y1 += 1
         return x0, y0, x1, y1
 
-    def expand(self):
-        width = self.x1 - self.x0
-        if occupied_y(self.y0):
-            self.y0 -= 1
-            self.data = [0] * width + self.data
-        if occupied_y(self.y1 - 1):
-            self.y1 += 1
-            self.data += [0] * width
-
-        height = self.y1 - self.y0
-        if occupied_x(self.x0):
-            self.x0 -= 1
-            self.data = [0] * height + self.data
-        if occupied_y(self.y1 - 1):
-            self.y1 += 1
-            self.data += [0] * height
-
-        self.check()
-
     def popcount(self):
-        return sum(self.data)
+        return len(self.data)
 
     def new_cell(self, x, y):
         n = 0
@@ -83,43 +41,13 @@ class Grid:
 
     def run(self, steps=1):
         for step in range(steps):
-            self.check()
-
-            # current size
-            x0 = self.x0
-            y0 = self.y0
-            x1 = self.x1
-            y1 = self.y1
-
-            # expand north
-            for x in range(self.x0 + 1, self.x1 - 1):
-                if self.new_cell(x, self.y0 - 1):
-                    y0 -= 1
-                    break
-
-            # expand south
-            for x in range(self.x0 + 1, self.x1 - 1):
-                if self.new_cell(x, self.y1):
-                    y1 += 1
-                    break
-
-            # expand west
-            for x in range(self.x0 + 1, self.x1 - 1):
-                if self.new_cell(x, self.y0 - 1):
-                    y0 -= 1
-                    break
-
-            new = [0] * len(self.data)
-            for y in range(self.y0, self.y1):
-                for x in range(self.x0, self.x1):
-                    new[idx(self.x0, self.y0, self.x1, self.y1, x, y)] = self.new_cell(
-                        x, y
-                    )
+            x0, y0, x1, y1 = self.bound()
+            new = set()
+            for y in range(y0 - 1, y1 + 1):
+                for x in range(x0 - 1, x1 + 1):
+                    if self.new_cell(x, y):
+                        new.add((x, y))
             self.data = new
-            self.expand()
-
-    def check(self):
-        assert (self.x1 - self.x0) * (self.y1 - self.y0) == len(self.data)
 
 
 def randgrid(size):
@@ -134,3 +62,4 @@ if __name__ == "__main__":
     assert g.popcount() == 0
 
     g[0, 0] = 1
+    assert g.popcount() == 1
