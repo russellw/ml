@@ -34,11 +34,17 @@ class Grid:
         return len(self.data)
 
     def new_cell(self, x, y):
-        n = 0
-        for y2 in range(y - 1, y + 2):
-            for x2 in range(x - 1, x + 2):
-                if x2 != x or y2 != y:
-                    n += self[x2, y2]
+        d = self.data
+        n = (
+            ((x - 1, y - 1) in d)
+            + ((x - 1, y) in d)
+            + ((x - 1, y + 1) in d)
+            + ((x, y - 1) in d)
+            + ((x, y + 1) in d)
+            + ((x + 1, y - 1) in d)
+            + ((x + 1, y) in d)
+            + ((x + 1, y + 1) in d)
+        )
         return n == 3 or n == 2 and self[x, y]
 
     def __repr__(self):
