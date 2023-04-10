@@ -59,6 +59,52 @@ class Grid:
             self.data = new
 
 
+def read_rle(file):
+    s = open(file).read()
+    i = 0
+    x = 0
+    y = 0
+    g = Grid()
+    while i < len(s):
+        # comment
+        if s[i] in "#x":
+            while s[i] != "\n":
+                i += 1
+
+        # space
+        if s[i].isspace():
+            i += 1
+            continue
+
+        # end
+        if s[i] == "!":
+            break
+
+        # run count
+        n = 1
+        if s[i].isdigit():
+            j = i
+            while s[i].isdigit():
+                i += 1
+            n = int(s[j:i])
+
+        # tag
+        t = s[i]
+        i += 1
+        if t == "b":
+            x += n
+        elif t == "o":
+            for j in range(n):
+                g[x, y] = 1
+                x += 1
+        elif t == "$":
+            x = 0
+            y += n
+        else:
+            raise Exception(t)
+    return g
+
+
 def randgrid(size, density=0.5):
     g = Grid()
     for y in range(size):
@@ -110,6 +156,7 @@ if __name__ == "__main__":
     parser.add_argument("-g", "--steps", help="number of steps", type=int, default=1000)
     parser.add_argument("-r", "--rand", help="random pattern size", type=int)
     parser.add_argument("-s", "--seed", help="random number seed", type=int)
+    parser.add_argument("file", nargs="?")
     args = parser.parse_args()
 
     if args.seed is not None:
@@ -118,6 +165,8 @@ if __name__ == "__main__":
     g = None
     if args.rand is not None:
         g = randgrid(args.rand, args.density)
+    if args.file:
+        g = read_rle(args.file)
     if g:
         g.run(args.steps)
         prn(g)

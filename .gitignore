@@ -13,3 +13,5 @@ bin/
 data/
 obj/
 *.log
+*.rle
+*.cells
