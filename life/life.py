@@ -3,80 +3,60 @@ import os
 import random
 
 
-class Grid:
-    def __init__(self):
-        self.d = set()
+def bound(a):
+    if not a:
+        return 0, 0, 0, 0
+    x0, y0 = next(iter(a))
+    x1, y1 = x0, y0
+    for x, y in a:
+        x0 = min(x0, x)
+        y0 = min(y0, y)
+        x1 = max(x, x1)
+        y1 = max(y, y1)
+    return x0, y0, x1 + 1, y1 + 1
 
-    def __setitem__(self, xy, c):
-        if c:
-            self.d.add(xy)
-        else:
-            self.d.discard(xy)
 
-    def __getitem__(self, xy):
-        return xy in self.d
+def matrix(a, *q):
+    if not q:
+        q = bound(a)
+    x0, y0, x1, y1 = q
 
-    def bound(self):
-        if not self.d:
-            return 0, 0, 0, 0
-        x0, y0 = next(iter(self.d))
-        x1, y1 = x0, y0
-        for x, y in self.d:
-            x0 = min(x0, x)
-            y0 = min(y0, y)
-            x1 = max(x, x1)
-            y1 = max(y, y1)
+    w = []
+    for y in range(y0, y1):
+        v = []
+        for x in range(x0, x1):
+            v.append((x, y) in a)
+        w.append(v)
+    return w
+
+
+def run(a, steps=1):
+    for step in range(steps):
+        x0, y0, x1, y1 = bound(a)
+        x0 -= 1
+        y0 -= 1
         x1 += 1
         y1 += 1
-        return x0, y0, x1, y1
 
-    def popcount(self):
-        return len(self.d)
-
-    def __repr__(self):
-        x0, y0, x1, y1 = self.bound()
-        return f"{x0},{y0} -> {x1},{y1}"
-
-    def data(self, *b):
-        if not b:
-            b = self.bound()
-        x0, y0, x1, y1 = b
-        q = []
+        b = set()
         for y in range(y0, y1):
-            r = []
+            y_minus_1 = y - 1
+            y_plus_1 = y + 1
             for x in range(x0, x1):
-                r.append(self[x, y])
-            q.append(r)
-        return q
-
-    def run(self, steps=1):
-        for step in range(steps):
-            x0, y0, x1, y1 = self.bound()
-            x0 -= 1
-            y0 -= 1
-            x1 += 1
-            y1 += 1
-
-            d = self.d
-
-            new = set()
-            for y in range(y0, y1):
-                y_minus_1 = y - 1
-                y_plus_1 = y + 1
-                for x in range(x0, x1):
-                    n = (
-                        ((x - 1, y_minus_1) in d)
-                        + ((x - 1, y) in d)
-                        + ((x - 1, y_plus_1) in d)
-                        + ((x, y_minus_1) in d)
-                        + ((x, y_plus_1) in d)
-                        + ((x + 1, y_minus_1) in d)
-                        + ((x + 1, y) in d)
-                        + ((x + 1, y_plus_1) in d)
-                    )
-                    if n == 3 or n == 2 and (x, y) in d:
-                        new.add((x, y))
-            self.d = new
+                n = (
+                    ((x - 1, y_minus_1) in a)
+                    + ((x - 1, y) in a)
+                    + ((x - 1, y_plus_1) in a)
+                    + ((x, y_minus_1) in a)
+                    + ((x, y_plus_1) in a)
+                    + ((x + 1, y_minus_1) in a)
+                    + ((x + 1, y) in a)
+                    + ((x + 1, y_plus_1) in a)
+                )
+                if n == 3 or n == 2 and (x, y) in a:
+                    b.add((x, y))
+        a = b
+    return a
 
 
 def read_rle(file):
@@ -84,7 +64,7 @@ def read_rle(file):
     i = 0
     x = 0
     y = 0
-    g = Grid()
+    a = set()
     while i < len(s):
         # comment
         if s[i] in "#x":
@@ -115,14 +95,14 @@ def read_rle(file):
             x += n
         elif t == "o":
             for j in range(n):
-                g[x, y] = 1
+                a.add((x, y))
                 x += 1
         elif t == "$":
             x = 0
             y += n
         else:
             raise Exception(t)
-    return g
+    return a
 
 
 def read(file):
@@ -136,7 +116,7 @@ def read(file):
 
 def read_plaintext(file):
     y = 0
-    g = Grid()
+    a = set()
     for s in open(file).readlines():
         # comment
         if s.startswith("!"):
@@ -151,29 +131,29 @@ def read_plaintext(file):
             if c == ".":
                 pass
             elif c == "O":
-                g[x, y] = 1
+                a.add((x, y))
             else:
                 raise Exception(s)
             x += 1
         y += 1
-    return g
+    return a
 
 
 def randgrid(size, density=0.5):
-    g = Grid()
+    a = set()
     for y in range(size):
         for x in range(size):
             if random.random() < density:
-                g[x, y] = 1
-    return g
+                a.add((x, y))
+    return a
 
 
-def prn(g):
-    print(g)
-    x0, y0, x1, y1 = g.bound()
+def prn(a):
+    x0, y0, x1, y1 = bound(a)
+    print(f"{x0},{y0} -> {x1},{y1}")
     for y in range(y0, y1):
         for x in range(x0, x1):
-            if g[x, y]:
+            if (x, y) in a:
                 print("O", end=" ")
             else:
                 print(".", end=" ")
@@ -182,28 +162,24 @@ def prn(g):
 
 
 if __name__ == "__main__":
-    g = Grid()
-    assert g.popcount() == 0
+    a = set()
+    a.add((0, 0))
+    assert bound(a) == (0, 0, 1, 1)
 
-    g[0, 0] = 1
-    assert g.popcount() == 1
-    assert g.bound() == (0, 0, 1, 1)
+    a = run(a)
+    assert len(a) == 0
+    assert bound(a) == (0, 0, 0, 0)
 
-    g.run()
-    assert g.popcount() == 0
-    assert g.bound() == (0, 0, 0, 0)
+    a.add((0, 0))
+    a.add((0, 1))
+    a.add((1, 0))
+    assert bound(a) == (0, 0, 2, 2)
 
-    g[0, 0] = 1
-    g[0, 1] = 1
-    g[1, 0] = 1
-    assert g.popcount() == 3
-    assert g.bound() == (0, 0, 2, 2)
-
-    g.run()
-    assert g.popcount() == 4
-    assert g.bound() == (0, 0, 2, 2)
-    assert g.data() == [[1, 1], [1, 1]]
-    assert g.data(0, 0, 3, 3) == [[1, 1, 0], [1, 1, 0], [0, 0, 0]]
+    a = run(a)
+    assert len(a) == 4
+    assert bound(a) == (0, 0, 2, 2)
+    assert matrix(a) == [[1, 1], [1, 1]]
+    assert matrix(a, 0, 0, 3, 3) == [[1, 1, 0], [1, 1, 0], [0, 0, 0]]
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -218,11 +194,11 @@ if __name__ == "__main__":
     if args.seed is not None:
         random.seed(args.seed)
 
-    g = None
+    a = None
     if args.rand is not None:
-        g = randgrid(args.rand, args.density)
+        a = randgrid(args.rand, args.density)
     if args.file:
-        g = read(args.file)
-    if g:
-        g.run(args.steps)
-        prn(g)
+        a = read(args.file)
+    if a:
+        a = run(a, args.steps)
+        prn(a)
