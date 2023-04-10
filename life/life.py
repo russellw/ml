@@ -58,6 +58,7 @@ class Grid:
             y1 += 1
 
             d = self.data
+
             new = set()
             for y in range(y0, y1):
                 y_minus_1 = y - 1
