@@ -1,4 +1,5 @@
 import argparse
+import os
 import random
 
 
@@ -42,7 +43,7 @@ class Grid:
 
     def __repr__(self):
         x0, y0, x1, y1 = self.bound()
-        return f"{x0,y0} -> {x1,y1}"
+        return f"{x0},{y0} -> {x1},{y1}"
 
     def run(self, steps=1):
         for step in range(steps):
@@ -102,6 +103,40 @@ def read_rle(file):
             y += n
         else:
             raise Exception(t)
+    return g
+
+
+def read(file):
+    ext = os.path.splitext(file)[1]
+    if ext == ".cells":
+        return read_plaintext(file)
+    if ext == ".rle":
+        return read_rle(file)
+    raise Exception(file)
+
+
+def read_plaintext(file):
+    y = 0
+    g = Grid()
+    for s in open(file).readlines():
+        # comment
+        if s.startswith("!"):
+            continue
+
+        # cells
+        x = 0
+        for c in s:
+            if c.isspace():
+                continue
+
+            if c == ".":
+                pass
+            elif c == "O":
+                g[x, y] = 1
+            else:
+                raise Exception(s)
+            x += 1
+        y += 1
     return g
 
 
@@ -166,7 +201,7 @@ if __name__ == "__main__":
     if args.rand is not None:
         g = randgrid(args.rand, args.density)
     if args.file:
-        g = read_rle(args.file)
+        g = read(args.file)
     if g:
         g.run(args.steps)
         prn(g)
