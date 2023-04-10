@@ -11,15 +11,15 @@ class Grid:
         else:
             self.data.discard(xy)
 
-    def __getitem__(self, x, y):
-        return (x, y) in self.data
+    def __getitem__(self, xy):
+        return xy in self.data
 
     def bound(self):
         if not self.data:
             return 0, 0, 0, 0
         x0, y0 = next(iter(self.data))
         x1, y1 = x0, y0
-        for (x, y) in self.data:
+        for x, y in self.data:
             x0 = min(x0, x)
             y0 = min(y0, y)
             x1 = max(x, x1)
@@ -42,9 +42,13 @@ class Grid:
     def run(self, steps=1):
         for step in range(steps):
             x0, y0, x1, y1 = self.bound()
+            x0 -= 1
+            y0 -= 1
+            x1 += 1
+            y1 += 1
             new = set()
-            for y in range(y0 - 1, y1 + 1):
-                for x in range(x0 - 1, x1 + 1):
+            for y in range(y0, y1):
+                for x in range(x0, x1):
                     if self.new_cell(x, y):
                         new.add((x, y))
             self.data = new
@@ -57,9 +61,37 @@ def randgrid(size):
     return Grid(rows)
 
 
+def prn(g):
+    print(g)
+    x0, y0, x1, y1 = g.bound()
+    for y in range(y0, y1):
+        for x in range(x0, x1):
+            if g[x, y]:
+                print("O", end=" ")
+            else:
+                print(".", end=" ")
+        print()
+    print()
+
+
 if __name__ == "__main__":
     g = Grid()
     assert g.popcount() == 0
 
     g[0, 0] = 1
     assert g.popcount() == 1
+    assert g.bound() == (0, 0, 1, 1)
+
+    g.run()
+    assert g.popcount() == 0
+    assert g.bound() == (0, 0, 0, 0)
+
+    g[0, 0] = 1
+    g[0, 1] = 1
+    g[1, 0] = 1
+    assert g.popcount() == 3
+    assert g.bound() == (0, 0, 2, 2)
+
+    g.run()
+    assert g.popcount() == 4
+    assert g.bound() == (0, 0, 2, 2)
