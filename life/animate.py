@@ -13,7 +13,7 @@ parser.add_argument("-r", "--rand", help="random pattern", action="store_true")
 parser.add_argument("-s", "--seed", help="random number seed", type=int)
 parser.add_argument("-x", help="origin X coordinate", type=int)
 parser.add_argument("-y", help="origin Y coordinate", type=int)
-parser.add_argument("-z", "--size", help="grid size", type=int, default=256)
+parser.add_argument("-z", "--size", help="grid size", type=int, default=400)
 parser.add_argument("file", nargs="?")
 args = parser.parse_args()
 
