@@ -45,8 +45,10 @@ class Grid:
         x0, y0, x1, y1 = self.bound()
         return f"{x0},{y0} -> {x1},{y1}"
 
-    def get_data(self):
-        x0, y0, x1, y1 = self.bound()
+    def get_data(self, *b):
+        if not b:
+            b = self.bound()
+        x0, y0, x1, y1 = b
         q = []
         for y in range(y0, y1):
             r = []
@@ -194,6 +196,7 @@ if __name__ == "__main__":
     assert g.popcount() == 4
     assert g.bound() == (0, 0, 2, 2)
     assert g.get_data() == [[1, 1], [1, 1]]
+    assert g.get_data(0, 0, 3, 3) == [[1, 1, 0], [1, 1, 0], [0, 0, 0]]
 
     parser = argparse.ArgumentParser()
     parser.add_argument(

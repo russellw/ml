@@ -2,40 +2,38 @@ import argparse
 
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
+
 from life import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "-d", "--density", help="density of random grid", type=float, default=0.5
 )
-parser.add_argument("-g", "--steps", help="number of steps", type=int, default=1000)
-parser.add_argument("-r", "--rand", help="random pattern size", type=int)
+parser.add_argument("-r", "--rand", help="random pattern", action="store_true")
 parser.add_argument("-s", "--seed", help="random number seed", type=int)
+parser.add_argument("-z", "--size", help="grid size", type=int, default=256)
 parser.add_argument("file", nargs="?")
 args = parser.parse_args()
 
 if args.seed is not None:
     random.seed(args.seed)
 
+size = args.size
+
 g = None
 if args.rand is not None:
-    g = randgrid(args.rand, args.density)
+    g = randgrid(size, args.density)
 if args.file:
     g = read(args.file)
 
-size=100
 
 def update(frame):
     g.run()
-    data=g.get_data()
+    data = g.get_data(0, 0, size, size)
     img = ax.imshow(data, interpolation="nearest")
-    img.set_data(data)
-    return (img,)
+    return img
+
 
 fig, ax = plt.subplots()
-ani = animation.FuncAnimation(
-    fig,
-    update,
-    interval=100,
-)
+ani = animation.FuncAnimation(fig, update, interval=0)
 plt.show()
