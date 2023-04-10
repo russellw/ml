@@ -60,18 +60,20 @@ class Grid:
             d = self.data
             new = set()
             for y in range(y0, y1):
+                y_minus_1 = y - 1
+                y_plus_1 = y + 1
                 for x in range(x0, x1):
                     n = (
-                        ((x - 1, y - 1) in d)
+                        ((x - 1, y_minus_1) in d)
                         + ((x - 1, y) in d)
-                        + ((x - 1, y + 1) in d)
+                        + ((x - 1, y_plus_1) in d)
                         + ((x, y - 1) in d)
                         + ((x, y + 1) in d)
-                        + ((x + 1, y - 1) in d)
+                        + ((x + 1, y_minus_1) in d)
                         + ((x + 1, y) in d)
-                        + ((x + 1, y + 1) in d)
+                        + ((x + 1, y_plus_1) in d)
                     )
-                    if n == 3 or n == 2 and self[x, y]:
+                    if n == 3 or n == 2 and (x, y) in d:
                         new.add((x, y))
             self.data = new
 
