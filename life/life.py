@@ -1,3 +1,4 @@
+import argparse
 import random
 
 
@@ -39,6 +40,10 @@ class Grid:
                     n += self[x2, y2]
         return n == 3 or n == 2 and self[x, y]
 
+    def __repr__(self):
+        x0, y0, x1, y1 = self.bound()
+        return f"{x0,y0} -> {x1,y1}"
+
     def run(self, steps=1):
         for step in range(steps):
             x0, y0, x1, y1 = self.bound()
@@ -54,11 +59,13 @@ class Grid:
             self.data = new
 
 
-def randgrid(size):
-    rows = []
-    for i in range(size):
-        rows.append([random.randrange(2) for j in range(size)])
-    return Grid(rows)
+def randgrid(size, density=0.5):
+    g = Grid()
+    for y in range(size):
+        for x in range(size):
+            if random.random() < density:
+                g[x, y] = 1
+    return g
 
 
 def prn(g):
@@ -95,3 +102,22 @@ if __name__ == "__main__":
     g.run()
     assert g.popcount() == 4
     assert g.bound() == (0, 0, 2, 2)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-d", "--density", help="density of random grid", type=float, default=0.5
+    )
+    parser.add_argument("-g", "--steps", help="number of steps", type=int, default=1000)
+    parser.add_argument("-r", "--rand", help="random pattern size", type=int)
+    parser.add_argument("-s", "--seed", help="random number seed", type=int)
+    args = parser.parse_args()
+
+    if args.seed is not None:
+        random.seed(args.seed)
+
+    g = None
+    if args.rand is not None:
+        g = randgrid(args.rand, args.density)
+    if g:
+        g.run(args.steps)
+        prn(g)
