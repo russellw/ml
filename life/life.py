@@ -139,7 +139,7 @@ def read_plaintext(file):
     return a
 
 
-def randgrid(size, density=0.5):
+def rand(size, density=0.5):
     a = set()
     for y in range(size):
         for x in range(size):
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-d", "--density", help="density of random grid", type=float, default=0.5
     )
-    parser.add_argument("-g", "--steps", help="number of steps", type=int, default=1000)
+    parser.add_argument("-g", "--steps", help="number of steps", type=int, default=100)
     parser.add_argument("-r", "--rand", help="random pattern size", type=int)
     parser.add_argument("-s", "--seed", help="random number seed", type=int)
     parser.add_argument("file", nargs="?")
@@ -196,7 +196,7 @@ if __name__ == "__main__":
 
     a = None
     if args.rand is not None:
-        a = randgrid(args.rand, args.density)
+        a = rand(args.rand, args.density)
     if args.file:
         a = read(args.file)
     if a:

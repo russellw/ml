@@ -40,7 +40,7 @@ y1 = y0 + size
 
 g = None
 if args.rand is not None:
-    g = randgrid(size, args.density)
+    g = rand(size, args.density)
 if args.file:
     g = read(args.file)
 
