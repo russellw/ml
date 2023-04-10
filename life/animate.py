@@ -29,11 +29,11 @@ if args.file:
 
 def update(frame):
     g.run()
-    data = g.get_data(0, 0, size, size)
-    img = ax.imshow(data, interpolation="nearest")
+    img.set_data(g.get_data(0, 0, size, size))
     return img
 
 
 fig, ax = plt.subplots()
+img = ax.imshow(g.get_data(0, 0, size, size), interpolation="nearest")
 ani = animation.FuncAnimation(fig, update, interval=0)
 plt.show()
